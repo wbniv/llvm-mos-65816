@@ -4,15 +4,15 @@ Prepared September 28, 2026. This packet extracts the completed downstream optim
 
 ## Split series (current)
 
-This packet's destination was `26d7c2c1eebf`, with its own #321 extraction as patch 1. Its later patches (0063 and 0065, patches 2 and 3 below) now apply with `git am -3`, without conflicts, on the 16-commit [#321 split series](../../2026-09-30/split-320-321/README.md) at `06bc967d2668`. [`patches-split/`](patches-split/) holds the 16 split commits followed by those two patches.
+This packet's destination was `26d7c2c1eebf`, with its own #321 extraction as patch 1. Its later patches (0063 and 0065, patches 2 and 3 below) now apply with `git am -3`, without conflicts, on the 16-commit [#321 split series](../../2026-09-30/split-320-321/README.md) at `06bc967d2668`. [`patches-split/`](patches-split/) holds the 16 split commits followed by those two patches. On 2026‑09‑30 the split was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application) (#321‑1 and #321‑8), and this section records the rerun on the regenerated commits.
 
 | Check | Result |
 | --- | --- |
 | 0063 and 0065 on the split | Applied with `git am -3`, no conflicts |
-| Final tree | `c580f57d9040` |
+| Final tree | `cde019345d24` |
 | Round trip | Each of the 18 patches applied in order to `06bc967d2668` reproduces its commit's tree ([record](evidence/split-series.json)) |
-| MOS CodeGen + MC | 156 passed, 1 unsupported: the split's 153 plus 0065's three tests |
-| `llc` | sha256 `288617e72764…`; it differs from the previous candidate because the destination and the #321 extraction differ |
+| MOS CodeGen + MC | 158 passed, 1 unsupported: the split's 155 plus 0065's three tests |
+| `llc` | sha256 `0f7583ca279b…`; it differs from the previous candidate because the destination and the #321 extraction differ, and now also by the pressure-set change |
 
 The replay, runtime and loaded-pointer measurements below were taken on the `26d7c2c1eebf` series and have not been repeated on the split. Everything below this section is that dated record.
 

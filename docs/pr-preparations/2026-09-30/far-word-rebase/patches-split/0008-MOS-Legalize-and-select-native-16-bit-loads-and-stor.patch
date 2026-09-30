@@ -1,4 +1,4 @@
-From e43bae5fa46fcafabf716960a6d4f706d6508b51 Mon Sep 17 00:00:00 2001
+From c6337b5af8783d19e2365314ab8b65e2320a2de4 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 08/32] [MOS] Legalize and select native 16-bit loads and
@@ -8,24 +8,32 @@ Under +mos-a16, s16 G_LOAD and G_STORE are legalized before byte narrowing. An a
 
 Accesses stay on the byte path where the native form costs more: constant-valued stores, loads whose every use splits the value into bytes, stores of values built from bytes in the same block with no call or inline assembly in between, and indirect stores of an A:X argument. Atomic accesses remain a single operation.
 
+These are the first native values, and Ac16, Xc16 and Yc16 have no generated pressure sets, so MOSRegisterInfo now takes the subtarget and the optimization level and overrides the pressure-set hooks. Under +mos-a16, each native class counts toward its low byte's generated sets (Ac16 toward Ac's). Below -O3, the hooks also append the sets A16, X16 and Y16, each with a limit of 2, charged by the 16-bit register's byte units and by the classes inside it (Ac and Ac16 for A16). The scheduler, MachineLICM and MachineSink then see that an 8-bit value live across a 16-bit one competes for the same register. On the fixed input set at the end of this series, the appended sets save 78 bytes with +mos-a16 and 162 bytes with +mos-a16,+mos-xy16 at -Os, but cost about 0.2% of cycles at -O2 and -O3, so -O3 (CodeGenOptLevel::Aggressive) leaves them out. The choice is made once, when the subtarget is built, because RegisterClassInfo caches set limits per register info. Without +mos-a16 every hook returns the generated tables.
+
 Default-mode effect: none (fixed input set identical).
 
-Tests: a16-load-store.ll checks one rep/sep-bracketed word load and store for absolute, (zp) and (zp),y (runtime and constant index) addresses, and a constant store kept as two byte stores. a16-byte-store.ll and a16-indirect-byte-store.ll, which pin the byte-versus-native store decisions, need native arithmetic results next to the stores and land with it.
+Tests: a16-load-store.ll checks one rep/sep-bracketed word load and store for absolute, (zp) and (zp),y (runtime and constant index) addresses, and a constant store kept as two byte stores. a16-byte-store.ll and a16-indirect-byte-store.ll, which pin the byte-versus-native store decisions, need native arithmetic results next to the stores and land with it. native-width-pressure-opt-level.ll (assertions builds) checks the scheduler's pressure sets for a word copy: the A16 set at -O2, and only the low byte's sets at -O3.
 
-Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-load-store.ll`.
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-load-store.ll llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll`.
 
-Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort. Native-width pressure sets: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
 ---
  llvm/lib/Target/MOS/MOSInstrGISel.td          |  72 +++++
  .../lib/Target/MOS/MOSInstructionSelector.cpp | 211 ++++++++++++
  llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 300 +++++++++++++++++-
  llvm/lib/Target/MOS/MOSLegalizerInfo.h        |   5 +
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp       | 135 +++++++-
+ llvm/lib/Target/MOS/MOSRegisterInfo.h         |  28 +-
+ llvm/lib/Target/MOS/MOSSubtarget.cpp          |   2 +-
  llvm/test/CodeGen/MOS/a16-load-store.ll       |  89 ++++++
- 5 files changed, 664 insertions(+), 13 deletions(-)
+ .../MOS/native-width-pressure-opt-level.ll    |  30 ++
+ 9 files changed, 855 insertions(+), 17 deletions(-)
  create mode 100644 llvm/test/CodeGen/MOS/a16-load-store.ll
+ create mode 100644 llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
 index 70e8bb0d45b3..6764ef9a0627 100644
@@ -733,6 +741,240 @@ index 6c1f0987d982..b979eea6c2b4 100644
    bool selectAddressingMode(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
                              GLoadStore &MI) const;
    std::optional<MachineOperand>
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index d02c88c15874..efda8fdb4078 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -21,6 +21,7 @@
+ #include "MOSMachineFunctionInfo.h"
+ #include "MOSSubtarget.h"
+ #include "llvm/ADT/BitVector.h"
++#include "llvm/ADT/STLExtras.h"
+ #include "llvm/ADT/SmallSet.h"
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/CodeGen/LiveIntervals.h"
+@@ -46,10 +47,24 @@
+ 
+ using namespace llvm;
+ 
+-MOSRegisterInfo::MOSRegisterInfo()
++// The native 16-bit registers, in the order of their appended pressure sets.
++static constexpr MCPhysReg NativePressureRegs[] = {MOS::A16, MOS::X16,
++                                                   MOS::Y16};
++
++// The appended sets are left out at -O3 (CodeGenOptLevel::Aggressive), where
++// they cost speed. The decision is made once, here, because it has to hold for
++// the subtarget's lifetime: RegisterClassInfo caches the set limits per
++// register info, and the pressure trackers size their tables from
++// getNumRegPressureSets. The level does not change after construction: the
++// only TargetMachine::setOptLevel caller in codegen is SelectionDAGISel's
++// per-function optnone override, and MOS selects with GlobalISel only.
++MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
++                                 CodeGenOptLevel OptLevel)
+     : MOSGenRegisterInfo(/*RA=*/0, /*DwarfFlavor=*/0, /*EHFlavor=*/0,
+                          /*PC=*/0, /*HwMode=*/0),
+-      Imag8SymbolNames(new std::string[getNumRegs()]), Reserved(getNumRegs()) {
++      STI(STI), Imag8SymbolNames(new std::string[getNumRegs()]),
++      Reserved(getNumRegs()),
++      AppendNativePressureSets(OptLevel != CodeGenOptLevel::Aggressive) {
+   for (unsigned Reg : seq(0u, getNumRegs())) {
+     // Pointers are referred to by their low byte in the addressing modes that
+     // use them.
+@@ -73,6 +88,122 @@ MOSRegisterInfo::MOSRegisterInfo()
+ 
+   // Reserve one temporary register for use by register scavenger.
+   reserveAllSubregs(&Reserved, MOS::RS8);
++
++  // Build the native-width pressure-set lists; see getNumRegPressureSets.
++  auto Generated = [](const int *PSets) {
++    SmallVector<int, 8> L;
++    for (; *PSets != -1; ++PSets)
++      L.push_back(*PSets);
++    return L;
++  };
++  NativeClassPSets.resize(getNumRegClasses());
++  NativeUnitPSets.resize(getNumRegUnits());
++  const int NumGenerated = MOSGenRegisterInfo::getNumRegPressureSets();
++  for (unsigned I = 0; I < std::size(NativePressureRegs); ++I) {
++    const MCPhysReg Wide = NativePressureRegs[I];
++    const int PSet = NumGenerated + I;
++    // Each unit of the wide register counts toward its set.
++    if (AppendNativePressureSets) {
++      for (MCRegUnit Unit : regunits(Wide)) {
++        auto &L = NativeUnitPSets[static_cast<unsigned>(Unit)];
++        if (L.empty())
++          L = Generated(MOSGenRegisterInfo::getRegUnitPressureSets(Unit));
++        L.push_back(PSet);
++      }
++    }
++    // So does each class whose registers all lie within the wide register:
++    // its low byte's class (Ac, Xc, Yc) and its own class (Ac16, Xc16, Yc16).
++    // The latter has GeneratePressureSet = 0 and so no generated sets; it
++    // counts toward its low byte's sets, like the 8-bit register it contains,
++    // with or without the appended set.
++    const TargetRegisterClass *LoRC =
++        getMinimalPhysRegClass(getSubReg(Wide, MOS::sublo));
++    for (unsigned ID = 0; ID < getNumRegClasses(); ++ID) {
++      const TargetRegisterClass *RC = getRegClass(ID);
++      if (!RC->getNumRegs() || !all_of(*RC, [&](MCPhysReg Reg) {
++            return isSubRegisterEq(Wide, Reg);
++          }))
++        continue;
++      if (!AppendNativePressureSets && !RC->contains(Wide))
++        continue;
++      auto &L = NativeClassPSets[ID];
++      if (L.empty())
++        L = Generated(MOSGenRegisterInfo::getRegClassPressureSets(
++            RC->contains(Wide) ? LoRC : RC));
++      if (AppendNativePressureSets)
++        L.push_back(PSet);
++    }
++  }
++  for (auto &L : NativeClassPSets)
++    if (!L.empty())
++      L.push_back(-1);
++  for (auto &L : NativeUnitPSets)
++    if (!L.empty())
++      L.push_back(-1);
++}
++
++// Register pressure under native widths.
++//
++// Ac16, Xc16 and Yc16 set GeneratePressureSet = 0, so the generated pressure
++// sets are exactly those of the 8-bit register file: the opt-in 16-bit
++// registers leave MachineLICM, MachineSink and the scheduler unchanged for
++// every subtarget that doesn't enable them. Under +mos-a16 (and so +mos-xy16),
++// each native class counts toward its low byte's generated sets, and below
++// -O3 these hooks also append one set per 16-bit register, holding its two
++// byte units with a limit of 2. The 8-bit A, X or Y and the 16-bit register
++// that contains it count toward the same set, so the heuristics see that an
++// 8-bit value live across a 16-bit one competes for the same physical
++// register. That saves code size but costs cycles, so -O3 leaves it out.
++bool MOSRegisterInfo::hasNativePressureSets() const { return STI.hasAccum16(); }
++
++unsigned MOSRegisterInfo::getNumRegPressureSets() const {
++  unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
++  return hasNativePressureSets() && AppendNativePressureSets
++             ? N + std::size(NativePressureRegs)
++             : N;
++}
++
++const char *MOSRegisterInfo::getRegPressureSetName(unsigned Idx) const {
++  unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
++  if (Idx < N)
++    return MOSGenRegisterInfo::getRegPressureSetName(Idx);
++  return getName(NativePressureRegs[Idx - N]);
++}
++
++unsigned MOSRegisterInfo::getRegPressureSetLimit(const MachineFunction &MF,
++                                                 unsigned Idx) const {
++  unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
++  if (Idx < N)
++    return MOSGenRegisterInfo::getRegPressureSetLimit(MF, Idx);
++  auto Units = regunits(NativePressureRegs[Idx - N]);
++  return std::distance(Units.begin(), Units.end());
++}
++
++const TargetRegisterClass *
++MOSRegisterInfo::getLargestRegClassForRegPressureSet(unsigned Idx) const {
++  unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
++  if (Idx < N)
++    return MOSGenRegisterInfo::getLargestRegClassForRegPressureSet(Idx);
++  return getMinimalPhysRegClass(NativePressureRegs[Idx - N]);
++}
++
++const int *
++MOSRegisterInfo::getRegClassPressureSets(const TargetRegisterClass *RC) const {
++  if (hasNativePressureSets()) {
++    const auto &L = NativeClassPSets[RC->getID()];
++    if (!L.empty())
++      return L.data();
++  }
++  return MOSGenRegisterInfo::getRegClassPressureSets(RC);
++}
++
++const int *MOSRegisterInfo::getRegUnitPressureSets(MCRegUnit RegUnit) const {
++  if (hasNativePressureSets()) {
++    const auto &L = NativeUnitPSets[static_cast<unsigned>(RegUnit)];
++    if (!L.empty())
++      return L.data();
++  }
++  return MOSGenRegisterInfo::getRegUnitPressureSets(RegUnit);
+ }
+ 
+ const MCPhysReg *
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.h b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+index 4374d26d8f55..023252208c30 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.h
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+@@ -16,8 +16,10 @@
+ #include "MOSInstrCost.h"
+ 
+ #include "llvm/ADT/BitVector.h"
++#include "llvm/ADT/SmallVector.h"
+ #include "llvm/CodeGen/MachineOperand.h"
+ #include "llvm/CodeGen/TargetRegisterInfo.h"
++#include "llvm/Support/CodeGen.h"
+ 
+ #define GET_REGINFO_HEADER
+ #include "MOSGenRegisterInfo.inc"
+@@ -27,11 +29,24 @@ namespace llvm {
+ class MOSSubtarget;
+ 
+ class MOSRegisterInfo : public MOSGenRegisterInfo {
++  const MOSSubtarget &STI;
+   std::unique_ptr<std::string[]> Imag8SymbolNames;
+   BitVector Reserved;
+ 
++  // Whether native widths append the A16, X16 and Y16 pressure sets. Fixed at
++  // construction from the target machine's optimization level; see the
++  // constructor.
++  const bool AppendNativePressureSets;
++
++  // Pressure-set lists (-1 terminated) used under native widths, by register
++  // class ID and by register unit. An empty list defers to the generated one.
++  SmallVector<SmallVector<int, 8>, 0> NativeClassPSets;
++  SmallVector<SmallVector<int, 8>, 0> NativeUnitPSets;
++
++  bool hasNativePressureSets() const;
++
+ public:
+-  MOSRegisterInfo();
++  MOSRegisterInfo(const MOSSubtarget &STI, CodeGenOptLevel OptLevel);
+ 
+   const MCPhysReg *getCalleeSavedRegs(const MachineFunction *MF) const override;
+ 
+@@ -49,6 +64,17 @@ public:
+ 
+   unsigned getCSRCost(const MachineFunction &MF) const override;
+ 
++  // Native-width register pressure; see the comment on the implementation.
++  unsigned getNumRegPressureSets() const override;
++  const char *getRegPressureSetName(unsigned Idx) const override;
++  unsigned getRegPressureSetLimit(const MachineFunction &MF,
++                                  unsigned Idx) const override;
++  const TargetRegisterClass *
++  getLargestRegClassForRegPressureSet(unsigned Idx) const override;
++  const int *
++  getRegClassPressureSets(const TargetRegisterClass *RC) const override;
++  const int *getRegUnitPressureSets(MCRegUnit RegUnit) const override;
++
+   bool requiresRegisterScavenging(const MachineFunction &MF) const override {
+     // Saving/restoring to stack may require temporary registers.
+     return true;
+diff --git a/llvm/lib/Target/MOS/MOSSubtarget.cpp b/llvm/lib/Target/MOS/MOSSubtarget.cpp
+index 00453914f347..73b4f25636d3 100644
+--- a/llvm/lib/Target/MOS/MOSSubtarget.cpp
++++ b/llvm/lib/Target/MOS/MOSSubtarget.cpp
+@@ -37,7 +37,7 @@ using namespace llvm;
+ MOSSubtarget::MOSSubtarget(const Triple &TT, const std::string &CPU,
+                            const std::string &FS, const MOSTargetMachine &TM)
+     : MOSGenSubtargetInfo(TT, CPU, /* TuneCPU */ CPU, FS), InstrInfo(*this),
+-      RegInfo(), FrameLowering(),
++      RegInfo(*this, TM.getOptLevel()), FrameLowering(),
+       TLInfo(TM, initializeSubtargetDependencies(CPU, FS, TM)),
+       CallLoweringInfo(&TLInfo), Legalizer(*this),
+       InstSelector(createMOSInstructionSelector(TM, *this, RegBankInfo)),
 diff --git a/llvm/test/CodeGen/MOS/a16-load-store.ll b/llvm/test/CodeGen/MOS/a16-load-store.ll
 new file mode 100644
 index 000000000000..92d804cd5aa5
@@ -826,6 +1068,42 @@ index 000000000000..92d804cd5aa5
 +; CHECK:      stx g+1
 +; CHECK-NEXT: rts
 +  store i16 4660, ptr @g, align 1
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll b/llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll
+new file mode 100644
+index 000000000000..4294eaeed5df
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll
+@@ -0,0 +1,30 @@
++; REQUIRES: asserts
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -debug-only=machine-scheduler \
++; RUN:   < %s -o /dev/null 2>&1 | FileCheck %s --check-prefix=SETS
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O3 -debug-only=machine-scheduler \
++; RUN:   < %s -o /dev/null 2>&1 | FileCheck %s --check-prefix=NOSETS
++
++; Under +mos-a16, a 16-bit accumulator value counts toward the pressure sets of
++; its low byte, A. Below -O3, it and the 8-bit A also count toward an appended
++; A16 set with a limit of 2, so the heuristics see that an 8-bit value live
++; across a 16-bit one competes for the same register. That set saves code size
++; but costs cycles, so -O3 leaves it out.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++@g = global i16 0, align 1
++@h = global i16 0, align 1
++
++define void @copy_global_to_global() {
++; SETS:         Max Pressure: GPR_LSB=2 GPR_LSB_with_Pc=2 Anyi1=2 Anyi1_with_Pc=2 A16=2 {{$}}
++; SETS:         STAImag16 %{{[0-9]+}}:ac16
++; SETS:         Pressure Diff      : GPR_LSB 2    GPR_LSB_with_Pc 2    A16 2{{$}}
++; NOSETS-NOT:   A16{{[= ]}}
++; NOSETS:       Max Pressure: GPR_LSB=2 GPR_LSB_with_Pc=2 Anyi1=2 Anyi1_with_Pc=2 {{$}}
++; NOSETS:       STAImag16 %{{[0-9]+}}:ac16
++; NOSETS:       Pressure Diff      : GPR_LSB 2    GPR_LSB_with_Pc 2{{$}}
++; NOSETS-NOT:   A16{{[= ]}}
++  %v = load volatile i16, ptr @g, align 1
++  store volatile i16 %v, ptr @h, align 1
 +  ret void
 +}
 -- 

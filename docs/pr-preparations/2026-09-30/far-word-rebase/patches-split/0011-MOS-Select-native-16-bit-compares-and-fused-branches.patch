@@ -1,4 +1,4 @@
-From ebdd0900230fc715c11c76d691f6b0e5f3cbeff5 Mon Sep 17 00:00:00 2001
+From 9b471aa8df068e251307d1632e3dec30969eb9fe Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 11/32] [MOS] Select native 16-bit compares and fused branches
@@ -728,10 +728,10 @@ index e963285fe981..eda3c1950fa1 100644
      MI.eraseFromParent();
      break;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index d02c88c15874..bd90e7c881a7 100644
+index efda8fdb4078..ca45b5d5878e 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -395,11 +395,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
+@@ -526,11 +526,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
  
    int Idx = MI->getOperand(FIOperandNum).getIndex();
    int64_t Offset = MFI.getObjectOffset(Idx);

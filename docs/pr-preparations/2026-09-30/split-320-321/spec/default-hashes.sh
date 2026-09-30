@@ -18,7 +18,7 @@ C_LLC=/work/${LLC#$ROOT/}; C_OUT=/work/${OUT#$ROOT/}
 cd "$ROOT"
 dev/container.sh -- sh -c '
 set -eu
-ulimit -c 0
+ulimit -c 0; ulimit -v 2000000
 LLC=$1; OUT=$2; IN=/work/build/split-320-321/default-inputs
 T=$(mktemp -d)
 : > "$OUT.tmp"

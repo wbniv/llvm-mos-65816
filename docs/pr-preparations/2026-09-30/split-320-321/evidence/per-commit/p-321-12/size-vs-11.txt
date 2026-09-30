@@ -1,0 +1,2 @@
+mos6502: 54 inputs, bytes 278940 -> 279183 (delta 243), larger 12, smaller 3, excluded 36
+mosw65816: 78 inputs, bytes 290773 -> 290671 (delta -102), larger 0, smaller 17, excluded 12

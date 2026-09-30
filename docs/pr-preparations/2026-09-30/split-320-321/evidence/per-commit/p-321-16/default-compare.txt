@@ -1,0 +1,5 @@
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 87 identical, 3 asm differ, 0 object-only differ
+  asm mosw65816 tests/nonreentrant.ll: ['0', 'c4cb5fd7b6129790', '0', 'b0728d62d3c7dd03'] -> ['0', 'a29c7c8227f51b69', '0', '48d9ca81f48f194e']
+  asm mosw65816 tests/static-stack.ll: ['0', 'a794a206e8768fc1', '0', '3481eb1d6d63772e'] -> ['0', '5cccfa8fce7d32f7', '0', '87cd1e238e3812f9']
+  asm mosw65816 tests/zp-alloc.ll: ['0', '8b62db651eea7730', '0', 'f37d522c1186c77d'] -> ['0', 'efd97aa38f22ce43', '0', '24f1f2d1f613f6dd']

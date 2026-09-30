@@ -30,7 +30,7 @@ sha256sum "$SPLIT/build/bin/llc" | awk '{print $1}' > "$EV/llc.sha256"
 set +e
 dev/container.sh -v "$SPLIT/source":/work/build/register-exhaustion-src \
   -v "$SPLIT/build":/work/build/0029-cross-target-build -v "$EV":/work/ev -- \
-  sh -c 'ulimit -c 0; exec /work/build/0029-cross-target-build/bin/llvm-lit -v -o /work/ev/lit.json /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS /work/build/register-exhaustion-src/llvm/test/MC/MOS' \
+  sh -c 'ulimit -c 0; ulimit -v 2000000; exec timeout 3000 /work/build/0029-cross-target-build/bin/llvm-lit -v -o /work/ev/lit.json /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS /work/build/register-exhaustion-src/llvm/test/MC/MOS' \
   > "$EV/lit.log" 2>&1
 lrc=$?
 set -e
@@ -55,7 +55,7 @@ if [ -n "${PROBE_DIR:-}" ] && [ -d "$PROBE_DIR" ]; then
   set +e
   dev/container.sh -v "$SPLIT/source":/work/build/register-exhaustion-src \
     -v "$SPLIT/build":/work/build/0029-cross-target-build -- \
-    sh -c 'ulimit -c 0; exec /work/build/0029-cross-target-build/bin/llvm-lit -v /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/zz-probe /work/build/register-exhaustion-src/llvm/test/MC/MOS/zz-probe' \
+    sh -c 'ulimit -c 0; ulimit -v 2000000; exec timeout 3000 /work/build/0029-cross-target-build/bin/llvm-lit -v /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/zz-probe /work/build/register-exhaustion-src/llvm/test/MC/MOS/zz-probe' \
     > "$EV/probe-lit.log" 2>&1
   set -e
   rm -rf "$P" "$PM"

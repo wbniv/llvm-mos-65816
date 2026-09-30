@@ -1,4 +1,4 @@
-From f088a60da47127d58699bb1b0de9e55266ad1df5 Mon Sep 17 00:00:00 2001
+From 3721ab9a5c0e98e912f7055bf9dfe3ad8ba2e359 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:45:14 +0700
 Subject: [PATCH 17/32] Honor explicit address widths for constant operands

@@ -1,160 +1,166 @@
 {
  "destination": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
- "head": "874f40b8025b88248cf99affef8863b7c62966fa",
- "final_tree": "929f85df00ac64dbc5deaea210b0e7ac095b43cf",
+ "head": "5ce81a01e46512750440a191bcd65b01dfd54f28",
+ "final_tree": "6bd824516c0606cc7d27c09eb3e9d312f6095222",
  "all_intermediate_trees_match": true,
  "original_candidate": "980fe1f29381a212e585df81e537ed21bcfe4a68",
  "tree_delta_vs_original_candidate": [
   "M\tllvm/lib/Target/MOS/MOSFeatures.td",
+  "M\tllvm/lib/Target/MOS/MOSRegisterInfo.cpp",
+  "M\tllvm/lib/Target/MOS/MOSRegisterInfo.h",
+  "M\tllvm/lib/Target/MOS/MOSRegisterInfo.td",
+  "M\tllvm/lib/Target/MOS/MOSSubtarget.cpp",
   "A\tllvm/test/CodeGen/MOS/a16-accumulator-forms.mir",
   "A\tllvm/test/CodeGen/MOS/a16-load-store.ll",
   "A\tllvm/test/CodeGen/MOS/a16-small-add.ll",
   "A\tllvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir",
   "A\tllvm/test/CodeGen/MOS/native-spill-copy.mir",
+  "A\tllvm/test/CodeGen/MOS/native-width-default-pressure.ll",
+  "A\tllvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll",
   "A\tllvm/test/CodeGen/MOS/native-width-registers.mir",
   "A\tllvm/test/CodeGen/MOS/near-index-nowrap.ll",
   "A\tllvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
   "A\tllvm/test/CodeGen/MOS/xy16-index-forms.mir",
   "A\tllvm/test/MC/MOS/index-width-mapping-65816.s"
  ],
- "mos_suites": "PASS=155 UNSUPPORTED=1",
- "llc_sha256": "c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64",
+ "mos_suites": "PASS=157 UNSUPPORTED=1",
+ "llc_sha256": "aab70a21cb0484f3a70e79817ff903afa95a45ddd1f94d46d006f8ab469aa88d",
  "series": [
   {
    "patch": "patches-split/0001-MOS-Model-65816-native-width-registers-and-feature-g.patch",
-   "commit": "c38fa4cc5a602b3af84e4bdad085b4fcf751566a",
+   "commit": "45bc97d89c6a603008894622970ee2524fef68e7",
    "subject": "[MOS] Model 65816 native-width registers and feature gates",
-   "tree": "348a94e4c91972a3271990a79219af028a6c102f",
+   "tree": "02a2de002570380ea33a356473d14d2ee296abc7",
    "matches_commit_tree": true,
-   "sha256": "6eb2879a2e9b917b4164a7e6cda411588b42a62d1ac09b994f104ed61594370f"
+   "sha256": "8798561ae6ffc5cfee46a131e02d1a40e7f339482acf8ce248a315279a2fc800"
   },
   {
    "patch": "patches-split/0002-MOS-Define-16-bit-accumulator-instruction-forms.patch",
-   "commit": "1b52f2ece5ba9ec2a81bc77184a29b9a8001896d",
+   "commit": "793da9041cd3366b7b55a40af04144847c868f97",
    "subject": "[MOS] Define 16-bit accumulator instruction forms",
-   "tree": "7b9d26eecd38963342387be1e3c133bb9464edb6",
+   "tree": "068a8d67a5f1d882a43bdaf3e86c82f9c0fce0e6",
    "matches_commit_tree": true,
-   "sha256": "34e943f1adea45bf2ed1745e502946f4b505277ad3a7e658866a2d30fbaee465"
+   "sha256": "c166b3a16f2e93322c766624e79a8bb079470ea14ae94e9634158ca0088ea275"
   },
   {
    "patch": "patches-split/0003-MOS-Define-16-bit-index-instruction-forms-and-X-widt.patch",
-   "commit": "420e010ad26bf20502a24f776274d3f48b3d7fc0",
+   "commit": "2d64d3c841ff42ebf814f78f86da767aaec279b1",
    "subject": "[MOS] Define 16-bit index instruction forms and X-width requirements",
-   "tree": "d1b5cfc64a93fb08b0d0e142d4221adcead8f8c7",
+   "tree": "8182e78bb689991f7c1f5272eb50e84e2b1c6770",
    "matches_commit_tree": true,
-   "sha256": "58c4cb1a28d97c0435d724a12e716bdacbe062e4eb96d8b1d50a0a317042627f"
+   "sha256": "c1bdf2a02aef5b139cf8c7f4435a6216fdbb1b5909aedfb7abda5b6a8b3d9a4f"
   },
   {
    "patch": "patches-split/0004-MOS-Insert-REP-SEP-from-M-X-width-requirements.patch",
-   "commit": "bc5f120a58084f85e370267244d6f92ea98e2173",
+   "commit": "c5dfebbfbf55e974d067d7af148eb5da83a3bcd1",
    "subject": "[MOS] Insert REP/SEP from M/X width requirements",
-   "tree": "d78c572f68d5648b203ed929b00a9b7023ad59e7",
+   "tree": "90455428fe7298e68a16d07e8610dfca98006c5f",
    "matches_commit_tree": true,
-   "sha256": "13c9cf5371e8db2834aa39e5548032dbf6e624f64fde637036487da9eb4b5b8b"
+   "sha256": "a7b10a75740bb56c7b57aed6ab9f6266b31ff41f050595baeafdc047f77785b1"
   },
   {
    "patch": "patches-split/0005-MOS-Preserve-status-flags-across-register-scavenging.patch",
-   "commit": "dbd065b5e351a03afd3e7eb1878a49c716114844",
+   "commit": "8eb8a6534bdf5fe93d9eedd0dd4ff2aacc28c493",
    "subject": "[MOS] Preserve status flags across register scavenging",
-   "tree": "5a90dcafd24b8d27a94579d7add216d9655db805",
+   "tree": "c5023867fd40bee49d65b6de10e5d7e14e0edd0e",
    "matches_commit_tree": true,
-   "sha256": "50e0df3577121d0d10b846ce65f2fd6de182f72616b7a9edee084f6c3da62545"
+   "sha256": "f6b8e617f5067b568fae7ce0ac99fd02aa053e89b304598bf41d8311c5ee10cc"
   },
   {
    "patch": "patches-split/0006-MOS-Spill-and-copy-native-width-registers.patch",
-   "commit": "aba628a4d70d60c521bde1d8bab69689bb9f2516",
+   "commit": "b86abf199cbb437fe0d463a64585fef2626f0b33",
    "subject": "[MOS] Spill and copy native-width registers",
-   "tree": "1b594a411fc8d3fe1350c1181b7f1982a208b024",
+   "tree": "720fbb0f69f0ddeed6ddc7dc5ee1201f2c193945",
    "matches_commit_tree": true,
-   "sha256": "81d8b64decff0bcf541e78d306144a6fd348766fdf3d92a6d2d6d67a93eef725"
+   "sha256": "69c7a8001c6effd80134d3930149b095bc677795667da4e0cf7836b4be6ca21e"
   },
   {
    "patch": "patches-split/0007-MOS-Keep-call-clobbered-imaginary-copies-out-of-Imag.patch",
-   "commit": "09506482de2f121caca79d269651913b1a2602c3",
+   "commit": "ba6887cac12db842a3e47e3fd6ee9bee78c725c1",
    "subject": "[MOS] Keep call-clobbered imaginary copies out of Imag16 pairs",
-   "tree": "a51e7c150c58d21c29a4d4557f07db6e12d12027",
+   "tree": "679ae1edb1a81e47c7f3bb43042cd352682084a1",
    "matches_commit_tree": true,
-   "sha256": "9f683f6dacd6cc1bfef1f8f102fd9cd78aacf2ab155da8ef56b7effbeb128bd8"
+   "sha256": "08d37fa7fda9e60d5f48639dc66d91384b81e3acc02a1a901feec6dd782702e7"
   },
   {
    "patch": "patches-split/0008-MOS-Legalize-and-select-native-16-bit-loads-and-stor.patch",
-   "commit": "e43bae5fa46fcafabf716960a6d4f706d6508b51",
+   "commit": "c6337b5af8783d19e2365314ab8b65e2320a2de4",
    "subject": "[MOS] Legalize and select native 16-bit loads and stores",
-   "tree": "b52b2aaa267bd7ad71de01f77b0b3689d5506e05",
+   "tree": "d609a7bbf1512b17858eed3f37a6849cd0086bc7",
    "matches_commit_tree": true,
-   "sha256": "effe9234cb45149fc0a42e194b3025fb5b13487f52d3ad15ba97e25c9948acac"
+   "sha256": "7a734c5cce4670df8e5cca64d19a0b6f8584a018fb8b645a4cfc5a35dc01e5c3"
   },
   {
    "patch": "patches-split/0009-MOS-Legalize-native-s32-s64-lanes-and-wide-any-exten.patch",
-   "commit": "3cec9891c6cf3a20877b0e67148ad6780eea223f",
+   "commit": "56e6c7f91e9e0a9254b1f0e682684e046d6893e1",
    "subject": "[MOS] Legalize native s32/s64 lanes and wide any-extensions",
-   "tree": "e0b92cd107186f8e1aeda670ffb2f7cf2a09f05a",
+   "tree": "a24cc7d7fdb59fdba660080b000d65a6d028616d",
    "matches_commit_tree": true,
-   "sha256": "2950346ae79d10eb680ff5a472d23370c410138f42e78d7dbd16b1bd55790307"
+   "sha256": "0d4fce852193c8495d632f2c2de6bf42d5adb6608d342e94aa4066f32c8d5423"
   },
   {
    "patch": "patches-split/0010-MOS-Select-native-16-bit-arithmetic-logic-and-consta.patch",
-   "commit": "460ed3e89eedf5926ce285779f885fe525c216a4",
+   "commit": "a520448a2c7f3193f7d523c1e8dba53eae888011",
    "subject": "[MOS] Select native 16-bit arithmetic, logic and constant shifts",
-   "tree": "2181a8a796df5472634d927914b43ad5fe1c3a27",
+   "tree": "487772f3a7d216008f09a271aeca7dd7b2e552a4",
    "matches_commit_tree": true,
-   "sha256": "dc2e20f9e05586f8ee198beddb77701b39ed110dd58695bf5a05e42a2a7174f2"
+   "sha256": "af31db05a50da8a758f7529aa705da6b94d16fc776ec06af0ceee292f481411b"
   },
   {
    "patch": "patches-split/0011-MOS-Select-native-16-bit-compares-and-fused-branches.patch",
-   "commit": "ebdd0900230fc715c11c76d691f6b0e5f3cbeff5",
+   "commit": "9b471aa8df068e251307d1632e3dec30969eb9fe",
    "subject": "[MOS] Select native 16-bit compares and fused branches",
-   "tree": "374c9967aabe4ae91ffbe899246fbc398577f7d8",
+   "tree": "2abe9a13ca0aa96a2b0ce4ba9e9dc19bfcd64fe4",
    "matches_commit_tree": true,
-   "sha256": "0be0f9d89a8603d236a1abddf224a1619ca8af4d752257223eacadfe361c3158"
+   "sha256": "9fb19f27144c756f0491854d899c27fb3384162692b2a5a15744a55d0b199d54"
   },
   {
    "patch": "patches-split/0012-MOS-Keep-byte-indexes-byte-wide-in-absolute-indexed-.patch",
-   "commit": "77326e4aaff3f6faae77f4d21f663dc10a73a9ae",
+   "commit": "497db27604400f5961676dace699fefc5d1225bb",
    "subject": "[MOS] Keep byte indexes byte-wide in absolute indexed addressing",
-   "tree": "a0872a7424fdaf736ff31973cdeaa2e01fe5ed1f",
+   "tree": "84debe54c9a8dd3f1589ce8f958b5ebe87f8c59e",
    "matches_commit_tree": true,
-   "sha256": "5ee483d6687f8cce37def36554ab5496b9c66fa7a243d640ecbd51e5f07e7a67"
+   "sha256": "e38b51811319671515fffae737f04d27bc7056feb3eb59554902cd97cf09f0f8"
   },
   {
    "patch": "patches-split/0013-MOS-Require-a-no-wrap-proof-before-folding-near-inde.patch",
-   "commit": "0284f9f318a41a2c19773c66ae05a05a3ab8af45",
+   "commit": "ef1fdd877206a81fa961da92b8cad45877a93be4",
    "subject": "[MOS] Require a no-wrap proof before folding near indexes on the 65816",
-   "tree": "230f899f5be0317aa96a8aaf4328b5119c2f9ff4",
+   "tree": "5d385b950627efd7dfc6120b0b1379c39d998f82",
    "matches_commit_tree": true,
-   "sha256": "eafd2e00d2f040d1bf4e551223b4fe6f466b9adfad1e025b91741f15c6a23985"
+   "sha256": "d51abde578582f06c47cb070ed54af6fa2d1fdb18594a7c35f8193c46bf57da7"
   },
   {
    "patch": "patches-split/0014-MOS-Select-16-bit-index-registers-under-mos-xy16.patch",
-   "commit": "e8c51cc3b8cf542718e8270c7777e5638c7e20f3",
+   "commit": "a6718b6f6560a7070d518015443e188a5a65530a",
    "subject": "[MOS] Select 16-bit index registers under +mos-xy16",
-   "tree": "55b27b17b9f2892bbbac5e36d0fef774dc8369f3",
+   "tree": "15a3c8f6977335e7c8803678ee2ccb5f7e9f744d",
    "matches_commit_tree": true,
-   "sha256": "6353b58f76b0b2135c46ccbcfae9bc8d5881bc1bcab135eccd1229246dc23ff3"
+   "sha256": "f8f30faef6f2cc4cf972d71b39427d8bafaac9ebe9f52df975e76e1bd193e3b7"
   },
   {
    "patch": "patches-split/0015-MOS-Keep-small-8-bit-adds-relocatable-under-mos-a16.patch",
-   "commit": "50db44329f1d1f6b57bd419bcd013fbf98ccd9cc",
+   "commit": "8db2e8118a70bae7913cf959498f8210802703d8",
    "subject": "[MOS] Keep small 8-bit adds relocatable under +mos-a16",
-   "tree": "4962c0b9b4475e8c59d867751791556c1a0d6ef9",
+   "tree": "cc770fd1d7986a21e0e526288452d5b3cc5a1b13",
    "matches_commit_tree": true,
-   "sha256": "1844f7eab066f90be84dd2255059a4d839a81f92540b50ea3d2b9be97e1cbf71"
+   "sha256": "5c111af95d32fa2aca2c67c306a0e68acc70dc516d255f91c3529f171a85eb15"
   },
   {
    "patch": "patches-split/0016-MOS-Preserve-interrupted-M-X-state-in-65816-interrup.patch",
-   "commit": "780d9e028c04ebbad1cc1821125110552490c982",
+   "commit": "aa868b9525705f8612cd316a3e5c86d500b2bcc1",
    "subject": "[MOS] Preserve interrupted M/X state in 65816 interrupt handlers",
-   "tree": "6bb9b089ba566c4a1116fbe7a136a4edfaff7c90",
+   "tree": "d6b87f6d2aa674b13cdb4eacccb8b9dbecd56bfe",
    "matches_commit_tree": true,
-   "sha256": "8f7d33029f7a6949a6eaa2595f0233fd1b8a70cac32cbbe8df6eb55ebedea48e"
+   "sha256": "98dd6b25a8df8acb567983650ec1113d4e70203d7a0d08570fdf55f982b69f91"
   },
   {
    "patch": "patches-split/0017-Recover-near-index-no-wrap-proofs-after-loop-strengt.patch",
-   "commit": "874f40b8025b88248cf99affef8863b7c62966fa",
+   "commit": "5ce81a01e46512750440a191bcd65b01dfd54f28",
    "subject": "Recover near-index no-wrap proofs after loop strength reduction",
-   "tree": "929f85df00ac64dbc5deaea210b0e7ac095b43cf",
+   "tree": "6bd824516c0606cc7d27c09eb3e9d312f6095222",
    "matches_commit_tree": true,
-   "sha256": "4621aa4878ab1f19c4f6bb83cbf05d05f3a1dbe08a6a608a2f3688980c4b8ffc"
+   "sha256": "fcbfaecaee9d9d7cc05a18fe97bb49ec486fe74eb45ce0d43f3ebe6aaa8e475a"
   }
  ]
 }

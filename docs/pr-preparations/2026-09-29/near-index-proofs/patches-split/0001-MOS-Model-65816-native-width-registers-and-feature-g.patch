@@ -1,4 +1,4 @@
-From c38fa4cc5a602b3af84e4bdad085b4fcf751566a Mon Sep 17 00:00:00 2001
+From 45bc97d89c6a603008894622970ee2524fef68e7 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 01/17] [MOS] Model 65816 native-width registers and feature
@@ -8,23 +8,26 @@ Add two opt-in subtarget features for the WDC 65816: mos-a16 selects 16-bit accu
 
 The 65816 widens A to 16 bits when the M status bit is clear and X/Y when the X bit is clear. The high accumulator byte B, and the high index bytes, alias the 8-bit registers the backend already models. Add A16 (A:B), X16 (X:XH) and Y16 (Y:YH) as registers covered by their byte halves, so liveness and allocation see a 16-bit value in A16 as clobbering $a and the reverse. The full registers carry the MOS native-mode DWARF numbers 0x01000000-0x01000002; the internal high bytes have no DWARF number. Single-member classes Ac16, Xc16 and Yc16 give later commits allocation targets, and Ac16 joins the register bank. Nothing selects these registers yet.
 
-Default-mode effect: the new classes change the generated register pressure sets (MOSAsmParamRegClass stops being a separate set; Ac16, Xc16 and Yc16 sets appear). MachineLICM, MachineSink and the machine scheduler read pressure sets, so default mos6502 and mosw65816 code changes: 18 of 54 compiling mos6502 inputs and 33 of 78 mosw65816 inputs in the fixed input set produce different assembly. With -disable-machine-licm -disable-machine-sink -enable-misched=false -enable-post-misched=false the outputs are identical. Total default code size over the set grows by 3,478 bytes (mos6502) and 3,202 bytes (mosw65816).
+Default-mode effect: none (fixed input set identical in mos6502 and mosw65816). Ac16, Xc16 and Yc16 set GeneratePressureSet = 0, so the generated register pressure tables are the parent's. Without it, TableGen derives pressure sets from the new classes (Ac16, Xc16 and Yc16 sets appear and MOSAsmParamRegClass stops being a separate set), and because MachineLICM, MachineSink and the machine scheduler read those tables in every mode, 18 of 54 compiling mos6502 inputs and 33 of 78 mosw65816 inputs in the fixed input set would change (+3,478 and +3,202 bytes). Native values get their pressure modelling where they are first selected.
 
-Tests: native-width-registers.mir checks that both features are recognized and that the Ac16, Xc16 and Yc16 classes and the A16, X16 and Y16 registers parse and verify, with sublo naming the existing byte register.
+Tests: native-width-registers.mir checks that both features are recognized and that the Ac16, Xc16 and Yc16 classes and the A16, X16 and Y16 registers parse and verify, with sublo naming the existing byte register. native-width-default-pressure.ll pins default mos6502 and mosw65816 code for a three-way compare whose low-byte subtraction the scheduler moves when the native classes have pressure sets; it passes on the parent and guards this commit.
 
-Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/native-width-registers.mir`.
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/native-width-registers.mir llvm/test/CodeGen/MOS/native-width-default-pressure.ll`.
 
-Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort. Native-width pressure sets: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
 ---
- llvm/lib/Target/MOS/MOSFeatures.td            | 16 ++++++++++
- llvm/lib/Target/MOS/MOSRegisterBanks.td       |  5 ++-
- llvm/lib/Target/MOS/MOSRegisterInfo.td        | 32 +++++++++++++++++++
- llvm/lib/Target/MOS/MOSSubtarget.h            |  8 +++++
- .../CodeGen/MOS/native-width-registers.mir    | 28 ++++++++++++++++
- 5 files changed, 88 insertions(+), 1 deletion(-)
+ llvm/lib/Target/MOS/MOSFeatures.td            |  16 +++
+ llvm/lib/Target/MOS/MOSRegisterBanks.td       |   5 +-
+ llvm/lib/Target/MOS/MOSRegisterInfo.td        |  38 ++++++
+ llvm/lib/Target/MOS/MOSSubtarget.h            |   8 ++
+ .../MOS/native-width-default-pressure.ll      | 124 ++++++++++++++++++
+ .../CodeGen/MOS/native-width-registers.mir    |  28 ++++
+ 6 files changed, 218 insertions(+), 1 deletion(-)
+ create mode 100644 llvm/test/CodeGen/MOS/native-width-default-pressure.ll
  create mode 100644 llvm/test/CodeGen/MOS/native-width-registers.mir
 
 diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
@@ -65,7 +68,7 @@ index 868f6c71270a..d7e981ef61dc 100644
 +// register class on the selected ops, not by the bank (banks are unused here).
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index 5d4b239d1f3d..e64c0860e596 100644
+index 5d4b239d1f3d..52d4cbc453be 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 @@ -111,6 +111,28 @@ def P : MOSReg<3, "P"> {
@@ -97,10 +100,15 @@ index 5d4b239d1f3d..e64c0860e596 100644
  //===----------------------------------------------------------------------===//
  //  Imaginary registers
  //===----------------------------------------------------------------------===//
-@@ -212,6 +234,16 @@ let isPressureFineGrained = true in {
+@@ -212,6 +234,22 @@ let isPressureFineGrained = true in {
  def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
  def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
  
++// The native-width classes below are opt-in and must not create register
++// pressure sets: MachineLICM, MachineSink and the scheduler read the pressure
++// tables in every mode, so new sets would change code for programs that never
++// enable +mos-a16 or +mos-xy16.
++let GeneratePressureSet = 0 in {
 +// Native widths: the 16-bit accumulator as a register class (single member,
 +// A16 = B:A — NOT the carry flag C). Target of 16-bit-accumulator load/add/store
 +// under +mos-a16. Named Ac16 to parallel the 8-bit accumulator class `Ac`.
@@ -110,6 +118,7 @@ index 5d4b239d1f3d..e64c0860e596 100644
 +// +mos-xy16; inert otherwise. Mirror Ac16.
 +def Xc16 : MOSReg16Class<(add X16)>;
 +def Yc16 : MOSReg16Class<(add Y16)>;
++}
 +
  // Instruction-specific register classes.
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
@@ -140,6 +149,136 @@ index 6d303255c67f..5cb39f7dfefe 100644
  
    // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
    // no variable, so we instead bind pseudo features to this variable.
+diff --git a/llvm/test/CodeGen/MOS/native-width-default-pressure.ll b/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
+new file mode 100644
+index 000000000000..832ed7b375dc
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
+@@ -0,0 +1,124 @@
++; NOTE: Assertions have been autogenerated by utils/update_llc_test_checks.py UTC_ARGS: --version 6
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs < %s | FileCheck %s --check-prefix=MOS6502
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefix=W65816
++
++; The opt-in 65816 native-width registers must not change register pressure,
++; and so code, for subtargets that don't enable them. Pressure sets derived
++; from Ac16, Xc16 and Yc16 would move the low-byte subtraction of this compare
++; in both modes. The expected output is the one without those registers.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++define i16 @scmp_i16_i32(i32 %a, i32 %b) {
++; MOS6502-LABEL: scmp_i16_i32:
++; MOS6502:       ; %bb.0:
++; MOS6502-NEXT:    sta __rc9
++; MOS6502-NEXT:    stx __rc8
++; MOS6502-NEXT:    ldy __rc7
++; MOS6502-NEXT:    pha
++; MOS6502-NEXT:    lda __rc4
++; MOS6502-NEXT:    sta __rc11
++; MOS6502-NEXT:    pla
++; MOS6502-NEXT:    cmp __rc4
++; MOS6502-NEXT:    txa
++; MOS6502-NEXT:    ldx __rc5
++; MOS6502-NEXT:    stx __rc10
++; MOS6502-NEXT:    sbc __rc5
++; MOS6502-NEXT:    lda __rc2
++; MOS6502-NEXT:    sbc __rc6
++; MOS6502-NEXT:    lda __rc3
++; MOS6502-NEXT:    sty __rc5
++; MOS6502-NEXT:    sty __rc4
++; MOS6502-NEXT:    sbc __rc4
++; MOS6502-NEXT:    bvc .LBB0_2
++; MOS6502-NEXT:  ; %bb.1:
++; MOS6502-NEXT:    eor #128
++; MOS6502-NEXT:  .LBB0_2:
++; MOS6502-NEXT:    ldx #255
++; MOS6502-NEXT:    ldy #255
++; MOS6502-NEXT:    cmp #0
++; MOS6502-NEXT:    bmi .LBB0_9
++; MOS6502-NEXT:  ; %bb.3:
++; MOS6502-NEXT:    ldx __rc11
++; MOS6502-NEXT:    cpx __rc9
++; MOS6502-NEXT:    lda __rc10
++; MOS6502-NEXT:    sbc __rc8
++; MOS6502-NEXT:    lda __rc6
++; MOS6502-NEXT:    sbc __rc2
++; MOS6502-NEXT:    lda __rc5
++; MOS6502-NEXT:    sbc __rc3
++; MOS6502-NEXT:    bvc .LBB0_5
++; MOS6502-NEXT:  ; %bb.4:
++; MOS6502-NEXT:    eor #128
++; MOS6502-NEXT:  .LBB0_5:
++; MOS6502-NEXT:    tax
++; MOS6502-NEXT:    bpl .LBB0_7
++; MOS6502-NEXT:  ; %bb.6:
++; MOS6502-NEXT:    ldy #1
++; MOS6502-NEXT:    jmp .LBB0_8
++; MOS6502-NEXT:  .LBB0_7:
++; MOS6502-NEXT:    ldy #0
++; MOS6502-NEXT:  .LBB0_8:
++; MOS6502-NEXT:    ldx #0
++; MOS6502-NEXT:  .LBB0_9:
++; MOS6502-NEXT:    tya
++; MOS6502-NEXT:    rts
++;
++; W65816-LABEL: scmp_i16_i32:
++; W65816:       ; %bb.0:
++; W65816-NEXT:    sta __rc9
++; W65816-NEXT:    stx __rc8
++; W65816-NEXT:    ldy __rc7
++; W65816-NEXT:    pha
++; W65816-NEXT:    lda __rc4
++; W65816-NEXT:    sta __rc11
++; W65816-NEXT:    pla
++; W65816-NEXT:    cmp __rc4
++; W65816-NEXT:    txa
++; W65816-NEXT:    ldx __rc5
++; W65816-NEXT:    stx __rc10
++; W65816-NEXT:    sbc __rc5
++; W65816-NEXT:    lda __rc2
++; W65816-NEXT:    sbc __rc6
++; W65816-NEXT:    lda __rc3
++; W65816-NEXT:    sty __rc5
++; W65816-NEXT:    sty __rc4
++; W65816-NEXT:    sbc __rc4
++; W65816-NEXT:    bvc .LBB0_2
++; W65816-NEXT:  ; %bb.1:
++; W65816-NEXT:    eor #128
++; W65816-NEXT:  .LBB0_2:
++; W65816-NEXT:    ldx #255
++; W65816-NEXT:    txy
++; W65816-NEXT:    cmp #0
++; W65816-NEXT:    bmi .LBB0_9
++; W65816-NEXT:  ; %bb.3:
++; W65816-NEXT:    ldx __rc11
++; W65816-NEXT:    cpx __rc9
++; W65816-NEXT:    lda __rc10
++; W65816-NEXT:    sbc __rc8
++; W65816-NEXT:    lda __rc6
++; W65816-NEXT:    sbc __rc2
++; W65816-NEXT:    lda __rc5
++; W65816-NEXT:    sbc __rc3
++; W65816-NEXT:    bvc .LBB0_5
++; W65816-NEXT:  ; %bb.4:
++; W65816-NEXT:    eor #128
++; W65816-NEXT:  .LBB0_5:
++; W65816-NEXT:    tax
++; W65816-NEXT:    bpl .LBB0_7
++; W65816-NEXT:  ; %bb.6:
++; W65816-NEXT:    ldy #1
++; W65816-NEXT:    bra .LBB0_8
++; W65816-NEXT:  .LBB0_7:
++; W65816-NEXT:    ldy #0
++; W65816-NEXT:  .LBB0_8:
++; W65816-NEXT:    ldx #0
++; W65816-NEXT:  .LBB0_9:
++; W65816-NEXT:    tya
++; W65816-NEXT:    rts
++  %r = call i16 @llvm.scmp.i16.i32(i32 %a, i32 %b)
++  ret i16 %r
++}
++
++declare i16 @llvm.scmp.i16.i32(i32, i32)
 diff --git a/llvm/test/CodeGen/MOS/native-width-registers.mir b/llvm/test/CodeGen/MOS/native-width-registers.mir
 new file mode 100644
 index 000000000000..4f5f668dde7d

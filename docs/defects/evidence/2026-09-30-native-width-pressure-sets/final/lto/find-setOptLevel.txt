@@ -1,0 +1,63 @@
+# git grep 'setOptLevel(' in the split source at 06bc967d2668 (llvm, clang, lld; tests excluded)
+clang/tools/clang-fuzzer/handle-llvm/handle_llvm.cpp:177:  builder.setOptLevel(OLvl);
+llvm/include/llvm/ExecutionEngine/ExecutionEngine.h:593:  EngineBuilder &setOptLevel(CodeGenOptLevel l) {
+llvm/include/llvm/LTO/legacy/LTOCodeGenerator.h:104:  LLVM_ABI void setOptLevel(unsigned OptLevel);
+llvm/include/llvm/LTO/legacy/ThinLTOCodeGenerator.h:232:  void setOptLevel(unsigned NewOptLevel) {
+llvm/include/llvm/Target/TargetMachine.h:309:  void setOptLevel(CodeGenOptLevel Level) { OptLevel = Level; }
+llvm/include/llvm/Transforms/Scalar/LoopUnrollPass.h:122:  LoopUnrollOptions &setOptLevel(int O) {
+llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:268:        IS.TM.setOptLevel(NewOptLevel);
+llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:293:      IS.TM.setOptLevel(SavedOptLevel);
+llvm/lib/CodeGen/TwoAddressInstructionPass.cpp:199:  void setOptLevel(CodeGenOptLevel Level) { OptLevel = Level; }
+llvm/lib/CodeGen/TwoAddressInstructionPass.cpp:215:      Impl.setOptLevel(CodeGenOptLevel::None);
+llvm/lib/CodeGen/TwoAddressInstructionPass.cpp:240:    Impl.setOptLevel(CodeGenOptLevel::None);
+llvm/lib/ExecutionEngine/ExecutionEngineBindings.cpp:141:      .setOptLevel((CodeGenOptLevel)OptLevel);
+llvm/lib/ExecutionEngine/ExecutionEngineBindings.cpp:199:      .setOptLevel((CodeGenOptLevel)options.OptLevel)
+llvm/lib/LTO/LTOCodeGenerator.cpp:187:void LTOCodeGenerator::setOptLevel(unsigned Level) {
+llvm/lib/Passes/PassBuilder.cpp:909:      UnrollOpts.setOptLevel(static_cast<int>(*OptLevel));
+llvm/tools/lli/lli.cpp:510:  builder.setOptLevel(getOptLevel());
+llvm/tools/llvm-lto/llvm-lto.cpp:1127:  CodeGen.setOptLevel(OptLevel - '0');
+llvm/tools/lto/lto.cpp:186:  CG->setOptLevel(OptLevel - '0');
+llvm/tools/lto/lto.cpp:568:    CodeGen->setOptLevel(OptLevel - '0');
+
+# the same in vendor/llvm-mos (downstream)
+llvm/lib/CodeGen/TwoAddressInstructionPass.cpp:202:  void setOptLevel(CodeGenOptLevel Level) { OptLevel = Level; }
+llvm/lib/CodeGen/TwoAddressInstructionPass.cpp:218:      Impl.setOptLevel(CodeGenOptLevel::None);
+llvm/lib/CodeGen/TwoAddressInstructionPass.cpp:245:    Impl.setOptLevel(CodeGenOptLevel::None);
+llvm/lib/ExecutionEngine/ExecutionEngineBindings.cpp:141:      .setOptLevel((CodeGenOptLevel)OptLevel);
+llvm/lib/ExecutionEngine/ExecutionEngineBindings.cpp:199:      .setOptLevel((CodeGenOptLevel)options.OptLevel)
+llvm/lib/Passes/PassBuilder.cpp:831:      UnrollOpts.setOptLevel(OptLevel->getSpeedupLevel());
+llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:268:        IS.TM.setOptLevel(NewOptLevel);
+llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:293:      IS.TM.setOptLevel(SavedOptLevel);
+llvm/lib/LTO/LTOCodeGenerator.cpp:185:void LTOCodeGenerator::setOptLevel(unsigned Level) {
+llvm/tools/lto/lto.cpp:183:  CG->setOptLevel(OptLevel - '0');
+llvm/tools/lto/lto.cpp:564:    CodeGen->setOptLevel(OptLevel - '0');
+llvm/tools/lli/lli.cpp:510:  builder.setOptLevel(getOptLevel());
+llvm/tools/llvm-lto/llvm-lto.cpp:1127:  CodeGen.setOptLevel(OptLevel - '0');
+
+# MOS selects with GlobalISel only (vendor MOSTargetMachine.cpp)
+113:  setGlobalISel(true);
+115:  setGlobalISelAbort(GlobalISelAbortMode::Enable);
+split: llvm/lib/Target/MOS/MOSTargetMachine.cpp:113:  setGlobalISel(true);
+split: llvm/lib/Target/MOS/MOSTargetMachine.cpp:115:  setGlobalISelAbort(GlobalISelAbortMode::Enable);
+
+# lld: LTO codegen level from --lto-O / -plugin-opt=O
+1532:  ctx.arg.ltoo = args::getInteger(args, OPT_lto_O, 2);
+1535:  unsigned ltoCgo =
+1536:      args::getInteger(args, OPT_lto_CGO, args::getCGOptLevel(ctx.arg.ltoo));
+1537:  if (auto level = CodeGenOpt::getLevel(ltoCgo))
+1538:    ctx.arg.ltoCgo = *level;
+1540:    ErrAlways(ctx) << "invalid codegen optimization level for LTO: " << ltoCgo;
+22:int lld::args::getCGOptLevel(int optLevelLTO) {
+23-  return std::clamp(optLevelLTO, 2, 3);
+24-}
+25-
+
+# RegisterClassInfo caches PSetLimits per register info
+llvm/include/llvm/CodeGen/RegisterClassInfo.h:76:  std::unique_ptr<unsigned[]> PSetLimits;
+llvm/include/llvm/CodeGen/RegisterClassInfo.h:171:    if (!PSetLimits[Idx])
+llvm/include/llvm/CodeGen/RegisterClassInfo.h:172:      PSetLimits[Idx] = computePSetLimit(Idx);
+llvm/include/llvm/CodeGen/RegisterClassInfo.h:173:    return PSetLimits[Idx];
+llvm/lib/CodeGen/RegisterClassInfo.cpp:116:    PSetLimits.reset(new unsigned[NumPSets]);
+llvm/lib/CodeGen/RegisterClassInfo.cpp:117:    std::fill(&PSetLimits[0], &PSetLimits[NumPSets], 0);
+llvm/lib/CodeGen/RegisterClassInfo.cpp:136:  std::fill_n(PSetLimits.get(), TRI->getNumRegPressureSets(), 0);
+llvm/lib/CodeGen/RegisterClassInfo.cpp:279:  // target's nonzero limit; zero is the PSetLimits cache sentinel.

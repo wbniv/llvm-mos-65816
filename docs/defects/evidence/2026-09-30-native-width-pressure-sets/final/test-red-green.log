@@ -1,0 +1,42 @@
+f7d124682d1eb991ec42dc62d2a5a2a1557bcc71c5eb4b7bb86aed3bd707248e  /home/will/llvm-mos-65816-pressure/docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tests/native-width-default-pressure.ll
+d2738e9cecd101768e53055a6d5ad2234306793c53f6f818cccecfd2636ea5ff  /home/will/llvm-mos-65816-pressure/docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tests/native-width-pressure-opt-level.ll
+== /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 2f5c17683f938257
+  default mos6502   : PASS
+  default mosw65816 : PASS
+  +mos-a16 -O2 sets : FAIL
+  +mos-a16 -O3 none : FAIL
+== /home/will/llvm-mos-65816/build/pressure-sets/llc/321-01 2422c0682d4f35dd
+  default mos6502   : FAIL
+  default mosw65816 : FAIL
+  +mos-a16 -O2 sets : FAIL
+  +mos-a16 -O3 none : FAIL
+== /home/will/llvm-mos-65816/build/pressure-sets/llc/321-16 b80064893ccf9fde
+  default mos6502   : FAIL
+  default mosw65816 : FAIL
+  +mos-a16 -O2 sets : FAIL
+  +mos-a16 -O3 none : FAIL
+== /home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-16-t4 0f3f63bf4d2cc090
+  default mos6502   : PASS
+  default mosw65816 : PASS
+  +mos-a16 -O2 sets : PASS
+  +mos-a16 -O3 none : FAIL
+== /home/will/llvm-mos-65816/build/split-320-321/llc/p-321-07 d3b84411c3315703
+  default mos6502   : PASS
+  default mosw65816 : PASS
+  +mos-a16 -O2 sets : FAIL
+  +mos-a16 -O3 none : FAIL
+== /home/will/llvm-mos-65816/build/pressure-sets/final/llc/321-01 e8130e32bb482adb
+  default mos6502   : PASS
+  default mosw65816 : PASS
+  +mos-a16 -O2 sets : FAIL
+  +mos-a16 -O3 none : FAIL
+== /home/will/llvm-mos-65816/build/pressure-sets/final/llc/321-16 da1a6f4ba69c97f3
+  default mos6502   : PASS
+  default mosw65816 : PASS
+  +mos-a16 -O2 sets : PASS
+  +mos-a16 -O3 none : PASS
+== /home/will/llvm-mos-65816/build/split-320-321/llc/p-320-04 5b7d45e7da478195
+  default mos6502   : PASS
+  default mosw65816 : PASS
+  +mos-a16 -O2 sets : PASS
+  +mos-a16 -O3 none : PASS

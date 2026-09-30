@@ -1,4 +1,4 @@
-From 66269164b70409d87fb01b5fe3e3971d63d5c5ac Mon Sep 17 00:00:00 2001
+From 6585051de28be2d3da4f524f27a9661be763d2f6 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:20:41 +0700
 Subject: [PATCH 29/32] Preserve undefined lane definitions in identity copies

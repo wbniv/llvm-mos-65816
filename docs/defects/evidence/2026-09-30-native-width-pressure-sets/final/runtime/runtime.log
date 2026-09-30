@@ -1,0 +1,273 @@
+avalanche_sim	O2	a16	final	PASS	980	50551094	-	-
+avalanche_sim	O2	a16xy16	final	PASS	980	50551094	-	-
+avalanche_sim	O3	a16	final	PASS	990	50583254	-	-
+avalanche_sim	O3	a16xy16	final	PASS	990	50583254	-	-
+boids_sim	O2	a16	final	PASS	4440	87634898	-	-
+boids_sim	O2	a16xy16	final	PASS	4396	87559492	-	-
+boids_sim	O3	a16	final	PASS	12807	86621482	-	-
+boids_sim	O3	a16xy16	final	PASS	12767	86550420	-	-
+cgrade_sim	O2	a16	final	PASS	937	2805208	-	-
+cgrade_sim	O2	a16xy16	final	PASS	937	2805208	-	-
+cgrade_sim	O3	a16	final	PASS	933	2804204	-	-
+cgrade_sim	O3	a16xy16	final	PASS	933	2804204	-	-
+critters_sim	O2	a16	final	PASS	658	9226808	-	-
+critters_sim	O2	a16xy16	final	PASS	651	8782392	-	-
+critters_sim	O3	a16	final	PASS	656	9097440	-	-
+critters_sim	O3	a16xy16	final	PASS	651	8718304	-	-
+domcol_sim	O2	a16	final	PASS	1822	23747476	-	-
+domcol_sim	O2	a16xy16	final	PASS	1822	23747476	-	-
+domcol_sim	O3	a16	final	PASS	1828	23747444	-	-
+domcol_sim	O3	a16xy16	final	PASS	1828	23747444	-	-
+fenwick_sim	O2	a16	final	PASS	676	14332966	-	-
+fenwick_sim	O2	a16xy16	final	PASS	647	13294246	-	-
+fenwick_sim	O3	a16	final	PASS	773	10476780	-	-
+fenwick_sim	O3	a16xy16	final	PASS	762	9709300	-	-
+grid3d_sim	O2	a16	final	PASS	2829	24596746	-	-
+grid3d_sim	O2	a16xy16	final	PASS	2802	23769238	-	-
+grid3d_sim	O3	a16	final	PASS	8378	20013270	-	-
+grid3d_sim	O3	a16xy16	final	PASS	8345	19737998	-	-
+jt256_sim	O2	a16	final	PASS	7064	7042182	-	-
+jt256_sim	O2	a16xy16	final	PASS	7110	6809030	-	-
+jt256_sim	O3	a16	final	PASS	9357	7087744	-	-
+jt256_sim	O3	a16xy16	final	PASS	9322	6826984	-	-
+lzdec_sim	O2	a16	final	PASS	741	479884	-	-
+lzdec_sim	O2	a16xy16	final	PASS	646	460806	-	-
+lzdec_sim	O3	a16	final	PASS	760	478012	-	-
+lzdec_sim	O3	a16xy16	final	PASS	671	460906	-	-
+montorbit_sim	O2	a16	final	PASS	400	2736608	-	-
+montorbit_sim	O2	a16xy16	final	PASS	400	2736608	-	-
+montorbit_sim	O3	a16	final	PASS	372	2721064	-	-
+montorbit_sim	O3	a16xy16	final	PASS	372	2721064	-	-
+nmitally_sim	O2	a16	final	PASS	824	6330266	-	-
+nmitally_sim	O2	a16xy16	final	PASS	824	6330266	-	-
+nmitally_sim	O3	a16	final	PASS	650	5914130	-	-
+nmitally_sim	O3	a16xy16	final	PASS	650	5914130	-	-
+perlin_sim	O2	a16	final	llc-fail rc=-6	-	-	-	['Remaining virtual register %3240...']
+perlin_sim	O2	a16xy16	final	llc-fail rc=-6	-	-	-	['Remaining virtual register %3224...']
+perlin_sim	O3	a16	final	llc-fail rc=-6	-	-	-	['Remaining virtual register %3257...']
+perlin_sim	O3	a16xy16	final	llc-fail rc=-6	-	-	-	['Remaining virtual register %3235...']
+rangecode_sim	O2	a16	final	PASS	877	2905660	-	-
+rangecode_sim	O2	a16xy16	final	PASS	877	2905660	-	-
+rangecode_sim	O3	a16	final	PASS	902	2890072	-	-
+rangecode_sim	O3	a16xy16	final	PASS	902	2890072	-	-
+satcast_sim	O2	a16	final	llc-fail rc=-6	-	-	-	['Remaining virtual register %709...']
+satcast_sim	O2	a16xy16	final	llc-fail rc=-6	-	-	-	['Remaining virtual register %709...']
+satcast_sim	O3	a16	final	llc-fail rc=-6	-	-	-	['Remaining virtual register %936...']
+satcast_sim	O3	a16xy16	final	llc-fail rc=-6	-	-	-	['Remaining virtual register %936...']
+sodo_sim	O2	a16	final	PASS	1140	68745004	-	-
+sodo_sim	O2	a16xy16	final	PASS	1140	68745004	-	-
+sodo_sim	O3	a16	final	PASS	1140	68745004	-	-
+sodo_sim	O3	a16xy16	final	PASS	1140	68745004	-	-
+tea_sim	O2	a16	final	PASS	800	1957044	-	-
+tea_sim	O2	a16xy16	final	PASS	800	1957044	-	-
+tea_sim	O3	a16	final	PASS	13	96	-	-
+tea_sim	O3	a16xy16	final	PASS	13	96	-	-
+ulam_sim	O2	a16	final	PASS	424	7652912	-	-
+ulam_sim	O2	a16xy16	final	PASS	376	7162844	-	-
+ulam_sim	O3	a16	final	PASS	424	7652912	-	-
+ulam_sim	O3	a16xy16	final	PASS	376	7162844	-	-
+avalanche_sim	O2	a16	head	PASS	981	50567974	-	-
+avalanche_sim	O2	a16	t4	PASS	980	50551094	True	-
+avalanche_sim	O2	a16	memb1	PASS	990	50583254	-	-
+avalanche_sim	O2	a16xy16	head	PASS	981	50567974	-	-
+avalanche_sim	O2	a16xy16	t4	PASS	980	50551094	True	-
+avalanche_sim	O2	a16xy16	memb1	PASS	990	50583254	-	-
+avalanche_sim	O3	a16	head	PASS	981	50567974	-	-
+avalanche_sim	O3	a16	t4	PASS	980	50551094	-	-
+avalanche_sim	O3	a16	memb1	PASS	990	50583254	True	-
+avalanche_sim	O3	a16xy16	head	PASS	981	50567974	-	-
+avalanche_sim	O3	a16xy16	t4	PASS	980	50551094	-	-
+avalanche_sim	O3	a16xy16	memb1	PASS	990	50583254	True	-
+boids_sim	O2	a16	head	PASS	4440	87634898	True	-
+boids_sim	O2	a16	t4	PASS	4440	87634898	True	-
+boids_sim	O2	a16	memb1	PASS	4419	87513962	-	-
+boids_sim	O2	a16xy16	head	PASS	4396	87559492	True	-
+boids_sim	O2	a16xy16	t4	PASS	4396	87559492	True	-
+boids_sim	O2	a16xy16	memb1	PASS	4375	87438556	-	-
+boids_sim	O3	a16	head	PASS	12805	86621458	-	-
+boids_sim	O3	a16	t4	PASS	12807	86621482	True	-
+boids_sim	O3	a16	memb1	PASS	12807	86621482	True	-
+boids_sim	O3	a16xy16	head	PASS	12765	86550396	-	-
+boids_sim	O3	a16xy16	t4	PASS	12767	86550420	True	-
+boids_sim	O3	a16xy16	memb1	PASS	12767	86550420	True	-
+cgrade_sim	O2	a16	head	PASS	937	2805208	True	-
+cgrade_sim	O2	a16	t4	PASS	937	2805208	True	-
+cgrade_sim	O2	a16	memb1	PASS	933	2804204	-	-
+cgrade_sim	O2	a16xy16	head	PASS	937	2805208	True	-
+cgrade_sim	O2	a16xy16	t4	PASS	937	2805208	True	-
+cgrade_sim	O2	a16xy16	memb1	PASS	933	2804204	-	-
+cgrade_sim	O3	a16	head	PASS	965	2810714	-	-
+cgrade_sim	O3	a16	t4	PASS	965	2810714	-	-
+cgrade_sim	O3	a16	memb1	PASS	933	2804204	True	-
+cgrade_sim	O3	a16xy16	head	PASS	965	2810714	-	-
+cgrade_sim	O3	a16xy16	t4	PASS	965	2810714	-	-
+cgrade_sim	O3	a16xy16	memb1	PASS	933	2804204	True	-
+critters_sim	O2	a16	head	PASS	658	9226808	True	-
+critters_sim	O2	a16	t4	PASS	658	9226808	True	-
+critters_sim	O2	a16	memb1	PASS	656	9097440	-	-
+critters_sim	O2	a16xy16	head	PASS	651	8782392	True	-
+critters_sim	O2	a16xy16	t4	PASS	651	8782392	True	-
+critters_sim	O2	a16xy16	memb1	PASS	651	8718304	-	-
+critters_sim	O3	a16	head	PASS	658	9226808	-	-
+critters_sim	O3	a16	t4	PASS	658	9226808	-	-
+critters_sim	O3	a16	memb1	PASS	656	9097440	True	-
+critters_sim	O3	a16xy16	head	PASS	651	8782392	-	-
+critters_sim	O3	a16xy16	t4	PASS	651	8782392	-	-
+critters_sim	O3	a16xy16	memb1	PASS	651	8718304	True	-
+domcol_sim	O2	a16	head	PASS	1822	23747476	True	-
+domcol_sim	O2	a16	t4	PASS	1822	23747476	True	-
+domcol_sim	O2	a16	memb1	PASS	1822	23747476	True	-
+domcol_sim	O2	a16xy16	head	PASS	1822	23747476	True	-
+domcol_sim	O2	a16xy16	t4	PASS	1822	23747476	True	-
+domcol_sim	O2	a16xy16	memb1	PASS	1822	23747476	True	-
+domcol_sim	O3	a16	head	PASS	1828	23747444	True	-
+domcol_sim	O3	a16	t4	PASS	1828	23747444	True	-
+domcol_sim	O3	a16	memb1	PASS	1828	23747444	True	-
+domcol_sim	O3	a16xy16	head	PASS	1828	23747444	True	-
+domcol_sim	O3	a16xy16	t4	PASS	1828	23747444	True	-
+domcol_sim	O3	a16xy16	memb1	PASS	1828	23747444	True	-
+fenwick_sim	O2	a16	head	PASS	676	14332966	True	-
+fenwick_sim	O2	a16	t4	PASS	676	14332966	True	-
+fenwick_sim	O2	a16	memb1	PASS	676	14332966	True	-
+fenwick_sim	O2	a16xy16	head	PASS	647	13294246	True	-
+fenwick_sim	O2	a16xy16	t4	PASS	647	13294246	True	-
+fenwick_sim	O2	a16xy16	memb1	PASS	647	13294246	True	-
+fenwick_sim	O3	a16	head	PASS	773	10476780	True	-
+fenwick_sim	O3	a16	t4	PASS	773	10476780	True	-
+fenwick_sim	O3	a16	memb1	PASS	773	10476780	True	-
+fenwick_sim	O3	a16xy16	head	PASS	762	9709300	True	-
+fenwick_sim	O3	a16xy16	t4	PASS	762	9709300	True	-
+fenwick_sim	O3	a16xy16	memb1	PASS	762	9709300	True	-
+grid3d_sim	O2	a16	head	PASS	2829	24596746	True	-
+grid3d_sim	O2	a16	t4	PASS	2829	24596746	True	-
+grid3d_sim	O2	a16	memb1	PASS	2860	24630764	-	-
+grid3d_sim	O2	a16xy16	head	PASS	2802	23769238	True	-
+grid3d_sim	O2	a16xy16	t4	PASS	2802	23769238	True	-
+grid3d_sim	O2	a16xy16	memb1	PASS	2843	23820512	-	-
+grid3d_sim	O3	a16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %5151...']
+grid3d_sim	O3	a16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %5171...']
+grid3d_sim	O3	a16	memb1	PASS	8378	20013270	True	-
+grid3d_sim	O3	a16xy16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %5123...']
+grid3d_sim	O3	a16xy16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %5143...']
+grid3d_sim	O3	a16xy16	memb1	PASS	8345	19737998	True	-
+jt256_sim	O2	a16	head	PASS	7064	7042182	True	-
+jt256_sim	O2	a16	t4	PASS	7064	7042182	True	-
+jt256_sim	O2	a16	memb1	PASS	7066	7056982	-	-
+jt256_sim	O2	a16xy16	head	PASS	7110	6809030	True	-
+jt256_sim	O2	a16xy16	t4	PASS	7110	6809030	True	-
+jt256_sim	O2	a16xy16	memb1	PASS	7110	6809030	True	-
+jt256_sim	O3	a16	head	PASS	9355	7072944	-	-
+jt256_sim	O3	a16	t4	PASS	9355	7072944	-	-
+jt256_sim	O3	a16	memb1	PASS	9357	7087744	True	-
+jt256_sim	O3	a16xy16	head	PASS	9322	6826984	True	-
+jt256_sim	O3	a16xy16	t4	PASS	9322	6826984	True	-
+jt256_sim	O3	a16xy16	memb1	PASS	9322	6826984	True	-
+lzdec_sim	O2	a16	head	PASS	741	479884	True	-
+lzdec_sim	O2	a16	t4	PASS	741	479884	True	-
+lzdec_sim	O2	a16	memb1	PASS	733	477912	-	-
+lzdec_sim	O2	a16xy16	head	PASS	646	460806	True	-
+lzdec_sim	O2	a16xy16	t4	PASS	646	460806	True	-
+lzdec_sim	O2	a16xy16	memb1	PASS	646	460806	True	-
+lzdec_sim	O3	a16	head	PASS	768	479984	-	-
+lzdec_sim	O3	a16	t4	PASS	768	479984	-	-
+lzdec_sim	O3	a16	memb1	PASS	760	478012	True	-
+lzdec_sim	O3	a16xy16	head	PASS	671	460906	True	-
+lzdec_sim	O3	a16xy16	t4	PASS	671	460906	True	-
+lzdec_sim	O3	a16xy16	memb1	PASS	671	460906	True	-
+montorbit_sim	O2	a16	head	PASS	400	2736608	True	-
+montorbit_sim	O2	a16	t4	PASS	400	2736608	True	-
+montorbit_sim	O2	a16	memb1	PASS	372	2721064	-	-
+montorbit_sim	O2	a16xy16	head	PASS	400	2736608	True	-
+montorbit_sim	O2	a16xy16	t4	PASS	400	2736608	True	-
+montorbit_sim	O2	a16xy16	memb1	PASS	372	2721064	-	-
+montorbit_sim	O3	a16	head	PASS	400	2736608	-	-
+montorbit_sim	O3	a16	t4	PASS	400	2736608	-	-
+montorbit_sim	O3	a16	memb1	PASS	372	2721064	True	-
+montorbit_sim	O3	a16xy16	head	PASS	400	2736608	-	-
+montorbit_sim	O3	a16xy16	t4	PASS	400	2736608	-	-
+montorbit_sim	O3	a16xy16	memb1	PASS	372	2721064	True	-
+nmitally_sim	O2	a16	head	PASS	827	6278140	-	-
+nmitally_sim	O2	a16	t4	PASS	824	6330266	True	-
+nmitally_sim	O2	a16	memb1	PASS	650	5914130	-	-
+nmitally_sim	O2	a16xy16	head	PASS	827	6278140	-	-
+nmitally_sim	O2	a16xy16	t4	PASS	824	6330266	True	-
+nmitally_sim	O2	a16xy16	memb1	PASS	650	5914130	-	-
+nmitally_sim	O3	a16	head	PASS	856	6287582	-	-
+nmitally_sim	O3	a16	t4	PASS	866	6346094	-	-
+nmitally_sim	O3	a16	memb1	PASS	650	5914130	True	-
+nmitally_sim	O3	a16xy16	head	PASS	856	6287582	-	-
+nmitally_sim	O3	a16xy16	t4	PASS	866	6346094	-	-
+nmitally_sim	O3	a16xy16	memb1	PASS	650	5914130	True	-
+perlin_sim	O2	a16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %3240...']
+perlin_sim	O2	a16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %3240...']
+perlin_sim	O2	a16	memb1	llc-fail rc=-6	-	-	-	['Remaining virtual register %3257...']
+perlin_sim	O2	a16xy16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %3224...']
+perlin_sim	O2	a16xy16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %3224...']
+perlin_sim	O2	a16xy16	memb1	llc-fail rc=-6	-	-	-	['Remaining virtual register %3235...']
+perlin_sim	O3	a16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %3240...']
+perlin_sim	O3	a16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %3240...']
+perlin_sim	O3	a16	memb1	llc-fail rc=-6	-	-	-	['Remaining virtual register %3257...']
+perlin_sim	O3	a16xy16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %3224...']
+perlin_sim	O3	a16xy16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %3224...']
+perlin_sim	O3	a16xy16	memb1	llc-fail rc=-6	-	-	-	['Remaining virtual register %3235...']
+rangecode_sim	O2	a16	head	PASS	877	2905660	True	-
+rangecode_sim	O2	a16	t4	PASS	877	2905660	True	-
+rangecode_sim	O2	a16	memb1	PASS	862	2890916	-	-
+rangecode_sim	O2	a16xy16	head	PASS	877	2905660	True	-
+rangecode_sim	O2	a16xy16	t4	PASS	877	2905660	True	-
+rangecode_sim	O2	a16xy16	memb1	PASS	862	2890916	-	-
+rangecode_sim	O3	a16	head	PASS	892	2905500	-	-
+rangecode_sim	O3	a16	t4	PASS	892	2905500	-	-
+rangecode_sim	O3	a16	memb1	PASS	902	2890072	True	-
+rangecode_sim	O3	a16xy16	head	PASS	892	2905500	-	-
+rangecode_sim	O3	a16xy16	t4	PASS	892	2905500	-	-
+rangecode_sim	O3	a16xy16	memb1	PASS	902	2890072	True	-
+satcast_sim	O2	a16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %709...']
+satcast_sim	O2	a16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %709...']
+satcast_sim	O2	a16	memb1	llc-fail rc=-6	-	-	-	['Remaining virtual register %723...']
+satcast_sim	O2	a16xy16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %709...']
+satcast_sim	O2	a16xy16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %709...']
+satcast_sim	O2	a16xy16	memb1	llc-fail rc=-6	-	-	-	['Remaining virtual register %723...']
+satcast_sim	O3	a16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %936...']
+satcast_sim	O3	a16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %936...']
+satcast_sim	O3	a16	memb1	llc-fail rc=-6	-	-	-	['Remaining virtual register %936...']
+satcast_sim	O3	a16xy16	head	llc-fail rc=-6	-	-	-	['Remaining virtual register %936...']
+satcast_sim	O3	a16xy16	t4	llc-fail rc=-6	-	-	-	['Remaining virtual register %936...']
+satcast_sim	O3	a16xy16	memb1	llc-fail rc=-6	-	-	-	['Remaining virtual register %936...']
+sodo_sim	O2	a16	head	PASS	1140	68745004	True	-
+sodo_sim	O2	a16	t4	PASS	1140	68745004	True	-
+sodo_sim	O2	a16	memb1	PASS	1140	68745004	True	-
+sodo_sim	O2	a16xy16	head	PASS	1140	68745004	True	-
+sodo_sim	O2	a16xy16	t4	PASS	1140	68745004	True	-
+sodo_sim	O2	a16xy16	memb1	PASS	1140	68745004	True	-
+sodo_sim	O3	a16	head	PASS	1140	68745004	True	-
+sodo_sim	O3	a16	t4	PASS	1140	68745004	True	-
+sodo_sim	O3	a16	memb1	PASS	1140	68745004	True	-
+sodo_sim	O3	a16xy16	head	PASS	1140	68745004	True	-
+sodo_sim	O3	a16xy16	t4	PASS	1140	68745004	True	-
+sodo_sim	O3	a16xy16	memb1	PASS	1140	68745004	True	-
+tea_sim	O2	a16	head	PASS	1089	2446958	-	-
+tea_sim	O2	a16	t4	PASS	800	1957044	True	-
+tea_sim	O2	a16	memb1	PASS	799	1909788	-	-
+tea_sim	O2	a16xy16	head	PASS	1089	2446958	-	-
+tea_sim	O2	a16xy16	t4	PASS	800	1957044	True	-
+tea_sim	O2	a16xy16	memb1	PASS	799	1909788	-	-
+tea_sim	O3	a16	head	PASS	13	96	True	-
+tea_sim	O3	a16	t4	PASS	13	96	True	-
+tea_sim	O3	a16	memb1	PASS	13	96	True	-
+tea_sim	O3	a16xy16	head	PASS	13	96	True	-
+tea_sim	O3	a16xy16	t4	PASS	13	96	True	-
+tea_sim	O3	a16xy16	memb1	PASS	13	96	True	-
+ulam_sim	O2	a16	head	PASS	424	7652912	True	-
+ulam_sim	O2	a16	t4	PASS	424	7652912	True	-
+ulam_sim	O2	a16	memb1	PASS	424	7652912	True	-
+ulam_sim	O2	a16xy16	head	PASS	376	7162844	True	-
+ulam_sim	O2	a16xy16	t4	PASS	376	7162844	True	-
+ulam_sim	O2	a16xy16	memb1	PASS	376	7162844	True	-
+ulam_sim	O3	a16	head	PASS	424	7652912	True	-
+ulam_sim	O3	a16	t4	PASS	424	7652912	True	-
+ulam_sim	O3	a16	memb1	PASS	424	7652912	True	-
+ulam_sim	O3	a16xy16	head	PASS	376	7162844	True	-
+ulam_sim	O3	a16xy16	t4	PASS	376	7162844	True	-
+ulam_sim	O3	a16xy16	memb1	PASS	376	7162844	True	-
+runtime rc=0

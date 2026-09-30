@@ -1,0 +1,136 @@
+################ level Os
+=== native bytes, 321-16 -> final
+a16: 80 inputs, bytes 321430 -> 321352 (delta -78), larger 16, smaller 4, asm-identical 60, excluded 10
+  a16 corpus/examples_snes_packrec.c.default.ll: 17711 -> 17797 (+86)
+  a16 corpus/examples_snes_epicycles.c.default.ll: 20445 -> 20462 (+17)
+  a16 corpus/examples_snes_1d-ca.c.default.ll: 14008 -> 14025 (+17)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 788 (-289)
+  a16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18286 -> 18282 (-4)
+a16xy16: 79 inputs, bytes 299953 -> 299791 (delta -162), larger 15, smaller 5, asm-identical 59, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16766 (+16)
+  a16xy16 corpus/examples_snes_1d-ca.c.default.ll: 13998 -> 14013 (+15)
+  a16xy16 corpus/examples_snes_funnelkal.c.default.ll: 16591 -> 16605 (+14)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 788 (-289)
+  a16xy16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16xy16 corpus/examples_65816_a16scavnz.c.default.ll: 527 -> 519 (-8)
+=== native asm+obj, final vs frozen t4 (and vs t4)
+  vs ref: 180/180 rows identical (size, asm, obj)
+  vs t4: 180/180 rows identical (size, asm, obj)
+=== default identity, upstream -> final01
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, cand1 -> final
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, t4 -> final
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+################ level Oz
+=== native bytes, 321-16 -> final
+a16: 80 inputs, bytes 321320 -> 321242 (delta -78), larger 16, smaller 4, asm-identical 60, excluded 10
+  a16 corpus/examples_snes_packrec.c.default.ll: 17711 -> 17797 (+86)
+  a16 corpus/examples_snes_epicycles.c.default.ll: 20445 -> 20462 (+17)
+  a16 corpus/examples_snes_1d-ca.c.default.ll: 14008 -> 14025 (+17)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 788 (-289)
+  a16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18267 -> 18263 (-4)
+a16xy16: 79 inputs, bytes 299842 -> 299680 (delta -162), larger 15, smaller 5, asm-identical 59, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16766 (+16)
+  a16xy16 corpus/examples_snes_1d-ca.c.default.ll: 13998 -> 14013 (+15)
+  a16xy16 corpus/examples_snes_funnelkal.c.default.ll: 16591 -> 16605 (+14)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 788 (-289)
+  a16xy16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16xy16 corpus/examples_65816_a16scavnz.c.default.ll: 527 -> 519 (-8)
+=== native asm+obj, final vs frozen t4 (and vs t4)
+  vs ref: 180/180 rows identical (size, asm, obj)
+  vs t4: 180/180 rows identical (size, asm, obj)
+=== default identity, upstream -> final01
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, cand1 -> final
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, t4 -> final
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+################ level O2
+=== native bytes, 321-16 -> final
+a16: 80 inputs, bytes 324317 -> 324233 (delta -84), larger 16, smaller 4, asm-identical 60, excluded 10
+  a16 corpus/examples_snes_packrec.c.default.ll: 17848 -> 17934 (+86)
+  a16 corpus/examples_snes_1d-ca.c.default.ll: 14132 -> 14149 (+17)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16912 -> 16927 (+15)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 800 (-289)
+  a16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18401 -> 18397 (-4)
+a16xy16: 79 inputs, bytes 302699 -> 302533 (delta -166), larger 15, smaller 5, asm-identical 59, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16850 -> 16866 (+16)
+  a16xy16 corpus/examples_snes_1d-ca.c.default.ll: 14122 -> 14137 (+15)
+  a16xy16 corpus/examples_snes_sodo.c.default.ll: 15010 -> 15023 (+13)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 800 (-289)
+  a16xy16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16xy16 corpus/examples_65816_a16scavnz.c.default.ll: 527 -> 519 (-8)
+=== native asm+obj, final vs frozen t4 (and vs t4)
+  vs ref: 180/180 rows identical (size, asm, obj)
+  vs t4: 180/180 rows identical (size, asm, obj)
+=== default identity, upstream -> final01
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, cand1 -> final
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, t4 -> final
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+################ level O3
+=== native bytes, 321-16 -> final
+a16: 80 inputs, bytes 326054 -> 325625 (delta -429), larger 20, smaller 12, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16706 -> 16811 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17874 -> 17975 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16934 -> 17013 (+79)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 799 (-424)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 856 -> 650 (-206)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18490 -> 18335 (-155)
+a16xy16: 79 inputs, bytes 304371 -> 303819 (delta -552), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16877 -> 16958 (+81)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19416 -> 19468 (+52)
+  a16xy16 corpus/examples_snes_bf-vm.c.default.ll: 18174 -> 18225 (+51)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 799 (-424)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 856 -> 650 (-206)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18452 -> 18299 (-153)
+=== native asm+obj, final vs frozen memb1 (and vs t4)
+  vs ref: 180/180 rows identical (size, asm, obj)
+  vs t4: 119/180 rows identical (size, asm, obj)
+=== default identity, upstream -> final01
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, cand1 -> final
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, t4 -> final
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0

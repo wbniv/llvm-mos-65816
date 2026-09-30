@@ -1,0 +1,21 @@
+source: /work/examples/snes/corpus/nmitally_sim.c
+clang-23 4c2d5ceb7212deaa  llc 9f9b74f91eab29e1  ld.lld 538a938bf6ba9703
+== clang -O3, no LTO
+clang -O3 object code 72ff33ee02eebc1e
+llc -O3 on its IR     72ff33ee02eebc1e
+llc -O2 on its IR     5f411f0389f6e791
+== mos-clang -flto link at -O3 (--save-temps)
+-mllvm -align-large-globals=false -mllvm -force-loop-cold-block -mllvm -force-precise-rotation-cost -mllvm -jump-inst-cost=6 -mllvm -lsr-complexity-limit=10000000 -mllvm -phi-node-folding-threshold=0 -mllvm -speculate-blocks=0 -mllvm -zp-avail=224 plugin-opt=O3 
+precodegen: rom.sfc.0.5.precodegen.bc  lto object: rom.sfc.lto.o
+LTO object code        18b5b6e985bb8442
+llc -O3 on precodegen  18b5b6e985bb8442
+llc -O2 on precodegen  599062bcb132e3c7
+== mos-clang -flto link at -Os (--save-temps)
+-mllvm -align-large-globals=false -mllvm -force-loop-cold-block -mllvm -force-precise-rotation-cost -mllvm -jump-inst-cost=6 -mllvm -lsr-complexity-limit=10000000 -mllvm -phi-node-folding-threshold=0 -mllvm -speculate-blocks=0 -mllvm -zp-avail=224 plugin-opt=O2 
+precodegen: rom.sfc.0.5.precodegen.bc  lto object: rom.sfc.lto.o
+LTO object code        599062bcb132e3c7
+llc -O3 on precodegen  18b5b6e985bb8442
+llc -O2 on precodegen  599062bcb132e3c7
+baseline llc f1fa50a225c36607 (before the change), same inputs:
+  clang -O3 IR: llc -O3 5f411f0389f6e791  llc -O2 5f411f0389f6e791
+  -O3 link precodegen: llc -O3 599062bcb132e3c7  llc -O2 599062bcb132e3c7

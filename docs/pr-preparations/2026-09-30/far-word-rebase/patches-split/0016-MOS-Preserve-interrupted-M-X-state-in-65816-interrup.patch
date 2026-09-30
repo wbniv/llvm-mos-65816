@@ -1,4 +1,4 @@
-From 780d9e028c04ebbad1cc1821125110552490c982 Mon Sep 17 00:00:00 2001
+From aa868b9525705f8612cd316a3e5c86d500b2bcc1 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 16/32] [MOS] Preserve interrupted M/X state in 65816 interrupt

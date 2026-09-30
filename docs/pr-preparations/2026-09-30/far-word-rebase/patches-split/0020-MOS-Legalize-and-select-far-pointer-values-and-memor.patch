@@ -1,4 +1,4 @@
-From 83802bc03edc5995df1e2b36c676a8881d2ff742 Mon Sep 17 00:00:00 2001
+From df00169bd7b189b19ca9e271aaa3852fe2ef624b Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 20/32] [MOS] Legalize and select far pointer values and memory
@@ -731,10 +731,10 @@ index 91259dc48d72..87faaebe35dc 100644
      // Jump tables are partitioned in two arrays: first all the low bytes,
      // then all the high bytes. This index referes to the high byte array, so
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index a1a345177981..c8ad24ce8697 100644
+index cf73f1bb1d92..3bcf45e83e3b 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -1089,11 +1089,22 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+@@ -1220,11 +1220,22 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
        }
        if (Other.getSubReg())
          OtherReg = TRI.getSubReg(OtherReg, Other.getSubReg());
@@ -757,7 +757,7 @@ index a1a345177981..c8ad24ce8697 100644
          MOSInstrCost Cost = copyCost(SelfReg, OtherReg, STI);
          if (Cost.value(CostMode) > WorstCost.value(CostMode))
            WorstCost = Cost;
-@@ -1102,6 +1113,8 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+@@ -1233,6 +1244,8 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
          Register SelfReg = R;
          if (Self.getSubReg())
            SelfReg = TRI.getSubReg(SelfReg, Self.getSubReg());

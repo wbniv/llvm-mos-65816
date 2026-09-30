@@ -1,0 +1,12 @@
+sizes Os.final build/pressure-sets/final/llc/321-16 /work/build/pressure-sets/opt-levels/inputs/Os 2 - a16=mosw65816:+mos-a16 a16xy16=mosw65816:+mos-a16,+mos-xy16
+hashes Os.def.final01 build/pressure-sets/final/llc/321-01 /work/build/pressure-sets/opt-levels/inputs/Os 2 - mos6502=mos6502 mosw65816=mosw65816
+hashes Os.def.final build/pressure-sets/final/llc/321-16 /work/build/pressure-sets/opt-levels/inputs/Os 2 - mos6502=mos6502 mosw65816=mosw65816
+sizes Oz.final build/pressure-sets/final/llc/321-16 /work/build/pressure-sets/opt-levels/inputs/Oz 2 - a16=mosw65816:+mos-a16 a16xy16=mosw65816:+mos-a16,+mos-xy16
+hashes Oz.def.final01 build/pressure-sets/final/llc/321-01 /work/build/pressure-sets/opt-levels/inputs/Oz 2 - mos6502=mos6502 mosw65816=mosw65816
+hashes Oz.def.final build/pressure-sets/final/llc/321-16 /work/build/pressure-sets/opt-levels/inputs/Oz 2 - mos6502=mos6502 mosw65816=mosw65816
+sizes O2.final build/pressure-sets/final/llc/321-16 /work/build/pressure-sets/opt-levels/inputs/O2 2 - a16=mosw65816:+mos-a16 a16xy16=mosw65816:+mos-a16,+mos-xy16
+hashes O2.def.final01 build/pressure-sets/final/llc/321-01 /work/build/pressure-sets/opt-levels/inputs/O2 2 - mos6502=mos6502 mosw65816=mosw65816
+hashes O2.def.final build/pressure-sets/final/llc/321-16 /work/build/pressure-sets/opt-levels/inputs/O2 2 - mos6502=mos6502 mosw65816=mosw65816
+sizes O3.final build/pressure-sets/final/llc/321-16 /work/build/pressure-sets/opt-levels/inputs/O2 3 - a16=mosw65816:+mos-a16 a16xy16=mosw65816:+mos-a16,+mos-xy16
+hashes O3.def.final01 build/pressure-sets/final/llc/321-01 /work/build/pressure-sets/opt-levels/inputs/O2 3 - mos6502=mos6502 mosw65816=mosw65816
+hashes O3.def.final build/pressure-sets/final/llc/321-16 /work/build/pressure-sets/opt-levels/inputs/O2 3 - mos6502=mos6502 mosw65816=mosw65816

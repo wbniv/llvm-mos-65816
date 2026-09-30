@@ -4,16 +4,16 @@ Prepared September 30, 2026. This packet rebases the [September 28 extracted ser
 
 ## Split series (current)
 
-The #321 and #320 prerequisites are no longer submitted as one patch each (patches 1 and 4 below). They are now the [split series](../split-320-321/README.md): #321 in 16 commits, the two unchanged MC commits, and #320 in 4 commits, followed by this packet's patches 5–14 applied unchanged with `git am -3`. [`patches-split/`](patches-split/) holds all 32 patches in that order. The #321 commits come before the MC commits, as patch 1 did before patches 2–3; the split evidence was built in that order.
+The #321 and #320 prerequisites are no longer submitted as one patch each (patches 1 and 4 below). They are now the [split series](../split-320-321/README.md): #321 in 16 commits, the two unchanged MC commits, and #320 in 4 commits, followed by this packet's patches 5–14 applied unchanged with `git am -3`. [`patches-split/`](patches-split/) holds all 32 patches in that order. The #321 commits come before the MC commits, as patch 1 did before patches 2–3; the split evidence was built in that order. On 2026‑09‑30 the split was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application) (#321‑1 and #321‑8), and this section records the rerun on the regenerated commits.
 
 | Check | Result |
 | --- | --- |
 | Patches 5–14 on the split | Applied with `git am -3`, no conflicts |
-| Final tree | `cf6262110789`: the previous candidate `77dc044c39bb` plus the 11 test files the split adds under `llvm/test/`; no other path differs |
+| Final tree | `c8fb49d93087`: the previous candidate `77dc044c39bb` plus the pressure-set change (`MOSRegisterInfo.{cpp,h,td}`, `MOSSubtarget.cpp`) and the 13 test files the split adds under `llvm/test/`; no other path differs |
 | Round trip | Each of the 32 patches applied in order to `06bc967d2668` reproduces its commit's tree ([record](evidence/split-series.json)) |
-| MOS CodeGen + MC | 172 passed, 1 unsupported (163 before, less the 2 X86 tests counted there, plus the 11 added tests) |
-| X86 0028 regressions | Both pass |
-| `llc` | sha256 `d7fde754bb02…`, identical to the previous candidate's `llc` |
+| MOS CodeGen + MC | 174 passed, 1 unsupported (163 before, less the 2 X86 tests counted there, plus the 13 added tests) |
+| X86 0028 regressions | Both passed on the first split; not rerun, because the pressure-set change touches only MOS files |
+| `llc` | sha256 `fd38e1c16b78…`; it differs from the previous candidate's `d7fde754bb02…` by the pressure-set change. The packet's replay and runtime measurements were taken before that change and have not been repeated |
 
 Everything below this section describes the monolithic-prerequisite series and remains its dated record.
 

@@ -1,4 +1,4 @@
-From 833ddf288b1798e76d3b1cdba9e7cfcbca0bae51 Mon Sep 17 00:00:00 2001
+From 28fcfc7d39e7d91435e00cf281eb4bf1d5d64e82 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:15:17 +0700
 Subject: [PATCH 31/32] Check far-word boundaries, operands, and loop-proof

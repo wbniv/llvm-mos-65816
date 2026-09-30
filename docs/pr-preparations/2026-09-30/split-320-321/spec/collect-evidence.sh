@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 # Copy the small split evidence into a packet directory and hash the large logs.
 #
-# usage: collect-evidence.sh DEST
+# usage: [LIT_PREFIX=t-] [DEF_PREFIX=] collect-evidence.sh DEST
 #   DEST  packet evidence directory (created). Large logs stay in
 #         build/split-320-321/evidence; their sha256 go to DEST/large-logs.sha256.
+#   LIT_PREFIX/DEF_PREFIX  evidence label prefixes of the suite run and of the
+#         default-mode run (the pressure-set rerun uses p- for both).
 set -euo pipefail
-case "${1:-}" in -h|--help|"") sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//'; exit 0;; esac
+case "${1:-}" in -h|--help|"") sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 0;; esac
 DEST=$1
 SPLIT=/home/will/llvm-mos-65816/build/split-320-321
 EV=$SPLIT/evidence
 mkdir -p "$DEST/per-commit"
-python3 "$SPLIT/spec/red-green.py" "$EV" t- > "$DEST/red-green.tsv"
+LP=${LIT_PREFIX-t-}; DP=${DEF_PREFIX-}
+python3 "$SPLIT/spec/red-green.py" "$EV" "$LP" > "$DEST/red-green.tsv"
 # One row per split commit: final commit, tree, suite result of the tests run
 # (t- labels), and the default-mode comparison from the first run, whose llc
 # binaries are byte-identical to the tests run (llc.sha256 compared per row).
@@ -19,15 +22,15 @@ python3 "$SPLIT/spec/red-green.py" "$EV" t- > "$DEST/red-green.tsv"
   for s in 321 320; do
     grep -v TREE "$SPLIT/spec/$s.list" | while IFS=$'\t' read -r k c t; do
       l=$s-$(printf %02d "$k")
-      same=$([ "$(cat "$EV/t-$l/llc.sha256")" = "$(cat "$EV/$l/llc.sha256")" ] && echo yes || echo NO)
-      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$l" "$c" "$t" "$(head -1 "$EV/t-$l/lit-summary.txt")" "$same" \
-        "$(sed -n 1p "$EV/$l/default-compare.txt" | sed 's/^mos6502: //')" \
-        "$(sed -n 2p "$EV/$l/default-compare.txt" | sed 's/^mosw65816: //')"
+      same=$([ "$(cat "$EV/$LP$l/llc.sha256")" = "$(cat "$EV/$DP$l/llc.sha256")" ] && echo yes || echo NO)
+      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$l" "$c" "$t" "$(head -1 "$EV/$LP$l/lit-summary.txt")" "$same" \
+        "$(sed -n 1p "$EV/$DP$l/default-compare.txt" | sed 's/^mos6502: //')" \
+        "$(sed -n 2p "$EV/$DP$l/default-compare.txt" | sed 's/^mosw65816: //')"
     done
   done
 } > "$DEST/series-evidence.tsv"
 : > "$DEST/large-logs.sha256"
-for d in "$EV"/321-?? "$EV"/320-?? "$EV"/t-32?-?? "$EV"/pkt-*; do
+for d in "$EV"/"$DP"321-?? "$EV"/"$DP"320-?? "$EV"/"$LP"32?-?? "$EV"/pkt-*; do
   [ -d "$d" ] || continue
   l=$(basename "$d"); mkdir -p "$DEST/per-commit/$l"
   for f in lit-summary.txt llc.sha256 default-compare.txt pressure-sets.txt objdiff-boids.txt \

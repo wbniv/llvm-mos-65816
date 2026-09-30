@@ -1,0 +1,12 @@
+mos6502: 90 inputs (54 compile before), 85 identical, 5 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 85 identical, 5 asm differ, 0 object-only differ
+  asm mos6502 corpus/examples_65816_far_fnptr.c.default.ll: ['1', 'err:87ee7c28706c', '1', '-'] -> ['1', 'err:b0f4debfa723', '1', '-']
+  asm mos6502 corpus/examples_65816_farbank.c.default.ll: ['1', 'err:834b48ff702a', '1', '-'] -> ['1', 'err:b0f4debfa723', '1', '-']
+  asm mos6502 corpus/examples_65816_farptrcmp-natural.c.default.ll: ['1', 'err:e8bb696526f7', '1', '-'] -> ['1', 'err:845448114e57', '1', '-']
+  asm mos6502 corpus/examples_65816_k_mandel_far.c.default.ll: ['1', 'err:001098381168', '1', '-'] -> ['1', 'err:20f117b2d931', '1', '-']
+  asm mos6502 corpus/examples_snes_lzss-gallery.c.default.ll: ['1', 'err:faab5bcc80ce', '1', '-'] -> ['1', 'err:20f117b2d931', '1', '-']
+  asm mosw65816 corpus/examples_65816_far_fnptr.c.default.ll: ['1', 'err:87ee7c28706c', '1', '-'] -> ['1', 'err:b0f4debfa723', '1', '-']
+  asm mosw65816 corpus/examples_65816_farbank.c.default.ll: ['1', 'err:834b48ff702a', '1', '-'] -> ['1', 'err:b0f4debfa723', '1', '-']
+  asm mosw65816 corpus/examples_65816_farptrcmp-natural.c.default.ll: ['1', 'err:e8bb696526f7', '1', '-'] -> ['1', 'err:845448114e57', '1', '-']
+  asm mosw65816 corpus/examples_65816_k_mandel_far.c.default.ll: ['1', 'err:001098381168', '1', '-'] -> ['1', 'err:20f117b2d931', '1', '-']
+  asm mosw65816 corpus/examples_snes_lzss-gallery.c.default.ll: ['1', 'err:faab5bcc80ce', '1', '-'] -> ['1', 'err:20f117b2d931', '1', '-']

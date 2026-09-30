@@ -16,11 +16,11 @@ Add two opt-in subtarget features for the WDC 65816: mos-a16 selects 16-bit accu
 
 The 65816 widens A to 16 bits when the M status bit is clear and X/Y when the X bit is clear. The high accumulator byte B, and the high index bytes, alias the 8-bit registers the backend already models. Add A16 (A:B), X16 (X:XH) and Y16 (Y:YH) as registers covered by their byte halves, so liveness and allocation see a 16-bit value in A16 as clobbering $a and the reverse. The full registers carry the MOS native-mode DWARF numbers 0x01000000-0x01000002; the internal high bytes have no DWARF number. Single-member classes Ac16, Xc16 and Yc16 give later commits allocation targets, and Ac16 joins the register bank. Nothing selects these registers yet.
 
-Default-mode effect: the new classes change the generated register pressure sets (MOSAsmParamRegClass stops being a separate set; Ac16, Xc16 and Yc16 sets appear). MachineLICM, MachineSink and the machine scheduler read pressure sets, so default mos6502 and mosw65816 code changes: 18 of 54 compiling mos6502 inputs and 33 of 78 mosw65816 inputs in the fixed input set produce different assembly. With -disable-machine-licm -disable-machine-sink -enable-misched=false -enable-post-misched=false the outputs are identical. Total default code size over the set grows by 3,478 bytes (mos6502) and 3,202 bytes (mosw65816).
+Default-mode effect: none (fixed input set identical in mos6502 and mosw65816). Ac16, Xc16 and Yc16 set GeneratePressureSet = 0, so the generated register pressure tables are the parent's. Without it, TableGen derives pressure sets from the new classes (Ac16, Xc16 and Yc16 sets appear and MOSAsmParamRegClass stops being a separate set), and because MachineLICM, MachineSink and the machine scheduler read those tables in every mode, 18 of 54 compiling mos6502 inputs and 33 of 78 mosw65816 inputs in the fixed input set would change (+3,478 and +3,202 bytes). Native values get their pressure modelling where they are first selected.
 
-Tests: native-width-registers.mir checks that both features are recognized and that the Ac16, Xc16 and Yc16 classes and the A16, X16 and Y16 registers parse and verify, with sublo naming the existing byte register.
+Tests: native-width-registers.mir checks that both features are recognized and that the Ac16, Xc16 and Yc16 classes and the A16, X16 and Y16 registers parse and verify, with sublo naming the existing byte register. native-width-default-pressure.ll pins default mos6502 and mosw65816 code for a three-way compare whose low-byte subtraction the scheduler moves when the native classes have pressure sets; it passes on the parent and guards this commit.
 
-Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/native-width-registers.mir`.
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/native-width-registers.mir llvm/test/CodeGen/MOS/native-width-default-pressure.ll`.
 """)
 
 M[2] = ("[MOS] Define 16-bit accumulator instruction forms", """
@@ -106,11 +106,13 @@ Under +mos-a16, s16 G_LOAD and G_STORE are legalized before byte narrowing. An a
 
 Accesses stay on the byte path where the native form costs more: constant-valued stores, loads whose every use splits the value into bytes, stores of values built from bytes in the same block with no call or inline assembly in between, and indirect stores of an A:X argument. Atomic accesses remain a single operation.
 
+These are the first native values, and Ac16, Xc16 and Yc16 have no generated pressure sets, so MOSRegisterInfo now takes the subtarget and the optimization level and overrides the pressure-set hooks. Under +mos-a16, each native class counts toward its low byte's generated sets (Ac16 toward Ac's). Below -O3, the hooks also append the sets A16, X16 and Y16, each with a limit of 2, charged by the 16-bit register's byte units and by the classes inside it (Ac and Ac16 for A16). The scheduler, MachineLICM and MachineSink then see that an 8-bit value live across a 16-bit one competes for the same register. On the fixed input set at the end of this series, the appended sets save 78 bytes with +mos-a16 and 162 bytes with +mos-a16,+mos-xy16 at -Os, but cost about 0.2% of cycles at -O2 and -O3, so -O3 (CodeGenOptLevel::Aggressive) leaves them out. The choice is made once, when the subtarget is built, because RegisterClassInfo caches set limits per register info. Without +mos-a16 every hook returns the generated tables.
+
 Default-mode effect: none (fixed input set identical).
 
-Tests: a16-load-store.ll checks one rep/sep-bracketed word load and store for absolute, (zp) and (zp),y (runtime and constant index) addresses, and a constant store kept as two byte stores. a16-byte-store.ll and a16-indirect-byte-store.ll, which pin the byte-versus-native store decisions, need native arithmetic results next to the stores and land with it.
+Tests: a16-load-store.ll checks one rep/sep-bracketed word load and store for absolute, (zp) and (zp),y (runtime and constant index) addresses, and a constant store kept as two byte stores. a16-byte-store.ll and a16-indirect-byte-store.ll, which pin the byte-versus-native store decisions, need native arithmetic results next to the stores and land with it. native-width-pressure-opt-level.ll (assertions builds) checks the scheduler's pressure sets for a word copy: the A16 set at -O2, and only the low byte's sets at -O3.
 
-Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-load-store.ll`.
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-load-store.ll llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll`.
 """)
 
 M[10] = ("[MOS] Select native 16-bit arithmetic, logic and constant shifts", """
@@ -154,7 +156,7 @@ In absolute indexed addressing, an index that is already s8 (a zero-page pointer
 
 Both lanes of the shared s16 offset stay explicitly defined: under native widths that value can reach a word spill or a word consumer, which reads both bytes.
 
-Default-mode effect: yes, in every mode. legalizer.mir drops a COPY of the s8 index in two zero-page tests, and the high byte of a shared offset becomes a known zero. In the fixed input set 16 of 54 compiling mos6502 inputs and 17 of 78 mosw65816 inputs produce different assembly; code size changes by +280 bytes on mos6502 (12 inputs larger, 3 smaller) and -83 bytes on mosw65816 (1 larger, 14 smaller).
+Default-mode effect: yes, in every mode. legalizer.mir drops a COPY of the s8 index in two zero-page tests, and the high byte of a shared offset becomes a known zero. In the fixed input set 16 of 54 compiling mos6502 inputs and 18 of 78 mosw65816 inputs produce different assembly; code size changes by +243 bytes on mos6502 (12 inputs larger, 3 smaller) and -102 bytes on mosw65816 (17 smaller).
 
 Tests: zp-byte-index.ll checks zero-page indexed loads and stores in mos6502, +mos-a16 and +mos-a16,+mos-xy16 modes; legalizer-indexed-offset-observer.mir checks the rewritten operands and the CSE observer contract (assertions builds); legalizer.mir is updated.
 
@@ -164,7 +166,7 @@ Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/zp-byte-index.ll llvm/tes
 M[13] = ("[MOS] Require a no-wrap proof before folding near indexes on the 65816", """
 On the 65816, indexed addressing adds the index to the 16-bit base with carry into the bank (DBR), while a near G_PTR_ADD wraps at 16 bits. Folding the add into abs,X, abs,Y or (zp),Y is correct only if the unsigned sum cannot wrap. canFoldNearIndex allows the fold when the add is nuw, when it is nusw with a known non-negative offset, or when known bits bound base + offset below 0x10000. Other CPUs are unaffected. The check applies to the native word forms and to the existing byte abs-indexed (except zero page) and indirect-indexed folds.
 
-Default-mode effect: yes, on plain mosw65816 when an index cannot be proven not to wrap; mos6502 is unchanged. In the fixed input set 27 of the 78 mosw65816 inputs that compile before change (25 larger, 2 smaller, +4,626 bytes, 1.6%), because a byte index into a runtime pointer now needs a 16-bit add. One corpus input (examples_snes_sodo) that already fails on the base commit with "Remaining virtual register" during frame lowering compiles after this change; the change avoids that shape rather than repairing it.
+Default-mode effect: yes, on plain mosw65816 when an index cannot be proven not to wrap; mos6502 is unchanged. In the fixed input set 27 of the 78 mosw65816 inputs that compile before change (26 larger, 1 smaller, +4,620 bytes, 1.6%), because a byte index into a runtime pointer now needs a 16-bit add. One corpus input (examples_snes_sodo) that already fails on the base commit with "Remaining virtual register" during frame lowering compiles after this change; the change avoids that shape rather than repairing it.
 
 Tests: near-index-nowrap.ll checks, on mos6502 and mosw65816, a plain add (folded only on mos6502), nuw and inbounds non-negative adds (folded on both), a global base (folded only on mos6502) and a constant base whose known bits bound the sum (folded on both).
 
@@ -205,7 +207,15 @@ Tests: interrupt-width-65816.ll checks the prologue and epilogue on plain mosw65
 Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/interrupt-width-65816.ll`.
 """)
 
+# Commits that carry the native-width pressure-set change.
+PRESSURE = "Native-width pressure sets: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort."
+PRESSURE_SESSION = "Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F\n"
+
 for k, (subj, body) in M.items():
+    foot = FOOT
+    if k in (1, 8):
+        head, trailers = FOOT.split('\n\n', 1)
+        foot = head + ' ' + PRESSURE + '\n\n' + trailers + PRESSURE_SESSION
     with open(os.path.join(HERE, f'321-{k:02d}.txt'), 'w') as f:
-        f.write(subj + '\n' + body.rstrip('\n') + '\n\n' + FOOT)
+        f.write(subj + '\n' + body.rstrip('\n') + '\n\n' + foot)
 print('wrote', len(M))

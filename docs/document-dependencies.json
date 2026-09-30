@@ -93,7 +93,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
-          "docs/defects/mos-native-width-pressure-sets.json": "d463a71b28a0e92c8c5641d5b3e8c99c688c97d975037d276f6635d799c6bb26",
+          "docs/defects/mos-native-width-pressure-sets.json": "af493f59488159ee5e8251ff8b31fc99393c48abb23e27e74ac271951ad92521",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
           "docs/defects/mos-near-nowrap-option-clash.json": "f02673b6a5a6895a2ec4edd8d312ad02cb8813c4e42a411719b353c858ce33b1",
@@ -113,7 +113,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "b0c7195f41c3eeec2fa7447718e69a6454a42093673f426f864bf93a1f6e1b99"
+          "docs/upstream-dashboard.json": "e14fa4fca503d2e1e19f865185b2f60d1dc75283be451f3b8a85ad2cc073315c"
         }
       }
     },
@@ -136,11 +136,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "fe7c1942314a963973fa3576ce4695d1e71292836a01de04d9ac234efb82a5f9",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "b0c7195f41c3eeec2fa7447718e69a6454a42093673f426f864bf93a1f6e1b99",
+          "docs/upstream-dashboard.json": "e14fa4fca503d2e1e19f865185b2f60d1dc75283be451f3b8a85ad2cc073315c",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "3fe182c7905653bd22aaecc986647740b872e95dd63c53ef8636d2d7dec7e656"
+          "docs/upstream-dashboard-graph.json": "a7ad6507dec85a2a81a99ea59638287133f22ab5e5213f3d305c1b38b5282363"
         }
       }
     },
@@ -315,7 +315,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "5849b2c8c6594bc311967ea34953d4265492e8d953686d31c3055b052820cd1f",
+          "docs/defects/mos-native-width-pressure-sets.json": "616f7c81baf5370a9da004620a3db4647dc080fc42d808c4fec6dfeaa3a62938",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -355,11 +355,11 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T10:54:23.499225+00:00",
-        "note": "New confirmed record mos-far-cc-split-axy-custom-args (opt-in split/AXY far CC crash); no TODO item added pending orchestrator ranking, and the trackers describe the default far-pointer path, which is unaffected.",
-        "attribution": "Review: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort. Re-recorded after the 2026-09-30 OOM reboot interrupted its rebase: Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-09-30T15:13:00.076435+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -409,7 +409,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "5849b2c8c6594bc311967ea34953d4265492e8d953686d31c3055b052820cd1f",
+          "docs/defects/mos-native-width-pressure-sets.json": "616f7c81baf5370a9da004620a3db4647dc080fc42d808c4fec6dfeaa3a62938",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -441,11 +441,11 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T10:54:23.606597+00:00",
-        "note": "New confirmed record mos-far-cc-split-axy-custom-args (opt-in split/AXY far CC crash); no TODO item added pending orchestrator ranking, and the trackers describe the default far-pointer path, which is unaffected.",
-        "attribution": "Review: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort. Re-recorded after the 2026-09-30 OOM reboot interrupted its rebase: Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-09-30T15:13:00.183527+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -495,7 +495,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "5849b2c8c6594bc311967ea34953d4265492e8d953686d31c3055b052820cd1f",
+          "docs/defects/mos-native-width-pressure-sets.json": "616f7c81baf5370a9da004620a3db4647dc080fc42d808c4fec6dfeaa3a62938",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -527,11 +527,11 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T10:54:23.611289+00:00",
-        "note": "New confirmed record mos-far-cc-split-axy-custom-args (opt-in split/AXY far CC crash); no TODO item added pending orchestrator ranking, and the trackers describe the default far-pointer path, which is unaffected.",
-        "attribution": "Review: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort. Re-recorded after the 2026-09-30 OOM reboot interrupted its rebase: Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-09-30T15:13:00.188315+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -692,11 +692,11 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T02:44:48.962375+00:00",
-        "note": "Reviewed against the #320/#321 split series: these summaries already route the far repairs through the split series and describe no split as done or pending in a way the split contradicts; the pressure-set item in TODO.md matches the split's recorded #321-1 default-mode change. No change needed. The 0065 PR body still describes its 26d7c2c1eebf three-patch series; regenerating it on the split is left to the posting step.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T15:13:00.575872+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -976,12 +976,12 @@
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-30T02:44:51.648992+00:00",
-        "note": "Reviewed against the #320/#321 split series: these summaries already route the far repairs through the split series and describe no split as done or pending in a way the split contradicts; the pressure-set item in TODO.md matches the split's recorded #321-1 default-mode change. No change needed. The 0065 PR body still describes its 26d7c2c1eebf three-patch series; regenerating it on the split is left to the posting step.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T15:13:03.147777+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -1464,12 +1464,12 @@
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-30T02:44:52.207326+00:00",
-        "note": "Reviewed against the #320/#321 split series: these summaries already route the far repairs through the split series and describe no split as done or pending in a way the split contradicts; the pressure-set item in TODO.md matches the split's recorded #321-1 default-mode change. No change needed. The 0065 PR body still describes its 26d7c2c1eebf three-patch series; regenerating it on the split is left to the posting step.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T15:13:03.720751+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -1493,11 +1493,11 @@
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T02:44:52.300885+00:00",
-        "note": "Reviewed against the #320/#321 split series: these summaries already route the far repairs through the split series and describe no split as done or pending in a way the split contradicts; the pressure-set item in TODO.md matches the split's recorded #321-1 default-mode change. No change needed. The 0065 PR body still describes its 26d7c2c1eebf three-patch series; regenerating it on the split is left to the posting step.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T15:13:03.816398+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -1706,13 +1706,13 @@
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5"
         },
-        "reviewed_at": "2026-09-30T02:43:42.222313+00:00",
-        "note": "Updated for the #320/#321 split series: the blueprint points at the 16-commit #321 series, the 0065 README gains a Split series section with patches-split and a round-trip record, and the dashboard next step records that the split exists and repairs go onto it.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T15:13:04.305428+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -2470,7 +2470,7 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-environment.json": "f1323091cf81d3bb57025bfc723e60cc936eb69678142f1e18f0b7f8d81d382e",
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-identity.json": "24f2aea2481100a84a88b6edfc1d10880afd9a58e217ba8776313902c6ef95e2",
           "docs/pr-preparations/2026-09-28/0065/evidence/series.json": "4e73fa3210ef23f059256a82b3487b5c24d46b9c8468b5f0b30de8648ca70c62",
-          "docs/pr-preparations/2026-09-28/0065/evidence/split-series.json": "672817c863e03561ec4571ac077000644272c02ee6c1e3b1c9c3a241e3a27c13",
+          "docs/pr-preparations/2026-09-28/0065/evidence/split-series.json": "e88e4ede03d765510ffd49ad3e8d7a8557c96231fab7021e908eaf42c7037e47",
           "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
@@ -2489,9 +2489,9 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSRegisterInfo.td.txt": "a96ed543ff671dfb59a66d55756681fddc48342c5ea987a09d12d7c02e4e76c9",
           "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSTargetMachine.cpp.txt": "a10b1fe04db6fb3f33f502e62e1f653543ac1e5e9188c824e1234e0e5b4ce3ba"
         },
-        "reviewed_at": "2026-09-30T02:43:41.406623+00:00",
-        "note": "Updated for the #320/#321 split series: the blueprint points at the 16-commit #321 series, the 0065 README gains a Split series section with patches-split and a round-trip record, and the dashboard next step records that the split exists and repairs go onto it.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T15:13:05.179436+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -2504,14 +2504,14 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb",
           "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
           "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4"
         },
-        "reviewed_at": "2026-09-30T02:44:52.595964+00:00",
-        "note": "Reviewed against the #320/#321 split series: these summaries already route the far repairs through the split series and describe no split as done or pending in a way the split contradicts; the pressure-set item in TODO.md matches the split's recorded #321-1 default-mode change. No change needed. The 0065 PR body still describes its 26d7c2c1eebf three-patch series; regenerating it on the split is left to the posting step.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T15:13:05.371191+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {
@@ -2521,11 +2521,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T02:43:40.384820+00:00",
-        "note": "Updated for the #320/#321 split series: the blueprint points at the 16-commit #321 series, the 0065 README gains a Split series section with patches-split and a round-trip record, and the dashboard next step records that the split exists and repairs go onto it.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T15:13:05.371241+00:00",
+        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
+        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
       }
     },
     {

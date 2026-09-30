@@ -1,4 +1,4 @@
-From 76015eb1589894316805e94657d92f330520f7d2 Mon Sep 17 00:00:00 2001
+From e80c8b3136e0fef5e8e0e6b019955e554da33ec2 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:47:16 +0700
 Subject: [PATCH 24/32] Select native accumulator far word accesses

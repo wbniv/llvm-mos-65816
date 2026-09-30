@@ -1,0 +1,10 @@
+== mos-clang --config mos-snes.cfg (no -O) m.c -o m.sfc : linker line
+"/work/build/llvm-mos-install/bin/ld.lld" "-plugin-opt=mcpu=mosw65816" "-plugin-opt=-function-sections=1" "-plugin-opt=-data-sections=1" 
+== mos-clang --config mos-snes.cfg -Os m.c -o m.sfc : linker line
+"/work/build/llvm-mos-install/bin/ld.lld" "-plugin-opt=mcpu=mosw65816" "-plugin-opt=O2" "-plugin-opt=-function-sections=1" "-plugin-opt=-data-sections=1" 
+== mos-clang --config mos-snes.cfg -O2 m.c -o m.sfc : linker line
+"/work/build/llvm-mos-install/bin/ld.lld" "-plugin-opt=mcpu=mosw65816" "-plugin-opt=O2" "-plugin-opt=-function-sections=1" "-plugin-opt=-data-sections=1" 
+== mos-clang --config mos-snes.cfg -O3 m.c -o m.sfc : linker line
+"/work/build/llvm-mos-install/bin/ld.lld" "-plugin-opt=mcpu=mosw65816" "-plugin-opt=O3" "-plugin-opt=-function-sections=1" "-plugin-opt=-data-sections=1" 
+== mos-clang --config mos-snes.cfg -Oz m.c -o m.sfc : linker line
+"/work/build/llvm-mos-install/bin/ld.lld" "-plugin-opt=mcpu=mosw65816" "-plugin-opt=O2" "-plugin-opt=-function-sections=1" "-plugin-opt=-data-sections=1" 

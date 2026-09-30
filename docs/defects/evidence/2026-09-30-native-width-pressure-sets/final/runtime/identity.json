@@ -1,0 +1,117 @@
+{
+  "clang": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+  "mos-clang-cfg": "f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205",
+  "probe": "3c04775feb68c4d25d904df8b079f0de5a8a58a8e20c7e62adde31060cb5bec3",
+  "llvm-size": "8c9376085559ce88020e5864547cdd730f61d7a49210eb3f122cd4d6d07f8c4b",
+  "llcs": {
+    "final": {
+      "path": "/work/build/pressure-sets/final/llc/321-16",
+      "sha256": "da1a6f4ba69c97f3776280e7cff07345175da4d385c92eafd820bc6f24c9bc10",
+      "flag": ""
+    },
+    "head": {
+      "path": "/work/build/pressure-sets/llc/321-16",
+      "sha256": "b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45",
+      "flag": ""
+    },
+    "t4": {
+      "path": "/work/build/pressure-sets/t4/llc/321-16-t4",
+      "sha256": "0f3f63bf4d2cc0907979fb1699c02da0654717cdc1c0c3a0fc08250a7933054d",
+      "flag": ""
+    },
+    "memb1": {
+      "path": "/work/build/pressure-sets/t4/llc/head-probe",
+      "sha256": "d0e46c1353ba5d0d45e81d201ca3cf4ce171e0292b29bea4b810f70a98cca8be",
+      "flag": "-mos-native-pressure-probe=1"
+    }
+  },
+  "sources": {
+    "avalanche_sim": "f60178acfd786590d57b2f81a9afbc8ed636316dbbcb12ff7bd166729a704520",
+    "boids_sim": "55de8e8a254c838d324cb2420e5284c8bd491bb6747cd28454c445799aa821f4",
+    "cgrade_sim": "faf41275809c5199f22f6cd409e55d22a432919dee639e640cd100fba867d33a",
+    "critters_sim": "4fb9534807dc61ab7ad892f5483b4b4adf716bfd6643878c66f36f6a24cb2849",
+    "domcol_sim": "a8db71434aadec09fdc9c1e69691660c9ffd91e3a452536a228f1cd0abda0f0e",
+    "fenwick_sim": "d49dc1982e31fffca6a03cf07beeb3f39f7a96d6bbf330753226fb0fc2640cc7",
+    "grid3d_sim": "8c730481d59183a03a873598caee9e1ba882a8f6bf15aad67c8db55571eff5fd",
+    "jt256_sim": "dc041d113e47c677f5ff62db7e708fa0de9487d98f4d488587db2ca6e3e41918",
+    "lzdec_sim": "fe25a9fb17174e6cbd4215b5f622ffbf6ec6f75a51ab998d86c4af3efabc0a45",
+    "montorbit_sim": "7f039e1ba24ebd9244825ca8329ee3565e750f9259b9588a9ee27c49f6765b45",
+    "nmitally_sim": "6c4d32d0927246ff6c0b167fd5753518d220ae45126fa3d06e75f71785338ed5",
+    "perlin_sim": "aabaebccc02c910ac33be9773e2c7dca9882e804a64ffdd2ff19aa4c2951a879",
+    "rangecode_sim": "faa3c61983163fa3ab798313773fa522078da1ee55f72f960b7fb1623a618a6c",
+    "satcast_sim": "7baf8d9d727215ffe49ccdc1a5aea396511b2b30c91b80f6ffaa8156bb41e3e4",
+    "sodo_sim": "63f02ba36b0415b3886d1130f2fff0bf810ff1718ddcc6bee657dc8edeb2b6a7",
+    "tea_sim": "69ccfef2eb0bdf0d59f1bd58487fd9698c54f8ca0419f1178c7435fe6fc97f10",
+    "ulam_sim": "341ffd70e494c74a28462266395abec6b69c02074a92abf2e78cfeb92af6e85b"
+  },
+  "expected": {
+    "avalanche_sim": [
+      "0x27ea",
+      "expected.tsv"
+    ],
+    "boids_sim": [
+      "0xa8ab",
+      "expected.tsv"
+    ],
+    "cgrade_sim": [
+      "0x783f",
+      "tools/cgrade-sim.c"
+    ],
+    "critters_sim": [
+      "0xad9f",
+      "tools/critters-sim.c"
+    ],
+    "domcol_sim": [
+      "0xf3fd",
+      "expected.tsv"
+    ],
+    "fenwick_sim": [
+      "0x3454",
+      "expected.tsv"
+    ],
+    "grid3d_sim": [
+      "0xfcde",
+      "expected.tsv"
+    ],
+    "jt256_sim": [
+      "0xb8cc",
+      "expected.tsv"
+    ],
+    "lzdec_sim": [
+      "0x100",
+      "tools/lzdec-sim.c"
+    ],
+    "montorbit_sim": [
+      "0xba9b",
+      "tools/montorbit-sim.c"
+    ],
+    "nmitally_sim": [
+      "0xbce6",
+      "expected.tsv"
+    ],
+    "perlin_sim": [
+      "0xa72d",
+      "expected.tsv"
+    ],
+    "rangecode_sim": [
+      "0x6d21",
+      "tools/rangecode-sim.c"
+    ],
+    "satcast_sim": [
+      "0xc8cf",
+      "tools/satcast-sim.c"
+    ],
+    "sodo_sim": [
+      "0xd2a2",
+      "tools/sodo-sim.c"
+    ],
+    "tea_sim": [
+      "0xdf0e",
+      "expected.tsv"
+    ],
+    "ulam_sim": [
+      "0x1f2f",
+      "tools/ulam-sim.c"
+    ]
+  }
+}

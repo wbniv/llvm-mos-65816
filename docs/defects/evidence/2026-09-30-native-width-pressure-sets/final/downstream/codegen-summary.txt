@@ -1,0 +1,3 @@
+default: {'changed': 251, 'identical': 11, 'llc-fail(base=1,cand=1)': 15}; bytes 2315097 -> 2328524 (+13427), larger 207, smaller 35
+a16: {'changed': 168, 'identical': 108, 'llc-fail(base=1,cand=1)': 1}; bytes 2441232 -> 2444235 (+3003), larger 148, smaller 13
+a16xy16: {'changed': 167, 'identical': 109, 'llc-fail(base=1,cand=1)': 1}; bytes 2431285 -> 2434355 (+3070), larger 143, smaller 12

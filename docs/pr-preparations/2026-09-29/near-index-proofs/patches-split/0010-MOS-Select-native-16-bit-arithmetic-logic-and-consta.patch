@@ -1,4 +1,4 @@
-From 460ed3e89eedf5926ce285779f885fe525c216a4 Mon Sep 17 00:00:00 2001
+From a520448a2c7f3193f7d523c1e8dba53eae888011 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 10/17] [MOS] Select native 16-bit arithmetic, logic and

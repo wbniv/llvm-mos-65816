@@ -1250,10 +1250,10 @@ index d7e981ef61dc..eeea52ad87a5 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index bd90e7c881a7..c8ad24ce8697 100644
+index ca45b5d5878e..3bcf45e83e3b 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -54,6 +54,10 @@ MOSRegisterInfo::MOSRegisterInfo()
+@@ -69,6 +69,10 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
      // Pointers are referred to by their low byte in the addressing modes that
      // use them.
      unsigned R = Reg;
@@ -1264,7 +1264,7 @@ index bd90e7c881a7..c8ad24ce8697 100644
      if (MOS::Imag16RegClass.contains(R))
        R = getSubReg(R, MOS::sublo);
      if (!MOS::Imag8RegClass.contains(R))
-@@ -92,6 +96,17 @@ BitVector MOSRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
+@@ -223,6 +227,17 @@ BitVector MOSRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
    BitVector Reserved = this->Reserved;
    if (TFI->hasFP(MF))
      reserveAllSubregs(&Reserved, getFrameRegister(MF));
@@ -1282,7 +1282,7 @@ index bd90e7c881a7..c8ad24ce8697 100644
    return Reserved;
  }
  
-@@ -1074,11 +1089,22 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+@@ -1205,11 +1220,22 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
        }
        if (Other.getSubReg())
          OtherReg = TRI.getSubReg(OtherReg, Other.getSubReg());
@@ -1305,7 +1305,7 @@ index bd90e7c881a7..c8ad24ce8697 100644
          MOSInstrCost Cost = copyCost(SelfReg, OtherReg, STI);
          if (Cost.value(CostMode) > WorstCost.value(CostMode))
            WorstCost = Cost;
-@@ -1087,6 +1113,8 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+@@ -1218,6 +1244,8 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
          Register SelfReg = R;
          if (Self.getSubReg())
            SelfReg = TRI.getSubReg(SelfReg, Self.getSubReg());
@@ -1314,7 +1314,7 @@ index bd90e7c881a7..c8ad24ce8697 100644
          MOSInstrCost Cost = copyCost(SelfReg, OtherReg, STI);
          if (Cost.value(CostMode) < WorstCost.value(CostMode))
            RegScores[R] += (WorstCost - Cost);
-@@ -1325,6 +1353,11 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+@@ -1456,6 +1484,11 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
    if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
      return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
    }
@@ -1327,7 +1327,7 @@ index bd90e7c881a7..c8ad24ce8697 100644
      Register SrcReg8 =
          getMatchingSuperReg(SrcReg, MOS::sublsb, &MOS::Anyi8RegClass);
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index e64c0860e596..2c84b489848a 100644
+index 52d4cbc453be..438aac92f709 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 @@ -27,6 +27,12 @@ def sublo : MOSSubRegIndex<8>;
@@ -1379,15 +1379,20 @@ index e64c0860e596..2c84b489848a 100644
  
  // Single register classes.
  let isPressureFineGrained = true in {
-@@ -234,7 +262,11 @@ let isPressureFineGrained = true in {
+@@ -234,12 +262,16 @@ let isPressureFineGrained = true in {
  def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
  def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
  
--// Native widths: the 16-bit accumulator as a register class (single member,
 +// the 32-bit far-pointer ZP class (4 contiguous __rc bytes).
 +// The runtime far pointer dereferenced by `lda [dp]`/`sta [dp]` lives here.
 +def Imag32 : MOSReg32Class<(sequence "RL%u", 0, !add(MaxImag32Regs, -1))>;
 +
+ // The native-width classes below are opt-in and must not create register
+ // pressure sets: MachineLICM, MachineSink and the scheduler read the pressure
+ // tables in every mode, so new sets would change code for programs that never
+ // enable +mos-a16 or +mos-xy16.
+ let GeneratePressureSet = 0 in {
+-// Native widths: the 16-bit accumulator as a register class (single member,
 +// #321 Increment 1b: the 16-bit accumulator as a register class (single member,
  // A16 = B:A — NOT the carry flag C). Target of 16-bit-accumulator load/add/store
  // under +mos-a16. Named Ac16 to parallel the 8-bit accumulator class `Ac`.

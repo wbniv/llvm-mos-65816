@@ -1,0 +1,11 @@
+# Default and +mos-a16 object bytes over the downstream codegen IR (the ok rows of
+# codegen-results.tsv), baseline llc f1fa50a2 (before) vs candidate llc 9f9b74f9
+# (with the change), llc -O2 plus the flag shown. Command: scratch sz.sh (the
+# same llvm-size .text+.data+.rodata sum as downstream-codegen.sh).
+default flags[] (downstream default, -mos-carry-sched=always): 262 inputs, 2315097 -> 2328524 (+13427), larger 207, smaller 35
+default flags[-mos-carry-sched=gated]: 262 inputs, 2319044 -> 2328737 (9693), larger 186, smaller 56
+default flags[-mos-carry-sched=off]: 262 inputs, 2354306 -> 2329016 (-25290), larger 52, smaller 192
+a16 flags[] (always): 276 inputs, 2441232 -> 2444235 (+3003), larger 148, smaller 13
+a16 flags[-mos-carry-sched=off]: 276 inputs, 2448479 -> 2450117 (1638), larger 139, smaller 25
+# Attribution sample: 11 changed default inputs are identical between the two llc with
+# -disable-machine-licm -disable-machine-sink -enable-misched=false -enable-post-misched=false.

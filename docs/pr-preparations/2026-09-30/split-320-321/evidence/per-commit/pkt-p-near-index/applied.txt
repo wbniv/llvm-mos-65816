@@ -1,0 +1,1 @@
+5ce81a01e46512750440a191bcd65b01dfd54f28 Recover near-index no-wrap proofs after loop strength reduction

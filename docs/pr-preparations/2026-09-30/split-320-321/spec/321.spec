@@ -43,10 +43,10 @@ file llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir 4
 file llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir 4
 
 file llvm/lib/Target/MOS/MOSRegisterInfo.cpp 6
-range 4657 4667 7
-range 4685 4921 5
-range 4922 4950 11
-range 5125 5186 7
+range 4658 4668 7
+range 4837 5072 5
+range 5074 5101 11
+range 5277 5337 7
 file llvm/lib/Target/MOS/MOSRegisterInfo.h 6
 
 file llvm/lib/Target/MOS/MOSInstrInfo.cpp 11
@@ -133,6 +133,9 @@ file llvm/test/CodeGen/MOS/zp-byte-index.ll 12
 file llvm/test/CodeGen/MOS/xy16-near-indir-y.ll 14
 file llvm/test/CodeGen/MOS/interrupt-width-65816.ll 16
 
+# The pressure-set hooks take the optimization level from the subtarget.
+file llvm/lib/Target/MOS/MOSSubtarget.cpp 8
+
 # Focused tests added by the split (not in the monolithic patch).
 file llvm/test/CodeGen/MOS/native-width-registers.mir 1
 file llvm/test/CodeGen/MOS/a16-accumulator-forms.mir 2
@@ -144,3 +147,22 @@ file llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir 7
 file llvm/test/CodeGen/MOS/a16-load-store.ll 8
 file llvm/test/CodeGen/MOS/near-index-nowrap.ll 13
 file llvm/test/CodeGen/MOS/a16-small-add.ll 15
+file llvm/test/CodeGen/MOS/native-width-default-pressure.ll 1
+file llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll 8
+
+# Native-width pressure sets: lines only in the regenerated diff.
+range 4662 4662 8
+range 4673 4686 8
+range 4689 4692 8
+range 4700 4815 8
+range 5346 5346 8
+range 5349 5349 8
+range 5357 5357 8
+range 5361 5372 8
+range 5374 5375 8
+range 5383 5393 8
+range 5450 5454 1
+range 5464 5464 1
+range 5477 5478 8
+range 7529 7652 1
+range 7659 7688 8

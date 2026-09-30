@@ -1,4 +1,4 @@
-From 3cec9891c6cf3a20877b0e67148ad6780eea223f Mon Sep 17 00:00:00 2001
+From 56e6c7f91e9e0a9254b1f0e682684e046d6893e1 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 09/32] [MOS] Legalize native s32/s64 lanes and wide

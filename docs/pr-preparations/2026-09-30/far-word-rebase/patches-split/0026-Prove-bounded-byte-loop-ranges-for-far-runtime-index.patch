@@ -1,4 +1,4 @@
-From ec331788a077e45d7faf60f49cd9a7b194596146 Mon Sep 17 00:00:00 2001
+From a51a7d24d80f307cc0fd94f9cf7359b0a6920ac3 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:47:56 +0700
 Subject: [PATCH 26/32] Prove bounded byte-loop ranges for far runtime indexing

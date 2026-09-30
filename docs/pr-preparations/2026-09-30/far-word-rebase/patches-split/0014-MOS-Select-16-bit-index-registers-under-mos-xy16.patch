@@ -1,4 +1,4 @@
-From e8c51cc3b8cf542718e8270c7777e5638c7e20f3 Mon Sep 17 00:00:00 2001
+From a6718b6f6560a7070d518015443e188a5a65530a Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 14/32] [MOS] Select 16-bit index registers under +mos-xy16

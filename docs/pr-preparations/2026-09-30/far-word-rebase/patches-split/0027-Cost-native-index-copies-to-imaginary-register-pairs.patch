@@ -1,4 +1,4 @@
-From 5cf1fcf9792e2a7e71254c765134fd59ac544e1b Mon Sep 17 00:00:00 2001
+From 0a70fd9dce0503c8cb29bb64f9f8eec5363f071d Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:04:27 +0700
 Subject: [PATCH 27/32] Cost native index copies to imaginary register pairs
@@ -27,10 +27,10 @@ vscode), model gpt-6-astra, xhigh reasoning effort; verified session
  create mode 100644 llvm/test/CodeGen/MOS/native-index-copy-cost.mir
 
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index c8ad24ce8697..d6c48bfdadff 100644
+index 3bcf45e83e3b..9f68b8a7dc99 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -1353,6 +1353,15 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+@@ -1484,6 +1484,15 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
    if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
      return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
    }

@@ -1,832 +1,1263 @@
 {
-  "schema": 1,
-  "id": "mos-native-width-pressure-sets",
-  "title": "Opt-in native-width register classes change default-mode register pressure sets and code",
-  "status": "confirmed",
-  "summary": "Split #321-1 (a359c6b1d73c) adds the single-member classes Ac16, Xc16 and Yc16 for the opt-in 65816 native widths. TableGen derives pressure sets from them: the MOS pressure tables grow from 6 sets to 14 and lose MOSAsmParamRegClass. MachineLICM, MachineSink and the scheduler read those tables in every mode, so default-mode code changes. Against upstream 06bc967d2668 on the split's fixed 90-input set, 18 of 90 mos6502 and 33 of 90 plain mosw65816 results differ, adding +3,478 bytes on mos6502 and +3,202 bytes on mosw65816. Candidate (Phase A, not yet applied to the series or downstream): let GeneratePressureSet = 0 on Ac16/Xc16/Yc16 restores upstream's PressureNameTable/PressureLimitTable exactly and makes default output byte-identical to upstream on all 90 inputs in both modes, in asm and object. At #321-1, +mos-a16 and +mos-a16,+mos-xy16 output also becomes identical to upstream plain mosw65816 (-3,202 bytes). At series head c33eb63d65a3 the change removes 3,515 bytes (mos6502) and 3,379 bytes (mosw65816) of default-mode code, but native output grows by 539 bytes (+mos-a16: 21 inputs larger, 13 smaller) and by 217 bytes (+mos-a16,+mos-xy16: 21 larger, 10 smaller). That growth is unexplained and escalated.",
-  "report": "docs/plans/2026-09-30-native-register-pressure-sets.md",
-  "reproducer_origin": "original",
-  "attribution": [
-    "Record, baseline, candidate experiment and evidence: Claude Code 2.1.285 (claude --version at run time; t3-opus-med subagent), model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (agent definition); session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk. Original observation (split 321-01 pressure-set diff and default-mode size growth) and plan: the #320/#321 split work and the planning session (Claude Code 2.1.283, model claude-opus-5-5, xhigh reasoning effort, session f79adc39-72b4-4dc5-abc1-849c14c5ce96, as recorded in the plan).",
-    "T4 design, experiments and evidence (t4-design/): Claude Code 2.1.285 (claude --version at run time; t4-opus-high subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk.",
-    "Optimization-level gating run and evidence (opt-levels/): Claude Code 2.1.285 (claude --version at run time; T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition; not readable from session metadata); session https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F."
+ "schema": 1,
+ "id": "mos-native-width-pressure-sets",
+ "title": "Opt-in native-width register classes change default-mode register pressure sets and code",
+ "status": "confirmed",
+ "summary": "Split #321-1 (a359c6b1d73c) adds the single-member classes Ac16, Xc16 and Yc16 for the opt-in 65816 native widths. TableGen derives pressure sets from them: the MOS pressure tables grow from 6 sets to 14 and lose MOSAsmParamRegClass. MachineLICM, MachineSink and the scheduler read those tables in every mode, so default-mode code changes. Against upstream 06bc967d2668 on the split's fixed 90-input set, 18 of 90 mos6502 and 33 of 90 plain mosw65816 results differ, adding +3,478 bytes on mos6502 and +3,202 bytes on mosw65816. Candidate (Phase A, not yet applied to the series or downstream): let GeneratePressureSet = 0 on Ac16/Xc16/Yc16 restores upstream's PressureNameTable/PressureLimitTable exactly and makes default output byte-identical to upstream on all 90 inputs in both modes, in asm and object. At #321-1, +mos-a16 and +mos-a16,+mos-xy16 output also becomes identical to upstream plain mosw65816 (-3,202 bytes). At series head c33eb63d65a3 the change removes 3,515 bytes (mos6502) and 3,379 bytes (mosw65816) of default-mode code, but native output grows by 539 bytes (+mos-a16: 21 inputs larger, 13 smaller) and by 217 bytes (+mos-a16,+mos-xy16: 21 larger, 10 smaller). That growth is unexplained and escalated. Status 2026-09-30: fixed in the #320/#321 split series; downstream 0002 held (escalated), so the record stays confirmed. Ac16, Xc16 and Yc16 set GeneratePressureSet = 0 (split #321-1), so the generated pressure tables equal upstream's; MOSRegisterInfo overrides the pressure-set hooks under +mos-a16 (split #321-8): native classes charge their low byte's sets and, below -O3 (CodeGenOptLevel::Aggressive, read once per subtarget), A16/X16/Y16 sets are appended. Default output at #321-1 is byte-identical to upstream again (90 of 90 inputs, both modes, every level); native bytes at head vs unchanged 321-16: -78/-162 B at -Os, -84/-166 B at -O2, -429/-552 B at -O3; clocks -0.15% at -O2 and -0.18%/-0.17% at -O3. Downstream, the same change grows default-mode code by 13,427 B (+0.58%) over 262 SNES sources at -Os because the downstream computed-carry scheduling (0064/0067) relies on the Ac16/Xc16/Yc16-derived sets; with -mos-carry-sched=off it shrinks default code by 25,290 B. 0002 is unchanged pending the user decision.",
+ "report": "docs/plans/2026-09-30-native-register-pressure-sets.md",
+ "reproducer_origin": "original",
+ "attribution": [
+  "Record, baseline, candidate experiment and evidence: Claude Code 2.1.285 (claude --version at run time; t3-opus-med subagent), model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (agent definition); session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk. Original observation (split 321-01 pressure-set diff and default-mode size growth) and plan: the #320/#321 split work and the planning session (Claude Code 2.1.283, model claude-opus-5-5, xhigh reasoning effort, session f79adc39-72b4-4dc5-abc1-849c14c5ce96, as recorded in the plan).",
+  "T4 design, experiments and evidence (t4-design/): Claude Code 2.1.285 (claude --version at run time; t4-opus-high subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk.",
+  "Optimization-level gating run and evidence (opt-levels/): Claude Code 2.1.285 (claude --version at run time; T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition; not readable from session metadata); session https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F.",
+  "Application to the #320/#321 split series and downstream 0002, -O3 gate, regression tests, measurements and closure (final/): Claude Code 2.1.285 (claude --version at run time; T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition; not readable from session metadata); session https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F."
+ ],
+ "prior_work": {
+  "disposition": "distinct_from_related",
+  "search_terms": [
+   "GeneratePressureSet",
+   "PressureNameTable",
+   "PressureLimitTable",
+   "getRegPressureSetLimit",
+   "MOSAsmParamRegClass",
+   "pressure set",
+   "Ac16",
+   "Xc16",
+   "Yc16",
+   "default-mode",
+   "278,940",
+   "282,418"
   ],
-  "prior_work": {
-    "disposition": "distinct_from_related",
-    "search_terms": [
-      "GeneratePressureSet",
-      "PressureNameTable",
-      "PressureLimitTable",
-      "getRegPressureSetLimit",
-      "MOSAsmParamRegClass",
-      "pressure set",
-      "Ac16",
-      "Xc16",
-      "Yc16",
-      "default-mode",
-      "278,940",
-      "282,418"
-    ],
-    "related_records": [
-      "docs/defects/mos-carry-scheduling-pressure.json"
-    ],
-    "related_reports": [
-      "docs/plans/2026-09-26-mos-carry-scheduling.md",
-      "docs/investigations/2026-09-27-competing-carry-gate.md"
-    ],
-    "related_changes": [
-      "a359c6b1d73c (split #321-1, upstream-source repo)",
-      "patches/llvm-mos/0002-321-accum16.patch"
-    ],
-    "source_assessment": "a359c6b1d73c and series head c33eb63d65a3 define Ac16/Xc16/Yc16 without GeneratePressureSet, and both generate the same 14-set tables. Downstream vendor/llvm-mos (pin 8be0546128a5, patch 0002) defines the same classes the same way. No local or upstream change sets GeneratePressureSet for MOS.",
-    "binary_assessment": "The rebuilt a359c6b1d73c llc (sha256 2422c068...) is bit-identical to the split agent's deleted 321-01 llc, and its default hash table matches the split's 321-01/default-hashes.tsv. The rebuilt unchanged c33eb63d65a3 llc matches the split's 321-16 llc (b8006489...). Downstream build/llvm-mos MOSGenRegisterInfoTargetDesc.inc (d5c3510d...) has the same 14-entry tables. Its default-mode byte effect is unmeasured: no downstream build without the classes exists.",
-    "decision": "New canonical record. mos-carry-scheduling-pressure concerns isPressureFineGrained not reaching the initial pressure sets, so carry pressure is lost. This record concerns opt-in classes adding pressure sets that change default-mode heuristics. The mechanism, the affected mode and the repair differ.",
-    "evidence": {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/prior-work-audit.md",
-      "sha256": "4a392850e3578fe0b385df89867dcba33e29eb0b020108aefce45e15e7d190ef"
-    }
-  },
-  "baseline": {
-    "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/llc/321-01 /home/will/llvm-mos-65816/build/pressure-sets/runs/baseline",
-    "working_directory": "/home/will/llvm-mos-65816-pressure",
-    "configuration": {
-      "tool": "llc",
-      "triple": "mos",
-      "cpus": [
-        "mos6502",
-        "mosw65816"
-      ],
-      "features": [],
-      "optimization": "O2",
-      "lto": false,
-      "outputs": [
-        "asm",
-        "obj"
-      ],
-      "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
-    },
-    "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/llc/321-01 (read-only; split #321-1 a359c6b1d73c, assertions Release build; recipe tools/build-and-test.sh)",
-    "toolchain_sha256": "2422c0682d4f35dd98be7cb83d0f19b48abf530fe5584172e8d8a5fa7f93df50",
-    "container_image": "llvm-mos-65816-dev sha256:d0aea4bcf613d9deb929e61a051ba368cf87d42ef992edcfc6afd9e77c56c84b",
-    "input": {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
-      "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
-    },
-    "log": {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/default-identity.log",
-      "sha256": "d12d6cf7aa366c4dc01a551bcfd0ff25928528397e909aa29a8b8d9adf17f098"
-    },
-    "exit_code": 1,
-    "observed": "mos6502: 18 asm differ of 90; mosw65816: 33 asm differ of 90; 51 input/mode results changed",
-    "failure_signature": "RESULT: DIFFER (51 input/mode results changed)"
-  },
-  "additional_runs": [
-    {
-      "label": "Phase A candidate at #321-1 (not a closure run: Phase B applies the change to the series and downstream)",
-      "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/llc/321-01-cand1 /home/will/llvm-mos-65816/build/pressure-sets/runs/cand1-default",
-      "working_directory": "/home/will/llvm-mos-65816-pressure",
-      "configuration": {
-        "tool": "llc",
-        "triple": "mos",
-        "cpus": [
-          "mos6502",
-          "mosw65816"
-        ],
-        "features": [],
-        "optimization": "O2",
-        "lto": false,
-        "outputs": [
-          "asm",
-          "obj"
-        ],
-        "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
-      },
-      "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/llc/321-01-cand1 (a359c6b1d73c + candidate-321-01/change.diff)",
-      "toolchain_sha256": "e8130e32bb482adb61e3a98fb345a3154368a95804b1aecdd11c98dfabe17f3e",
-      "input": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
-        "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
-      },
-      "log": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/default-identity.log",
-        "sha256": "34304c26bd32e6b2a0506b87df167afdbfbf899e8797601f907abdcbbefbf4e9"
-      },
-      "exit_code": 0,
-      "observed": "mos6502 and mosw65816: 90 of 90 identical; RESULT: IDENTICAL"
-    },
-    {
-      "label": "T4 design at #321-1 (not a closure run: application to the series and downstream is dispatched separately)",
-      "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-01-t4 /home/will/llvm-mos-65816/build/pressure-sets/t4/runs/default-321-01",
-      "working_directory": "/home/will/llvm-mos-65816-pressure",
-      "configuration": {
-        "tool": "llc",
-        "triple": "mos",
-        "cpus": [
-          "mos6502",
-          "mosw65816"
-        ],
-        "features": [],
-        "optimization": "O2",
-        "lto": false,
-        "outputs": [
-          "asm",
-          "obj"
-        ],
-        "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
-      },
-      "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-01-t4 (a359c6b1d73c + t4-design/change/change-321-01.diff)",
-      "toolchain_sha256": "ab1c56fd19e197869ef1cddbaedb7189c2720f014fc1298b1de063f8668fedfb",
-      "input": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
-        "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
-      },
-      "log": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/default-vs-upstream/default-identity.log",
-        "sha256": "34304c26bd32e6b2a0506b87df167afdbfbf899e8797601f907abdcbbefbf4e9"
-      },
-      "exit_code": 0,
-      "observed": "mos6502 and mosw65816: 90 of 90 identical; RESULT: IDENTICAL"
-    },
-    {
-      "label": "Optimization-level gating: default-mode identity at -Os, -Oz, -O2 and -O3 (not a closure run)",
-      "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/make-level-inputs.sh {Os,Oz,O2} /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/inputs/{Os,Oz,O2}; bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/run-matrix.sh /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/jobs-sizes.txt /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/runs; bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/summarize.sh /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/runs",
-      "working_directory": "/home/will/llvm-mos-65816-pressure",
-      "configuration": {
-        "tool": "llc",
-        "triple": "mos",
-        "cpus": [
-          "mos6502",
-          "mosw65816"
-        ],
-        "features": [],
-        "optimization": "Os/Oz: llc -O2 on the fixed set with optsize (Os) or optsize+minsize (Oz) added to every non-optnone definition; O2: llc -O2 with optsize/minsize removed; O3: llc -O3 on the O2 inputs",
-        "lto": false,
-        "outputs": [
-          "asm",
-          "obj"
-        ],
-        "comparisons": [
-          "upstream 06bc967d2668 (321-00) vs 321-01-t4",
-          "321-16-cand1 vs 321-16-t4",
-          "321-16-t4 vs 321-16-gateprobe with the level gate on"
-        ]
-      },
-      "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-01-t4 and 321-16-t4 (all binaries: docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/binaries.sha256)",
-      "toolchain_sha256": "ab1c56fd19e197869ef1cddbaedb7189c2720f014fc1298b1de063f8668fedfb",
-      "input": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.sha256",
-        "sha256": "28afb2de8d279b3394ea25473f7e521fdeecdad0520786ae2fe054cec9496c7f"
-      },
-      "log": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/summary.txt",
-        "sha256": "55d9f77b25dbfb70b8f148c4436acd25ef2c837f7095d461486d22c4fe4157c2"
-      },
-      "exit_code": 0,
-      "observed": "At Os, Oz, O2 and O3, mos6502 and mosw65816: 90 of 90 identical for every comparison; RESULT: IDENTICAL (12 comparisons)."
-    },
-    {
-      "label": "Optimization-level gating: native sizes per level, ungated design vs size/speed gate probe vs unchanged 321-16",
-      "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/run-matrix.sh /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/jobs-sizes.txt /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/runs",
-      "working_directory": "/home/will/llvm-mos-65816-pressure",
-      "configuration": {
-        "tool": "llc",
-        "triple": "mos",
-        "cpus": [
-          "mosw65816"
-        ],
-        "features": [
-          "+mos-a16",
-          "+mos-a16,+mos-xy16"
-        ],
-        "optimization": "Os, Oz, O2, O3 as in the identity run",
-        "lto": false,
-        "outputs": [
-          "obj size (.text+.data+.rodata)",
-          "asm",
-          "obj"
-        ],
-        "reference": "unchanged 321-16 (build/pressure-sets/llc/321-16, sha256 b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45)",
-        "gate_probe": "build/pressure-sets/opt-levels/llc/321-16-gateprobe (321-16-t4 + docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/gate-probe-vs-t4.diff; measurement only)"
-      },
-      "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/opt-levels/llc/321-16-gateprobe",
-      "toolchain_sha256": "352ef8f4851c600769156466b8533ec27a1cd6c71ac5849ee5e7ff3d6d916ba0",
-      "input": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.sha256",
-        "sha256": "28afb2de8d279b3394ea25473f7e521fdeecdad0520786ae2fe054cec9496c7f"
-      },
-      "log": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/summary.txt",
-        "sha256": "55d9f77b25dbfb70b8f148c4436acd25ef2c837f7095d461486d22c4fe4157c2"
-      },
-      "exit_code": 0,
-      "observed": "Bytes vs 321-16, ungated / appended sets off: +mos-a16 Os -78/-10, Oz -78/-13, O2 -84/-29, O3 -214/-429; +mos-a16,+mos-xy16 Os -162/-147, Oz -162/-150, O2 -166/-175, O3 -296/-552. Ungated wins the size levels."
-    },
-    {
-      "label": "Optimization-level gating: bsnes-jg master clocks of the 17 fixed-set corpus sims rebuilt from source at O2, O3, Os and Oz",
-      "command": "dev/container.sh -v docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools:/tools -- python3 /tools/runtime-clocks.py /work/build/pressure-sets/opt-levels/runtime --level O2 --level O3 --level Os --level Oz --variant head=... --variant t4=... --variant gate2=... --variant gate1=... --variant memb1=... --modes a16,a16xy16 --jobs 4 (full command in docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/README.md; variant llcs in docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/identity.json)",
-      "working_directory": "/home/will/llvm-mos-65816",
-      "configuration": {
-        "tool": "installed project clang (IR) + llc under test + installed mos-clang/SDK link at -Os + bsnes-jg cycle probe",
-        "triple": "mos",
-        "cpus": [
-          "mosw65816"
-        ],
-        "features": [
-          "+mos-a16",
-          "+mos-a16,+mos-xy16"
-        ],
-        "optimization": "clang -O2/-O3/-Os/-Oz IR; llc -O2 (-O3 for O3)",
-        "lto": false,
-        "region": "main entry to the instruction that writes the expected corpus_result (Policy 0070)"
-      },
-      "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-16-t4 (reference build/pressure-sets/llc/321-16)",
-      "toolchain_sha256": "0f3f63bf4d2cc0907979fb1699c02da0654717cdc1c0c3a0fc08250a7933054d",
-      "input": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/ir.sha256",
-        "sha256": "0d1d4cdf8b30b373b8a0c3bf1cadb0e0c5d478754cbdf350ab3007c1743ad9bd"
-      },
-      "log": {
-        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/summary.txt",
-        "sha256": "ff73a498001fb49b99ae496363ca4720a120a616a5aab2be2c7bb3f066396c33"
-      },
-      "exit_code": 0,
-      "observed": "All measured ROMs PASS and are deterministic over two runs. Clocks vs 321-16 (15 sims; 14 at O3), ungated / appended sets off: O2 a16 -0.15%/-0.36%, O2 a16xy16 -0.15%/-0.34%, O3 a16 +0.01%/-0.18%, O3 a16xy16 +0.02%/-0.17%. Pre-existing Remaining virtual register aborts (spill-hoist, patch 0033) in every variant for perlin, satcast, domcol at Oz, grid3d at O3."
-    }
+  "related_records": [
+   "docs/defects/mos-carry-scheduling-pressure.json"
   ],
-  "candidate_change": {
-    "description": "let GeneratePressureSet = 0 in { Ac16, Xc16, Yc16 } in llvm/lib/Target/MOS/MOSRegisterInfo.td",
-    "diff": {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/change.diff",
-      "sha256": "e85a7793f2f50e8432d0bc3b5c38496fa835b7018b95abd9e60589d9f9632826"
-    },
-    "pressure_tables": "tables/candidate-321-01.txt and tables/candidate-321-16.txt equal tables/upstream-06bc967d2668.txt"
-  },
-  "unknowns": "Native-mode growth cause established by the T4 design (t4-design/README.md). Open: placement of the pressure hooks in the split series (commit 1 moves 8-bit +mos-a16 code by +1491 B vs upstream mosw65816 before native codegen exists); 16/15 inputs still grow individually at head (largest packrec +86 B) under shrinking totals; the downstream default-mode effect is not measured; MAME runtime legs not run (SPC700 IPL secret). Optimization-level gating (opt-levels/README.md): ungated wins at -Os/-Oz; turning the appended sets off at -O2/-O3 saves about 0.2% of master clocks, but getRegPressureSetLimit is cached by RegisterClassInfo per subtarget, so a sound per-function gate needs a per-level subtarget key; that decision is escalated.",
-  "observations": [
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/README.md",
-      "sha256": "d4d39af724abc790731cba2d90f37da513308574726600a5ce2b6659c1664c44"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/prior-work-audit.md",
-      "sha256": "4a392850e3578fe0b385df89867dcba33e29eb0b020108aefce45e15e7d190ef"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/frozen-llc.sha256",
-      "sha256": "840599d29b6f400db105bc97edcaaa0ed81363f7791691f7a158cf34114aaeb6"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
-      "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/split-observation/pressure-sets.txt",
-      "sha256": "ae1f0e039e3f5a5afe3f7c3b4361134f82896af2ca2bad87d94280388118b86d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/split-observation/size-vs-base.txt",
-      "sha256": "faa0784bb2a7627524044b566433a3232377039a3d982cef65bddf8bbca5e603"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/split-observation/default-compare.txt",
-      "sha256": "a0e4be362569ebc999d67c38b1489b5f8aea80e582a87583343b01544f310d22"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/upstream-06bc967d2668.txt",
-      "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/a359c6b1d73c.txt",
-      "sha256": "67758cdf6f17e11320f7c9fad0403ddbdd814b29b424d62dc0cad3dc0a3855f2"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/baseline-vs-upstream.diff",
-      "sha256": "7c4877df9733bb36fc52eafe4ee782ff3b875522d94e1904321ba78efa355fb7"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/candidate-321-01.txt",
-      "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/candidate-321-16.txt",
-      "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/c33eb63d65a3.txt",
-      "sha256": "67758cdf6f17e11320f7c9fad0403ddbdd814b29b424d62dc0cad3dc0a3855f2"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/downstream-build-llvm-mos.txt",
-      "sha256": "67758cdf6f17e11320f7c9fad0403ddbdd814b29b424d62dc0cad3dc0a3855f2"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/upstream-06bc967d2668.full.txt",
-      "sha256": "03f6632cbe44664da0a02453de21cac41a9ef93b75ba23eabb2e651a5f5330ae"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/a359c6b1d73c.full.txt",
-      "sha256": "74ae2f823fc75aa7ca882b3dc96714b055b4c16e5a4f5f6ac2209d945bbee457"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/candidate-321-01.full.txt",
-      "sha256": "01d863beab88bcfa996dd5c0d9629c6841c7d92b7b54bee3d98c94880e920f3c"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/compare.txt",
-      "sha256": "16a7eda5754f44951e51ab68e4e4a6eab98c7d08cdb26dd38e73388afc1d16bc"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/ref.tsv",
-      "sha256": "c1c0834456d5d25e08ab69a05f871f6b7af099092c5dcb93e1cbcd18de180df6"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/cand.tsv",
-      "sha256": "516dbf19a89e88dcdfc9ebafdb6d95ea91baadad7fec04def4129beb58a8515d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/llc.sha256",
-      "sha256": "cb8de44fc5b9ce0e0979942f8c58139ab7e7249924df480a6e273e62228568b5"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/build.log",
-      "sha256": "7260ab213ede6bdc5f290d125a5c7de44094dd3a1bb7cb9f58015d02e06f0015"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/lit-summary.txt",
-      "sha256": "115588ce8b1e53cd8df681976fc047ffdfaa07ce280764f013516013c911bb31"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/commit",
-      "sha256": "4243462ca62388c31f10911c39fe635876cc495acbf119fe819e54bc937cfc1f"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/compare.txt",
-      "sha256": "e8d532b7cfe52a581f20c2eab6c98cd22eeb3ed698b899ade4a862ee35695d46"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/cand.tsv",
-      "sha256": "c1c0834456d5d25e08ab69a05f871f6b7af099092c5dcb93e1cbcd18de180df6"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/build.log",
-      "sha256": "ea21c11770f278b61925c52c76329d08b48eb3f313bbff7c6d19dc7f0e3b4859"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/lit-summary.txt",
-      "sha256": "115588ce8b1e53cd8df681976fc047ffdfaa07ce280764f013516013c911bb31"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/change.diff",
-      "sha256": "e85a7793f2f50e8432d0bc3b5c38496fa835b7018b95abd9e60589d9f9632826"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/native-321-01/compare.txt",
-      "sha256": "71f5ce69a38197dc1199fadee0f972e820418ea418fd40dd5a9850f117f68a69"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/native-321-01/size.txt",
-      "sha256": "5fc917f253455e1418f4e34007c7d0a394c762b9d01c7aeef22d5e7d9dfcb05b"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/native-321-01/ref.tsv",
-      "sha256": "bcf65b52e32fd06091dbf056bbf758dadcc4358939f8147635e6fc4f3dace4a0"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/native-321-01/cand.tsv",
-      "sha256": "85924f56c9799db825d0774c9f826652f0d14a197833c55694fe79e4d0020cef"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/default-vs-upstream/default-identity.log",
-      "sha256": "f534f34ef704dcca9bfb3be878ac867bf19ac94a078e9dedc3e6801812a20735"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/default-vs-head/default-identity.log",
-      "sha256": "4f324e047f48081f1ae1ff6657f23564bcef1d0448bd9ff1777812efbda672af"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/default-vs-head/size.txt",
-      "sha256": "6621d95c4942afa64352197996f139665b573a84dbf31e0d70842ce1c6c40342"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/native/compare.txt",
-      "sha256": "9fb6b76956acfa7d5906b317bddbc39e92740c12d0f2aa8a1c3c7b2b0908c1bc"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/native/size.txt",
-      "sha256": "3b164489c28ab3084eb348febd37f1f66fd12b7a53ab6bc47ecd448c20add53a"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/native/ref.tsv",
-      "sha256": "c6a0c83a732f8d700bd4ce919f788386a82a1a60ac6c7521fb3e75dd004d9d50"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/native/cand.tsv",
-      "sha256": "7c6926b31640293c88822b53ac6c9173a744f4214319d2dbe05c5399bc1756a3"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/build.log",
-      "sha256": "de520d031372e85c2d3a02101364121cef340bd9495e3f617d91f3dcefd3f4dc"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/lit-summary.txt",
-      "sha256": "d666a9fb870a8999a400547381cbaeea61f401328ab9d1e0b9e796313af64b88"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/unmodified-rebuild.sha256",
-      "sha256": "9f351b1db27ec990c0b85c0ed474a95ca565aaebb304b0bb15995dafe336f931"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh",
-      "sha256": "2b254ccffe574aa8a4a3e3dcdd8006a4d87482360ad7fffb4dccefdc8303cf2f"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/mode-hashes.sh",
-      "sha256": "fc3eb3ddc1435c880ab09e3de93fc3ddb0ec0d642a855204087a82ab8b2feb39"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/compare-hashes.py",
-      "sha256": "85b93d26ab064d956b666831240eba26d95785827994b199c82049b9ed537d69"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/size-compare.sh",
-      "sha256": "e4d3bd788d8d6602c38a168b39aaee06dfee1d9a2077acf7cf72e54116a48199"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/pressure-tables.sh",
-      "sha256": "21337f3909858eccd980b23360bace75cf3707f1e0d54f91dbbcd6c967e29539"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/README.md",
-      "sha256": "829701515e3b39ad4155e19f48f9c70b8518cecd2ea5fd4835bdeda8d37cd4c1"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-01.diff",
-      "sha256": "7b07b4c231dba7a8ff17dcee3f07a148114b1c5cad230031cf2bcb9af2880734"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-16.diff",
-      "sha256": "61e7e0444dfab32c2fcf585bdf633b1176e8cf2a3092ac16aceb4935744f8e61"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/frozen-llc.sha256",
-      "sha256": "8d89ebe9300ac716ebf053a50c6b7a05387dfcf3c583ccaf1363fd9f9f2153e5"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/consumers/summary.txt",
-      "sha256": "f72eb9afc85483b4db7e06afb717941ca97048db0498dfa545a8dad7e07cb58b"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/variants/summary.txt",
-      "sha256": "ea026eacaa14adea8855d3eb47c5ade23505f6a327f358939ceeaaa071f0a1fc"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/variants/probe.diff",
-      "sha256": "df516f9d49073c02afdf951fa8d484cea8a80a83d8ae4cf3ed48741baca725ba"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/native/size.txt",
-      "sha256": "32521f47a638a431b23c8c5889e32eeba88b0939d527b759915b14cb4a9b9d0a"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/native/compare.txt",
-      "sha256": "feea80536bd1d8353efb93f7dc75e6910c6236c456d3edc26fecbac0b4208e88"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/default-vs-cand1/compare.txt",
-      "sha256": "8727396bd1d52ac103d14567edd18809625bd04733992a08cb34b6cb7bea929b"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/native-summary.txt",
-      "sha256": "9f99bd4f46b2efc238ceef3f788ef0a0ba57355539eb81cb6ccd49112599f31d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/lit-summary.txt",
-      "sha256": "115588ce8b1e53cd8df681976fc047ffdfaa07ce280764f013516013c911bb31"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/lit-summary.txt",
-      "sha256": "d666a9fb870a8999a400547381cbaeea61f401328ab9d1e0b9e796313af64b88"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/runtime/results-321-16-t4.tsv",
-      "sha256": "3ed44463d8004792aae274ffbd44d34164b2b86922db52ddb44a5ee54fe64a6d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/runtime/results-321-16.tsv",
-      "sha256": "3ed44463d8004792aae274ffbd44d34164b2b86922db52ddb44a5ee54fe64a6d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/321-01-t4.txt",
-      "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/321-16-t4.txt",
-      "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/decoded-321-16-unchanged.txt",
-      "sha256": "29802f8eea6fade6bc4fdefd5365bcbb7cd2c43731e5ae25b8202b3af5c1a1ce"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/decoded-candidate.txt",
-      "sha256": "94516e488fa8cf2baa273525d66d68648b7b00cef57a53f1bbd6c0a3419ffba5"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/mir/mv_step.p0.after.mir",
-      "sha256": "0e696c0a143c40fccea5c8543d48c72642a4fec87b4d9959df090c2c4e721e7b"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/README.md",
-      "sha256": "a66c3731910b665aab6fc64c16de26b3c323df6f34a70bf06bd3ec4a3344d75e"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/binaries.sha256",
-      "sha256": "803bd7ba07a1f54b202f1c58e8583cd54084e4d1ec66730288dd08301164c0f5"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/cycle-probe-identity.json",
-      "sha256": "0eac377a20f285587a9f56dd1b4c25a253cd16b2fc56b3cc07c49da1dbc829e4"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/build-gateprobe.log",
-      "sha256": "284b42a43f33a5cfb55e0ff784299f6b1bf33d3104e0bdc2304a5e07ac5765e6"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/build-restore.log",
-      "sha256": "284b42a43f33a5cfb55e0ff784299f6b1bf33d3104e0bdc2304a5e07ac5765e6"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/gate-probe-full.diff",
-      "sha256": "3a37714eda86e6a3807766d153ce6829bd3d64a23d04628498de3ba0fe83431c"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/gate-probe-vs-t4.diff",
-      "sha256": "d2b13384d3317f1e311ea098ce1a40293fa9b08292e36e8b105dd7408ea7cd50"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/mixed-rev.ll",
-      "sha256": "ead91b75e64e73dad55c229fa61dda7ebaa68084debc7c421eaf1efb2b1e08f6"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/mixed.ll",
-      "sha256": "e4696502418770765f68217b7e452e50bf4582cd13704963ccd1de8cd7a2f201"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/trace.txt",
-      "sha256": "a0f543a342e0e9297defd0dd3fb845d3b0b5e19ea699e8f704233d8073a45693"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.log",
-      "sha256": "0ba3d58c3ef811f65369c55baa2dd773cd3503ee71c3d1863b27ea0f245e18a8"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.sha256",
-      "sha256": "28afb2de8d279b3394ea25473f7e521fdeecdad0520786ae2fe054cec9496c7f"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/identity.json",
-      "sha256": "9dca64b65067f8b4582f00d858720656e2a176febe477a4fa68c5771fbf906ee"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/ir.sha256",
-      "sha256": "0d1d4cdf8b30b373b8a0c3bf1cadb0e0c5d478754cbdf350ab3007c1743ad9bd"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/results.tsv",
-      "sha256": "105405291b39ca262fcc33adc2e117097c40579974f35e888ed4a7fbb1c68cf5"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/runtime.log",
-      "sha256": "d6687a03340dc806f75e8d45cf090cdd1ca42e27d20186737d38936da48fe35b"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/summary.txt",
-      "sha256": "ff73a498001fb49b99ae496363ca4720a120a616a5aab2be2c7bb3f066396c33"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.cand1.tsv",
-      "sha256": "ec5607ccccc04ceba00d7d838a516276c8a283e9cb61a22a13599acfc4e73cec"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.cand1.tsv",
-      "sha256": "7f95d14b5f11e7a7e0b1eb3b11694a89265fbc58381818ed28c29a0228761cf5"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.gate2.tsv",
-      "sha256": "7f95d14b5f11e7a7e0b1eb3b11694a89265fbc58381818ed28c29a0228761cf5"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.t4-01.tsv",
-      "sha256": "42b2f8d466a38ed3410c4af4d50c7f20d0f678e07a23adc9b6b61d43b6394e23"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.t4.tsv",
-      "sha256": "7f95d14b5f11e7a7e0b1eb3b11694a89265fbc58381818ed28c29a0228761cf5"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.upstream.tsv",
-      "sha256": "42b2f8d466a38ed3410c4af4d50c7f20d0f678e07a23adc9b6b61d43b6394e23"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.gate2.tsv",
-      "sha256": "e1ce8e4ccb82ebd8eec57cbecfb79e38a817af2f444705d453e93802d4002cf2"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.head.tsv",
-      "sha256": "89645a76cf4195e6be2593f2d8085b84464e18fc72333475da90aaf4ca22ac14"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.memb1.tsv",
-      "sha256": "494362aa1721bef592a71e23d1f172ffc57d82ffd4e87d2bc3e27fe324f6d6eb"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.t4.tsv",
-      "sha256": "5f0389e4f58279401d793d6ca3ed27af2f32d1f8554ffaba3b8dd0be1a849f55"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.cand1.tsv",
-      "sha256": "910ec38a16a6ce6b98c4e70cb9e1cc76f899573eca423ecefe40cf1f61b8587f"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.cand1.tsv",
-      "sha256": "377592f7e742dd255e214231c6e7913e4f62fc8caa69c5d695246a69a04c4d0c"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.gate2.tsv",
-      "sha256": "377592f7e742dd255e214231c6e7913e4f62fc8caa69c5d695246a69a04c4d0c"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.t4-01.tsv",
-      "sha256": "f914c5b08d41e68857f61c1bac50d88a97fdd11b92468d719ee501c4360b4627"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.t4.tsv",
-      "sha256": "377592f7e742dd255e214231c6e7913e4f62fc8caa69c5d695246a69a04c4d0c"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.upstream.tsv",
-      "sha256": "f914c5b08d41e68857f61c1bac50d88a97fdd11b92468d719ee501c4360b4627"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.gate2.tsv",
-      "sha256": "82a6bd19cfb104f2446f0bb49884c1ce5887104fd5fc1831a14825a34f5e950f"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.head.tsv",
-      "sha256": "feb18d38a64ff1fbeb44ae9bb2eabb799865dc144f84684ae10fc4d4338a5e51"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.memb1.tsv",
-      "sha256": "b0d44e01f7aee706b9f35c32577c8d2f11909798f316971915bb873481d0a317"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.t4.tsv",
-      "sha256": "55b420106441e52900ed4452ae2122a2cd5d389d942e8f9f791ae7ce97e80f6a"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.cand1.tsv",
-      "sha256": "99c3cf567a4cbfdcebe006183de305fdf42a95bf09ecb599cd4ae0a502412603"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.cand1.tsv",
-      "sha256": "891c78a4e091dde561458b744352a5cd8daa08cd0bbedeff626537168accec6d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.gate1.tsv",
-      "sha256": "891c78a4e091dde561458b744352a5cd8daa08cd0bbedeff626537168accec6d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.t4-01.tsv",
-      "sha256": "2429a49a73592d6309ef3b40f6ade67e6bbc3b02c449f3b2d4b5c7638560ba0d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.t4.tsv",
-      "sha256": "891c78a4e091dde561458b744352a5cd8daa08cd0bbedeff626537168accec6d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.upstream.tsv",
-      "sha256": "2429a49a73592d6309ef3b40f6ade67e6bbc3b02c449f3b2d4b5c7638560ba0d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.gate0.tsv",
-      "sha256": "3407acfbb30e8ea8309c5c37fd4cdd9037f86318dfd1d31ac88097d79942e3c0"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.gate1.tsv",
-      "sha256": "361af96452e2a9461fe3cc26cc0e8c2dd59b7372c0e12c0ee7fca13d41e55c5d"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.head.tsv",
-      "sha256": "efc2603f517ab2def22617029c333218df757cda5d0240c310b2d49bd6b327f8"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.memb1.tsv",
-      "sha256": "e4ab5cd1a8d61ac550d9b8f57d42efa897b8041141bf3270573b721c544d6264"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.t4.tsv",
-      "sha256": "3407acfbb30e8ea8309c5c37fd4cdd9037f86318dfd1d31ac88097d79942e3c0"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.cand1.tsv",
-      "sha256": "6d4944b5ec91358f5cc75059fb11a70c38594e56ed1f2570f64d96e68079ce68"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.cand1.tsv",
-      "sha256": "7f15b2e5bd904106478342a0bfd3a383a32a0e672aaa049c4955fe6f197f6936"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.gate1.tsv",
-      "sha256": "7f15b2e5bd904106478342a0bfd3a383a32a0e672aaa049c4955fe6f197f6936"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.t4-01.tsv",
-      "sha256": "92ddcde2db714df4d40db83591970063bcdcbfebd090f58f1bea87e6bd3d98a7"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.t4.tsv",
-      "sha256": "7f15b2e5bd904106478342a0bfd3a383a32a0e672aaa049c4955fe6f197f6936"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.upstream.tsv",
-      "sha256": "92ddcde2db714df4d40db83591970063bcdcbfebd090f58f1bea87e6bd3d98a7"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.gate1.tsv",
-      "sha256": "4c1934fc2a69caa44f9652554c3da4f4e52f28272f170bd6d943e9d1d3ff2c4f"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.head.tsv",
-      "sha256": "64d426dbef02c9060aa0e58d2fe44fbea55c0a839a9b19d7ba4f0e780776c163"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.memb1.tsv",
-      "sha256": "2a45e2a4da34b1f140df649a718e2e2df553bda6977b2fcbbe8775b8543afdb7"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.t4.tsv",
-      "sha256": "4b51035fe5f715b5b6516d440eb2d5f3ffd7736e0374055e95bdd9f718cb61f7"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/jobs.txt",
-      "sha256": "e5ed5284d1a8c41c87be1e8d93c519b9c55b35b5f4d81a387c27395125c55b5b"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/matrix-jobs.log",
-      "sha256": "29b69b98832f207bb9cc5c148514659bd485ace9aa392b8a8c5a1428180a8236"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/matrix.log",
-      "sha256": "45aa102131689c96f588d96a70740be222499f23873069b7017d736816b0fa22"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/summary.txt",
-      "sha256": "55d9f77b25dbfb70b8f148c4436acd25ef2c837f7095d461486d22c4fe4157c2"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/validate.O2orig.t4.tsv",
-      "sha256": "e676fbade3f5d9abc6f38b627aaeab44a81cc39d5ca90aca083ddde49308f8b4"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/clocks-summary.py",
-      "sha256": "299ea8daec85f90ad2213bedcf02adf3d0c0a641a15973043d14b8ef2b84cece"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/make-level-inputs.sh",
-      "sha256": "3c783cc68f28e63222f91320dd5e2d496334324118a8f0a91863a03e25448fcb"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/mode-hashes-level.sh",
-      "sha256": "5dad94062d868d80cf39b51265c3a1500f45936f960132a8f5a5b505736fcebd"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/run-matrix.sh",
-      "sha256": "dcef2deddb1e0cd18e0118123d75a731e871ae87602f462fcf9c3fb292e2d3de"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/runtime-clocks.py",
-      "sha256": "c2380c88a1e08c538c3720a835fa7c751da2ad19c91a4cdeb50bbee68364192c"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/sizes-level.sh",
-      "sha256": "d4f1e732fdf7c9511c62272f2d01552f332770970b14e17510bd2e791fbd3d89"
-    },
-    {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/summarize.sh",
-      "sha256": "32db08de8b420845930b75a1b5ab5cfd53239faa2d18d0aaca3e31c199d9fd95"
-    }
+  "related_reports": [
+   "docs/plans/2026-09-26-mos-carry-scheduling.md",
+   "docs/investigations/2026-09-27-competing-carry-gate.md"
   ],
-  "t4_design": {
-    "description": "Keep GeneratePressureSet = 0 on Ac16/Xc16/Yc16 (generated tables = upstream) and, under +mos-a16 only, append pressure sets A16/X16/Y16 (limit 2) through MOSRegisterInfo overrides of the six pressure-set hooks; the sets are charged by each wide register's byte units and by Ac/Ac16, Xc/Xc16, Yc/Yc16; the native class also charges its low byte's generated sets.",
-    "diff": {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-01.diff",
-      "sha256": "7b07b4c231dba7a8ff17dcee3f07a148114b1c5cad230031cf2bcb9af2880734"
-    },
-    "diff_at_head": {
-      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-16.diff",
-      "sha256": "61e7e0444dfab32c2fcf585bdf633b1176e8cf2a3092ac16aceb4935744f8e61"
-    },
-    "native_at_head_vs_321_16": "+mos-a16 321489 -> 321411 B (-78; 16 larger, 4 smaller); +mos-a16,+mos-xy16 300012 -> 299850 B (-162; 15 larger, 5 smaller)",
-    "cause": "With the flag alone the native classes have no pressure sets, so 16-bit vregs cost nothing to MachineLICM, MachineSink and the machine scheduler (all three contribute; all three disabled gives identical output). Restoring native-class pressure removes the native growth."
+  "related_changes": [
+   "a359c6b1d73c (split #321-1, upstream-source repo)",
+   "patches/llvm-mos/0002-321-accum16.patch"
+  ],
+  "source_assessment": "a359c6b1d73c and series head c33eb63d65a3 define Ac16/Xc16/Yc16 without GeneratePressureSet, and both generate the same 14-set tables. Downstream vendor/llvm-mos (pin 8be0546128a5, patch 0002) defines the same classes the same way. No local or upstream change sets GeneratePressureSet for MOS.",
+  "binary_assessment": "The rebuilt a359c6b1d73c llc (sha256 2422c068...) is bit-identical to the split agent's deleted 321-01 llc, and its default hash table matches the split's 321-01/default-hashes.tsv. The rebuilt unchanged c33eb63d65a3 llc matches the split's 321-16 llc (b8006489...). Downstream build/llvm-mos MOSGenRegisterInfoTargetDesc.inc (d5c3510d...) has the same 14-entry tables. Its default-mode byte effect is unmeasured: no downstream build without the classes exists.",
+  "decision": "New canonical record. mos-carry-scheduling-pressure concerns isPressureFineGrained not reaching the initial pressure sets, so carry pressure is lost. This record concerns opt-in classes adding pressure sets that change default-mode heuristics. The mechanism, the affected mode and the repair differ.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/prior-work-audit.md",
+   "sha256": "4a392850e3578fe0b385df89867dcba33e29eb0b020108aefce45e15e7d190ef"
   }
+ },
+ "baseline": {
+  "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/llc/321-01 /home/will/llvm-mos-65816/build/pressure-sets/runs/baseline",
+  "working_directory": "/home/will/llvm-mos-65816-pressure",
+  "configuration": {
+   "tool": "llc",
+   "triple": "mos",
+   "cpus": [
+    "mos6502",
+    "mosw65816"
+   ],
+   "features": [],
+   "optimization": "O2",
+   "lto": false,
+   "outputs": [
+    "asm",
+    "obj"
+   ],
+   "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
+  },
+  "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/llc/321-01 (read-only; split #321-1 a359c6b1d73c, assertions Release build; recipe tools/build-and-test.sh)",
+  "toolchain_sha256": "2422c0682d4f35dd98be7cb83d0f19b48abf530fe5584172e8d8a5fa7f93df50",
+  "container_image": "llvm-mos-65816-dev sha256:d0aea4bcf613d9deb929e61a051ba368cf87d42ef992edcfc6afd9e77c56c84b",
+  "input": {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
+   "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/default-identity.log",
+   "sha256": "d12d6cf7aa366c4dc01a551bcfd0ff25928528397e909aa29a8b8d9adf17f098"
+  },
+  "exit_code": 1,
+  "observed": "mos6502: 18 asm differ of 90; mosw65816: 33 asm differ of 90; 51 input/mode results changed",
+  "failure_signature": "RESULT: DIFFER (51 input/mode results changed)"
+ },
+ "additional_runs": [
+  {
+   "label": "Phase A candidate at #321-1 (not a closure run: Phase B applies the change to the series and downstream)",
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/llc/321-01-cand1 /home/will/llvm-mos-65816/build/pressure-sets/runs/cand1-default",
+   "working_directory": "/home/will/llvm-mos-65816-pressure",
+   "configuration": {
+    "tool": "llc",
+    "triple": "mos",
+    "cpus": [
+     "mos6502",
+     "mosw65816"
+    ],
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "outputs": [
+     "asm",
+     "obj"
+    ],
+    "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/llc/321-01-cand1 (a359c6b1d73c + candidate-321-01/change.diff)",
+   "toolchain_sha256": "e8130e32bb482adb61e3a98fb345a3154368a95804b1aecdd11c98dfabe17f3e",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
+    "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/default-identity.log",
+    "sha256": "34304c26bd32e6b2a0506b87df167afdbfbf899e8797601f907abdcbbefbf4e9"
+   },
+   "exit_code": 0,
+   "observed": "mos6502 and mosw65816: 90 of 90 identical; RESULT: IDENTICAL"
+  },
+  {
+   "label": "T4 design at #321-1 (not a closure run: application to the series and downstream is dispatched separately)",
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-01-t4 /home/will/llvm-mos-65816/build/pressure-sets/t4/runs/default-321-01",
+   "working_directory": "/home/will/llvm-mos-65816-pressure",
+   "configuration": {
+    "tool": "llc",
+    "triple": "mos",
+    "cpus": [
+     "mos6502",
+     "mosw65816"
+    ],
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "outputs": [
+     "asm",
+     "obj"
+    ],
+    "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-01-t4 (a359c6b1d73c + t4-design/change/change-321-01.diff)",
+   "toolchain_sha256": "ab1c56fd19e197869ef1cddbaedb7189c2720f014fc1298b1de063f8668fedfb",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
+    "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/default-vs-upstream/default-identity.log",
+    "sha256": "34304c26bd32e6b2a0506b87df167afdbfbf899e8797601f907abdcbbefbf4e9"
+   },
+   "exit_code": 0,
+   "observed": "mos6502 and mosw65816: 90 of 90 identical; RESULT: IDENTICAL"
+  },
+  {
+   "label": "Optimization-level gating: default-mode identity at -Os, -Oz, -O2 and -O3 (not a closure run)",
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/make-level-inputs.sh {Os,Oz,O2} /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/inputs/{Os,Oz,O2}; bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/run-matrix.sh /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/jobs-sizes.txt /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/runs; bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/summarize.sh /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/runs",
+   "working_directory": "/home/will/llvm-mos-65816-pressure",
+   "configuration": {
+    "tool": "llc",
+    "triple": "mos",
+    "cpus": [
+     "mos6502",
+     "mosw65816"
+    ],
+    "features": [],
+    "optimization": "Os/Oz: llc -O2 on the fixed set with optsize (Os) or optsize+minsize (Oz) added to every non-optnone definition; O2: llc -O2 with optsize/minsize removed; O3: llc -O3 on the O2 inputs",
+    "lto": false,
+    "outputs": [
+     "asm",
+     "obj"
+    ],
+    "comparisons": [
+     "upstream 06bc967d2668 (321-00) vs 321-01-t4",
+     "321-16-cand1 vs 321-16-t4",
+     "321-16-t4 vs 321-16-gateprobe with the level gate on"
+    ]
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-01-t4 and 321-16-t4 (all binaries: docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/binaries.sha256)",
+   "toolchain_sha256": "ab1c56fd19e197869ef1cddbaedb7189c2720f014fc1298b1de063f8668fedfb",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.sha256",
+    "sha256": "28afb2de8d279b3394ea25473f7e521fdeecdad0520786ae2fe054cec9496c7f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/summary.txt",
+    "sha256": "55d9f77b25dbfb70b8f148c4436acd25ef2c837f7095d461486d22c4fe4157c2"
+   },
+   "exit_code": 0,
+   "observed": "At Os, Oz, O2 and O3, mos6502 and mosw65816: 90 of 90 identical for every comparison; RESULT: IDENTICAL (12 comparisons)."
+  },
+  {
+   "label": "Optimization-level gating: native sizes per level, ungated design vs size/speed gate probe vs unchanged 321-16",
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/run-matrix.sh /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/jobs-sizes.txt /home/will/llvm-mos-65816/build/pressure-sets/opt-levels/runs",
+   "working_directory": "/home/will/llvm-mos-65816-pressure",
+   "configuration": {
+    "tool": "llc",
+    "triple": "mos",
+    "cpus": [
+     "mosw65816"
+    ],
+    "features": [
+     "+mos-a16",
+     "+mos-a16,+mos-xy16"
+    ],
+    "optimization": "Os, Oz, O2, O3 as in the identity run",
+    "lto": false,
+    "outputs": [
+     "obj size (.text+.data+.rodata)",
+     "asm",
+     "obj"
+    ],
+    "reference": "unchanged 321-16 (build/pressure-sets/llc/321-16, sha256 b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45)",
+    "gate_probe": "build/pressure-sets/opt-levels/llc/321-16-gateprobe (321-16-t4 + docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/gate-probe-vs-t4.diff; measurement only)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/opt-levels/llc/321-16-gateprobe",
+   "toolchain_sha256": "352ef8f4851c600769156466b8533ec27a1cd6c71ac5849ee5e7ff3d6d916ba0",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.sha256",
+    "sha256": "28afb2de8d279b3394ea25473f7e521fdeecdad0520786ae2fe054cec9496c7f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/summary.txt",
+    "sha256": "55d9f77b25dbfb70b8f148c4436acd25ef2c837f7095d461486d22c4fe4157c2"
+   },
+   "exit_code": 0,
+   "observed": "Bytes vs 321-16, ungated / appended sets off: +mos-a16 Os -78/-10, Oz -78/-13, O2 -84/-29, O3 -214/-429; +mos-a16,+mos-xy16 Os -162/-147, Oz -162/-150, O2 -166/-175, O3 -296/-552. Ungated wins the size levels."
+  },
+  {
+   "label": "Optimization-level gating: bsnes-jg master clocks of the 17 fixed-set corpus sims rebuilt from source at O2, O3, Os and Oz",
+   "command": "dev/container.sh -v docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools:/tools -- python3 /tools/runtime-clocks.py /work/build/pressure-sets/opt-levels/runtime --level O2 --level O3 --level Os --level Oz --variant head=... --variant t4=... --variant gate2=... --variant gate1=... --variant memb1=... --modes a16,a16xy16 --jobs 4 (full command in docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/README.md; variant llcs in docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/identity.json)",
+   "working_directory": "/home/will/llvm-mos-65816",
+   "configuration": {
+    "tool": "installed project clang (IR) + llc under test + installed mos-clang/SDK link at -Os + bsnes-jg cycle probe",
+    "triple": "mos",
+    "cpus": [
+     "mosw65816"
+    ],
+    "features": [
+     "+mos-a16",
+     "+mos-a16,+mos-xy16"
+    ],
+    "optimization": "clang -O2/-O3/-Os/-Oz IR; llc -O2 (-O3 for O3)",
+    "lto": false,
+    "region": "main entry to the instruction that writes the expected corpus_result (Policy 0070)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-16-t4 (reference build/pressure-sets/llc/321-16)",
+   "toolchain_sha256": "0f3f63bf4d2cc0907979fb1699c02da0654717cdc1c0c3a0fc08250a7933054d",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/ir.sha256",
+    "sha256": "0d1d4cdf8b30b373b8a0c3bf1cadb0e0c5d478754cbdf350ab3007c1743ad9bd"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/summary.txt",
+    "sha256": "ff73a498001fb49b99ae496363ca4720a120a616a5aab2be2c7bb3f066396c33"
+   },
+   "exit_code": 0,
+   "observed": "All measured ROMs PASS and are deterministic over two runs. Clocks vs 321-16 (15 sims; 14 at O3), ungated / appended sets off: O2 a16 -0.15%/-0.36%, O2 a16xy16 -0.15%/-0.34%, O3 a16 +0.01%/-0.18%, O3 a16xy16 +0.02%/-0.17%. Pre-existing Remaining virtual register aborts (spill-hoist, patch 0033) in every variant for perlin, satcast, domcol at Oz, grid3d at O3."
+  },
+  {
+   "label": "Final binaries: default-mode identity per level (upstream vs final #321-1; Phase A candidate and ungated design vs final #321-16) and native sizes per level vs unchanged 321-16",
+   "command": "JOBS=3 bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/run-matrix.sh /home/will/llvm-mos-65816/build/pressure-sets/final/sizes/jobs.txt /home/will/llvm-mos-65816/build/pressure-sets/final/sizes",
+   "working_directory": "/home/will/llvm-mos-65816",
+   "configuration": {
+    "tool": "llc",
+    "triple": "mos",
+    "cpus": [
+     "mos6502",
+     "mosw65816"
+    ],
+    "features": [],
+    "optimization": "Os, Oz, O2 (llc -O2 on the per-level inputs) and O3 (llc -O3 on the O2 inputs)",
+    "lto": false,
+    "outputs": [
+     "asm",
+     "obj"
+    ]
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/final/llc/{321-01,321-16}",
+   "toolchain_sha256": "da1a6f4ba69c97f3776280e7cff07345175da4d385c92eafd820bc6f24c9bc10",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.sha256",
+    "sha256": "28afb2de8d279b3394ea25473f7e521fdeecdad0520786ae2fe054cec9496c7f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/summary.txt",
+    "sha256": "7b2bc2ff9ab33104dff4dc8dce28387553b2cd2f83db4d01fffa56a431af9484"
+   },
+   "exit_code": 0,
+   "observed": "Default: 12 of 12 comparisons RESULT: IDENTICAL. Native vs 321-16: Os -78/-162, Oz -78/-162, O2 -84/-166, O3 -429/-552 B (+mos-a16 / +mos-a16,+mos-xy16); 180 of 180 input/modes equal t4 at Os/Oz/O2 and memb1 at O3."
+  },
+  {
+   "label": "Final binaries: bsnes-jg master clocks of the 17 fixed-set corpus sims at O2 and O3 (final, head, t4, memb1)",
+   "command": "dev/container.sh -- python3 /work/build/pressure-sets/final/rt-tools/runtime-clocks.py /work/build/pressure-sets/final/runtime --level O2 --level O3 --variant final=build/pressure-sets/final/llc/321-16 --variant head=build/pressure-sets/llc/321-16 --variant t4=build/pressure-sets/t4/llc/321-16-t4 --variant memb1=build/pressure-sets/t4/llc/head-probe:-mos-native-pressure-probe=1 --jobs 3",
+   "working_directory": "/home/will/llvm-mos-65816",
+   "configuration": {
+    "tool": "llc + installed mos-clang link (-Os) + bsnes-jg cycle probe",
+    "triple": "mos",
+    "cpus": [
+     "mosw65816"
+    ],
+    "features": [
+     "+mos-a16",
+     "+mos-a16,+mos-xy16"
+    ],
+    "optimization": "O2, O3",
+    "lto": false,
+    "outputs": [
+     "master clocks main..corpus_result"
+    ]
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/final/llc/321-16",
+   "toolchain_sha256": "da1a6f4ba69c97f3776280e7cff07345175da4d385c92eafd820bc6f24c9bc10",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runtime/ir.sha256",
+    "sha256": "93251800a6d06ef99c7f41c4dba419761c7463d7226333a1291e8706a46dd5de"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runtime/summary.txt",
+    "sha256": "d46f521baa6463277a1c007797310883b46252d1a9cd888dfe65fd3f3b74805d"
+   },
+   "exit_code": 0,
+   "observed": "O2: final = t4, -0.15% vs 321-16 in both modes. O3: final = memb1, -0.18% (+mos-a16) and -0.17% (+mos-a16,+mos-xy16) vs 321-16, -0.20%/-0.18% vs t4. Every passing run deterministic."
+  },
+  {
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/final/llc/321-01 /home/will/llvm-mos-65816/build/pressure-sets/final/runs/default-321-01",
+   "working_directory": "/home/will/llvm-mos-65816-pressure",
+   "configuration": {
+    "tool": "llc",
+    "triple": "mos",
+    "cpus": [
+     "mos6502",
+     "mosw65816"
+    ],
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "outputs": [
+     "asm",
+     "obj"
+    ],
+    "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/final/llc/321-01 (copy of build/split-320-321/llc/p-321-01: final split #321-1 45bc97d89c6a, assertions Release build of build/split-320-321/build; bit-identical to Phase A 321-01-cand1)",
+   "toolchain_sha256": "e8130e32bb482adb61e3a98fb345a3154368a95804b1aecdd11c98dfabe17f3e",
+   "container_image": "llvm-mos-65816-dev sha256:d0aea4bcf613d9deb929e61a051ba368cf87d42ef992edcfc6afd9e77c56c84b",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
+    "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runs/candidate-default-321-01.log",
+    "sha256": "34304c26bd32e6b2a0506b87df167afdbfbf899e8797601f907abdcbbefbf4e9"
+   },
+   "exit_code": 0,
+   "observed": "mos6502 and mosw65816: 90 of 90 identical; RESULT: IDENTICAL",
+   "label": "Final split #321-1 (45bc97d89c6a): closure-ready candidate, same input and configuration as the baseline (not yet a closure run: downstream held)"
+  },
+  {
+   "label": "Downstream candidate (held): codegen of 277 SNES corpus and demo sources, same -Os frontend IR, baseline llc vs candidate llc",
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tools/downstream-codegen.sh build/far-review-defects/candidate/llc build/pressure-sets/final/downstream/llc build/pressure-sets/final/downstream/codegen",
+   "working_directory": "/home/will/llvm-mos-65816",
+   "configuration": {
+    "tool": "installed clang -Os -fno-lto (IR) + llc -O2",
+    "triple": "mos",
+    "cpus": [
+     "mosw65816"
+    ],
+    "features": [
+     "",
+     "+mos-a16",
+     "+mos-a16,+mos-xy16"
+    ],
+    "optimization": "Os (clang) / O2 (llc)",
+    "lto": false,
+    "outputs": [
+     "obj",
+     "obj size (.text+.data+.rodata)"
+    ]
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/final/downstream/llc (held candidate; baseline build/far-review-defects/candidate/llc f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1)",
+   "toolchain_sha256": "9f9b74f91eab29e17ed0c25f46af803e5cad3dbaf2f4a29847cf0ff868948f47",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/codegen-sources.txt",
+    "sha256": "04714a04fde9fa85964b671a3ac8dd8d24585e5f4e9eeb4c53898afd773d470d"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/codegen-summary.txt",
+    "sha256": "f97972b225ea05e8b558cfa519edf26560d4b2c9f8423eb19e06402c3a279dc2"
+   },
+   "exit_code": 0,
+   "observed": "default: 251 changed, 11 identical, 15 fail on both; 2,315,097 -> 2,328,524 B (+13,427). +mos-a16 +3,003 B; +mos-a16,+mos-xy16 +3,070 B. With -mos-carry-sched=off: default -25,290 B."
+  }
+ ],
+ "candidate_change": {
+  "description": "let GeneratePressureSet = 0 in { Ac16, Xc16, Yc16 } in llvm/lib/Target/MOS/MOSRegisterInfo.td",
+  "diff": {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/change.diff",
+   "sha256": "e85a7793f2f50e8432d0bc3b5c38496fa835b7018b95abd9e60589d9f9632826"
+  },
+  "pressure_tables": "tables/candidate-321-01.txt and tables/candidate-321-16.txt equal tables/upstream-06bc967d2668.txt"
+ },
+ "unknowns": "Resolved: native growth (T4 design), placement (#321-1 flag, #321-8 hooks), opt-level gate (-O3, target-machine-wide; the level cannot change after the subtarget is built because MOS never runs SelectionDAGISel). Remaining: per-input growth under shrinking totals is recorded but does not block (user decision); the SDK -flto link without -O or with -Os/-Oz/-O2 codegens at Default and keeps the appended sets (accepted); the downstream -debug-only gate test is UNSUPPORTED in the Release toolchain (assertions builds run it); Downstream application is held: with 0064/0067 carry scheduling (default always), removing the Ac16/Xc16/Yc16-derived sets grows default-mode code by 13,427 B (+0.58%) and native code by about 3 KB at -Os over 262-276 SNES sources; the carry model's dependence on those incidental sets needs a user decision (apply anyway, retune carry scheduling first, or keep downstream's sets). Native growth with carry scheduling off (+1,638 B, +mos-a16) is not yet explained.",
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/README.md",
+   "sha256": "d4d39af724abc790731cba2d90f37da513308574726600a5ce2b6659c1664c44"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/prior-work-audit.md",
+   "sha256": "4a392850e3578fe0b385df89867dcba33e29eb0b020108aefce45e15e7d190ef"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/frozen-llc.sha256",
+   "sha256": "840599d29b6f400db105bc97edcaaa0ed81363f7791691f7a158cf34114aaeb6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
+   "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/split-observation/pressure-sets.txt",
+   "sha256": "ae1f0e039e3f5a5afe3f7c3b4361134f82896af2ca2bad87d94280388118b86d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/split-observation/size-vs-base.txt",
+   "sha256": "faa0784bb2a7627524044b566433a3232377039a3d982cef65bddf8bbca5e603"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/split-observation/default-compare.txt",
+   "sha256": "a0e4be362569ebc999d67c38b1489b5f8aea80e582a87583343b01544f310d22"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/upstream-06bc967d2668.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/a359c6b1d73c.txt",
+   "sha256": "67758cdf6f17e11320f7c9fad0403ddbdd814b29b424d62dc0cad3dc0a3855f2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/baseline-vs-upstream.diff",
+   "sha256": "7c4877df9733bb36fc52eafe4ee782ff3b875522d94e1904321ba78efa355fb7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/candidate-321-01.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/candidate-321-16.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/c33eb63d65a3.txt",
+   "sha256": "67758cdf6f17e11320f7c9fad0403ddbdd814b29b424d62dc0cad3dc0a3855f2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/downstream-build-llvm-mos.txt",
+   "sha256": "67758cdf6f17e11320f7c9fad0403ddbdd814b29b424d62dc0cad3dc0a3855f2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/upstream-06bc967d2668.full.txt",
+   "sha256": "03f6632cbe44664da0a02453de21cac41a9ef93b75ba23eabb2e651a5f5330ae"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/a359c6b1d73c.full.txt",
+   "sha256": "74ae2f823fc75aa7ca882b3dc96714b055b4c16e5a4f5f6ac2209d945bbee457"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tables/candidate-321-01.full.txt",
+   "sha256": "01d863beab88bcfa996dd5c0d9629c6841c7d92b7b54bee3d98c94880e920f3c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/compare.txt",
+   "sha256": "16a7eda5754f44951e51ab68e4e4a6eab98c7d08cdb26dd38e73388afc1d16bc"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/ref.tsv",
+   "sha256": "c1c0834456d5d25e08ab69a05f871f6b7af099092c5dcb93e1cbcd18de180df6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/cand.tsv",
+   "sha256": "516dbf19a89e88dcdfc9ebafdb6d95ea91baadad7fec04def4129beb58a8515d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/llc.sha256",
+   "sha256": "cb8de44fc5b9ce0e0979942f8c58139ab7e7249924df480a6e273e62228568b5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/build.log",
+   "sha256": "7260ab213ede6bdc5f290d125a5c7de44094dd3a1bb7cb9f58015d02e06f0015"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/lit-summary.txt",
+   "sha256": "115588ce8b1e53cd8df681976fc047ffdfaa07ce280764f013516013c911bb31"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/baseline/commit",
+   "sha256": "4243462ca62388c31f10911c39fe635876cc495acbf119fe819e54bc937cfc1f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/compare.txt",
+   "sha256": "e8d532b7cfe52a581f20c2eab6c98cd22eeb3ed698b899ade4a862ee35695d46"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/cand.tsv",
+   "sha256": "c1c0834456d5d25e08ab69a05f871f6b7af099092c5dcb93e1cbcd18de180df6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/build.log",
+   "sha256": "ea21c11770f278b61925c52c76329d08b48eb3f313bbff7c6d19dc7f0e3b4859"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/lit-summary.txt",
+   "sha256": "115588ce8b1e53cd8df681976fc047ffdfaa07ce280764f013516013c911bb31"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/candidate-321-01/change.diff",
+   "sha256": "e85a7793f2f50e8432d0bc3b5c38496fa835b7018b95abd9e60589d9f9632826"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/native-321-01/compare.txt",
+   "sha256": "71f5ce69a38197dc1199fadee0f972e820418ea418fd40dd5a9850f117f68a69"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/native-321-01/size.txt",
+   "sha256": "5fc917f253455e1418f4e34007c7d0a394c762b9d01c7aeef22d5e7d9dfcb05b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/native-321-01/ref.tsv",
+   "sha256": "bcf65b52e32fd06091dbf056bbf758dadcc4358939f8147635e6fc4f3dace4a0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/native-321-01/cand.tsv",
+   "sha256": "85924f56c9799db825d0774c9f826652f0d14a197833c55694fe79e4d0020cef"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/default-vs-upstream/default-identity.log",
+   "sha256": "f534f34ef704dcca9bfb3be878ac867bf19ac94a078e9dedc3e6801812a20735"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/default-vs-head/default-identity.log",
+   "sha256": "4f324e047f48081f1ae1ff6657f23564bcef1d0448bd9ff1777812efbda672af"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/default-vs-head/size.txt",
+   "sha256": "6621d95c4942afa64352197996f139665b573a84dbf31e0d70842ce1c6c40342"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/native/compare.txt",
+   "sha256": "9fb6b76956acfa7d5906b317bddbc39e92740c12d0f2aa8a1c3c7b2b0908c1bc"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/native/size.txt",
+   "sha256": "3b164489c28ab3084eb348febd37f1f66fd12b7a53ab6bc47ecd448c20add53a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/native/ref.tsv",
+   "sha256": "c6a0c83a732f8d700bd4ce919f788386a82a1a60ac6c7521fb3e75dd004d9d50"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/native/cand.tsv",
+   "sha256": "7c6926b31640293c88822b53ac6c9173a744f4214319d2dbe05c5399bc1756a3"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/build.log",
+   "sha256": "de520d031372e85c2d3a02101364121cef340bd9495e3f617d91f3dcefd3f4dc"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/lit-summary.txt",
+   "sha256": "d666a9fb870a8999a400547381cbaeea61f401328ab9d1e0b9e796313af64b88"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/head-321-16/unmodified-rebuild.sha256",
+   "sha256": "9f351b1db27ec990c0b85c0ed474a95ca565aaebb304b0bb15995dafe336f931"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh",
+   "sha256": "2b254ccffe574aa8a4a3e3dcdd8006a4d87482360ad7fffb4dccefdc8303cf2f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/mode-hashes.sh",
+   "sha256": "fc3eb3ddc1435c880ab09e3de93fc3ddb0ec0d642a855204087a82ab8b2feb39"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/compare-hashes.py",
+   "sha256": "85b93d26ab064d956b666831240eba26d95785827994b199c82049b9ed537d69"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/size-compare.sh",
+   "sha256": "e4d3bd788d8d6602c38a168b39aaee06dfee1d9a2077acf7cf72e54116a48199"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/pressure-tables.sh",
+   "sha256": "21337f3909858eccd980b23360bace75cf3707f1e0d54f91dbbcd6c967e29539"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/README.md",
+   "sha256": "829701515e3b39ad4155e19f48f9c70b8518cecd2ea5fd4835bdeda8d37cd4c1"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-01.diff",
+   "sha256": "7b07b4c231dba7a8ff17dcee3f07a148114b1c5cad230031cf2bcb9af2880734"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-16.diff",
+   "sha256": "61e7e0444dfab32c2fcf585bdf633b1176e8cf2a3092ac16aceb4935744f8e61"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/frozen-llc.sha256",
+   "sha256": "8d89ebe9300ac716ebf053a50c6b7a05387dfcf3c583ccaf1363fd9f9f2153e5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/consumers/summary.txt",
+   "sha256": "f72eb9afc85483b4db7e06afb717941ca97048db0498dfa545a8dad7e07cb58b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/variants/summary.txt",
+   "sha256": "ea026eacaa14adea8855d3eb47c5ade23505f6a327f358939ceeaaa071f0a1fc"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/variants/probe.diff",
+   "sha256": "df516f9d49073c02afdf951fa8d484cea8a80a83d8ae4cf3ed48741baca725ba"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/native/size.txt",
+   "sha256": "32521f47a638a431b23c8c5889e32eeba88b0939d527b759915b14cb4a9b9d0a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/native/compare.txt",
+   "sha256": "feea80536bd1d8353efb93f7dc75e6910c6236c456d3edc26fecbac0b4208e88"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/default-vs-cand1/compare.txt",
+   "sha256": "8727396bd1d52ac103d14567edd18809625bd04733992a08cb34b6cb7bea929b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/native-summary.txt",
+   "sha256": "9f99bd4f46b2efc238ceef3f788ef0a0ba57355539eb81cb6ccd49112599f31d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/lit-summary.txt",
+   "sha256": "115588ce8b1e53cd8df681976fc047ffdfaa07ce280764f013516013c911bb31"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/lit-summary.txt",
+   "sha256": "d666a9fb870a8999a400547381cbaeea61f401328ab9d1e0b9e796313af64b88"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/runtime/results-321-16-t4.tsv",
+   "sha256": "3ed44463d8004792aae274ffbd44d34164b2b86922db52ddb44a5ee54fe64a6d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/runtime/results-321-16.tsv",
+   "sha256": "3ed44463d8004792aae274ffbd44d34164b2b86922db52ddb44a5ee54fe64a6d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/321-01-t4.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/321-16-t4.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/decoded-321-16-unchanged.txt",
+   "sha256": "29802f8eea6fade6bc4fdefd5365bcbb7cd2c43731e5ae25b8202b3af5c1a1ce"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/decoded-candidate.txt",
+   "sha256": "94516e488fa8cf2baa273525d66d68648b7b00cef57a53f1bbd6c0a3419ffba5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/mir/mv_step.p0.after.mir",
+   "sha256": "0e696c0a143c40fccea5c8543d48c72642a4fec87b4d9959df090c2c4e721e7b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/README.md",
+   "sha256": "a66c3731910b665aab6fc64c16de26b3c323df6f34a70bf06bd3ec4a3344d75e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/binaries.sha256",
+   "sha256": "803bd7ba07a1f54b202f1c58e8583cd54084e4d1ec66730288dd08301164c0f5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/cycle-probe-identity.json",
+   "sha256": "0eac377a20f285587a9f56dd1b4c25a253cd16b2fc56b3cc07c49da1dbc829e4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/build-gateprobe.log",
+   "sha256": "284b42a43f33a5cfb55e0ff784299f6b1bf33d3104e0bdc2304a5e07ac5765e6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/build-restore.log",
+   "sha256": "284b42a43f33a5cfb55e0ff784299f6b1bf33d3104e0bdc2304a5e07ac5765e6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/gate-probe-full.diff",
+   "sha256": "3a37714eda86e6a3807766d153ce6829bd3d64a23d04628498de3ba0fe83431c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/gate-probe-vs-t4.diff",
+   "sha256": "d2b13384d3317f1e311ea098ce1a40293fa9b08292e36e8b105dd7408ea7cd50"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/mixed-rev.ll",
+   "sha256": "ead91b75e64e73dad55c229fa61dda7ebaa68084debc7c421eaf1efb2b1e08f6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/mixed.ll",
+   "sha256": "e4696502418770765f68217b7e452e50bf4582cd13704963ccd1de8cd7a2f201"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/gate-probe/trace.txt",
+   "sha256": "a0f543a342e0e9297defd0dd3fb845d3b0b5e19ea699e8f704233d8073a45693"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.log",
+   "sha256": "0ba3d58c3ef811f65369c55baa2dd773cd3503ee71c3d1863b27ea0f245e18a8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/level-inputs.sha256",
+   "sha256": "28afb2de8d279b3394ea25473f7e521fdeecdad0520786ae2fe054cec9496c7f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/identity.json",
+   "sha256": "9dca64b65067f8b4582f00d858720656e2a176febe477a4fa68c5771fbf906ee"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/ir.sha256",
+   "sha256": "0d1d4cdf8b30b373b8a0c3bf1cadb0e0c5d478754cbdf350ab3007c1743ad9bd"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/results.tsv",
+   "sha256": "105405291b39ca262fcc33adc2e117097c40579974f35e888ed4a7fbb1c68cf5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/runtime.log",
+   "sha256": "d6687a03340dc806f75e8d45cf090cdd1ca42e27d20186737d38936da48fe35b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/runtime/summary.txt",
+   "sha256": "ff73a498001fb49b99ae496363ca4720a120a616a5aab2be2c7bb3f066396c33"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.cand1.tsv",
+   "sha256": "ec5607ccccc04ceba00d7d838a516276c8a283e9cb61a22a13599acfc4e73cec"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.cand1.tsv",
+   "sha256": "7f95d14b5f11e7a7e0b1eb3b11694a89265fbc58381818ed28c29a0228761cf5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.gate2.tsv",
+   "sha256": "7f95d14b5f11e7a7e0b1eb3b11694a89265fbc58381818ed28c29a0228761cf5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.t4-01.tsv",
+   "sha256": "42b2f8d466a38ed3410c4af4d50c7f20d0f678e07a23adc9b6b61d43b6394e23"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.t4.tsv",
+   "sha256": "7f95d14b5f11e7a7e0b1eb3b11694a89265fbc58381818ed28c29a0228761cf5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.def.upstream.tsv",
+   "sha256": "42b2f8d466a38ed3410c4af4d50c7f20d0f678e07a23adc9b6b61d43b6394e23"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.gate2.tsv",
+   "sha256": "e1ce8e4ccb82ebd8eec57cbecfb79e38a817af2f444705d453e93802d4002cf2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.head.tsv",
+   "sha256": "89645a76cf4195e6be2593f2d8085b84464e18fc72333475da90aaf4ca22ac14"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.memb1.tsv",
+   "sha256": "494362aa1721bef592a71e23d1f172ffc57d82ffd4e87d2bc3e27fe324f6d6eb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O2.t4.tsv",
+   "sha256": "5f0389e4f58279401d793d6ca3ed27af2f32d1f8554ffaba3b8dd0be1a849f55"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.cand1.tsv",
+   "sha256": "910ec38a16a6ce6b98c4e70cb9e1cc76f899573eca423ecefe40cf1f61b8587f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.cand1.tsv",
+   "sha256": "377592f7e742dd255e214231c6e7913e4f62fc8caa69c5d695246a69a04c4d0c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.gate2.tsv",
+   "sha256": "377592f7e742dd255e214231c6e7913e4f62fc8caa69c5d695246a69a04c4d0c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.t4-01.tsv",
+   "sha256": "f914c5b08d41e68857f61c1bac50d88a97fdd11b92468d719ee501c4360b4627"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.t4.tsv",
+   "sha256": "377592f7e742dd255e214231c6e7913e4f62fc8caa69c5d695246a69a04c4d0c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.def.upstream.tsv",
+   "sha256": "f914c5b08d41e68857f61c1bac50d88a97fdd11b92468d719ee501c4360b4627"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.gate2.tsv",
+   "sha256": "82a6bd19cfb104f2446f0bb49884c1ce5887104fd5fc1831a14825a34f5e950f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.head.tsv",
+   "sha256": "feb18d38a64ff1fbeb44ae9bb2eabb799865dc144f84684ae10fc4d4338a5e51"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.memb1.tsv",
+   "sha256": "b0d44e01f7aee706b9f35c32577c8d2f11909798f316971915bb873481d0a317"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/O3.t4.tsv",
+   "sha256": "55b420106441e52900ed4452ae2122a2cd5d389d942e8f9f791ae7ce97e80f6a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.cand1.tsv",
+   "sha256": "99c3cf567a4cbfdcebe006183de305fdf42a95bf09ecb599cd4ae0a502412603"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.cand1.tsv",
+   "sha256": "891c78a4e091dde561458b744352a5cd8daa08cd0bbedeff626537168accec6d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.gate1.tsv",
+   "sha256": "891c78a4e091dde561458b744352a5cd8daa08cd0bbedeff626537168accec6d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.t4-01.tsv",
+   "sha256": "2429a49a73592d6309ef3b40f6ade67e6bbc3b02c449f3b2d4b5c7638560ba0d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.t4.tsv",
+   "sha256": "891c78a4e091dde561458b744352a5cd8daa08cd0bbedeff626537168accec6d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.def.upstream.tsv",
+   "sha256": "2429a49a73592d6309ef3b40f6ade67e6bbc3b02c449f3b2d4b5c7638560ba0d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.gate0.tsv",
+   "sha256": "3407acfbb30e8ea8309c5c37fd4cdd9037f86318dfd1d31ac88097d79942e3c0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.gate1.tsv",
+   "sha256": "361af96452e2a9461fe3cc26cc0e8c2dd59b7372c0e12c0ee7fca13d41e55c5d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.head.tsv",
+   "sha256": "efc2603f517ab2def22617029c333218df757cda5d0240c310b2d49bd6b327f8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.memb1.tsv",
+   "sha256": "e4ab5cd1a8d61ac550d9b8f57d42efa897b8041141bf3270573b721c544d6264"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Os.t4.tsv",
+   "sha256": "3407acfbb30e8ea8309c5c37fd4cdd9037f86318dfd1d31ac88097d79942e3c0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.cand1.tsv",
+   "sha256": "6d4944b5ec91358f5cc75059fb11a70c38594e56ed1f2570f64d96e68079ce68"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.cand1.tsv",
+   "sha256": "7f15b2e5bd904106478342a0bfd3a383a32a0e672aaa049c4955fe6f197f6936"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.gate1.tsv",
+   "sha256": "7f15b2e5bd904106478342a0bfd3a383a32a0e672aaa049c4955fe6f197f6936"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.t4-01.tsv",
+   "sha256": "92ddcde2db714df4d40db83591970063bcdcbfebd090f58f1bea87e6bd3d98a7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.t4.tsv",
+   "sha256": "7f15b2e5bd904106478342a0bfd3a383a32a0e672aaa049c4955fe6f197f6936"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.def.upstream.tsv",
+   "sha256": "92ddcde2db714df4d40db83591970063bcdcbfebd090f58f1bea87e6bd3d98a7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.gate1.tsv",
+   "sha256": "4c1934fc2a69caa44f9652554c3da4f4e52f28272f170bd6d943e9d1d3ff2c4f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.head.tsv",
+   "sha256": "64d426dbef02c9060aa0e58d2fe44fbea55c0a839a9b19d7ba4f0e780776c163"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.memb1.tsv",
+   "sha256": "2a45e2a4da34b1f140df649a718e2e2df553bda6977b2fcbbe8775b8543afdb7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/Oz.t4.tsv",
+   "sha256": "4b51035fe5f715b5b6516d440eb2d5f3ffd7736e0374055e95bdd9f718cb61f7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/jobs.txt",
+   "sha256": "e5ed5284d1a8c41c87be1e8d93c519b9c55b35b5f4d81a387c27395125c55b5b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/matrix-jobs.log",
+   "sha256": "29b69b98832f207bb9cc5c148514659bd485ace9aa392b8a8c5a1428180a8236"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/matrix.log",
+   "sha256": "45aa102131689c96f588d96a70740be222499f23873069b7017d736816b0fa22"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/summary.txt",
+   "sha256": "55d9f77b25dbfb70b8f148c4436acd25ef2c837f7095d461486d22c4fe4157c2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/sizes/validate.O2orig.t4.tsv",
+   "sha256": "e676fbade3f5d9abc6f38b627aaeab44a81cc39d5ca90aca083ddde49308f8b4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/clocks-summary.py",
+   "sha256": "299ea8daec85f90ad2213bedcf02adf3d0c0a641a15973043d14b8ef2b84cece"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/make-level-inputs.sh",
+   "sha256": "3c783cc68f28e63222f91320dd5e2d496334324118a8f0a91863a03e25448fcb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/mode-hashes-level.sh",
+   "sha256": "5dad94062d868d80cf39b51265c3a1500f45936f960132a8f5a5b505736fcebd"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/run-matrix.sh",
+   "sha256": "dcef2deddb1e0cd18e0118123d75a731e871ae87602f462fcf9c3fb292e2d3de"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/runtime-clocks.py",
+   "sha256": "c2380c88a1e08c538c3720a835fa7c751da2ad19c91a4cdeb50bbee68364192c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/sizes-level.sh",
+   "sha256": "d4f1e732fdf7c9511c62272f2d01552f332770970b14e17510bd2e791fbd3d89"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/tools/summarize.sh",
+   "sha256": "32db08de8b420845930b75a1b5ab5cfd53239faa2d18d0aaca3e31c199d9fd95"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/README.md",
+   "sha256": "32444802d134627766ef7cf2ba2618e2e32e6c78ef4f8f4ec597006a85a31d89"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/test-red-green.log",
+   "sha256": "62ed632a0f597b2e30f8e6c8343381e92de5f7fd0773c5cfb877f31f3c5389bb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/O2.def.final.tsv",
+   "sha256": "7f95d14b5f11e7a7e0b1eb3b11694a89265fbc58381818ed28c29a0228761cf5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/O2.def.final01.tsv",
+   "sha256": "42b2f8d466a38ed3410c4af4d50c7f20d0f678e07a23adc9b6b61d43b6394e23"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/O2.final.tsv",
+   "sha256": "5f0389e4f58279401d793d6ca3ed27af2f32d1f8554ffaba3b8dd0be1a849f55"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/O3.def.final.tsv",
+   "sha256": "377592f7e742dd255e214231c6e7913e4f62fc8caa69c5d695246a69a04c4d0c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/O3.def.final01.tsv",
+   "sha256": "f914c5b08d41e68857f61c1bac50d88a97fdd11b92468d719ee501c4360b4627"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/O3.final.tsv",
+   "sha256": "b0d44e01f7aee706b9f35c32577c8d2f11909798f316971915bb873481d0a317"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/Os.def.final.tsv",
+   "sha256": "891c78a4e091dde561458b744352a5cd8daa08cd0bbedeff626537168accec6d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/Os.def.final01.tsv",
+   "sha256": "2429a49a73592d6309ef3b40f6ade67e6bbc3b02c449f3b2d4b5c7638560ba0d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/Os.final.tsv",
+   "sha256": "3407acfbb30e8ea8309c5c37fd4cdd9037f86318dfd1d31ac88097d79942e3c0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/Oz.def.final.tsv",
+   "sha256": "7f15b2e5bd904106478342a0bfd3a383a32a0e672aaa049c4955fe6f197f6936"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/Oz.def.final01.tsv",
+   "sha256": "92ddcde2db714df4d40db83591970063bcdcbfebd090f58f1bea87e6bd3d98a7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/Oz.final.tsv",
+   "sha256": "4b51035fe5f715b5b6516d440eb2d5f3ffd7736e0374055e95bdd9f718cb61f7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/jobs.txt",
+   "sha256": "237245e07ac401b800b34330285b03ef3db5d6da52984a4da1b1d37e800ba0bc"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/matrix.log",
+   "sha256": "aac13fe131705c7cd6835b282f3d0ce5d95d54feb703963b8a9041b4ae18eb67"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/sizes/summary.txt",
+   "sha256": "7b2bc2ff9ab33104dff4dc8dce28387553b2cd2f83db4d01fffa56a431af9484"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/verify/O2.final.tsv",
+   "sha256": "71e0874c275519183bb2c238c2cc09bc3e5f9e3e6181f26d80473c5785bfef8e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/verify/O3.final.tsv",
+   "sha256": "71e0874c275519183bb2c238c2cc09bc3e5f9e3e6181f26d80473c5785bfef8e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/verify/O3.head.tsv",
+   "sha256": "71e0874c275519183bb2c238c2cc09bc3e5f9e3e6181f26d80473c5785bfef8e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/0002-candidate-delta.diff",
+   "sha256": "6ec4d2f293d01cec22c639aa2c766c120335c2c53d7dbdc3e58f9318c35886ad"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/carry-sched-interaction.txt",
+   "sha256": "0fbccb51683c323e92746bf6c46d33731d843aa0a6aec36b6634cbdf2e2e5041"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/codegen-results.tsv",
+   "sha256": "6a9f424fa6f68208f3fc338d7d6afb8784b3b2385e6cf2280d93f291e7d54763"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/codegen-sources.txt",
+   "sha256": "04714a04fde9fa85964b671a3ac8dd8d24585e5f4e9eeb4c53898afd773d470d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/codegen-summary.txt",
+   "sha256": "f97972b225ea05e8b558cfa519edf26560d4b2c9f8423eb19e06402c3a279dc2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/corpus-a16.log",
+   "sha256": "9577985274ff43559aa610e6f147444d6a1e85a1b0e547cb110eecd91952e4d6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/identity.sha256",
+   "sha256": "97cca87b6208b9a0bcc46a020aec8330986ba7dfba07f040d33c0d58b5134ebe"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/lit-summary.txt",
+   "sha256": "c5baf7bbdfe06937d78300568e3418ae5a3354a530b32a21af2e86057b95d44a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/test-red-green.log",
+   "sha256": "c8b1a33848fc160c6a0e537882e661d51d85ecfe2d64e3bd8f97fb235c061f63"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/vendor-candidate.diff",
+   "sha256": "b8b5d20dd2f9290a7948e8167722819d5e878c3720a3448bb285476d9e9d45e9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/verify-O2.base.tsv",
+   "sha256": "bbb731888270cfdc4a87af7d9315f2b5b70407203b7284b6fcefda23c817b9c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/verify-O2.final.tsv",
+   "sha256": "bbb731888270cfdc4a87af7d9315f2b5b70407203b7284b6fcefda23c817b9c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/verify-O3.base.tsv",
+   "sha256": "bbb731888270cfdc4a87af7d9315f2b5b70407203b7284b6fcefda23c817b9c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/verify-O3.final.tsv",
+   "sha256": "bbb731888270cfdc4a87af7d9315f2b5b70407203b7284b6fcefda23c817b9c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tables/320-04.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tables/321-00.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tables/321-01.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tables/321-16.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tables/downstream.txt",
+   "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runtime/identity.json",
+   "sha256": "e59992a55e7e2ebe684cbf1dab1ae92eeeff715aa5d9d7a289587e00279dc19d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runtime/ir.sha256",
+   "sha256": "93251800a6d06ef99c7f41c4dba419761c7463d7226333a1291e8706a46dd5de"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runtime/results.tsv",
+   "sha256": "fa8c539af47e51649f26814e21718986d0fc53f1c7e24af10346705095f3c3a8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runtime/runtime.log",
+   "sha256": "c5011614da2d79b3c600c56061cfd50b81da474ba4d29fe47703c1858d64b813"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runtime/summary.txt",
+   "sha256": "d46f521baa6463277a1c007797310883b46252d1a9cd888dfe65fd3f3b74805d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/lto/driver-link-lines.txt",
+   "sha256": "26168ed808cb9cab2ffdf61766c08dfbcc07c452694610dacd532d1996570908"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/lto/find-setOptLevel.txt",
+   "sha256": "d110f2aa63629ac4dd1375e2ac53e124dd7eb56af002972f8826b147c75927f1"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/lto/gate-real-builds.txt",
+   "sha256": "e24e8c6dc93b6d006a2a8098c113d7fbd9f1483d7d0f07e1ffec095bfaf42160"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runs/baseline-rerun-llc.sha256",
+   "sha256": "cb8de44fc5b9ce0e0979942f8c58139ab7e7249924df480a6e273e62228568b5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runs/baseline-rerun.log",
+   "sha256": "d12d6cf7aa366c4dc01a551bcfd0ff25928528397e909aa29a8b8d9adf17f098"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runs/candidate-compare.txt",
+   "sha256": "e8d532b7cfe52a581f20c2eab6c98cd22eeb3ed698b899ade4a862ee35695d46"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runs/candidate-default-321-01.log",
+   "sha256": "34304c26bd32e6b2a0506b87df167afdbfbf899e8797601f907abdcbbefbf4e9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runs/candidate-llc.sha256",
+   "sha256": "95fa524687d0ff3c83c3a61a43afe132fdfca755d8d88b52c9e40ec76b9a78cd"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tools/downstream-codegen.sh",
+   "sha256": "8ca0904481e10176b59396b228f1e942b639d570dd780412d487311b2868e5c5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tools/downstream-sizes-flags.sh",
+   "sha256": "5ea5fedc4fb6c3b1da059b2032a84488561b9e507f092e78077df3954ec42de0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tools/gate-real-builds.sh",
+   "sha256": "db6fdedd236813dde6fecd13abb7cd8052df5b663fddc3f27af7f32b8ab00b5d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tools/test-red-green.sh",
+   "sha256": "b0db606af577eb395f3d830dddd7d5abf0e64cb31af7308a30c51800f3217a24"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tools/verify-sweep-level.sh",
+   "sha256": "94411603a97f10dabe1e62ce00d403428e15b411e19a75c46ad4ef6ad5ffa534"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tests/native-width-default-pressure.ll",
+   "sha256": "f7d124682d1eb991ec42dc62d2a5a2a1557bcc71c5eb4b7bb86aed3bd707248e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/tests/native-width-pressure-opt-level.ll",
+   "sha256": "d2738e9cecd101768e53055a6d5ad2234306793c53f6f818cccecfd2636ea5ff"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/change/pressure-320.diff",
+   "sha256": "41708ad7023727e04e7607bfc0d4c73a61edc72c9914710a246cdcea3c7b3492"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/change/pressure-321.diff",
+   "sha256": "abc6039622bac90076a43010c8437a4beaa2ef7a678f609ddb3b893c6cd3497a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/change/pressure-targets.txt",
+   "sha256": "fbdf18efa7d7e64f706febf902304cce57260488d744f88bed1ce0a85c38fbe2"
+  }
+ ],
+ "t4_design": {
+  "description": "Keep GeneratePressureSet = 0 on Ac16/Xc16/Yc16 (generated tables = upstream) and, under +mos-a16 only, append pressure sets A16/X16/Y16 (limit 2) through MOSRegisterInfo overrides of the six pressure-set hooks; the sets are charged by each wide register's byte units and by Ac/Ac16, Xc/Xc16, Yc/Yc16; the native class also charges its low byte's generated sets.",
+  "diff": {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-01.diff",
+   "sha256": "7b07b4c231dba7a8ff17dcee3f07a148114b1c5cad230031cf2bcb9af2880734"
+  },
+  "diff_at_head": {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-16.diff",
+   "sha256": "61e7e0444dfab32c2fcf585bdf633b1176e8cf2a3092ac16aceb4935744f8e61"
+  },
+  "native_at_head_vs_321_16": "+mos-a16 321489 -> 321411 B (-78; 16 larger, 4 smaller); +mos-a16,+mos-xy16 300012 -> 299850 B (-162; 15 larger, 5 smaller)",
+  "cause": "With the flag alone the native classes have no pressure sets, so 16-bit vregs cost nothing to MachineLICM, MachineSink and the machine scheduler (all three contribute; all three disabled gives identical output). Restoring native-class pressure removes the native growth."
+ },
+ "closure_ready": {
+  "note": "Prepared resolution for the split-series fix (the recorded baseline is split #321-1). It becomes the resolution, and status fixed, once the downstream decision is made; the candidate run meets the closure rules (same input and configuration as the baseline, distinct toolchain, exit 0).",
+  "change": "Split #321-1: let GeneratePressureSet = 0 around Ac16/Xc16/Yc16 in MOSRegisterInfo.td. Split #321-8: MOSRegisterInfo(const MOSSubtarget &, CodeGenOptLevel) (MOSSubtarget passes TM.getOptLevel()) builds per-class and per-unit pressure-set lists and overrides getNumRegPressureSets, getRegPressureSetName, getRegPressureSetLimit, getLargestRegClassForRegPressureSet, getRegClassPressureSets and getRegUnitPressureSets; under +mos-a16 the native classes charge their low byte's generated sets and, unless the level is Aggressive, sets A16/X16/Y16 (limit 2) are appended. Diffs: docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/change/. Downstream 0002 is not changed: its candidate (docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/) is held for the user decision.",
+  "causal_explanation": "TableGen derives pressure sets from every register class; the opt-in classes Ac16/Xc16/Yc16 added sets and removed MOSAsmParamRegClass, and MachineLICM, MachineSink and the scheduler read those tables in every mode. With GeneratePressureSet = 0 the generated tables are upstream's again (tables/ in final/), so default heuristics see exactly upstream's sets; native-mode pressure is restored only for +mos-a16 through the hooks, which return the generated tables otherwise.",
+  "trigger_check": "The unchanged regression runner (tools/default-identity.sh) over the unchanged fixed input set compares upstream 06bc967d2668 with the final #321-1 llc, in mos6502 and plain mosw65816 at -O2, asm and object; the same command on the preserved baseline llc still exits 1 with the recorded signature (final/runs/baseline-rerun.log).",
+  "regression": {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
+   "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
+  },
+  "regression_tests": [
+   "llvm/test/CodeGen/MOS/native-width-default-pressure.ll (split #321-1, 0002): default mos6502 and mosw65816 code for llvm.scmp.i16.i32 with upstream checks; FAIL on the preserved baseline 321-01 and unchanged 321-16 llc, PASS with the change (final/test-red-green.log; downstream: FAIL on the baseline llc f1fa50a2, PASS on the held candidate 9f9b74f9, final/downstream/test-red-green.log)",
+   "llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll (split #321-8, 0002; REQUIRES: asserts): the scheduler's pressure sets include A16 at -O2 and only the low byte's sets at -O3; FAIL on unchanged 321-16, on the ungated design at -O3 and on #321-7, PASS with the change"
+  ],
+  "candidate": {
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/final/llc/321-01 /home/will/llvm-mos-65816/build/pressure-sets/final/runs/default-321-01",
+   "working_directory": "/home/will/llvm-mos-65816-pressure",
+   "configuration": {
+    "tool": "llc",
+    "triple": "mos",
+    "cpus": [
+     "mos6502",
+     "mosw65816"
+    ],
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "outputs": [
+     "asm",
+     "obj"
+    ],
+    "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/final/llc/321-01 (copy of build/split-320-321/llc/p-321-01: final split #321-1 45bc97d89c6a, assertions Release build of build/split-320-321/build; bit-identical to Phase A 321-01-cand1)",
+   "toolchain_sha256": "e8130e32bb482adb61e3a98fb345a3154368a95804b1aecdd11c98dfabe17f3e",
+   "container_image": "llvm-mos-65816-dev sha256:d0aea4bcf613d9deb929e61a051ba368cf87d42ef992edcfc6afd9e77c56c84b",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
+    "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/runs/candidate-default-321-01.log",
+    "sha256": "34304c26bd32e6b2a0506b87df167afdbfbf899e8797601f907abdcbbefbf4e9"
+   },
+   "exit_code": 0,
+   "observed": "mos6502 and mosw65816: 90 of 90 identical; RESULT: IDENTICAL"
+  },
+  "validation": "Split series: 20 commits build with assertions and pass MOS CodeGen+MC (134..165 pass, 1 unsupported), no new MOS warnings, 12 of 13 added tests red on the parent (the default guard passes on its upstream parent by design); the far-word, near-index and 0065 packet patches apply unchanged (174/157/158 pass). Per level at head (final 321-16 da1a6f4ba69c97f3): default identical to the Phase A candidate and the design; native bytes equal the ungated design at -Os/-Oz/-O2 and memb1 (sets off) at -O3 on 180 of 180 input/modes; master clocks equal t4 at -O2 and memb1 at -O3; -verify-machineinstrs signatures equal unchanged head at -O2 and -O3. Downstream candidate (built, held, not landed; vendor restored): MOS CodeGen+MC 191 pass, 4 unsupported; verifier results unchanged; 0002 round-trips; corpus-a16 83/83 on MAME and bsnes-jg; SNES corpus/demo codegen at -Os grows (default +13,427 B, +mos-a16 +3,003 B, +mos-a16,+mos-xy16 +3,070 B), attributed to the 0064/0067 carry-scheduling interaction (with -mos-carry-sched=off the change shrinks default code by 25,290 B)."
+ }
 }

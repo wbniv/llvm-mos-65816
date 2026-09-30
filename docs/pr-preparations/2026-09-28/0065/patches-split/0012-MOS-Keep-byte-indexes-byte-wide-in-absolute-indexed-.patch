@@ -1,4 +1,4 @@
-From 77326e4aaff3f6faae77f4d21f663dc10a73a9ae Mon Sep 17 00:00:00 2001
+From 497db27604400f5961676dace699fefc5d1225bb Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 12/18] [MOS] Keep byte indexes byte-wide in absolute indexed
@@ -8,7 +8,7 @@ In absolute indexed addressing, an index that is already s8 (a zero-page pointer
 
 Both lanes of the shared s16 offset stay explicitly defined: under native widths that value can reach a word spill or a word consumer, which reads both bytes.
 
-Default-mode effect: yes, in every mode. legalizer.mir drops a COPY of the s8 index in two zero-page tests, and the high byte of a shared offset becomes a known zero. In the fixed input set 16 of 54 compiling mos6502 inputs and 17 of 78 mosw65816 inputs produce different assembly; code size changes by +280 bytes on mos6502 (12 inputs larger, 3 smaller) and -83 bytes on mosw65816 (1 larger, 14 smaller).
+Default-mode effect: yes, in every mode. legalizer.mir drops a COPY of the s8 index in two zero-page tests, and the high byte of a shared offset becomes a known zero. In the fixed input set 16 of 54 compiling mos6502 inputs and 18 of 78 mosw65816 inputs produce different assembly; code size changes by +243 bytes on mos6502 (12 inputs larger, 3 smaller) and -102 bytes on mosw65816 (17 smaller).
 
 Tests: zp-byte-index.ll checks zero-page indexed loads and stores in mos6502, +mos-a16 and +mos-a16,+mos-xy16 modes; legalizer-indexed-offset-observer.mir checks the rewritten operands and the CSE observer contract (assertions builds); legalizer.mir is updated.
 

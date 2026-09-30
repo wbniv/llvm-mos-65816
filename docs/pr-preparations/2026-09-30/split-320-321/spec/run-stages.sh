@@ -32,7 +32,9 @@ for k in $(seq "$FROM" "$TO"); do
   [ -n "${SKIP_HASH:-}" ] && continue
   rm -f "$SPLIT/llc/$label"; ln "$SPLIT/build/bin/llc" "$SPLIT/llc/$label"
   bash "$SPLIT/spec/default-hashes.sh" "$SPLIT/llc/$label" "$SPLIT/evidence/$label/default-hashes.tsv" > /dev/null
-  prev=$SERIES-$(printf %02d $((k-1)))
+  prev=${LABEL_PREFIX:-}$SERIES-$(printf %02d $((k-1)))
+  # The unchanged base (321-00) has no prefixed run; fall back to it.
+  [ -f "$SPLIT/evidence/$prev/default-hashes.tsv" ] || prev=$SERIES-$(printf %02d $((k-1)))
   if [ -f "$SPLIT/evidence/$prev/default-hashes.tsv" ]; then
     python3 "$SPLIT/spec/compare-hashes.py" "$SPLIT/evidence/$prev/default-hashes.tsv" \
       "$SPLIT/evidence/$label/default-hashes.tsv" > "$SPLIT/evidence/$label/default-compare.txt"

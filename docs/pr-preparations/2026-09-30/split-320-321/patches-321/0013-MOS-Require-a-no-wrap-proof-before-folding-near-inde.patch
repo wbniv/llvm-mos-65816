@@ -1,4 +1,4 @@
-From 0284f9f318a41a2c19773c66ae05a05a3ab8af45 Mon Sep 17 00:00:00 2001
+From ef1fdd877206a81fa961da92b8cad45877a93be4 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 13/16] [MOS] Require a no-wrap proof before folding near
@@ -6,7 +6,7 @@ Subject: [PATCH 13/16] [MOS] Require a no-wrap proof before folding near
 
 On the 65816, indexed addressing adds the index to the 16-bit base with carry into the bank (DBR), while a near G_PTR_ADD wraps at 16 bits. Folding the add into abs,X, abs,Y or (zp),Y is correct only if the unsigned sum cannot wrap. canFoldNearIndex allows the fold when the add is nuw, when it is nusw with a known non-negative offset, or when known bits bound base + offset below 0x10000. Other CPUs are unaffected. The check applies to the native word forms and to the existing byte abs-indexed (except zero page) and indirect-indexed folds.
 
-Default-mode effect: yes, on plain mosw65816 when an index cannot be proven not to wrap; mos6502 is unchanged. In the fixed input set 27 of the 78 mosw65816 inputs that compile before change (25 larger, 2 smaller, +4,626 bytes, 1.6%), because a byte index into a runtime pointer now needs a 16-bit add. One corpus input (examples_snes_sodo) that already fails on the base commit with "Remaining virtual register" during frame lowering compiles after this change; the change avoids that shape rather than repairing it.
+Default-mode effect: yes, on plain mosw65816 when an index cannot be proven not to wrap; mos6502 is unchanged. In the fixed input set 27 of the 78 mosw65816 inputs that compile before change (26 larger, 1 smaller, +4,620 bytes, 1.6%), because a byte index into a runtime pointer now needs a 16-bit add. One corpus input (examples_snes_sodo) that already fails on the base commit with "Remaining virtual register" during frame lowering compiles after this change; the change avoids that shape rather than repairing it.
 
 Tests: near-index-nowrap.ll checks, on mos6502 and mosw65816, a plain add (folded only on mos6502), nuw and inbounds non-negative adds (folded on both), a global base (folded only on mos6502) and a constant base whose known bits bound the sum (folded on both).
 

@@ -1,0 +1,49 @@
+== O2 a16: 15 sims pass under every variant; excluded perlin_sim, satcast_sim
+   final  clocks 310,744,756  bytes 24,612 | vs head: -454,668 clk (-0.15%), -293 B, faster 2 slower 1 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   head   clocks 311,199,424  bytes 24,905 | vs t4: +454,668 clk (+0.15%), +293 B, faster 1 slower 2
+   memb1  clocks 310,078,774  bytes 24,402 | vs head: -1,120,650 clk (-0.36%), -503 B, faster 8 slower 3 | vs t4: -665,982 clk (-0.21%), -210 B, faster 8 slower 3
+   t4     clocks 310,744,756  bytes 24,612 | vs head: -454,668 clk (-0.15%), -293 B, faster 2 slower 1
+     final vs head per sim: tea_sim -489,914; avalanche_sim -16,880; nmitally_sim +52,126
+     memb1 vs head per sim: tea_sim -537,170; nmitally_sim -364,010; critters_sim -129,368; boids_sim -120,936; montorbit_sim -15,544; rangecode_sim -14,744; lzdec_sim -1,972; cgrade_sim -1,004; jt256_sim +14,800; avalanche_sim +15,280; grid3d_sim +34,018
+     t4 vs head per sim: tea_sim -489,914; avalanche_sim -16,880; nmitally_sim +52,126
+== O2 a16xy16: 15 sims pass under every variant; excluded perlin_sim, satcast_sim
+   final  clocks 307,616,408  bytes 24,408 | vs head: -454,668 clk (-0.15%), -293 B, faster 2 slower 1 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   head   clocks 308,071,076  bytes 24,701 | vs t4: +454,668 clk (+0.15%), +293 B, faster 1 slower 2
+   memb1  clocks 307,020,134  bytes 24,216 | vs head: -1,050,942 clk (-0.34%), -485 B, faster 7 slower 2 | vs t4: -596,274 clk (-0.19%), -192 B, faster 7 slower 2
+   t4     clocks 307,616,408  bytes 24,408 | vs head: -454,668 clk (-0.15%), -293 B, faster 2 slower 1
+     final vs head per sim: tea_sim -489,914; avalanche_sim -16,880; nmitally_sim +52,126
+     memb1 vs head per sim: tea_sim -537,170; nmitally_sim -364,010; boids_sim -120,936; critters_sim -64,088; montorbit_sim -15,544; rangecode_sim -14,744; cgrade_sim -1,004; avalanche_sim +15,280; grid3d_sim +51,274
+     t4 vs head per sim: tea_sim -489,914; avalanche_sim -16,880; nmitally_sim +52,126
+== O3 a16: 14 sims pass under every variant; excluded grid3d_sim, perlin_sim, satcast_sim
+   final  clocks 278,819,638  bytes 31,605 | vs head: -512,170 clk (-0.18%), -253 B, faster 6 slower 3 | vs t4: -553,826 clk (-0.20%), -264 B, faster 6 slower 2
+   head   clocks 279,331,808  bytes 31,858 | vs t4: -41,656 clk (-0.01%), -11 B, faster 2 slower 1
+   memb1  clocks 278,819,638  bytes 31,605 | vs head: -512,170 clk (-0.18%), -253 B, faster 6 slower 3 | vs t4: -553,826 clk (-0.20%), -264 B, faster 6 slower 2
+   t4     clocks 279,373,464  bytes 31,869 | vs head: +41,656 clk (+0.01%), +11 B, faster 1 slower 2
+     final vs head per sim: nmitally_sim -373,452; critters_sim -129,368; montorbit_sim -15,544; rangecode_sim -15,428; cgrade_sim -6,510; lzdec_sim -1,972; boids_sim +24; jt256_sim +14,800; avalanche_sim +15,280
+     memb1 vs head per sim: nmitally_sim -373,452; critters_sim -129,368; montorbit_sim -15,544; rangecode_sim -15,428; cgrade_sim -6,510; lzdec_sim -1,972; boids_sim +24; jt256_sim +14,800; avalanche_sim +15,280
+     t4 vs head per sim: avalanche_sim -16,880; boids_sim +24; nmitally_sim +58,512
+== O3 a16xy16: 14 sims pass under every variant; excluded grid3d_sim, perlin_sim, satcast_sim
+   final  clocks 276,834,026  bytes 31,377 | vs head: -459,718 clk (-0.17%), -245 B, faster 5 slower 2 | vs t4: -501,374 clk (-0.18%), -256 B, faster 5 slower 1
+   head   clocks 277,293,744  bytes 31,622 | vs t4: -41,656 clk (-0.02%), -11 B, faster 2 slower 1
+   memb1  clocks 276,834,026  bytes 31,377 | vs head: -459,718 clk (-0.17%), -245 B, faster 5 slower 2 | vs t4: -501,374 clk (-0.18%), -256 B, faster 5 slower 1
+   t4     clocks 277,335,400  bytes 31,633 | vs head: +41,656 clk (+0.02%), +11 B, faster 1 slower 2
+     final vs head per sim: nmitally_sim -373,452; critters_sim -64,088; montorbit_sim -15,544; rangecode_sim -15,428; cgrade_sim -6,510; boids_sim +24; avalanche_sim +15,280
+     memb1 vs head per sim: nmitally_sim -373,452; critters_sim -64,088; montorbit_sim -15,544; rangecode_sim -15,428; cgrade_sim -6,510; boids_sim +24; avalanche_sim +15,280
+     t4 vs head per sim: avalanche_sim -16,880; boids_sim +24; nmitally_sim +58,512
+== status counts (level mode variant status: n)
+   O2 a16 final llc-fail rc=-6 2
+   O2 a16 head llc-fail rc=-6 2
+   O2 a16 memb1 llc-fail rc=-6 2
+   O2 a16 t4 llc-fail rc=-6 2
+   O2 a16xy16 final llc-fail rc=-6 2
+   O2 a16xy16 head llc-fail rc=-6 2
+   O2 a16xy16 memb1 llc-fail rc=-6 2
+   O2 a16xy16 t4 llc-fail rc=-6 2
+   O3 a16 final llc-fail rc=-6 2
+   O3 a16 head llc-fail rc=-6 3
+   O3 a16 memb1 llc-fail rc=-6 2
+   O3 a16 t4 llc-fail rc=-6 3
+   O3 a16xy16 final llc-fail rc=-6 2
+   O3 a16xy16 head llc-fail rc=-6 3
+   O3 a16xy16 memb1 llc-fail rc=-6 2
+   O3 a16xy16 t4 llc-fail rc=-6 3

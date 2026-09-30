@@ -9,4 +9,6 @@ llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir	321-07	FAIL	PASS x15	OK	e
 llvm/test/CodeGen/MOS/a16-load-store.ll	321-08	FAIL	PASS x14	OK	error: CHECK: expected string not found in input
 llvm/test/CodeGen/MOS/near-index-nowrap.ll	321-13	FAIL	PASS x9	OK	error: W65816: expected string not found in input
 llvm/test/CodeGen/MOS/a16-small-add.ll	321-15	FAIL	PASS x7	OK	error: NATIVE: expected string not found in input
+llvm/test/CodeGen/MOS/native-width-default-pressure.ll	321-01	PASS	PASS x21	CHECK	error: CHECK-DAG: expected string not found in input
+llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll	321-08	FAIL	PASS x14	OK	error: SETS: expected string not found in input
 llvm/test/CodeGen/MOS/imag32-copy.mir	320-01	FAIL	PASS x4	OK	unknown register name 'rl2'

@@ -4,15 +4,15 @@ Prepared September 29, 2026. This packet extracts the completed downstream near-
 
 ## Split series (current)
 
-The #321 prerequisite (patch 1 below) is now the 16-commit [split series](../../2026-09-30/split-320-321/README.md). [`patches-split/`](patches-split/) holds those 16 commits followed by this packet's near-index recovery patch, applied unchanged with `git am -3`.
+The #321 prerequisite (patch 1 below) is now the 16-commit [split series](../../2026-09-30/split-320-321/README.md). [`patches-split/`](patches-split/) holds those 16 commits followed by this packet's near-index recovery patch, applied unchanged with `git am -3`. On 2026‑09‑30 the split was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application) (#321‑1 and #321‑8), and this section records the rerun on the regenerated commits.
 
 | Check | Result |
 | --- | --- |
 | Recovery patch on the split | Applied with `git am -3`, no conflicts |
-| Final tree | `929f85df00ac`: the previous candidate `980fe1f29381` plus the 10 test files the #321 split adds, and one line in `MOSFeatures.td`: this packet's prerequisite had an extra trailing blank line that the split (like the monolithic `340c8ee25d5c`) does not |
+| Final tree | `6bd824516c06`: the previous candidate `980fe1f29381` plus the pressure-set change (`MOSRegisterInfo.{cpp,h,td}`, `MOSSubtarget.cpp`), the 12 test files the #321 split adds, and one line in `MOSFeatures.td`: this packet's prerequisite had an extra trailing blank line that the split (like the monolithic `340c8ee25d5c`) does not |
 | Round trip | Each of the 17 patches applied in order to `06bc967d2668` reproduces its commit's tree ([record](evidence/split-series.json)) |
-| MOS CodeGen + MC | 155 passed, 1 unsupported (145 before, plus the 10 added tests) |
-| `llc` | sha256 `c8fb18cbdc4f…`, identical to the previous candidate's `llc` |
+| MOS CodeGen + MC | 157 passed, 1 unsupported (145 before, plus the 12 added tests) |
+| `llc` | sha256 `aab70a21cb04…`; it differs from the previous candidate's `c8fb18cbdc4f…` by the pressure-set change. The replay and runtime measurements below were taken before that change and have not been repeated |
 
 Everything below this section describes the monolithic-prerequisite series and remains its dated record.
 
