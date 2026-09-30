@@ -2620,11 +2620,11 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "bf35b3f5842ebbf878b9500a7d5ced1a93790a06ca545eff3ad3f8d8bfbfe358"
+          "TODO.md": "69b883049fcee1a493186236221eee4a0de0af3d259411b302f964366cd85f40"
         },
-        "reviewed_at": "2026-09-30T20:59:01.468006+00:00",
-        "note": "TODO.md changed only in the carry-scheduling pressure-contract item text (2026-10-01 finding, nothing landed); the publication procedure is unchanged.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-09-30T21:19:18.509021+00:00",
+        "note": "Carry-scheduling now awaits the user's native-bar choice, and the MachineLICM item gained the downstream default-mode -Os finding; the publication procedure is unchanged, and the site is republished after the push.",
+        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
   ]
