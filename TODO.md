@@ -23,6 +23,8 @@ This file tracks actions that remain. The [September 28 history snapshot](TODO-h
 
 - [T4] **Repair multi-argument calls under the opt-in split/AXY far-pointer conventions.** Under `+mos-farcc-split` or `+mos-farcc-axy`, a custom-assigned far pointer followed by any other argument aborts in `CallLowering::handleAssignments`, and the matching call site grows memory without bound. A single far pointer compiles, and that is all the gates test; default Imag32 and Stack are unaffected. Root-cause it, repair it with a red/green on the frozen inputs, and extend the `farcc_split`/`farcc_axy` gates to multi-argument calls. Run every probe under `ulimit -v 2000000`. Ranked T4 (user, 2026‑09‑30): unknown root cause in custom-value assignment. [Record](docs/defects/mos-far-cc-split-axy-custom-args.json).
 
+- [wip T4] **Capture and root-cause the dither demo failure at `-O3`.** Built unmodified at `-O3` with the installed toolchain, `examples/snes/dither.c` never writes its gate result 0x80C4, in both plain mosw65816 and `+mos-a16`; `-O2` passes. It is independent of the pressure-set work. Rule out undefined behaviour in the demo, capture the baseline and a canonical record, check upstream llvm-mos, and narrow it to the function and pass; propose a fix without applying it. Ranked T4 (user, 2026‑10‑01): unknown root cause in a runtime miscompile. [Observation](docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/o3-dither/report.txt). <!-- agent:add8bcbbca20cdab7 -->
+
 ### Test Bench / CI
 
 
