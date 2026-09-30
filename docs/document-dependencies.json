@@ -365,9 +365,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T21:42:15.993199+00:00",
-        "note": "NOT reviewed by this agent: TODO.md belongs to the orchestrator. Receipt refreshed only so the second-round #320 records (mos-imag32-reserved-pair-units, mos-far-fold-dangling-dbg-sites, mos-legalizer-fold-dangling-dbg-upstream) can be committed; the 0069/0070 items still describe the second review's open blockers and need the orchestrator's update.",
-        "attribution": "Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort"
+        "reviewed_at": "2026-09-30T21:50:37.026601+00:00",
+        "note": "Reviewed against the round-two records (mos-imag32-reserved-pair-units, mos-far-fold-dangling-dbg-sites, mos-legalizer-fold-dangling-dbg-upstream): the 0069/0070 items now describe round two and the pending #594 answers; the implementer's placeholder receipt is superseded.",
+        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
@@ -2632,10 +2632,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "69b883049fcee1a493186236221eee4a0de0af3d259411b302f964366cd85f40"
+          "TODO.md": "42ca64e2dafcf323350ed156ae040434c141d35d573d1c73a2ce6f454af18ffc"
         },
-        "reviewed_at": "2026-09-30T21:19:18.509021+00:00",
-        "note": "Carry-scheduling now awaits the user's native-bar choice, and the MachineLICM item gained the downstream default-mode -Os finding; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-09-30T21:51:45.446067+00:00",
+        "note": "The 0069/0070 items record round two and the third review; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
