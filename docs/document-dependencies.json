@@ -2616,11 +2616,11 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "be636c28916913fca3eba870de326ddff27a6f72a675b1a32be3274a496919e0"
+          "TODO.md": "00bf4b205ed926f63b16e23a8210ed44f5bfc1bab172b4af9670ccb33966fb63"
         },
-        "reviewed_at": "2026-09-30T09:39:41.193729+00:00",
-        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
-        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
+        "reviewed_at": "2026-09-30T11:55:33.375218+00:00",
+        "note": "TODO.md gained two ranked T4 items (MachineLICM opt-level gating, split/AXY multi-argument repair) and an updated pressure-set item; the publication procedure is unchanged, and the site is republished after the push.",
+        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
   ]

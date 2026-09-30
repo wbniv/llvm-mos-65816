@@ -58,7 +58,7 @@ the fix. Do not retire an XFAIL merely because a replacement fixture passes.
 The pre-commit evidence check enforces structured closure requirements; do not
 bypass it. Its checks do not replace reviewing the trigger or replaying evidence.
 
-## Three governing lessons (hard-won)
+## Four governing lessons (hard-won)
 
 1. **Measure, don't assume.** Predicted codegen is often wrong here — build the real shape, diff the bytes,
    read the disasm; verify a rebuild actually took (the stale-`clang-23` gotcha). Measure in realistic
@@ -71,6 +71,12 @@ bypass it. Its checks do not replace reviewing the trigger or replaying evidence
 3. **Modest gains are worth doing.** On a compiler a few-byte win is amplified across every program built
    with the toolchain, so "high-effort / modest-gain" is a *scheduling* input, not a veto. But only
    *genuine* gains — a *blanket* change that regresses common shapes to win a sub-case is wrong; gate it.
+4. **Always ask whether the optimization level can gate it.** For every codegen change, ask whether it can
+   be switched on or off per optimization setting: `-O2`/`-O3` against `-Os`/`-Oz`, which reach llc as the
+   `optsize`/`minsize` function attributes. Measure each level on its own objective, size at `-Os`/`-Oz`
+   and cycles at `-O2`/`-O3`, and let the change fire only where it wins. Policy 0070 is the model: its
+   bounded M16/Y8 indexing is on at `-O2`/`-O3` and off at `-Os`/`-Oz`. A result measured only as `-O2`
+   bytes answers neither question. (User directive, 2026‑09‑30: "always ask yourself this question".)
 
 ## Commit discipline (project specifics; generic rules in `~/CLAUDE.md`)
 

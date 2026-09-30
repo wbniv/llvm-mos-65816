@@ -1,6 +1,6 @@
 # Keep the native-width registers out of default-mode register pressure
 
-Status: Phase A done; [T4 design](#t4-design) done and measured, awaiting a decision on placement and dispatch for application (nothing applied to the split series or `0002`). The T4 design followed the [decision](#decision-after-phase-a), after one escalation (see [Phase A results](#phase-a-results)). Canonical record: [`mos-native-width-pressure-sets`](../defects/mos-native-width-pressure-sets.json). The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
+Status: Phase A done. The [T4 design](#t4-design) is done and measured, and its bar and placement are [decided](#decision-after-the-t4-design). Optimization-level gating is being measured before application; nothing is applied to the split series or `0002` yet. The T4 design followed the [decision](#decision-after-phase-a), after one escalation (see [Phase A results](#phase-a-results)). Canonical record: [`mos-native-width-pressure-sets`](../defects/mos-native-width-pressure-sets.json). The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
 
 Attribution: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
 
@@ -71,6 +71,14 @@ The user chose **"Hold both, T4 first"**. Apply nothing to the split series or `
 - **Open for the application dispatch.**
     - Placement: in #321 commit 1, the appended sets already move 8‑bit `+mos-a16` code before any native codegen exists (+1,491 B against upstream mosw65816, −1,711 B against unchanged #321‑1). The alternative is to put the hooks in the first commit that selects `Ac16`.
     - Per-input growth under the shrinking totals: packrec grows by up to +86 B.
+
+## Decision after the T4 design
+
+**2026‑09‑30.** The user decided:
+
+1. **Bar: totals.** The native result of −78 B (`+mos-a16`) and −162 B (`+mos-a16,+mos-xy16`) meets the bar. Per-input growth, up to +86 B for packrec, is recorded but does not block.
+2. **Placement.** The TableGen `GeneratePressureSet = 0` flag goes in #321 commit 1, which keeps default output identical to upstream there. The `MOSRegisterInfo` hook overrides and the subtarget-taking constructor go in the first #321 commit that selects `Ac16`, so each commit's size change sits beside the code that causes it.
+3. **Gate by optimization level first.** The user asked whether the change can be enabled or disabled per optimization setting, and made that question standing (project [CLAUDE.md](../../CLAUDE.md), lesson 4). Every measurement above is `-O2` bytes. A T4 dispatch now measures `-Os`/`-Oz` size and `-O2` cycles, including a per-function gate through `getRegPressureSetLimit(MF, …)`. That is the only overridden hook that receives the function; the membership lists are fixed per subtarget. Its result goes in an "Optimization-level gating" section below. Application follows, with the placement in item 2.
 
 ## Verification
 

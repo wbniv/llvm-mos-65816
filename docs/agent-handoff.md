@@ -79,7 +79,7 @@ locally by patch 0068. Its preserved IR passes diagnostic null emission on the
 patched downstream build. The [standalone extraction](pr-preparations/2026-09-27/0068-validation.md) is now validated on upstream `26d7c2c1eebf`, with 21 null-output repairs, 24 identical ordinary outputs and 133 MOS passes / one unsupported. Independent review remains pending; the historical 0064 extraction is unchanged. See the [defect investigation](investigations/2026-09-27-mos-null-output-streamer.md).
 
 Verbose reference for doing codegen work on this repo. The high-level orientation, the `vendor/` model, the
-three governing lessons, and commit discipline are in the auto-loaded project
+four governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics
 live in `docs/plans/YYYY-MM-DD-<topic>.md`.)
 

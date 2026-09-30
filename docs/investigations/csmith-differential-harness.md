@@ -36,7 +36,7 @@ goals:
   part), as are the Apple IIGS, SA-1, etc. — so for this project's actual target it's arguably off-limits by
   its own license.
 - **It's a closed binary — you can't do the one thing this project *is*.** The whole thesis here (see the
-  [three governing lessons](../../CLAUDE.md)) is *measuring bytes and shaving them* — building the real
+  [governing lessons](../../CLAUDE.md)) is *measuring bytes and shaving them* — building the real
   codegen shape, diffing the disasm, gating native 16-bit ops to fire only where they win. You cannot do
   that to a compiler whose source you don't have. WDC816CC has a peephole "optimizer"; it has no SSA
   pipeline, no LLVM-grade register allocation, none of llvm-mos's whole-program / static-stack model — and

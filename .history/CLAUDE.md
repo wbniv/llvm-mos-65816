@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/27b7e242) | Keep pending PR prose on single source lines |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/d8f798c8) | Finish pending fix preparation and retain validation evidence |
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/c858c675) | Require prior-work audits and revalidate the existing far-memset repair |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/0bf5b688) | docs: require and restore model, version, and effort attribution |
@@ -12,6 +13,11 @@
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/00833780) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
+27b7e242	author	Will Norris
+27b7e242	added	1
+27b7e242	deleted	0
+27b7e242	files	1
+27b7e242	body	Reflow the 28 current unposted PR drafts, including held submissions and\nolder ready packets. Remove 953 prose source breaks across 248 paragraphs\nwhile preserving Markdown structure, literal code/HTML blocks, links,\nwording and original attribution.\n\nRequire one physical line per prose and list-item paragraph in AGENTS.md,\nthe project guide, the packet preparation instructions and the submission\nprotocol. Preserve structural newlines and exclude already-posted PRs and\ntheir retained copies unless the user explicitly requests those edits.\n\nReconcile the selection against the live read-only list of all 15 authored\nupstream PRs. This pass performs no upstream write and leaves posted,\nsuperseded and retired descriptions unchanged. Review current dependency\nsummaries and refresh their receipts and the document inventory.\n\nValidation: every selected draft has zero remaining prose soft breaks;\nrendered content and literal blocks match the previous versions.\n\nFormatting, workflow instructions and document review: OpenAI Codex CLI\n0.157.1, model gpt-6-astra, xhigh reasoning effort.
 d8f798c8	author	Will Norris
 d8f798c8	added	4
 d8f798c8	deleted	0
