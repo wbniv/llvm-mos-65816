@@ -116,6 +116,10 @@ TESTRELS=(
   "llvm/test/CodeGen/MOS/far-native-word.ll"
   "llvm/test/CodeGen/MOS/far-loop-range.mir"
   "llvm/test/CodeGen/MOS/far-word-policy.mir"
+  "llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll"   # mos-far-pointer-arg-exhaustion (B1)
+  "llvm/test/CodeGen/MOS/far-memop-length.ll"         # mos-far-memop-length-truncation (B2)
+  "llvm/test/CodeGen/MOS/far-access-non-65816.ll"     # mos-far-access-non-65816 (B3)
+  "llvm/test/CodeGen/MOS/far-index-fold-debug.ll"     # mos-far-index-fold-dangling-dbg (B4)
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }

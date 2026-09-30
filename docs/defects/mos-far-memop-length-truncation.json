@@ -2,17 +2,17 @@
  "schema": 1,
  "id": "mos-far-memop-length-truncation",
  "title": "Far memset/memcpy/memmove lengths above 65535 are truncated or deleted",
- "status": "confirmed",
+ "status": "fixed",
  "reproducer_origin": "original",
  "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md",
- "summary": "createFarMemLibcall truncates the length of an address-space-2 G_MEMSET, G_MEMCPY or G_MEMMOVE to 16 bits without a range check, and the IRTranslator has already truncated the length of a mixed-address-space memmove. A constant 70000-byte far memset calls __memset_far with 4464; a 65536-byte p2<-p0 memmove is deleted and the function returns at once; a runtime i32 memcpy length loses its high 16 bits. The compiler exits 0 and the verifier is clean. Found by the independent review (finding B2) and reproduced on the downstream toolchain.",
+ "summary": "createFarMemLibcall truncated the length of an address-space-2 G_MEMSET, G_MEMCPY or G_MEMMOVE to 16 bits without a range check. A constant 70000-byte far memset called __memset_far with 4464, and a runtime i32 memcpy length lost its high 16 bits. The compiler exited 0 and the verifier was clean. The input's len64k function (a 65536-byte memmove from a near pointer, which the IRTranslator narrows to 16 bits and so deletes) is not a defect: LangRef \"Allocated objects\" bounds every allocated object by the largest signed integer of its index type, 32767 bytes for the 16-bit near space, so a near operand cannot be valid for 65536 bytes and len64k is undefined behaviour. Found by the independent review (finding B2) and reproduced on the downstream toolchain.",
  "attribution": [
   "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
-  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
  ],
  "unknowns": [
-  "No repair attempted. The far runtime entry points take a 16-bit length; whether to split, reject or add 32-bit-length entries is undecided.",
-  "No emulator run: the wrong length is read from the emitted immediate operands."
+  "The baseline log also flags len64k as deleted; that half of the baseline runner describes undefined behaviour (see summary) and is not part of the repaired defect."
  ],
  "prior_work": {
   "disposition": "distinct_from_related",
@@ -71,6 +71,49 @@
   {
    "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/identity.json",
    "sha256": "5289a59b2b5c5bb11ec1be2ad19383dde9cd1f49d86499fa4f95be558e0295c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/candidate-identity.json",
+   "sha256": "ea628cd0c19a6c737e409303a068c860f627a992284fdce894f87d19f26b674c"
   }
- ]
+ ],
+ "resolution": {
+  "change": "patches/llvm-mos/0002-321-accum16.patch: createFarMemLibcall (MOSLegalizerInfo.cpp) keeps the 16-bit __memset_far/__memcpy_far/__memmove_far call only when the length is at most 16 bits, a constant <= 0xFFFF, or has known bits (LegalizerHelper::getValueTracking()) clearing bits 16 and up; any other length calls __memset_far32/__memcpy_far32/__memmove_far32 with a uint32_t length. platforms/snes/mem-far.c adds those three entries as weak C functions with the same direction rule for memmove.",
+  "causal_explanation": "createFarMemLibcall built G_TRUNC to s16 of every wider length without a range check, so 70000 became 4464 and a runtime i32 length lost its high half. Lengths that are not provably 16-bit now keep all 32 bits and reach a runtime entry that loops over a uint32_t index, so no length is truncated; provable lengths keep the identical 16-bit call.",
+  "trigger_check": "The unchanged farmemlen.ll runs through the candidate llc with the baseline configuration; the runner passes only when big_const tail-calls __memset_far32 and big_var tail-calls __memcpy_far32. len64k is excluded because it is undefined behaviour (see summary).",
+  "regression": {
+   "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll",
+   "sha256": "c5c669c56d04a420914dc88d55c52ce0d42d5ed62e99039e49f08652c277269f"
+  },
+  "regression_tests": [
+   "llvm/test/CodeGen/MOS/far-memop-length.ll (in 0002): 65535 stays 16-bit; 65536, 65537, 70000, unbounded i32 and zext(n)*2 use the 32-bit entries; zext i16, and-0xFFFF and i16 lengths stay 16-bit",
+   "dev/far_memops32.sh with examples/65816/far_memops32.c: 70000-byte fills, a 69984-byte overlapping move and a 32 KiB copy across $7E/$7F, +mos-a16 and +mos-a16,+mos-xy16 at -Os and -O2, corpus_result == 0xFFFF on MAME and bsnes-jg"
+  ],
+  "candidate": {
+   "command": "set -euo pipefail; out=$(build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll -o - | grep -v -E \"^[[:space:]]*[.;]\"); printf \"%s\\n\" \"$out\"; bad=0; if ! printf \"%s\\n\" \"$out\" | grep -A8 \"^big_const:\" | grep -q -E \"(jmp|jsr)[[:space:]]+__memset_far32$\"; then echo \"FAIL: 70000-byte far memset does not call __memset_far32\"; bad=1; fi; if ! printf \"%s\\n\" \"$out\" | grep -A2 \"^big_var:\" | grep -q -E \"(jmp|jsr)[[:space:]]+__memcpy_far32$\"; then echo \"FAIL: unbounded i32 far memcpy does not call __memcpy_far32\"; bad=1; fi; echo \"NOTE: len64k is not checked: a 65536-byte memmove from a near (addrspace 0) source is undefined behaviour, because LangRef (Allocated objects) bounds a near object by 32767 bytes; its deletion after the IRTranslator narrows the length to 16 bits is sound.\"; [ $bad = 0 ] && echo \"PASS: lengths above 0xFFFF reach the 32-bit-length far runtime\"; exit $bad",
+   "working_directory": "Repository root. Run in the wt/far-prerequisite-defects worktree /home/will/llvm-mos-65816-fardefects, whose build/far-review-defects/{downstream,candidate} are hard links of the main checkout's frozen tools.",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "lengths above 0xFFFF are rejected, split or passed to a 32-bit-length entry"
+   },
+   "toolchain_location": "build/far-review-defects/candidate/llc; identity in docs/defects/evidence/2026-09-30-far-memop-length-truncation/candidate-identity.json",
+   "toolchain_sha256": "f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll",
+    "sha256": "c5c669c56d04a420914dc88d55c52ce0d42d5ed62e99039e49f08652c277269f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/candidate.log",
+    "sha256": "cdcca3b1c35bf6094bf6be1393daa26c9b55b203ef1b6427504abd9325389a04"
+   },
+   "exit_code": 0
+  },
+  "validation": "Full MOS CodeGen/MC lit suites on the candidate llc: 190 passed, 3 unsupported, 0 failed; the same suites with the baseline llc bind-mounted over build/llvm-mos/bin/llc fail exactly the four new tests (186 passed, 3 unsupported, 4 failed). Codegen of the same frontend IR for 277 SNES corpus and demo sources in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16 at -Os (831 source/mode pairs) is byte-identical between baseline and candidate llc wherever both compile; the 15 pairs that fail fail identically on both, and 12 pairs are frontend skips. dev/run.sh far_memops32: 4 of 4 ROMs read 0xFFFF on MAME and on bsnes-jg. dev/run.sh far_memops, dev/run.sh xcheck and dev/check-far-memset.py (a16/xy16 x Os/O2) still pass."
+ }
 }

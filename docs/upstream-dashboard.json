@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "30e5aa11c21c4758982fd004e7742dd996094b61f3d640e21026dff285ef457b",
+  "sourceHash": "65ba5a59cc76208d064a73396e6d0bb6da7bbfb00dacdafa3deb4e6479cdb07d",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -112,12 +112,12 @@
       "kind": "defect",
       "title": "Far loads and stores on non-65816 CPUs emit 65816 [dp] opcodes",
       "summary": "The p2:32:8 data layout applies to every MOS CPU, and the far runtime-address path does not check hasW65816(); selection does not enforce the HasW65816 predicate on LDIndirLong. A runtime far byte load compiles for mos6502 without error and emits $A7 $00, which the 6502 decodes as an undocumented LAX, the SPC700 as sbc a,[$0+x] and the HuC6280 as smb. Far global loads on those CPUs fail loudly; runtime loads and stores do not. Found by the independent review (finding B3) and reproduced on the downstream toolchain.",
-      "localStatus": "qualified",
+      "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:320"
       ],
-      "nextStep": "Make address-space-2 memory operations fail with a clear diagnostic unless the subtarget has 65816 long addressing; add a mos6502 negative test.",
+      "nextStep": "Fixed downstream in 0002 on 2026-09-30 (plan docs/plans/2026-09-30-far-prerequisite-defects.md); carry into the split #320 series.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-access-non-65816.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
@@ -131,12 +131,12 @@
       "kind": "defect",
       "title": "Far runtime-index fold leaves an undef DBG_VALUE that fails machine verification",
       "summary": "When tryFarRuntimeIndexFold folds every non-debug use of a far pointer add into a [dp],Y access, salvageDebugInfo cannot express base + zext(offset) and leaves the DBG_VALUE naming the dead vreg. DetectDeadLanes marks it undef and -verify-machineinstrs rejects the function. Without the verifier the location degrades to $noreg and the emitted code is unaffected. The byte fold (0061/patch 4) and the native word fold (0070) both fail downstream. Found by the independent review (finding B4) and reproduced on the downstream toolchain.",
-      "localStatus": "qualified",
+      "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:320"
       ],
-      "nextStep": "Drop or salvage the DBG_VALUE of a far pointer add that the index fold erases, for byte and word folds; add -g verifier regressions.",
+      "nextStep": "Fixed downstream in 0002 on 2026-09-30 (plan docs/plans/2026-09-30-far-prerequisite-defects.md); carry into the split #320 series.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-index-fold-dangling-dbg.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
@@ -149,13 +149,13 @@
       "id": "defect:mos-far-memop-length-truncation",
       "kind": "defect",
       "title": "Far memset/memcpy/memmove lengths above 65535 are truncated or deleted",
-      "summary": "createFarMemLibcall truncates the length of an address-space-2 G_MEMSET, G_MEMCPY or G_MEMMOVE to 16 bits without a range check, and the IRTranslator has already truncated the length of a mixed-address-space memmove. A constant 70000-byte far memset calls __memset_far with 4464; a 65536-byte p2<-p0 memmove is deleted and the function returns at once; a runtime i32 memcpy length loses its high 16 bits. The compiler exits 0 and the verifier is clean. Found by the independent review (finding B2) and reproduced on the downstream toolchain.",
-      "localStatus": "qualified",
+      "summary": "createFarMemLibcall truncated the length of an address-space-2 G_MEMSET, G_MEMCPY or G_MEMMOVE to 16 bits without a range check. A constant 70000-byte far memset called __memset_far with 4464, and a runtime i32 memcpy length lost its high 16 bits. The compiler exited 0 and the verifier was clean. The input's len64k function (a 65536-byte memmove from a near pointer, which the IRTranslator narrows to 16 bits and so deletes) is not a defect: LangRef \"Allocated objects\" bounds every allocated object by the largest signed integer of its index type, 32767 bytes for the 16-bit near space, so a near operand cannot be valid for 65536 bytes and len64k is undefined behaviour. Found by the independent review (finding B2) and reproduced on the downstream toolchain.",
+      "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:320"
       ],
-      "nextStep": "Reject, split or route far memset/memcpy/memmove lengths above 0xFFFF in 0002 and the #320 series; regressions for 65535, 65536, 65537, 70000 and an unbounded runtime length.",
+      "nextStep": "Fixed downstream in 0002 on 2026-09-30 (plan docs/plans/2026-09-30-far-prerequisite-defects.md); carry into the split #320 series.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-memop-length-truncation.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
@@ -188,12 +188,12 @@
       "kind": "defect",
       "title": "A fourth far-pointer argument is assigned a 16-bit RS pair",
       "summary": "In the default far-pointer calling convention (Imag32), CC_MOS offers a far (addrspace 2) pointer only RL1..RL3 and has no fallback of its own. A fourth far-pointer argument falls through to the generic CCIfPtr rule and receives a free 16-bit RSn pair. The machine verifier rejects the resulting 32-bit COPY from a 16-bit register; the downstream release build without the verifier crashes with a segmentation fault. The same holds in plain mosw65816 and under +mos-a16. Found by the independent review of the extracted far series (finding B1) and reproduced on the downstream toolchain.",
-      "localStatus": "qualified",
+      "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:320"
       ],
-      "nextStep": "Add a far-pointer stack fallback after the RL rule in 0002 and the #320 series; caller and callee regressions for four far pointers and near/far interleavings.",
+      "nextStep": "Fixed downstream in 0002 on 2026-09-30 (plan docs/plans/2026-09-30-far-prerequisite-defects.md); carry into the split #320 series.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-pointer-arg-exhaustion.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"

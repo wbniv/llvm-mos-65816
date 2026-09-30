@@ -77,18 +77,18 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "b528fab5c76e1475efd088b72bef53f4222f39235bd70a8d9a45e5123e5bbbae",
+          "docs/upstream-dashboard-curation.json": "03b92d508e8ae75759b65151e8fdd99eb48facc7141931963ec36f7cb91c5300",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
           "docs/defects/mos-bank-relax-section-offset.json": "12bd09bd688b5d1453eb10947d4481ba4900482e46133d6f7cca1677cd250353",
           "docs/defects/mos-carry-scheduling-pressure.json": "e0b1ed7f5314f020ea1fc7f1b45f4aad005281fb4c75d8554999197324c594d1",
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
-          "docs/defects/mos-far-access-non-65816.json": "a3e9674ca8602c8e7f9428a36aecdb1d11ef25d46275c0e711243d55e8006b52",
-          "docs/defects/mos-far-index-fold-dangling-dbg.json": "422389897c6a50a4ea06d617f54b5332e45a52daae40e0dd791ca0ca4dccbfd9",
-          "docs/defects/mos-far-memop-length-truncation.json": "4ee58629cf38dc292dd24cd9b4273adb1d22f18a60135b20fbbbe122a81233f3",
+          "docs/defects/mos-far-access-non-65816.json": "ee8164cc13689bb4cb5d0c18a430b100b4e24501e05b6aca0486035dc0e7503d",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "1b2bc7e2d5ccfbaf1b806362efe8e617bba69d58300aa0475a02a34678c2aa4e",
+          "docs/defects/mos-far-memop-length-truncation.json": "53fd88560e0b1188419418fc9a4552d88216c5dac7a174afd624bf30a26adfc8",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
-          "docs/defects/mos-far-pointer-arg-exhaustion.json": "87913f0f3a26d0d8900b3b79af5a093678461fb1b6d690e9d964e94fc783dc5b",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "cb9b9d6bf056fc58ab79129dbacc71130b3268218513d728a196583b94c6643a",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
@@ -112,7 +112,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "27769b7a3eaeab7a42897624e0e2701435e67f57fdc1c9f070561c34a14931ba"
+          "docs/upstream-dashboard.json": "61f6289ba21ee0b409bbd9c47bc3f46493113a5fde72ea79c7173ffb36d29b9c"
         }
       }
     },
@@ -133,13 +133,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "c1dd697e376d8577ba2bc25713d9e6985ac0694394f700e9e31bcaa85d498482",
+          "docs/upstream-pending-work.md": "fe7c1942314a963973fa3576ce4695d1e71292836a01de04d9ac234efb82a5f9",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "27769b7a3eaeab7a42897624e0e2701435e67f57fdc1c9f070561c34a14931ba",
+          "docs/upstream-dashboard.json": "61f6289ba21ee0b409bbd9c47bc3f46493113a5fde72ea79c7173ffb36d29b9c",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "4f3c8e39471ebd366c79d216e5437f1a36444b6a8ec9b1f0160b99f9885c7b99"
+          "docs/upstream-dashboard-graph.json": "4af05d5a217cdeaea27ab21430f700aa3ebd535d0bf85df8a0b8cdd8e92092ee"
         }
       }
     },
@@ -305,11 +305,11 @@
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
-          "docs/defects/mos-far-access-non-65816.json": "ef0b35329ee9c6fe2265806a367cd4f10183b6142efa037713b8021e859da218",
-          "docs/defects/mos-far-index-fold-dangling-dbg.json": "8289ced7672443980d59bc73f86b953c813b6f4daf546fb4a8818c22ae402eda",
-          "docs/defects/mos-far-memop-length-truncation.json": "e7dfc7cdf40b29ee7ff2343a99e557a554109c4ea23e4e4617c8f4c177085a01",
+          "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
+          "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
-          "docs/defects/mos-far-pointer-arg-exhaustion.json": "3d270fa9a0069864daf789dbf3f8949f7328178f65007e928025eefbd23c647d",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
@@ -355,9 +355,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
         },
-        "reviewed_at": "2026-09-30T02:44:48.466362+00:00",
-        "note": "Reviewed against the #320/#321 split series: these summaries already route the far repairs through the split series and describe no split as done or pending in a way the split contradicts; the pressure-set item in TODO.md matches the split's recorded #321-1 default-mode change. No change needed. The 0065 PR body still describes its 26d7c2c1eebf three-patch series; regenerating it on the split is left to the posting step.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T09:39:47.286792+00:00",
+        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
+        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
       }
     },
     {
@@ -398,11 +398,11 @@
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
-          "docs/defects/mos-far-access-non-65816.json": "ef0b35329ee9c6fe2265806a367cd4f10183b6142efa037713b8021e859da218",
-          "docs/defects/mos-far-index-fold-dangling-dbg.json": "8289ced7672443980d59bc73f86b953c813b6f4daf546fb4a8818c22ae402eda",
-          "docs/defects/mos-far-memop-length-truncation.json": "e7dfc7cdf40b29ee7ff2343a99e557a554109c4ea23e4e4617c8f4c177085a01",
+          "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
+          "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
-          "docs/defects/mos-far-pointer-arg-exhaustion.json": "3d270fa9a0069864daf789dbf3f8949f7328178f65007e928025eefbd23c647d",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
@@ -440,9 +440,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
         },
-        "reviewed_at": "2026-09-30T02:44:48.968593+00:00",
-        "note": "Reviewed against the #320/#321 split series: these summaries already route the far repairs through the split series and describe no split as done or pending in a way the split contradicts; the pressure-set item in TODO.md matches the split's recorded #321-1 default-mode change. No change needed. The 0065 PR body still describes its 26d7c2c1eebf three-patch series; regenerating it on the split is left to the posting step.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T09:39:46.082037+00:00",
+        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
+        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
       }
     },
     {
@@ -483,11 +483,11 @@
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
-          "docs/defects/mos-far-access-non-65816.json": "ef0b35329ee9c6fe2265806a367cd4f10183b6142efa037713b8021e859da218",
-          "docs/defects/mos-far-index-fold-dangling-dbg.json": "8289ced7672443980d59bc73f86b953c813b6f4daf546fb4a8818c22ae402eda",
-          "docs/defects/mos-far-memop-length-truncation.json": "e7dfc7cdf40b29ee7ff2343a99e557a554109c4ea23e4e4617c8f4c177085a01",
+          "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
+          "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
-          "docs/defects/mos-far-pointer-arg-exhaustion.json": "3d270fa9a0069864daf789dbf3f8949f7328178f65007e928025eefbd23c647d",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
@@ -525,9 +525,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
         },
-        "reviewed_at": "2026-09-30T02:44:48.973650+00:00",
-        "note": "Reviewed against the #320/#321 split series: these summaries already route the far repairs through the split series and describe no split as done or pending in a way the split contradicts; the pressure-set item in TODO.md matches the split's recorded #321-1 default-mode change. No change needed. The 0065 PR body still describes its 26d7c2c1eebf three-patch series; regenerating it on the split is left to the posting step.",
-        "attribution": "Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T09:39:46.076721+00:00",
+        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
+        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
       }
     },
     {
@@ -731,7 +731,7 @@
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "36337397c1d7b44b6f377307e0249a7c1949824b1c32e6f7bd5ac327e530c043",
-          "patches/llvm-mos/0002-321-accum16.patch": "0293dfde9cdcc77e6add252d273ffbf5650d979732deb69af7d8cef4e487e4c3",
+          "patches/llvm-mos/0002-321-accum16.patch": "de47c8b26831903b05c4e6eca49fa57dbbd0141d8187946cda0660f6b2a2ca20",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
           "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
@@ -760,9 +760,9 @@
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
         },
-        "reviewed_at": "2026-09-29T22:37:49.007041+00:00",
-        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T09:39:44.455498+00:00",
+        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
+        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
       }
     },
     {
@@ -1541,13 +1541,13 @@
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "patches/llvm-mos/0002-321-accum16.patch": "0293dfde9cdcc77e6add252d273ffbf5650d979732deb69af7d8cef4e487e4c3",
+          "patches/llvm-mos/0002-321-accum16.patch": "de47c8b26831903b05c4e6eca49fa57dbbd0141d8187946cda0660f6b2a2ca20",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e"
         },
-        "reviewed_at": "2026-09-29T22:37:51.429871+00:00",
-        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T09:39:44.918742+00:00",
+        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
+        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
       }
     },
     {
@@ -1942,14 +1942,14 @@
       "receipt": {
         "sources": {
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
-          "patches/llvm-mos/0002-321-accum16.patch": "0293dfde9cdcc77e6add252d273ffbf5650d979732deb69af7d8cef4e487e4c3",
+          "patches/llvm-mos/0002-321-accum16.patch": "de47c8b26831903b05c4e6eca49fa57dbbd0141d8187946cda0660f6b2a2ca20",
           "dev/check-near-index-proofs.py": "8f514c4c8625bb8fdc08447deb44dd027a32090c37dc4176399eab0f427d498e",
           "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
           "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f"
         },
-        "reviewed_at": "2026-09-29T22:36:40.152235+00:00",
-        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T09:39:39.937560+00:00",
+        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
+        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
       }
     },
     {
@@ -2181,15 +2181,15 @@
           "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
           "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
           "dev/toolchain.sh": "93db87c392f24585ba3594d30f2fc1158ae490c770b5e2a967a7c8bbc6ade19a",
-          "dev/regen-patch.sh": "dca510f69fb0698a6e6094bf27004b22eb8e90396f26a02f514c3811b12a92c2",
+          "dev/regen-patch.sh": "01f69caba7fbe1de942aa52b6f46319ba01a2571ce01f69dead768497b45fcbb",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-09-29T22:36:40.940335+00:00",
-        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T09:39:41.084888+00:00",
+        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
+        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
       }
     },
     {
@@ -2612,11 +2612,11 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "db30ee68901c360ae427e504e37d18829d8c3d6f42e60fa455f3183621ad8c7b"
+          "TODO.md": "be636c28916913fca3eba870de326ddff27a6f72a675b1a32be3274a496919e0"
         },
-        "reviewed_at": "2026-09-30T02:58:33.887594+00:00",
-        "note": "Reviewed, no change: re-ranking the pressure-set TODO item to T4 does not affect the publication runbook.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T09:39:41.193729+00:00",
+        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
+        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
       }
     }
   ]

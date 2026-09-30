@@ -2,16 +2,17 @@
  "schema": 1,
  "id": "mos-far-index-fold-dangling-dbg",
  "title": "Far runtime-index fold leaves an undef DBG_VALUE that fails machine verification",
- "status": "confirmed",
+ "status": "fixed",
  "reproducer_origin": "original",
  "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md",
  "summary": "When tryFarRuntimeIndexFold folds every non-debug use of a far pointer add into a [dp],Y access, salvageDebugInfo cannot express base + zext(offset) and leaves the DBG_VALUE naming the dead vreg. DetectDeadLanes marks it undef and -verify-machineinstrs rejects the function. Without the verifier the location degrades to $noreg and the emitted code is unaffected. The byte fold (0061/patch 4) and the native word fold (0070) both fail downstream. Found by the independent review (finding B4) and reproduced on the downstream toolchain.",
  "attribution": [
   "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
-  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
  ],
  "unknowns": [
-  "No repair attempted. Setting the leftover operands to $noreg is the minimal repair; salvaging with DBG_VALUE_LIST would keep the location."
+  "The location is dropped, not salvaged; a DBG_VALUE_LIST over base and offset would keep it and is out of scope."
  ],
  "prior_work": {
   "disposition": "new_defect",
@@ -75,6 +76,56 @@
   {
    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll",
    "sha256": "4cb6dd64863871aad13b2b6480eae7cb2b5b34353917e6e76038247b6874d445"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/candidate-identity.json",
+   "sha256": "ea628cd0c19a6c737e409303a068c860f627a992284fdce894f87d19f26b674c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/candidate-word-fold.log",
+   "sha256": "42645a552a99aebfd6a4a339efb9b17df0d7fe82f5491e58005604f9d5229897"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/candidate-dbg-values.log",
+   "sha256": "6293e656791a8dc49f487b583bbcccff10654f1701eb46950b0016e337e37007"
   }
- ]
+ ],
+ "resolution": {
+  "change": "patches/llvm-mos/0002-321-accum16.patch: tryFarRuntimeIndexFold (MOSLegalizerInfo.cpp), after building the folded access, sets every DBG_VALUE of the far pointer add (and of constant-offset adds on it) to $noreg with MachineInstr::setDebugValueUndef() once no non-debug use remains. The fold code is shared by the byte fold and the 0070 word fold; 0070 is unchanged and still applies.",
+  "causal_explanation": "When the last access folded, the pointer add kept only debug uses; salvageDebugInfo cannot express base + zext(offset), so the DBG_VALUE kept naming the dead vreg, which DetectDeadLanes marked undef and the verifier rejected. Dropping the location when the add dies leaves no debug use of an erased value.",
+  "trigger_check": "The unchanged dbgbyte.ll runs through the candidate llc with the baseline configuration and exits 0; the word-fold dbg.ll also exits 0 (candidate-word-fold.log), and after the legalizer the \"p\" DBG_VALUE is $noreg (candidate-dbg-values.log).",
+  "regression": {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll",
+   "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e"
+  },
+  "regression_tests": [
+   "llvm/test/CodeGen/MOS/far-index-fold-debug.ll (in 0002): -g byte and word folds under -verify-machineinstrs, checking the folded pointer's DBG_VALUE operand is $noreg"
+  ],
+  "candidate": {
+   "command": "build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null",
+   "working_directory": "Repository root. Run in the wt/far-prerequisite-defects worktree /home/will/llvm-mos-65816-fardefects, whose build/far-review-defects/{downstream,candidate} are hard links of the main checkout's frozen tools.",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, location dropped or salvaged"
+   },
+   "toolchain_location": "build/far-review-defects/candidate/llc; identity in docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/candidate-identity.json",
+   "toolchain_sha256": "f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll",
+    "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/candidate.log",
+    "sha256": "a9639ee5be2d71396077c9e0d51a9c187c904a2f9636dcd631c7a9f0640d8cf8"
+   },
+   "exit_code": 0
+  },
+  "validation": "Full MOS CodeGen/MC lit suites on the candidate llc: 190 passed, 3 unsupported, 0 failed; the same suites with the baseline llc bind-mounted over build/llvm-mos/bin/llc fail exactly the four new tests (186 passed, 3 unsupported, 4 failed). Codegen of the same frontend IR for 277 SNES corpus and demo sources in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16 at -Os (831 source/mode pairs) is byte-identical between baseline and candidate llc wherever both compile; the 15 pairs that fail fail identically on both, and 12 pairs are frontend skips."
+ }
 }

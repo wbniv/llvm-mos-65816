@@ -63,3 +63,35 @@ __attribute__((weak)) void __memmove_far(FAR char *dst, FAR const char *src,
       dst[i - 1] = src[i - 1]; // backward, to handle dst > src overlap
   }
 }
+
+// 32-bit-length entries. The compiler calls these when it cannot prove that a
+// far memset/memcpy/memmove length fits the 16-bit size_t of the entries above
+// (a constant above 0xFFFF, or a runtime length such as a loop idiom's
+// zext(n) * 2). A far object may span more than one 64 KiB bank, e.g. the
+// 128 KiB of WRAM from $7E:0000 to $7F:FFFF, so the length and the index are
+// 32 bits wide. Truncating the length to 16 bits instead would silently fill or
+// copy the wrong number of bytes (docs/defects/mos-far-memop-length-truncation.json).
+__attribute__((weak)) void __memset_far32(FAR char *ptr, char value,
+                                          uint32_t num) {
+  for (uint32_t i = 0; i < num; i++)
+    ptr[i] = value;
+}
+
+__attribute__((weak)) void __memcpy_far32(FAR char *__restrict__ dst,
+                                          FAR const char *__restrict__ src,
+                                          uint32_t num) {
+  for (uint32_t i = 0; i < num; i++)
+    dst[i] = src[i];
+}
+
+__attribute__((weak)) void __memmove_far32(FAR char *dst, FAR const char *src,
+                                           uint32_t num) {
+  // Same full 32-bit direction rule as __memmove_far.
+  if ((uint32_t)dst <= (uint32_t)src) {
+    for (uint32_t i = 0; i < num; i++)
+      dst[i] = src[i]; // forward (or non-overlapping)
+  } else {
+    for (uint32_t i = num; i; i--)
+      dst[i - 1] = src[i - 1]; // backward, to handle dst > src overlap
+  }
+}

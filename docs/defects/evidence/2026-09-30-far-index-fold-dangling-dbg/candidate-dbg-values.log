@@ -1,0 +1,7 @@
+$ build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -stop-after=legalizer docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o - | grep -E 'DBG_VALUE|FAR_INDIR'
+    DBG_VALUE %0(p2), $noreg, !7, !DIExpression(), debug-location !10
+    DBG_VALUE $noreg, $noreg, !11, !DIExpression(), debug-location !10
+    %27:_(s8) = G_LOAD_FAR_INDIR_IDX %0(p2), %2, debug-location !10 :: (load (s8) from %ir.p, addrspace 2)
+    DBG_VALUE %9(p2), $noreg, !13, !DIExpression(), debug-location !14
+    %16:_(s8) = G_LOAD_FAR_INDIR %9(p2), debug-location !14 :: (volatile load (s8) from %ir.p, addrspace 2)
+exit_code=0

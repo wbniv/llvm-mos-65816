@@ -1,0 +1,5 @@
+$ set -euo pipefail; o=build/far-review-defects/rt-6502-candidate.o; rm -f "$o"; if build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-30-far-access-non-65816/rt.ll -o "$o" 2>build/far-review-defects/rt-6502-candidate.err; then echo "FAIL: mos6502 far byte load compiled without a diagnostic"; exit 1; fi; cat build/far-review-defects/rt-6502-candidate.err; [ ! -e "$o" ] || { echo "FAIL: an object was emitted"; exit 1; }; grep -q "far (address space 2) memory access requires 65816 long addressing" build/far-review-defects/rt-6502-candidate.err && echo "PASS: diagnosed; no object emitted"
+error: <unknown>:0:0: in function ld_rt i8 (ptr addrspace(2)): far (address space 2) memory access requires 65816 long addressing; the target CPU has none
+
+PASS: diagnosed; no object emitted
+exit_code=0

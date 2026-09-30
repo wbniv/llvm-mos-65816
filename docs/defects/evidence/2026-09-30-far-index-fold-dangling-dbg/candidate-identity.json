@@ -1,0 +1,42 @@
+{
+  "candidate_llc": {
+    "path": "build/far-review-defects/candidate/llc",
+    "sha256": "f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1",
+    "hard_link_of": "build/llvm-mos/bin/llc",
+    "built": "2026-09-30T08:38:49+07:00",
+    "assertions": false,
+    "source": "vendor/llvm-mos with the fork patch stack at origin/main 129ae82f plus the B1-B4 repairs in the regenerated patches/llvm-mos/0002-321-accum16.patch of the commit that closes this record"
+  },
+  "candidate_llvm_objdump": {
+    "path": "build/far-review-defects/candidate/llvm-objdump",
+    "sha256": "fba3e55229c58c9c2e0e7c730a47d6827d311d514c13ee5142b4afe367bc632a",
+    "note": "byte-identical to the baseline llvm-objdump; the repairs touch only CodeGen"
+  },
+  "candidate_llvm_dwarfdump": {
+    "path": "build/far-review-defects/candidate/llvm-dwarfdump",
+    "sha256": "856fd9e343be8ba90f5b732d613595dc4b15fcc46864479540e986434f4f05e9"
+  },
+  "candidate_clang": {
+    "path": "build/far-review-defects/candidate/clang-23",
+    "sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+    "hard_link_of": "build/llvm-mos-install/bin/clang-23",
+    "built": "2026-09-30T08:41:55+07:00"
+  },
+  "candidate_runtime": {
+    "mem-far.c.obj": {
+      "path": "build/far-review-defects/candidate/runtime/mem-far.c.obj",
+      "sha256": "0280822c13fbeb1bb1be1269ba448a0cf2b1876fb282004fa8599d5388d4bd52",
+      "hard_link_of": "build/mos-platform/build/mos-platform/snes/CMakeFiles/snes-c.dir/mem-far.c.obj"
+    },
+    "libc-snes.a": {
+      "path": "build/far-review-defects/candidate/runtime/libc-snes.a",
+      "sha256": "78b6040a322cd0ab1d97782f9c84c2aeb94d4f2126cf3ddc48756bd8586ca91b",
+      "hard_link_of": "build/install/mos-platform/snes/lib/libc.a"
+    }
+  },
+  "baseline_llc": {
+    "path": "build/far-review-defects/downstream/llc",
+    "sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2"
+  },
+  "core_dumps": "disabled (RLIMIT_CORE=0) for every run"
+}

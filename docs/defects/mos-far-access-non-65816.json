@@ -2,17 +2,16 @@
  "schema": 1,
  "id": "mos-far-access-non-65816",
  "title": "Far loads and stores on non-65816 CPUs emit 65816 [dp] opcodes",
- "status": "confirmed",
+ "status": "fixed",
  "reproducer_origin": "original",
  "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md",
  "summary": "The p2:32:8 data layout applies to every MOS CPU, and the far runtime-address path does not check hasW65816(); selection does not enforce the HasW65816 predicate on LDIndirLong. A runtime far byte load compiles for mos6502 without error and emits $A7 $00, which the 6502 decodes as an undocumented LAX, the SPC700 as sbc a,[$0+x] and the HuC6280 as smb. Far global loads on those CPUs fail loudly; runtime loads and stores do not. Found by the independent review (finding B3) and reproduced on the downstream toolchain.",
  "attribution": [
   "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
-  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
  ],
- "unknowns": [
-  "No repair attempted. Only the byte load was captured downstream; stores and the other CPUs are the reviewer's observations on the extracted candidate."
- ],
+ "unknowns": [],
  "prior_work": {
   "disposition": "new_defect",
   "search_terms": [
@@ -65,6 +64,46 @@
   {
    "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/identity.json",
    "sha256": "5289a59b2b5c5bb11ec1be2ad19383dde9cd1f49d86499fa4f95be558e0295c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/candidate-identity.json",
+   "sha256": "ea628cd0c19a6c737e409303a068c860f627a992284fdce894f87d19f26b674c"
   }
- ]
+ ],
+ "resolution": {
+  "change": "patches/llvm-mos/0002-321-accum16.patch: MOSLegalizerInfo.cpp reports a DiagnosticInfoUnsupported (\"far (address space 2) memory access requires 65816 long addressing; the target CPU has none\") for every address-space-2 G_LOAD, G_SEXTLOAD, G_ZEXTLOAD, G_STORE and far G_MEMSET/G_MEMCPY/G_MEMMOVE when the subtarget lacks hasW65816(), instead of legalizing it to a long-indirect access.",
+  "causal_explanation": "The far runtime-address path never checked hasW65816(), and selection did not enforce the HasW65816 predicate on LDIndirLong/STIndirLong, so mos6502 emitted $A7. The legalizer now rejects the access before any addressing-mode selection, so no long-addressing opcode can be produced on a CPU without it; far pointers passed as values are untouched.",
+  "trigger_check": "The unchanged rt.ll runs through the candidate llc with the baseline configuration (mos6502, O2, -verify-machineinstrs, -filetype=obj); the runner passes only when llc fails with the diagnostic and emits no object.",
+  "regression": {
+   "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/rt.ll",
+   "sha256": "8585558e29d144f568e491703c59afe68f52f03274a9f5172318c95bba703eba"
+  },
+  "regression_tests": [
+   "llvm/test/CodeGen/MOS/far-access-non-65816.ll (in 0002): far load, store, extending load and memset diagnosed on mos6502, mos65c02 and mosspc700; a far pointer passed as a value still compiles on mos6502; the same accesses compile on mosw65816"
+  ],
+  "candidate": {
+   "command": "set -euo pipefail; o=build/far-review-defects/rt-6502-candidate.o; rm -f \"$o\"; if build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-30-far-access-non-65816/rt.ll -o \"$o\" 2>build/far-review-defects/rt-6502-candidate.err; then echo \"FAIL: mos6502 far byte load compiled without a diagnostic\"; exit 1; fi; cat build/far-review-defects/rt-6502-candidate.err; [ ! -e \"$o\" ] || { echo \"FAIL: an object was emitted\"; exit 1; }; grep -q \"far (address space 2) memory access requires 65816 long addressing\" build/far-review-defects/rt-6502-candidate.err && echo \"PASS: diagnosed; no object emitted\"",
+   "working_directory": "Repository root. Run in the wt/far-prerequisite-defects worktree /home/will/llvm-mos-65816-fardefects, whose build/far-review-defects/{downstream,candidate} are hard links of the main checkout's frozen tools.",
+   "configuration": {
+    "cpu": "mos6502",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "a diagnostic: far (addrspace 2) memory needs 65816 long addressing"
+   },
+   "toolchain_location": "build/far-review-defects/candidate/llc; identity in docs/defects/evidence/2026-09-30-far-access-non-65816/candidate-identity.json",
+   "toolchain_sha256": "f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/rt.ll",
+    "sha256": "8585558e29d144f568e491703c59afe68f52f03274a9f5172318c95bba703eba"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/candidate.log",
+    "sha256": "c9964667d685c9ef29e19424bab7e539b50bfe38f8c45de3bbe51f2ab662d948"
+   },
+   "exit_code": 0
+  },
+  "validation": "Full MOS CodeGen/MC lit suites on the candidate llc: 190 passed, 3 unsupported, 0 failed; the same suites with the baseline llc bind-mounted over build/llvm-mos/bin/llc fail exactly the four new tests (186 passed, 3 unsupported, 4 failed). Codegen of the same frontend IR for 277 SNES corpus and demo sources in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16 at -Os (831 source/mode pairs) is byte-identical between baseline and candidate llc wherever both compile; the 15 pairs that fail fail identically on both, and 12 pairs are frontend skips."
+ }
 }

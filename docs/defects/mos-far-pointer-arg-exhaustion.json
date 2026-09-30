@@ -2,17 +2,18 @@
  "schema": 1,
  "id": "mos-far-pointer-arg-exhaustion",
  "title": "A fourth far-pointer argument is assigned a 16-bit RS pair",
- "status": "confirmed",
+ "status": "fixed",
  "reproducer_origin": "original",
  "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md",
  "summary": "In the default far-pointer calling convention (Imag32), CC_MOS offers a far (addrspace 2) pointer only RL1..RL3 and has no fallback of its own. A fourth far-pointer argument falls through to the generic CCIfPtr rule and receives a free 16-bit RSn pair. The machine verifier rejects the resulting 32-bit COPY from a 16-bit register; the downstream release build without the verifier crashes with a segmentation fault. The same holds in plain mosw65816 and under +mos-a16. Found by the independent review of the extracted far series (finding B1) and reproduced on the downstream toolchain.",
  "attribution": [
   "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
-  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
  ],
  "unknowns": [
-  "No repair attempted. The reviewer suggests CCIfPtrAddrSpace<2, CCAssignToStack<4, 1>> immediately after the RL rule; downstream already has that rule behind the opt-in +mos-farcc-stack feature only.",
-  "Near/far interleavings that exhaust the quads while leaving RS1 free were probed only on the extracted candidate."
+  "Plain mosw65816 (no +mos-a16): call lowering now stacks the fourth far pointer correctly, but reading that 4-byte stacked value back fails with \"unable to legalize G_MERGE_VALUES s32\" (candidate-plain-w65816.log). This is the existing plain-mode limitation for any far-pointer value in memory (a far-pointer load from a near global fails identically on the baseline); it is loud, not silent. Making far-pointer values in memory legal without +mos-a16 is a separate design decision.",
+  "The opt-in +mos-farcc-split and +mos-farcc-axy variants also reach the new fallback, but both already abort on the baseline with only two far-pointer arguments (MOSCallLowering assignCustomValue), before any exhaustion; they are not covered by a regression."
  ],
  "prior_work": {
   "disposition": "new_defect",
@@ -76,6 +77,56 @@
   {
    "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/plain-w65816.log",
    "sha256": "a6aeb8d0c0c795ff5aa5f077aba588f0eece7dd916cbc733bafa2c05a0bdc1a6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/candidate-identity.json",
+   "sha256": "ea628cd0c19a6c737e409303a068c860f627a992284fdce894f87d19f26b674c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/candidate-xy16.log",
+   "sha256": "a82d04c56abddacaae8f46889d3dec209e2c43aa92aaf8984b42f716bde2ca9a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/candidate-plain-w65816.log",
+   "sha256": "efe8d11a6b3fe96c29589dbdfe1f0d01f9a0570511a0af1a0f0b6af0a0a698a3"
   }
- ]
+ ],
+ "resolution": {
+  "change": "patches/llvm-mos/0002-321-accum16.patch: MOSCallingConv.td adds an ungated CCIfPtrAddrSpace<2, CCAssignToStack<4, 1>> after the four farPtrCC()-gated far-pointer rules and before the direct-page and generic CCIfPtr rules.",
+  "causal_explanation": "CC_MOS gave a far pointer only the selected variant's registers (RL1..RL3 for the default Imag32) and no fallback, so a fourth far pointer fell through to CCIfPtr<CCAssignToReg<[RS1..RS7]>> and took a free 16-bit RS pair; the 32-bit COPY from it is malformed. The new rule assigns a far pointer that found no register a 4-byte soft-stack slot, which the existing Stack-variant store/load path in MOSCallLowering already handles, so the pointer never reaches the 16-bit rule. Arguments that fit in registers are assigned exactly as before.",
+  "trigger_check": "The unchanged abi4.ll runs through the candidate llc with the baseline configuration (mosw65816, +mos-a16, O2, -verify-machineinstrs) and exits 0; the baseline llc aborts with the verifier's mismatching-size COPY on the same command.",
+  "regression": {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll",
+   "sha256": "c7764c04c7f17421acfed72e036e74382f2b3dceda4157caf43802f66a27a326"
+  },
+  "regression_tests": [
+   "llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll (in 0002): four-far caller/callee, far x4 then near with RS1 free, near x3 then far x3; plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16"
+  ],
+  "candidate": {
+   "command": "build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null",
+   "working_directory": "Repository root. Run in the wt/far-prerequisite-defects worktree /home/will/llvm-mos-65816-fardefects, whose build/far-review-defects/{downstream,candidate} are hard links of the main checkout's frozen tools.",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "the fourth far pointer is passed on the soft stack"
+   },
+   "toolchain_location": "build/far-review-defects/candidate/llc; identity in docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/candidate-identity.json",
+   "toolchain_sha256": "f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll",
+    "sha256": "c7764c04c7f17421acfed72e036e74382f2b3dceda4157caf43802f66a27a326"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/candidate.log",
+    "sha256": "c39e458c8a49f879f7ac87e8985159c592ba12a4212da815239b3aff8207311d"
+   },
+   "exit_code": 0
+  },
+  "validation": "Full MOS CodeGen/MC lit suites on the candidate llc: 190 passed, 3 unsupported, 0 failed; the same suites with the baseline llc bind-mounted over build/llvm-mos/bin/llc fail exactly the four new tests (186 passed, 3 unsupported, 4 failed). Codegen of the same frontend IR for 277 SNES corpus and demo sources in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16 at -Os (831 source/mode pairs) is byte-identical between baseline and candidate llc wherever both compile; the 15 pairs that fail fail identically on both, and 12 pairs are frontend skips. +mos-a16,+mos-xy16 on abi4.ll also exits 0 (candidate-xy16.log)."
+ }
 }
