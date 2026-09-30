@@ -25,6 +25,8 @@ This file tracks actions that remain. The [September 28 history snapshot](TODO-h
 
 - [wip T2] **Drop undef debug values after the far index fold (B4).** `-g` builds fail `-verify-machineinstrs` after the byte or word far index fold; set the orphaned `DBG_VALUE` to `$noreg`. Ranked T2: bounded, known repair. [Record](docs/defects/mos-far-index-fold-dangling-dbg.json) · [plan](docs/plans/2026-09-30-far-prerequisite-defects.md). <!-- agent:a66c88f07a12aa702 -->
 
+- [wip T3] **Keep native-width registers out of default-mode register pressure.** The first #321 commit adds opt-in A16/X16/Y16 register classes that change the generated pressure sets, growing default mos6502 output by 1.2% (+3,478 bytes on the split's fixed set). Test `GeneratePressureSet = 0` in isolation, then apply it to #321 commit 1 and `0002`. Ranked T3: one-flag hypothesis with existing comparison tooling; escalates to T4 if not neutral. [Plan](docs/plans/2026-09-30-native-register-pressure-sets.md). <!-- agent:a215decb9d21d92de -->
+
 - [T4] **Repair XY16 preserveX status-register saves.** `preserveX` saves `$p` as defined after a call clobbered its flags, which fails the machine verifier on the recovered-IR boids.c XY16 input; repair it in `0002` and the #321 prerequisite with a red/green on the retained IR. Ranked T4: liveness root cause spans preserveX and the scavenger P save. [Record](docs/defects/mos-xy16-preserve-x-p-save.json).
 
 ### Test Bench / CI
@@ -125,4 +127,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-09-30: B5 and B7 are covered by the 0069/0070 items (extraction gaps and the #594 collision). -->
 <!-- triaged 2026-09-30: dropped; no measured need to tune the 32-bit far runtime entries. Revisit only if one appears in a hot path. -->
 <!-- triaged 2026-09-30: plan verification is covered by the B1-B4 items now in progress. -->
+<!-- triaged 2026-09-30: plan verification is covered by the in-progress T3 pressure-set item. -->
 <!-- END auto-captured-deferrals -->

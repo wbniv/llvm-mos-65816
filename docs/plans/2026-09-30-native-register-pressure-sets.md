@@ -1,0 +1,38 @@
+# Keep the native-width registers out of default-mode register pressure
+
+Status: planned. The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
+
+Attribution: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
+
+No visible surface: compiler change, no mockups.
+
+## Cause
+
+The commit ("[MOS] Model 65816 native-width registers and feature gates", split commit `a359c6b1d73c`) adds the registers `A16`, `X16` and `Y16`, the byte halves `B`, `XH` and `YH`, and the single-member classes `Ac16`, `Xc16` and `Yc16`. TableGen derives register pressure sets from every register class. The generated `PressureNameTable` and `PressureLimitTable` gain `Ac16`, `Xc16` and `Yc16` sets and the inferred `GPR_LSB_with_*` and `Anyi1_with_*` sets, and lose `MOSAsmParamRegClass`. MachineLICM, MachineSink and the machine scheduler read those tables in every mode. With all three disabled, default outputs match. The opt-in feature therefore changes default heuristics, which breaks this project's gating rule: an opt-in native form must not change code for programs that don't use it.
+
+## Contract
+
+- **Defect record first.** Before changing the compiler, create a canonical `docs/defects/` record following the [defect workflow](../howto-defect-evidence.md). It needs a prior-work audit and a failing baseline: a comparison that exits non-zero when default-mode output differs between upstream `06bc967d2668` and the commit. Freeze the baseline tools.
+- **Hypothesis:** set `GeneratePressureSet = 0` on `Ac16`, `Xc16` and `Yc16`, the idiom AArch64 and AMDGPU use for classes that must not create pressure sets.
+- **Success:**
+  - The generated pressure tables equal upstream's.
+  - Default mos6502 and plain mosw65816 output on the fixed input set is byte-identical to upstream `06bc967d2668`.
+  - `+mos-a16` and `+mos-a16,+mos-xy16` output does not grow. Report any change with its size, and explain any that grows.
+- **If the flag alone is not neutral** (for example, inferred classes keep their own sets), try the smallest follow-up, such as marking the inferred classes or adjusting register-unit weights. If it is still not neutral, stop and report `ESCALATE:` with the tables. This then becomes a T4 design question.
+
+## Phases
+
+1. **Phase A: isolated experiment, now.** Work in a worktree of the upstream source at the split's #321-1 commit, with its own warm build directory. Do not touch `vendor/`, the `split-320-321` branch or its build directories: two other agents hold them. Produce the defect record, the baseline, the candidate change and the comparisons. Stop and report.
+2. **Phase B: apply, after the other agents finish.**
+    - Apply the change to #321 commit 1 of the split series, and recheck the later packet patches and the per-commit suites.
+    - Apply it downstream in `vendor/llvm-mos`, regenerate `0002`, rebuild, and run the project differential.
+    - Close the record with a same-input red/green.
+
+## Verification
+
+1. The baseline comparison fails on the unchanged commit with the recorded signature.
+2. With the change, the generated pressure tables equal upstream `06bc967d2668`'s.
+3. Default mos6502 and mosw65816 output on the fixed input set is byte-identical to upstream.
+4. Native-mode (`+mos-a16`, `+mos-a16,+mos-xy16`) output on the same inputs has no unexplained growth.
+5. The split series still meets its gates after the change (per-commit build and suites; later packet patches apply).
+6. Downstream `0002` round-trips. The project differential and MOS suites pass. The defect record closes as `fixed`, and `dev/check-defect-evidence.py` accepts it.

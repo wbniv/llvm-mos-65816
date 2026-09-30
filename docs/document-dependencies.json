@@ -2607,10 +2607,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "974b302b2fa73247d5c928355bb735dd8b9276225027268d0812c2c5f8904325"
+          "TODO.md": "fff39d839ad7abc1509fe1d6c8c5470ebb88c89a26a8a204681a92c56ddc7489"
         },
-        "reviewed_at": "2026-09-30T01:19:59.321705+00:00",
-        "note": "Reviewed, no change: work-in-progress stamps on the B1-B4 TODO items do not affect the publication runbook.",
+        "reviewed_at": "2026-09-30T01:51:06.299064+00:00",
+        "note": "Reviewed, no change: TODO Inbox triage for the pressure-set plan does not affect the publication runbook.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     }
