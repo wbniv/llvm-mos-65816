@@ -1,0 +1,36 @@
+$ timeout 60 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/caller.ll -o /dev/null
+LLVM ERROR: out of memory
+Allocation failed
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/caller.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/caller.ll'.
+2.	Running pass 'IRTranslator' on function '@f'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x0000565812cf6178 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x0000565812cf3455 llvm::sys::RunSignalHandlers() + 293
+2  llc       0x0000565812cf6ef1
+3  libc.so.6 0x000072c1b1445cb0
+4  libc.so.6 0x000072c1b14a61ac pthread_kill + 284
+5  libc.so.6 0x000072c1b1445b7e gsignal + 30
+6  libc.so.6 0x000072c1b14288ec abort + 39
+7  llc       0x0000565812c63cd5 llvm::report_bad_alloc_error(char const*, bool) + 117
+8  llc       0x0000565812c8c4e2 llvm::SmallVectorBase<unsigned int>::grow_pod(void*, unsigned long, unsigned long) + 402
+9  llc       0x00005658131960f6 llvm::CallLowering::buildCopyToRegs(llvm::MachineIRBuilder&, llvm::ArrayRef<llvm::Register>, llvm::Register, llvm::LLT, llvm::LLT, unsigned int) + 3526
+10 llc       0x0000565813196d5b llvm::CallLowering::handleAssignments(llvm::CallLowering::ValueHandler&, llvm::SmallVectorImpl<llvm::CallLowering::ArgInfo>&, llvm::CCState&, llvm::SmallVectorImpl<llvm::CCValAssign>&, llvm::MachineIRBuilder&, llvm::ArrayRef<llvm::Register>) const + 1419
+11 llc       0x0000565813196385 llvm::CallLowering::determineAndHandleAssignments(llvm::CallLowering::ValueHandler&, llvm::CallLowering::ValueAssigner&, llvm::SmallVectorImpl<llvm::CallLowering::ArgInfo>&, llvm::MachineIRBuilder&, unsigned int, bool, llvm::ArrayRef<llvm::Register>) const + 197
+12 llc       0x0000565811821492
+13 llc       0x0000565813191eac llvm::CallLowering::lowerCall(llvm::MachineIRBuilder&, llvm::CallBase const&, llvm::ArrayRef<llvm::Register>, llvm::ArrayRef<llvm::ArrayRef<llvm::Register>>, llvm::Register, std::optional<llvm::CallLowering::PtrAuthInfo>, llvm::Register, std::function<llvm::Register ()>) const + 2956
+14 llc       0x00005658131e5eb6 llvm::IRTranslator::translateCallBase(llvm::CallBase const&, llvm::MachineIRBuilder&) + 1446
+15 llc       0x00005658131e6ba6 llvm::IRTranslator::translateCall(llvm::User const&, llvm::MachineIRBuilder&) + 662
+16 llc       0x00005658131ed90a llvm::IRTranslator::runOnMachineFunction(llvm::MachineFunction&) + 4250
+17 llc       0x0000565811ceed73 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 723
+18 llc       0x00005658121452da llvm::FPPassManager::runOnFunction(llvm::Function&) + 618
+19 llc       0x000056581214b97c llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+20 llc       0x0000565812146009 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2601
+21 llc       0x000056581179421d
+22 llc       0x0000565811791bb3 main + 1331
+23 libc.so.6 0x000072c1b142a601
+24 libc.so.6 0x000072c1b142a718 __libc_start_main + 136
+25 llc       0x000056581178df25 _start + 37
+exit_code=134

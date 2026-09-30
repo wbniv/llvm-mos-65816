@@ -1,0 +1,98 @@
+{
+ "schema": 1,
+ "id": "mos-far-cc-split-axy-custom-args",
+ "title": "Opt-in split and A:X+Y far-pointer conventions crash when a far pointer is followed by another argument",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/plans/2026-09-30-far-prerequisite-defects.md",
+ "summary": "Under the opt-in +mos-farcc-split or +mos-farcc-axy far-pointer calling convention, a function whose far-pointer argument (assigned by the custom CC_MOS_FarPtrSplit / CC_MOS_FarPtrAXY assigner) is followed by any other argument aborts in CallLowering::handleAssignments during the IRTranslator: two far pointers, or one far pointer then an i8. The release build aborts with no diagnostic (exit 134). The matching call site does not terminate: IRTranslator memory grows until an address-space limit gives \"LLVM ERROR: out of memory\", or the kernel OOM killer ends llc. A single far-pointer argument compiles, which is all the existing farcc_split/farcc_axy gates exercise. The same holds with +mos-xy16 and on the B1-B4 candidate. The default Imag32 convention and the opt-in Stack convention are not affected. Found while testing the B1 stack fallback against these conventions (plan docs/plans/2026-09-30-far-prerequisite-defects.md, Outcome).",
+ "attribution": [
+  "Reproduction, prior-work audit and this record: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+ ],
+ "unknowns": [
+  "Root cause not investigated: the release build aborts without a message and no assertions build carries the far-pointer conventions. The custom VA handling in handleAssignments (j += NumArgRegs - 1) or MOSCallLowering assignCustomValue is the likely site.",
+  "Whether these conventions ever handled a second argument is unknown; their gates only pass a single far pointer.",
+  "The i8-then-far order compiles under split but aborts under axy (A is taken, so the far pointer is not custom-assigned); that case overlaps register exhaustion and is not separately characterised."
+ ],
+ "prior_work": {
+  "disposition": "distinct_from_related",
+  "search_terms": [
+   "mos-farcc-split",
+   "mos-farcc-axy",
+   "CC_MOS_FarPtrSplit",
+   "CC_MOS_FarPtrAXY",
+   "assignCustomValue"
+  ],
+  "related_records": [
+   "docs/defects/mos-far-pointer-arg-exhaustion.json"
+  ],
+  "related_reports": [
+   "docs/plans/2026-06-21-320-far-cc-variants-bcd-and-measure.md",
+   "docs/plans/2026-06-20-320-far-pointer-cc-build-all-variants.md"
+  ],
+  "related_changes": [
+   "patches/llvm-mos/0004-320-far-cc.patch",
+   "patches/llvm-mos/0002-321-accum16.patch"
+  ],
+  "source_assessment": "CC_MOS_FarPtrSplit and CC_MOS_FarPtrAXY push two or three custom CCValAssigns per far pointer, and MOSCallLowering assignCustomValue (incoming and outgoing) composes them. Nothing in the source, the variant plans or the gates covers a far pointer followed by another argument.",
+  "binary_assessment": "The downstream release llc 9031686c aborts (134) on two-far.ll and far-then-i8.ll in split and axy, with and without +mos-xy16, and compiles single-far.ll. The B1-B4 candidate llc behaves identically. caller.ll exhausts memory on both.",
+  "decision": "mos-far-pointer-arg-exhaustion covers the default Imag32 convention running out of RL quads and is fixed; it lists this crash only as an unknown. This failure needs no exhaustion (one far pointer plus an i8) and lies in custom-value call lowering, so it is a distinct defect. No existing record, TODO item or patch covers it. New canonical record.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/prior-work.json",
+   "sha256": "98645883f9f7c13fea82dfb96e5ff3f03913786bea3cc1d65d03f14df0e0ac84"
+  }
+ },
+ "baseline": {
+  "command": "build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null",
+  "working_directory": "Repository root. Captured in the wt/far-prerequisite-defects worktree /home/will/llvm-mos-65816-fardefects, whose build/far-review-defects/downstream holds hard links to the frozen binaries.",
+  "configuration": {
+   "cpu": "mosw65816",
+   "features": [
+    "+mos-a16",
+    "+mos-farcc-split"
+   ],
+   "optimization": "O2",
+   "lto": false,
+   "verifier": true,
+   "expected": "both far pointers are received (in registers or on the stack) and the function compiles"
+  },
+  "toolchain_location": "build/far-review-defects/downstream/llc; identity in docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/identity.json",
+  "toolchain_sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+  "input": {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll",
+   "sha256": "719d6ec7317139f5ec9e9e8ed786b77aaacc94c8a87ba5b70346d09930a08f99"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/baseline.log",
+   "sha256": "4bcce461d4ff48796ac0fb1fdf3ceb062da51921e42cc3bb7a0f46cd7f78c9ab"
+  },
+  "exit_code": 134,
+  "failure_signature": "llvm::CallLowering::handleAssignments"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/identity.json",
+   "sha256": "294930634a5fc3ba192fe24d533a7a37d85352316e95e66e71dbd9d95d01fddb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/matrix.log",
+   "sha256": "e26ab9b239bc18f94f6e111b23fb055dc5c2d1e0e0bdf964ef191c86518d4cd2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/caller-memory.log",
+   "sha256": "9e968e1b97be28cba7b7e8949022304022a66c14d6bfe011e845872e4cfabaae"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll",
+   "sha256": "faff0f987b783b6d0de356958fcea69b0f7ce33918e2ad5e2483fa56ca32ff23"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/caller.ll",
+   "sha256": "585ef970dd292c50dbb816181f91d0e9eba78e2346378fb3b5962104fa6fb000"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll",
+   "sha256": "db3c39f0b379a1c55c1b7f0cf147839288a545c38e7493c80b836f677bf7b703"
+  }
+ ]
+}

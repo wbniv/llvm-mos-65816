@@ -271,6 +271,16 @@
         "docs/defects/mos-far-index-fold-dangling-dbg.json",
         "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
       ]
+    },
+    "mos-far-cc-split-axy-custom-args": {
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Root-cause the custom far-pointer value handling in call lowering for the opt-in split and A:X+Y conventions, or retire those variants; the default Imag32 convention is unaffected.",
+      "evidencePaths": [
+        "docs/defects/mos-far-cc-split-axy-custom-args.json"
+      ]
     }
   },
   "items": [

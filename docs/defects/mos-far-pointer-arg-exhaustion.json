@@ -13,7 +13,7 @@
  ],
  "unknowns": [
   "Plain mosw65816 (no +mos-a16): call lowering now stacks the fourth far pointer correctly, but reading that 4-byte stacked value back fails with \"unable to legalize G_MERGE_VALUES s32\" (candidate-plain-w65816.log). This is the existing plain-mode limitation for any far-pointer value in memory (a far-pointer load from a near global fails identically on the baseline); it is loud, not silent. Making far-pointer values in memory legal without +mos-a16 is a separate design decision.",
-  "The opt-in +mos-farcc-split and +mos-farcc-axy variants also reach the new fallback, but both already abort on the baseline with only two far-pointer arguments (MOSCallLowering assignCustomValue), before any exhaustion; they are not covered by a regression."
+  "The opt-in +mos-farcc-split and +mos-farcc-axy variants also reach the new fallback, but they already abort on the baseline whenever a custom-assigned far pointer is followed by another argument, before any exhaustion (docs/defects/mos-far-cc-split-axy-custom-args.json); no regression covers them here."
  ],
  "prior_work": {
   "disposition": "new_defect",

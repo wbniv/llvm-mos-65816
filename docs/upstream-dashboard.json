@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "fe5861049d77f0d116003aa2d3424710ed5bc118b3a068ffbdc33d9edc85112e",
+  "sourceHash": "bd8bf9d5dd0a86cfd99ca852c0982888a471417d91c05e4120b93f1e12504d64",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -121,6 +121,24 @@
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-access-non-65816.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-far-cc-split-axy-custom-args",
+      "kind": "defect",
+      "title": "Opt-in split and A:X+Y far-pointer conventions crash when a far pointer is followed by another argument",
+      "summary": "Under the opt-in +mos-farcc-split or +mos-farcc-axy far-pointer calling convention, a function whose far-pointer argument (assigned by the custom CC_MOS_FarPtrSplit / CC_MOS_FarPtrAXY assigner) is followed by any other argument aborts in CallLowering::handleAssignments during the IRTranslator: two far pointers, or one far pointer then an i8. The release build aborts with no diagnostic (exit 134). The matching call site does not terminate: IRTranslator memory grows until an address-space limit gives \"LLVM ERROR: out of memory\", or the kernel OOM killer ends llc. A single far-pointer argument compiles, which is all the existing farcc_split/farcc_axy gates exercise. The same holds with +mos-xy16 and on the B1-B4 candidate. The default Imag32 convention and the opt-in Stack convention are not affected. Found while testing the B1 stack fallback against these conventions (plan docs/plans/2026-09-30-far-prerequisite-defects.md, Outcome).",
+      "localStatus": "qualified",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Root-cause the custom far-pointer value handling in call lowering for the opt-in split and A:X+Y conventions, or retire those variants; the default Imag32 convention is unaffected.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-cc-split-axy-custom-args.json"
       ],
       "evidenceNote": "",
       "upstreamUrl": null,

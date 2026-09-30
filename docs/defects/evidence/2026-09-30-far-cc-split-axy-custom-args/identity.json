@@ -1,0 +1,15 @@
+{
+  "downstream_llc": {
+    "path": "build/far-review-defects/downstream/llc",
+    "sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+    "hard_link_of": "build/llvm-mos/bin/llc (2026-09-30 05:29 build)",
+    "source": "vendor/llvm-mos with the fork patch stack as committed at 5dc63f4d",
+    "assertions": false
+  },
+  "candidate_llc": {
+    "path": "build/far-review-defects/candidate/llc",
+    "sha256": "f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1",
+    "note": "the B1-B4 candidate (664b877a); same result, see matrix.log"
+  },
+  "limits": "RLIMIT_CORE=0 and RLIMIT_AS=2000000 KiB (ulimit -v) for every run; without the address-space limit caller.ll grows until the kernel OOM killer ends llc (observed twice at about 4.5 GB RSS on 2026-09-30 16:51)."
+}

@@ -1,0 +1,64 @@
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+/bin/bash: line 4: 3780346 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+/bin/bash: line 4: 3780368 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll -o /dev/null
+/bin/bash: line 4: 3780397 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll -o /dev/null
+/bin/bash: line 4: 3780426 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll -o /dev/null
+exit_code=0
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll -o /dev/null
+exit_code=0
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+/bin/bash: line 4: 3780476 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+/bin/bash: line 4: 3780504 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll -o /dev/null
+/bin/bash: line 4: 3780545 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll -o /dev/null
+/bin/bash: line 4: 3780579 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll -o /dev/null
+exit_code=0
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll -o /dev/null
+exit_code=0
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+/bin/bash: line 4: 3780625 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+/bin/bash: line 4: 3780648 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll -o /dev/null
+/bin/bash: line 4: 3780689 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll -o /dev/null
+/bin/bash: line 4: 3780778 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll -o /dev/null
+exit_code=0
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll -o /dev/null
+exit_code=0
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+/bin/bash: line 4: 3780811 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+/bin/bash: line 4: 3780836 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll -o /dev/null
+/bin/bash: line 4: 3780865 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/far-then-i8.ll -o /dev/null
+/bin/bash: line 4: 3780901 Aborted                    (core dumped) bash -c "ulimit -c 0; ulimit -v 2000000; timeout 20 $L -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16$x,+mos-farcc-$m -O2 -verify-machineinstrs $D/$f.ll -o /dev/null" > /dev/null 2>&1
+exit_code=134
+$ timeout 20 build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll -o /dev/null
+exit_code=0
+$ timeout 20 build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16,+mos-farcc-axy -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/single-far.ll -o /dev/null
+exit_code=0

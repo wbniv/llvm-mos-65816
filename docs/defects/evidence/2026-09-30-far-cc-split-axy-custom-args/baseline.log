@@ -1,0 +1,28 @@
+$ build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-farcc-split -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-09-30-far-cc-split-axy-custom-args/two-far.ll'.
+2.	Running pass 'IRTranslator' on function '@f'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x000056e89a981178 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x000056e89a97e455 llvm::sys::RunSignalHandlers() + 293
+2  llc       0x000056e89a981ef1
+3  libc.so.6 0x0000701d45045cb0
+4  libc.so.6 0x0000701d450a61ac pthread_kill + 284
+5  libc.so.6 0x0000701d45045b7e gsignal + 30
+6  libc.so.6 0x0000701d450288ec abort + 39
+7  llc       0x000056e89ae22a57 llvm::CallLowering::handleAssignments(llvm::CallLowering::ValueHandler&, llvm::SmallVectorImpl<llvm::CallLowering::ArgInfo>&, llvm::CCState&, llvm::SmallVectorImpl<llvm::CCValAssign>&, llvm::MachineIRBuilder&, llvm::ArrayRef<llvm::Register>) const + 4743
+8  llc       0x000056e89ae21385 llvm::CallLowering::determineAndHandleAssignments(llvm::CallLowering::ValueHandler&, llvm::CallLowering::ValueAssigner&, llvm::SmallVectorImpl<llvm::CallLowering::ArgInfo>&, llvm::MachineIRBuilder&, unsigned int, bool, llvm::ArrayRef<llvm::Register>) const + 197
+9  llc       0x000056e8994abbb7
+10 llc       0x000056e89ae7872b llvm::IRTranslator::runOnMachineFunction(llvm::MachineFunction&) + 3771
+11 llc       0x000056e899979d73 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 723
+12 llc       0x000056e899dd02da llvm::FPPassManager::runOnFunction(llvm::Function&) + 618
+13 llc       0x000056e899dd697c llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+14 llc       0x000056e899dd1009 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2601
+15 llc       0x000056e89941f21d
+16 llc       0x000056e89941cbb3 main + 1331
+17 libc.so.6 0x0000701d4502a601
+18 libc.so.6 0x0000701d4502a718 __libc_start_main + 136
+19 llc       0x000056e899418f25 _start + 37
+exit_code=134

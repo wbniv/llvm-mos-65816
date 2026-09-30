@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "03b92d508e8ae75759b65151e8fdd99eb48facc7141931963ec36f7cb91c5300",
+          "docs/upstream-dashboard-curation.json": "4fb23717bb72840cbe6e3260653947d14a0de74cc333794c1db7f19655f23e32",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -85,10 +85,11 @@
           "docs/defects/mos-carry-scheduling-pressure.json": "e0b1ed7f5314f020ea1fc7f1b45f4aad005281fb4c75d8554999197324c594d1",
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
           "docs/defects/mos-far-access-non-65816.json": "ee8164cc13689bb4cb5d0c18a430b100b4e24501e05b6aca0486035dc0e7503d",
+          "docs/defects/mos-far-cc-split-axy-custom-args.json": "07f335500f42673c0eca96ed83e4fd40db8e5cd500971efcb72fbf6bc74a2087",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "1b2bc7e2d5ccfbaf1b806362efe8e617bba69d58300aa0475a02a34678c2aa4e",
           "docs/defects/mos-far-memop-length-truncation.json": "53fd88560e0b1188419418fc9a4552d88216c5dac7a174afd624bf30a26adfc8",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
-          "docs/defects/mos-far-pointer-arg-exhaustion.json": "cb9b9d6bf056fc58ab79129dbacc71130b3268218513d728a196583b94c6643a",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "82506cfea9e2d073ec3ae80b1d0347d7b8b8d07e502949a8c6241f30020ffecb",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
@@ -112,7 +113,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "9158171277a857d3a9e3e3d685cd0c415c57405e85546a5c34faf97d0eaffa92"
+          "docs/upstream-dashboard.json": "e8db79bf51d347ff6beca28047a11cf5877ed1a37dd8c5431f9c8170692a8ba3"
         }
       }
     },
@@ -135,11 +136,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "fe7c1942314a963973fa3576ce4695d1e71292836a01de04d9ac234efb82a5f9",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "9158171277a857d3a9e3e3d685cd0c415c57405e85546a5c34faf97d0eaffa92",
+          "docs/upstream-dashboard.json": "e8db79bf51d347ff6beca28047a11cf5877ed1a37dd8c5431f9c8170692a8ba3",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "165c8f77f3a5ba8b1e7418d8134409a74d45a1b2faa14067909b61b6adf3661d"
+          "docs/upstream-dashboard-graph.json": "651a94819720d8415205e8eb81184ff8ea63b9f707263ad5e8eec0e5f9234ab3"
         }
       }
     },
@@ -306,6 +307,7 @@
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
+          "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
@@ -355,9 +357,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
         },
-        "reviewed_at": "2026-09-30T09:39:47.286792+00:00",
-        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
-        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
+        "reviewed_at": "2026-09-30T10:54:23.499225+00:00",
+        "note": "New confirmed record mos-far-cc-split-axy-custom-args (opt-in split/AXY far CC crash); no TODO item added pending orchestrator ranking, and the trackers describe the default far-pointer path, which is unaffected.",
+        "attribution": "Review: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort. Re-recorded after the 2026-09-30 OOM reboot interrupted its rebase: Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
@@ -399,6 +401,7 @@
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
+          "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
@@ -440,9 +443,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
         },
-        "reviewed_at": "2026-09-30T09:39:46.082037+00:00",
-        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
-        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
+        "reviewed_at": "2026-09-30T10:54:23.606597+00:00",
+        "note": "New confirmed record mos-far-cc-split-axy-custom-args (opt-in split/AXY far CC crash); no TODO item added pending orchestrator ranking, and the trackers describe the default far-pointer path, which is unaffected.",
+        "attribution": "Review: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort. Re-recorded after the 2026-09-30 OOM reboot interrupted its rebase: Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
@@ -484,6 +487,7 @@
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
+          "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
@@ -525,9 +529,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "19ec7f841937786b2a93eed95e1487aa18da72e4a0cc0441b1081127dd6d1a2d"
         },
-        "reviewed_at": "2026-09-30T09:39:46.076721+00:00",
-        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
-        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
+        "reviewed_at": "2026-09-30T10:54:23.611289+00:00",
+        "note": "New confirmed record mos-far-cc-split-axy-custom-args (opt-in split/AXY far CC crash); no TODO item added pending orchestrator ranking, and the trackers describe the default far-pointer path, which is unaffected.",
+        "attribution": "Review: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort. Re-recorded after the 2026-09-30 OOM reboot interrupted its rebase: Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
