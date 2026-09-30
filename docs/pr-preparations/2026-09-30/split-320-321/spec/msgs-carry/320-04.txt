@@ -1,0 +1,19 @@
+[MOS] Select bounded runtime [dp],Y indexing for far byte accesses
+
+Fold an offset from a runtime far pointer into the 65816's `lda/sta [dp],y`, which adds Y to the full 24-bit address with carry into the bank. A constant displacement of 1-3 becomes an 8-bit Y constant. A runtime offset folds when its known-bits maximum plus the last accessed byte fits Y (8 bits, or 16 bits under +mos-xy16), every user of the pointer add is a non-atomic byte access or a constant non-negative displacement leading only to such accesses (so the 32-bit add disappears), the base is not an absolute address, no call can separate the add from its accesses, and a function with calls has only one such access. The offset keeps its own integer arithmetic; an 8-bit Y is preferred when the users fit it.
+
+When the last access folds, the pointer add and any constant-offset adds on it are dead. salvageDebugInfo cannot express base + zext(offset), so the fold sets the remaining DBG_VALUEs of those adds to $noreg. Otherwise they would name the erased register, which DetectDeadLanes marks undef and the machine verifier rejects under -g.
+
+With a 16-bit Y, the index stays in an Imag16 pair until emission: LDIndirLongYIdx/STIndirLongYIdx are emitted as `ldy zp` directly followed by the access, so no spill code can insert a `sep #$10` that clears Y's high byte.
+
+Default-mode effect: none; only far byte accesses change.
+
+Tests: far-indir-indexed.ll covers 16-bit reads through a runtime far pointer and a far array subscript; constant displacements 1 and 3 (and 0 and 4, which are not folded); runtime byte offsets for loads, stores and a blit, with 8-bit and 16-bit (+mos-xy16) Y, masked, sign-extended and 16-bit-wrapping offsets; and the declining cases: unbounded 32-bit offsets, absolute bases, escaping pointers, calls between the add and its accesses, multiple accesses in a function with calls, and a sibling access out of range. It checks assembly and object bytes ($a7/$b7/$97) in +mos-a16 and +mos-a16,+mos-xy16 modes, and the fused pseudos after instruction selection. far-index-fold-debug.ll checks a -g byte fold under -verify-machineinstrs: the dead pointer's DBG_VALUE becomes $noreg, the base pointer's location is kept, and the fold happens.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/far-indir-indexed.ll llvm/test/CodeGen/MOS/far-index-fold-debug.ll`.
+
+Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort. Repairs and review follow-ups carried into this commit: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F

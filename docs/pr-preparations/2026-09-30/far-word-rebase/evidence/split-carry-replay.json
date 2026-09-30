@@ -1,0 +1,491 @@
+{
+ "method": "llc arguments of runtime.py on the frozen post-LTO IR (.scratch/far-word-policy/runs/baseline-*.sfc.0.5.precodegen.bc); script build/split-320-321/spec/carry-replay-objects.py",
+ "carried": {
+  "pre0070_llc": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-fw-11",
+  "pre0070_sha256": "3626b2ca18d2fd22432a7d1ebcef2b3be633febbe3f49c6c3f4e7d16d439bf06",
+  "candidate_llc": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-fw-14",
+  "candidate_sha256": "cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7"
+ },
+ "pre_carry": {
+  "pre0070_llc": "/home/will/llvm-mos-65816/build/split-320-321/llc/o-fw-11",
+  "pre0070_sha256": "45eb47a4b4a68f21d89496077273dddb752ea71cddac1dd8b11ea456bc0efdf3",
+  "candidate_llc": "/home/will/llvm-mos-65816/build/split-320-321/llc/o-fw-14",
+  "candidate_sha256": "fd38e1c16b78a88e1443e55dbd96966694e7366bee3341606754030b11520912"
+ },
+ "summary": {
+  "configurations": 58,
+  "carried_equals_pre_carry": 58,
+  "carried_equals_sep28": 24
+ },
+ "emulator_run": {
+  "script": "docs/pr-preparations/2026-09-30/far-word-rebase/runtime.py --work build/split-320-321/runtime-carry (pre0070/llc and candidate/llc are wrappers that apply ulimit -c 0 and ulimit -v 2000000 and exec the carried llc binaries above)",
+  "results": "split-carry-runtime-results.json",
+  "commands": "split-carry-runtime-commands.json.xz"
+ },
+ "rows": [
+  {
+   "name": "baseline-farblit-a16-Os",
+   "carried_sha256": "9c1d801245dd02e21508006a90dc6d05dd02e54e6ca94cf859462eb0c9fb327a",
+   "pre_carry_sha256": "9c1d801245dd02e21508006a90dc6d05dd02e54e6ca94cf859462eb0c9fb327a",
+   "sep28_sha256": "9c1d801245dd02e21508006a90dc6d05dd02e54e6ca94cf859462eb0c9fb327a",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "default-farblit-a16-Os",
+   "carried_sha256": "9c1d801245dd02e21508006a90dc6d05dd02e54e6ca94cf859462eb0c9fb327a",
+   "pre_carry_sha256": "9c1d801245dd02e21508006a90dc6d05dd02e54e6ca94cf859462eb0c9fb327a",
+   "sep28_sha256": "9c1d801245dd02e21508006a90dc6d05dd02e54e6ca94cf859462eb0c9fb327a",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "all-farblit-a16-Os",
+   "carried_sha256": "b9d737bf91b3b8b92f646b3a6c73068b6ce1ed94564640b1b581f32553c3d094",
+   "pre_carry_sha256": "b9d737bf91b3b8b92f646b3a6c73068b6ce1ed94564640b1b581f32553c3d094",
+   "sep28_sha256": "b9d737bf91b3b8b92f646b3a6c73068b6ce1ed94564640b1b581f32553c3d094",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "baseline-farblit-a16-Oz",
+   "carried_sha256": "103b1ac4930aa084996c1f812a8678e38707361682c95b91287a591eff01f884",
+   "pre_carry_sha256": "103b1ac4930aa084996c1f812a8678e38707361682c95b91287a591eff01f884",
+   "sep28_sha256": "a8475f792aaa0e543c4d6260f36606078123bb76afd2ad0dd2976fc513592852",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-farblit-a16-Oz",
+   "carried_sha256": "103b1ac4930aa084996c1f812a8678e38707361682c95b91287a591eff01f884",
+   "pre_carry_sha256": "103b1ac4930aa084996c1f812a8678e38707361682c95b91287a591eff01f884",
+   "sep28_sha256": "a8475f792aaa0e543c4d6260f36606078123bb76afd2ad0dd2976fc513592852",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-farblit-a16-Oz",
+   "carried_sha256": "103b1ac4930aa084996c1f812a8678e38707361682c95b91287a591eff01f884",
+   "pre_carry_sha256": "103b1ac4930aa084996c1f812a8678e38707361682c95b91287a591eff01f884",
+   "sep28_sha256": "a8475f792aaa0e543c4d6260f36606078123bb76afd2ad0dd2976fc513592852",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-farblit-a16-O2",
+   "carried_sha256": "9c75c25c37261e608d7bcfea3c5e4012eb35b814c56cb6b1c6ae5157bfde8d97",
+   "pre_carry_sha256": "9c75c25c37261e608d7bcfea3c5e4012eb35b814c56cb6b1c6ae5157bfde8d97",
+   "sep28_sha256": "6eceea67cde574ec4908e6410c04c871376f156c7fea3d90bcb3e012886fcabc",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-farblit-a16-O2",
+   "carried_sha256": "5283ea31ad5f39844e7b258e4268d7b9f81205e2f1796ccd2b6fc39e2f1d4633",
+   "pre_carry_sha256": "5283ea31ad5f39844e7b258e4268d7b9f81205e2f1796ccd2b6fc39e2f1d4633",
+   "sep28_sha256": "3524306160a4ecff8dc932dc0d68600c790c8954b078e3f5be15b8886d8bdb84",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-farblit-a16-O2",
+   "carried_sha256": "5283ea31ad5f39844e7b258e4268d7b9f81205e2f1796ccd2b6fc39e2f1d4633",
+   "pre_carry_sha256": "5283ea31ad5f39844e7b258e4268d7b9f81205e2f1796ccd2b6fc39e2f1d4633",
+   "sep28_sha256": "3524306160a4ecff8dc932dc0d68600c790c8954b078e3f5be15b8886d8bdb84",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-farblit-a16-O3",
+   "carried_sha256": "f54f35f96d0adf7b5ac4601dcb854e8dc485ecf147301aabef8cd536162dc820",
+   "pre_carry_sha256": "f54f35f96d0adf7b5ac4601dcb854e8dc485ecf147301aabef8cd536162dc820",
+   "sep28_sha256": "dd729b295b0244544b88544c4942c01b7de746d831fc84c66d5c2123c61fef3c",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-farblit-a16-O3",
+   "carried_sha256": "1d67c7943603b29d532c717d5708b21b0f99236f6f57e6a7bf0d9215e055d7eb",
+   "pre_carry_sha256": "1d67c7943603b29d532c717d5708b21b0f99236f6f57e6a7bf0d9215e055d7eb",
+   "sep28_sha256": "8433a10a33f88bc9cd85e8a50246244be0c1ef147dc7759cea9a429e0fb466bb",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-farblit-xy16-Os",
+   "carried_sha256": "212146a5988278a32e33de5565da6123d071f431d3a831a22030990b18f3a3cc",
+   "pre_carry_sha256": "212146a5988278a32e33de5565da6123d071f431d3a831a22030990b18f3a3cc",
+   "sep28_sha256": "212146a5988278a32e33de5565da6123d071f431d3a831a22030990b18f3a3cc",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "default-farblit-xy16-Os",
+   "carried_sha256": "212146a5988278a32e33de5565da6123d071f431d3a831a22030990b18f3a3cc",
+   "pre_carry_sha256": "212146a5988278a32e33de5565da6123d071f431d3a831a22030990b18f3a3cc",
+   "sep28_sha256": "212146a5988278a32e33de5565da6123d071f431d3a831a22030990b18f3a3cc",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "all-farblit-xy16-Os",
+   "carried_sha256": "2ee4b2e27b36e862ab0c679c994b5d157c70bf277d075bc4a0382e47d162ba73",
+   "pre_carry_sha256": "2ee4b2e27b36e862ab0c679c994b5d157c70bf277d075bc4a0382e47d162ba73",
+   "sep28_sha256": "2ee4b2e27b36e862ab0c679c994b5d157c70bf277d075bc4a0382e47d162ba73",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "baseline-farblit-xy16-Oz",
+   "carried_sha256": "72673c9729219099c5e5a2855b265eb5479d4eca90a21442d05d946a85e6f283",
+   "pre_carry_sha256": "72673c9729219099c5e5a2855b265eb5479d4eca90a21442d05d946a85e6f283",
+   "sep28_sha256": "df19b9001fdcf06dfa0c69f2e82dacc1ea444157f0a4a9192f192b570886b5a5",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-farblit-xy16-Oz",
+   "carried_sha256": "72673c9729219099c5e5a2855b265eb5479d4eca90a21442d05d946a85e6f283",
+   "pre_carry_sha256": "72673c9729219099c5e5a2855b265eb5479d4eca90a21442d05d946a85e6f283",
+   "sep28_sha256": "df19b9001fdcf06dfa0c69f2e82dacc1ea444157f0a4a9192f192b570886b5a5",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-farblit-xy16-Oz",
+   "carried_sha256": "72673c9729219099c5e5a2855b265eb5479d4eca90a21442d05d946a85e6f283",
+   "pre_carry_sha256": "72673c9729219099c5e5a2855b265eb5479d4eca90a21442d05d946a85e6f283",
+   "sep28_sha256": "df19b9001fdcf06dfa0c69f2e82dacc1ea444157f0a4a9192f192b570886b5a5",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-farblit-xy16-O2",
+   "carried_sha256": "728fecf7004edc86868f28016a1d24fe78369108f27626bb1262f3423505f5c3",
+   "pre_carry_sha256": "728fecf7004edc86868f28016a1d24fe78369108f27626bb1262f3423505f5c3",
+   "sep28_sha256": "96eab947e18492f1681375f1e86721cefc6799e92b9a3e8b0eba5cf7c50abc06",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-farblit-xy16-O2",
+   "carried_sha256": "daf70a0198ea18594f3808f721fc69fd345d677d15db5435463987ed34639aca",
+   "pre_carry_sha256": "daf70a0198ea18594f3808f721fc69fd345d677d15db5435463987ed34639aca",
+   "sep28_sha256": "dcbaf3f610a61e1c707e60975766122f5d9a18eb7944b4592385d69b5471f0d3",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-farblit-xy16-O2",
+   "carried_sha256": "daf70a0198ea18594f3808f721fc69fd345d677d15db5435463987ed34639aca",
+   "pre_carry_sha256": "daf70a0198ea18594f3808f721fc69fd345d677d15db5435463987ed34639aca",
+   "sep28_sha256": "dcbaf3f610a61e1c707e60975766122f5d9a18eb7944b4592385d69b5471f0d3",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-farblit-xy16-O3",
+   "carried_sha256": "41b1482bd490e2433dac95ce3d72b29c6a432542d0a0fc88c93a4655a30a6641",
+   "pre_carry_sha256": "41b1482bd490e2433dac95ce3d72b29c6a432542d0a0fc88c93a4655a30a6641",
+   "sep28_sha256": "b61ffb81df1c4c104dea65b4fe44b749176f3b7ee306f235784da8710938e8fd",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-farblit-xy16-O3",
+   "carried_sha256": "3a6d66f80dae801cdfb715e404681145f7cd9ccc1c1a1e338a9a7c98f4820abe",
+   "pre_carry_sha256": "3a6d66f80dae801cdfb715e404681145f7cd9ccc1c1a1e338a9a7c98f4820abe",
+   "sep28_sha256": "5ddd1e42d7c034fb66b151db3f3f867d991aaa0d046465370c7d565c046525c5",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-bounds-a16-Os",
+   "carried_sha256": "db256b4695f41e925e6e37fe66f4828a7d147fc79e39a022100367738a4e4933",
+   "pre_carry_sha256": "db256b4695f41e925e6e37fe66f4828a7d147fc79e39a022100367738a4e4933",
+   "sep28_sha256": "4959d0ac069a9817a869ddc435e7157e305a2232b49428f76b5a0baef0756bff",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-bounds-a16-Os",
+   "carried_sha256": "db256b4695f41e925e6e37fe66f4828a7d147fc79e39a022100367738a4e4933",
+   "pre_carry_sha256": "db256b4695f41e925e6e37fe66f4828a7d147fc79e39a022100367738a4e4933",
+   "sep28_sha256": "4959d0ac069a9817a869ddc435e7157e305a2232b49428f76b5a0baef0756bff",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-bounds-a16-Os",
+   "carried_sha256": "b1c37232b3ef633490198b71b5ba20dc58aa171c19772f3c67fb5a7175d9cf6b",
+   "pre_carry_sha256": "b1c37232b3ef633490198b71b5ba20dc58aa171c19772f3c67fb5a7175d9cf6b",
+   "sep28_sha256": "09d7c2492d021eb29fdd01181f08b6ec384169ae47f38f2eaa288a4b96e01f5e",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-bounds-a16-Oz",
+   "carried_sha256": "08363ce825ad7f303bda0368327167ebe52725fcf4d5331e8992185753968c65",
+   "pre_carry_sha256": "08363ce825ad7f303bda0368327167ebe52725fcf4d5331e8992185753968c65",
+   "sep28_sha256": "dd19241c4b3ff83e61bee84e6fad0fb086d594141ba1f0a8d6341234b6a80ef4",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-bounds-a16-Oz",
+   "carried_sha256": "08363ce825ad7f303bda0368327167ebe52725fcf4d5331e8992185753968c65",
+   "pre_carry_sha256": "08363ce825ad7f303bda0368327167ebe52725fcf4d5331e8992185753968c65",
+   "sep28_sha256": "dd19241c4b3ff83e61bee84e6fad0fb086d594141ba1f0a8d6341234b6a80ef4",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-bounds-a16-Oz",
+   "carried_sha256": "08363ce825ad7f303bda0368327167ebe52725fcf4d5331e8992185753968c65",
+   "pre_carry_sha256": "08363ce825ad7f303bda0368327167ebe52725fcf4d5331e8992185753968c65",
+   "sep28_sha256": "dd19241c4b3ff83e61bee84e6fad0fb086d594141ba1f0a8d6341234b6a80ef4",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-bounds-a16-O2",
+   "carried_sha256": "a8269752fddfc2df07a31eadc1b2e4026f33b0778a631ea79f38555c9b657d27",
+   "pre_carry_sha256": "a8269752fddfc2df07a31eadc1b2e4026f33b0778a631ea79f38555c9b657d27",
+   "sep28_sha256": "8aea213df956ef3022b6a2f4badfc790cebefc3a8ef494a05213f089e5eb439d",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-bounds-a16-O2",
+   "carried_sha256": "5e7b9b45781a2e1306b0cb13d77fd444327960036e6e840275565fa5548d2d93",
+   "pre_carry_sha256": "5e7b9b45781a2e1306b0cb13d77fd444327960036e6e840275565fa5548d2d93",
+   "sep28_sha256": "0d9393cdb0d7097a21e8194f955488d398db0f6ceb44189d750757ba6ad41212",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-bounds-a16-O2",
+   "carried_sha256": "5e7b9b45781a2e1306b0cb13d77fd444327960036e6e840275565fa5548d2d93",
+   "pre_carry_sha256": "5e7b9b45781a2e1306b0cb13d77fd444327960036e6e840275565fa5548d2d93",
+   "sep28_sha256": "0d9393cdb0d7097a21e8194f955488d398db0f6ceb44189d750757ba6ad41212",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-bounds-xy16-Os",
+   "carried_sha256": "6d512ac24e9311c2690adef1c37a465e873caa45475d157e09ea4ca04e910161",
+   "pre_carry_sha256": "6d512ac24e9311c2690adef1c37a465e873caa45475d157e09ea4ca04e910161",
+   "sep28_sha256": "11a52b41abfcb98607213b3e1001561446bb64fc5cb08b4a88639d20563c492d",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-bounds-xy16-Os",
+   "carried_sha256": "6d512ac24e9311c2690adef1c37a465e873caa45475d157e09ea4ca04e910161",
+   "pre_carry_sha256": "6d512ac24e9311c2690adef1c37a465e873caa45475d157e09ea4ca04e910161",
+   "sep28_sha256": "11a52b41abfcb98607213b3e1001561446bb64fc5cb08b4a88639d20563c492d",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-bounds-xy16-Os",
+   "carried_sha256": "b41e5566202b840a7a4677b7b6fe5b732fb0e8e04893ce98c37a612bb983c0ec",
+   "pre_carry_sha256": "b41e5566202b840a7a4677b7b6fe5b732fb0e8e04893ce98c37a612bb983c0ec",
+   "sep28_sha256": "cb96fe1c8a14e92b5c7cfa3529e2182d8aff679dfedb10a76c9721eda29df2c8",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-bounds-xy16-Oz",
+   "carried_sha256": "bfb805c010db34d8b08f7881c316895c6e6fc5abe22eb964052f703b86794154",
+   "pre_carry_sha256": "bfb805c010db34d8b08f7881c316895c6e6fc5abe22eb964052f703b86794154",
+   "sep28_sha256": "97d048f2f0cc38d20454213bf0cb3095c3db9b6d5b0ca36c69eb886d21b831fa",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-bounds-xy16-Oz",
+   "carried_sha256": "bfb805c010db34d8b08f7881c316895c6e6fc5abe22eb964052f703b86794154",
+   "pre_carry_sha256": "bfb805c010db34d8b08f7881c316895c6e6fc5abe22eb964052f703b86794154",
+   "sep28_sha256": "97d048f2f0cc38d20454213bf0cb3095c3db9b6d5b0ca36c69eb886d21b831fa",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-bounds-xy16-Oz",
+   "carried_sha256": "bfb805c010db34d8b08f7881c316895c6e6fc5abe22eb964052f703b86794154",
+   "pre_carry_sha256": "bfb805c010db34d8b08f7881c316895c6e6fc5abe22eb964052f703b86794154",
+   "sep28_sha256": "97d048f2f0cc38d20454213bf0cb3095c3db9b6d5b0ca36c69eb886d21b831fa",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-bounds-xy16-O2",
+   "carried_sha256": "d8ec584a80eae082bc1a40d61b54d035a9bfe4edcb3f5006d1fb942f7d60fb64",
+   "pre_carry_sha256": "d8ec584a80eae082bc1a40d61b54d035a9bfe4edcb3f5006d1fb942f7d60fb64",
+   "sep28_sha256": "a678f17ddc8d1f4930beeb28bd053f9522d6803c82141b7dade330f2954c2b6a",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "default-bounds-xy16-O2",
+   "carried_sha256": "5bfc2ffd2a5916db12fbcea4295977f9cd878719b8aa3680b9577dbf3ce742a3",
+   "pre_carry_sha256": "5bfc2ffd2a5916db12fbcea4295977f9cd878719b8aa3680b9577dbf3ce742a3",
+   "sep28_sha256": "7529cc87a9bec6a3a5f3566dc7962ef88be7666462909d0fa5246f911788d9e7",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "all-bounds-xy16-O2",
+   "carried_sha256": "5bfc2ffd2a5916db12fbcea4295977f9cd878719b8aa3680b9577dbf3ce742a3",
+   "pre_carry_sha256": "5bfc2ffd2a5916db12fbcea4295977f9cd878719b8aa3680b9577dbf3ce742a3",
+   "sep28_sha256": "7529cc87a9bec6a3a5f3566dc7962ef88be7666462909d0fa5246f911788d9e7",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": false
+  },
+  {
+   "name": "baseline-farblit_press-a16-Os",
+   "carried_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "pre_carry_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "sep28_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "default-farblit_press-a16-Os",
+   "carried_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "pre_carry_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "sep28_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "all-farblit_press-a16-Os",
+   "carried_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "pre_carry_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "sep28_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "baseline-farblit_press-a16-Oz",
+   "carried_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "pre_carry_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "sep28_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "default-farblit_press-a16-Oz",
+   "carried_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "pre_carry_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "sep28_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "all-farblit_press-a16-Oz",
+   "carried_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "pre_carry_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "sep28_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "baseline-farblit_press-a16-O2",
+   "carried_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "pre_carry_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "sep28_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "default-farblit_press-a16-O2",
+   "carried_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "pre_carry_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "sep28_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "all-farblit_press-a16-O2",
+   "carried_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "pre_carry_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "sep28_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "baseline-farblit_press-xy16-Os",
+   "carried_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "pre_carry_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "sep28_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "default-farblit_press-xy16-Os",
+   "carried_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "pre_carry_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "sep28_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "all-farblit_press-xy16-Os",
+   "carried_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "pre_carry_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "sep28_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "baseline-farblit_press-xy16-Oz",
+   "carried_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "pre_carry_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "sep28_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "default-farblit_press-xy16-Oz",
+   "carried_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "pre_carry_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "sep28_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "all-farblit_press-xy16-Oz",
+   "carried_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "pre_carry_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "sep28_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "baseline-farblit_press-xy16-O2",
+   "carried_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "pre_carry_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "sep28_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "default-farblit_press-xy16-O2",
+   "carried_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "pre_carry_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "sep28_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  },
+  {
+   "name": "all-farblit_press-xy16-O2",
+   "carried_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "pre_carry_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "sep28_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+   "carried_equals_pre_carry": true,
+   "carried_equals_sep28": true
+  }
+ ]
+}

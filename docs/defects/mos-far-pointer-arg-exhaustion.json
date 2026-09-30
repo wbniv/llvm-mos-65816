@@ -9,7 +9,8 @@
  "attribution": [
   "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
   "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
-  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+  "Split-series carry (additional runs): Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); dispatched from session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
  ],
  "unknowns": [
   "Plain mosw65816 (no +mos-a16): call lowering now stacks the fourth far pointer correctly, but reading that 4-byte stacked value back fails with \"unable to legalize G_MERGE_VALUES s32\" (candidate-plain-w65816.log). This is the existing plain-mode limitation for any far-pointer value in memory (a far-pointer load from a near global fails identically on the baseline); it is loud, not silent. Making far-pointer values in memory legal without +mos-a16 is a separate design decision.",
@@ -89,6 +90,22 @@
   {
    "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/candidate-plain-w65816.log",
    "sha256": "efe8d11a6b3fe96c29589dbdfe1f0d01f9a0570511a0af1a0f0b6af0a0a698a3"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "sha256": "33bd49691e5eec36ea5420f3284539bb160cc9df5413d211c64159d1c405b5b8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b1-unrepaired-320-02.log",
+   "sha256": "4f0abb1a6595fcb149953ecc3ffe83a44675813172dad0f92da54a3c8d89cb5d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b1-carried-320-02.log",
+   "sha256": "f21317eda1fb814df1ac1edaa9142af9369c51c9cff1be39ea140d9fa0a26634"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b1-carried-fw-14.log",
+   "sha256": "64a438b8ff973a842cea607531ba1411f7bf489c748457fe36a095eb2f03c446"
   }
  ],
  "resolution": {
@@ -128,5 +145,88 @@
    "exit_code": 0
   },
   "validation": "Full MOS CodeGen/MC lit suites on the candidate llc: 190 passed, 3 unsupported, 0 failed; the same suites with the baseline llc bind-mounted over build/llvm-mos/bin/llc fail exactly the four new tests (186 passed, 3 unsupported, 4 failed). Codegen of the same frontend IR for 277 SNES corpus and demo sources in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16 at -Os (831 source/mode pairs) is byte-identical between baseline and candidate llc wherever both compile; the 15 pairs that fail fail identically on both, and 12 pairs are frontend skips. +mos-a16,+mos-xy16 on abi4.ll also exits 0 (candidate-xy16.log)."
- }
+ },
+ "additional_runs": [
+  {
+   "label": "Split #320-2 before the carry (df00169bd7b1): same input and configuration as the baseline",
+   "command": "build/split-320-321/llc/p-320-02 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "the fourth far pointer is passed on the soft stack"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-320-02 (unrepaired #320-2 (previous split, pressure-set series), commit df00169bd7b1); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "053193836fc67412772a1511a15f21ab2190050e5f84f1a1c61fcb9d62de778c",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll",
+    "sha256": "c7764c04c7f17421acfed72e036e74382f2b3dceda4157caf43802f66a27a326"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b1-unrepaired-320-02.log",
+    "sha256": "4f0abb1a6595fcb149953ecc3ffe83a44675813172dad0f92da54a3c8d89cb5d"
+   },
+   "exit_code": 134,
+   "observed": "fails, as on the baseline"
+  },
+  {
+   "label": "Split #320-2 with the carried repair (3576ad627b5b): same input and configuration",
+   "command": "build/split-320-321/llc/c-320-02 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "the fourth far pointer is passed on the soft stack"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-320-02 (carried #320-2, commit 3576ad627b5b); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "58540bdeab7b6ef59ff4180b8008873864cb3cb8af1c0adf95b35c71f9010095",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll",
+    "sha256": "c7764c04c7f17421acfed72e036e74382f2b3dceda4157caf43802f66a27a326"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b1-carried-320-02.log",
+    "sha256": "f21317eda1fb814df1ac1edaa9142af9369c51c9cff1be39ea140d9fa0a26634"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Far-word packet candidate on the carried split (a5515aab9219): same input and configuration",
+   "command": "build/split-320-321/llc/c-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "the fourth far pointer is passed on the soft stack"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-fw-14 (carried far-word candidate (patch 14), commit a5515aab9219); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll",
+    "sha256": "c7764c04c7f17421acfed72e036e74382f2b3dceda4157caf43802f66a27a326"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b1-carried-fw-14.log",
+    "sha256": "64a438b8ff973a842cea607531ba1411f7bf489c748457fe36a095eb2f03c446"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  }
+ ]
 }

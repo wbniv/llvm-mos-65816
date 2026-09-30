@@ -84,12 +84,12 @@
           "docs/defects/mos-bank-relax-section-offset.json": "12bd09bd688b5d1453eb10947d4481ba4900482e46133d6f7cca1677cd250353",
           "docs/defects/mos-carry-scheduling-pressure.json": "e0b1ed7f5314f020ea1fc7f1b45f4aad005281fb4c75d8554999197324c594d1",
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
-          "docs/defects/mos-far-access-non-65816.json": "ee8164cc13689bb4cb5d0c18a430b100b4e24501e05b6aca0486035dc0e7503d",
+          "docs/defects/mos-far-access-non-65816.json": "552b6483adfedf17890efc86ef069432227360cc96ee1188e8abda15206d0b3f",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "07f335500f42673c0eca96ed83e4fd40db8e5cd500971efcb72fbf6bc74a2087",
-          "docs/defects/mos-far-index-fold-dangling-dbg.json": "1b2bc7e2d5ccfbaf1b806362efe8e617bba69d58300aa0475a02a34678c2aa4e",
-          "docs/defects/mos-far-memop-length-truncation.json": "53fd88560e0b1188419418fc9a4552d88216c5dac7a174afd624bf30a26adfc8",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "58d2bf2bb3a3a00746dc74c2d4d9a11741bb390278dcc0b7eeec837b76ffe6eb",
+          "docs/defects/mos-far-memop-length-truncation.json": "91f4fe1cc38b07aae2f03652fd45de84fd39bd23a2a90a80fd902c2949ade72d",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
-          "docs/defects/mos-far-pointer-arg-exhaustion.json": "82506cfea9e2d073ec3ae80b1d0347d7b8b8d07e502949a8c6241f30020ffecb",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "bc62029675d6c745522a7f2dd823787379dd57877591b659d93f2dfb83695669",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
@@ -113,7 +113,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "259e006ee60cfd8eba2694d0236448cb8af0c876b3039e24f630e42b2ef2d933"
+          "docs/upstream-dashboard.json": "5fff19f9ddc54235d77d15576d9ef006884206691fb7e4849c4c80fdebdbfb42"
         }
       }
     },
@@ -136,11 +136,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "fe7c1942314a963973fa3576ce4695d1e71292836a01de04d9ac234efb82a5f9",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "259e006ee60cfd8eba2694d0236448cb8af0c876b3039e24f630e42b2ef2d933",
+          "docs/upstream-dashboard.json": "5fff19f9ddc54235d77d15576d9ef006884206691fb7e4849c4c80fdebdbfb42",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "13fe8b92ea8aa1da15b0322eaeeab2fda985951d0a5d7b71552afb686c2bd7c7"
+          "docs/upstream-dashboard-graph.json": "c7467a6cab60512068ef0148759a2a33b255c2fb135b9ec939dd933a78c7ae0e"
         }
       }
     },

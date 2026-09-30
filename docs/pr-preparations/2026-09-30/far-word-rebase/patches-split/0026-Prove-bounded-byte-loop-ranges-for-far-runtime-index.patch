@@ -1,4 +1,4 @@
-From a51a7d24d80f307cc0fd94f9cf7359b0a6920ac3 Mon Sep 17 00:00:00 2001
+From 43ed032311fde6a97a4ff3162f2f5d371d317a02 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:47:56 +0700
 Subject: [PATCH 26/32] Prove bounded byte-loop ranges for far runtime indexing
@@ -17,10 +17,10 @@ model gpt-6-astra, xhigh reasoning effort; verified session
  create mode 100644 llvm/test/CodeGen/MOS/far-loop-range.mir
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 9ed63b30c919..7a0de406eff0 100644
+index 62bc44467687..e5078caca96e 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -53,6 +53,7 @@
+@@ -54,6 +54,7 @@
  #include "llvm/IR/Instructions.h"
  #include "llvm/IR/Intrinsics.h"
  #include "llvm/IR/RuntimeLibcalls.h"
@@ -28,7 +28,7 @@ index 9ed63b30c919..7a0de406eff0 100644
  #include "llvm/Support/ErrorHandling.h"
  #include "llvm/Support/MathExtras.h"
  
-@@ -2837,6 +2838,111 @@ static bool noCallBetween(const MachineInstr &VDef, const MachineInstr &U,
+@@ -2889,6 +2890,111 @@ static bool noCallBetween(const MachineInstr &VDef, const MachineInstr &U,
           Clean(UB->begin(), U.getIterator());
  }
  
@@ -140,7 +140,7 @@ index 9ed63b30c919..7a0de406eff0 100644
  // The pointer add disappears only when every use is a non-atomic access, or
  // a constant non-negative displacement leading exclusively to such accesses.
  // MaxEnd includes each access's final byte. Escapes and selected fallbacks keep
-@@ -2886,7 +2992,7 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
+@@ -2941,7 +3047,7 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
    return true;
  }
  
@@ -149,7 +149,7 @@ index 9ed63b30c919..7a0de406eff0 100644
  // accessed byte fits Y (8 bits, or 16 bits under +mos-xy16). Use the computed
  // offset value directly, preserving narrow integer wrapping and bank carries.
  // All uses must fold so the 32-bit pointer add disappears. Absolute bases are
-@@ -2923,10 +3029,11 @@ static bool tryFarRuntimeIndexFold(
+@@ -2978,10 +3084,11 @@ tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
  
    // (b) range proof on the offset itself, before the (costlier) user walk.
    const uint64_t Limit = STI.hasIndex16() ? 0xFFFF : 0xFF;

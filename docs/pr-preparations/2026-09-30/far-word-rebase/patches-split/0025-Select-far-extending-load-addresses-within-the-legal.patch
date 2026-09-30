@@ -1,4 +1,4 @@
-From d94c72189061bec48ac1886a4bb6414d5fbeaf04 Mon Sep 17 00:00:00 2001
+From df21c7989ccc0f6fbccf0fa24681d003f4366ce7 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:47:30 +0700
 Subject: [PATCH 25/32] Select far extending-load addresses within the
@@ -18,10 +18,10 @@ model gpt-6-astra, xhigh reasoning effort; verified session
  create mode 100644 llvm/test/CodeGen/MOS/far-absolute-extload.mir
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 6c2a83bd7595..9ed63b30c919 100644
+index 824073bf85bd..62bc44467687 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -2652,11 +2652,14 @@ bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
+@@ -2686,11 +2686,14 @@ bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
    if (!Operand.has_value())
      return false;
  

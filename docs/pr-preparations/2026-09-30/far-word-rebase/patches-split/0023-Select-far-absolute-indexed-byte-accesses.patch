@@ -1,4 +1,4 @@
-From 8a455c77d88ce8300290c787b80f23fb0b29fc68 Mon Sep 17 00:00:00 2001
+From 0615a683bee7f63ed21d72d6499c77cd680007a2 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:46:28 +0700
 Subject: [PATCH 23/32] Select far absolute indexed byte accesses
@@ -61,7 +61,7 @@ index 180549c6d065..b2dfd7e3fb08 100644
  // via 65816 indirect-long (`lda [dp]`/`sta [dp]`). The address operand is the
  // far pointer itself (a 32-bit value that lands in a contiguous Imag32 ZP quad);
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index a7f0b3b74097..aac6f2f59ba7 100644
+index d3d66c3e3c9d..e1ca923cb44f 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -654,6 +654,32 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
@@ -98,7 +98,7 @@ index a7f0b3b74097..aac6f2f59ba7 100644
    let Predicates = [HasW65816];
    dag OutOperandList = (outs Ac:$dst);
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index d5c76cf2687b..016e66ec9aa3 100644
+index 497959704b77..a50bbbcc1422 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -365,6 +365,10 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
@@ -111,8 +111,8 @@ index d5c76cf2687b..016e66ec9aa3 100644
 +  case MOS::G_STORE_FAR_ABS_IDX16:
    case MOS::G_LOAD_FAR_INDIR:
    case MOS::G_STORE_FAR_INDIR:
-   // #321 Phase 2 inc 1: the indexed indirect-long forms (`lda [dp],y` /
-@@ -3328,6 +3332,12 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+   // The indexed indirect-long forms (`lda [dp],y` / `sta [dp],y`) take the
+@@ -3329,6 +3333,12 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    case MOS::G_LOAD_FAR_ABS: // 65816 far load -> LDA AbsoluteLong.
      Opcode = MOS::LDAbsLong;
      break;
@@ -125,7 +125,7 @@ index d5c76cf2687b..016e66ec9aa3 100644
    case MOS::G_LOAD_FAR_INDIR: // runtime far load -> LDA [dp].
      Opcode = MOS::LDIndirLong;
      break;
-@@ -3355,6 +3365,12 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+@@ -3356,6 +3366,12 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    case MOS::G_STORE_FAR_ABS: // 65816 far store -> STA AbsoluteLong.
      Opcode = MOS::STAbsLong;
      break;
@@ -139,10 +139,10 @@ index d5c76cf2687b..016e66ec9aa3 100644
      Opcode = MOS::STIndirLong;
      break;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 8d664c29c5c2..ceaaee7f39be 100644
+index 3f8f7366c04b..009202278c7e 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -2305,6 +2305,13 @@ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
+@@ -2339,6 +2339,13 @@ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
    MI.setDesc(Builder.getTII().get(MOS::G_LOAD));
    MI.getOperand(0).setReg(Tmp);
    Helper.Observer.changedInstr(MI);
@@ -156,16 +156,16 @@ index 8d664c29c5c2..ceaaee7f39be 100644
    return true;
  }
  
-@@ -2525,6 +2532,8 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
+@@ -2559,6 +2566,8 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
      // long (`lda [dp]`) through a ZP Imag32 quad.
      if (tryFarAbsoluteAddressing(Helper, MRI, MI))
        return true;
 +    if (tryFarAbsoluteIndexedAddressing(Helper, MRI, MI))
 +      return true;
-     // #321 Phase 2 inc 1: a small constant displacement off that runtime
+     // A constant displacement or a range-proven runtime offset from that
      // pointer folds into `lda [dp],y`/`sta [dp],y` instead of a 32-bit add.
      if (tryFarIndirectIndexedAddressing(Helper, MRI, MI))
-@@ -2618,6 +2627,100 @@ bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
+@@ -2652,6 +2661,100 @@ bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
    return true;
  }
  
@@ -267,7 +267,7 @@ index 8d664c29c5c2..ceaaee7f39be 100644
  // pointer — one not matchable as a constant/global, so absolute-long can't be
  // used. Replaces the generic G_LOAD/G_STORE with G_LOAD_FAR_INDIR/
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-index b0ec80a6321a..7e01eaa70ac3 100644
+index c016da02dcdb..a7053a182da4 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 @@ -107,6 +107,9 @@ private:

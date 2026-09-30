@@ -1,0 +1,4 @@
+$ set -euo pipefail; o=build/split-320-321/carry-records/rt-6502.o; e=build/split-320-321/carry-records/rt-6502.err; rm -f "$o"; if build/split-320-321/llc/p-320-02 -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-30-far-access-non-65816/rt.ll -o "$o" 2>"$e"; then echo "FAIL: mos6502 far byte load compiled without a diagnostic"; exit 1; fi; cat "$e"; [ ! -e "$o" ] || { echo "FAIL: an object was emitted"; exit 1; }; grep -q "far (address space 2) memory access requires 65816 long addressing" "$e" && echo "PASS: diagnosed; no object emitted"
+# llc sha256 053193836fc67412772a1511a15f21ab2190050e5f84f1a1c61fcb9d62de778c
+FAIL: mos6502 far byte load compiled without a diagnostic
+exit_code=1

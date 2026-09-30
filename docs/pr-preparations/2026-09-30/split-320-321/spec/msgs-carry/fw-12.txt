@@ -1,0 +1,23 @@
+Fold bounded native far word loads in speed-optimized functions
+
+Admit plain two-byte far loads to the all-users indexed-address walk.
+Require the final byte of every sibling to fit Y8; reject atomic,
+escaping, call-separated, and unsupported uses. Reuse the original
+bounded offset expression and existing M16/Y8 pseudo.
+
+Extend far-index-fold-debug.ll with a -g word fold: the fold drops
+the dead pointer's debug location through the same path as the byte
+fold.
+
+Default to speed at O2/O3, excluding optsize/minsize/optnone. Retain
+hidden off/all controls for experiments. The downstream evidence and
+its size tradeoffs are retained in the far-word-index preparation packet;
+they are not measurements of this rebased compiler.
+
+Implementation, extraction, and validation: OpenAI Codex CLI 0.157.1
+(session source vscode), model gpt-6-astra, xhigh reasoning effort;
+verified session 01a0e67f-298f-7a21-80af-06f867085f84.
+
+Word-fold debug-location test added while carrying the far-prerequisite
+repairs: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5
+(claude-opus-5-5), high reasoning effort.

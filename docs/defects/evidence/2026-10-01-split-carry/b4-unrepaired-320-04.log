@@ -1,0 +1,76 @@
+$ build/split-320-321/llc/p-320-04 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null
+# llc sha256 5b7d45e7da478195c8e597867b0b0a8ae53126227e3265787ac6fe199549825f
+
+# After Detect Dead Lanes
+# Machine code for function walk: IsSSA, TracksLiveness, Legalized, RegBankSelected, Selected
+
+bb.1.entry:
+  successors: %bb.2(0x80000000); %bb.2(100.00%)
+  liveins: $a, $rl1
+  %0:imag32 = COPY $rl1
+  DBG_VALUE %0:imag32, $noreg, !"base", !DIExpression(), debug-location !10; dbg.c:2 line no:1
+  %14:anyi8 = LDZ
+  %39:cc = LDImm1 0
+
+bb.2.loop:
+; predecessors: %bb.1, %bb.2
+  successors: %bb.3(0x04000000), %bb.2(0x7c000000); %bb.3(3.12%), %bb.2(96.88%)
+
+  %2:yc = PHI %14:anyi8, %bb.1, %10:gpr, %bb.2
+  %32:anyi8 = PHI %14:anyi8, %bb.1, %30:anyi8, %bb.2
+  %33:anyi8 = PHI %14:anyi8, %bb.1, %31:anyi8, %bb.2
+  %3:imag16 = REG_SEQUENCE %32:anyi8, %subreg.sublo, %33:anyi8, %subreg.subhi
+  DBG_VALUE undef %5:any, $noreg, !"p", !DIExpression(), debug-location !10; dbg.c:2 line no:2
+  %26:ac = LDIndirLongIdx %0:imag32, %2:yc, debug-location !10 :: (load (s8) from %ir.p, addrspace 2); dbg.c:2
+  %7:imag16 = REG_SEQUENCE %26:ac, %subreg.sublo, %14:anyi8, %subreg.subhi, debug-location !10; dbg.c:2
+  %38:ac16 = LDAImag16 %3:imag16, debug-location !10; dbg.c:2
+  %40:ac16, dead %41:cc, dead %42:vc = ADCImag16 %38:ac16(tied-def 0), %7:imag16, %39:cc, debug-location !10; dbg.c:2
+  %8:imag16 = STAImag16 %40:ac16, debug-location !10; dbg.c:2
+  %43:anyi8 = COPY %2:yc
+  %44:anyi8 = INC %43:anyi8(tied-def 0)
+  %10:gpr = COPY %44:anyi8
+  %30:anyi8 = COPY %8.sublo:imag16
+  %31:anyi8 = COPY %8.subhi:imag16
+  CmpBrImm %bb.2, undef $z, 0, %10:gpr, 100, implicit-def $c
+  BRA %bb.3
+
+bb.3.exit:
+; predecessors: %bb.2
+
+  %37:ac16 = LDAImag16 %8:imag16, debug-location !10; dbg.c:2
+  STAbs16 %37:ac16, @sink, debug-location !10 :: (volatile store (s16) into @sink, align 1); dbg.c:2
+  RTS debug-location !10; dbg.c:2
+
+# End machine code for function walk.
+
+*** Bad machine code: Generic virtual register use cannot be undef ***
+- function:    walk
+- basic block: %bb.2 loop (0x593b93ff6558)
+- instruction: DBG_VALUE undef %5:any, $noreg, !"p", !DIExpression(), debug-location !10; dbg.c:2 line no:2
+- operand 0:   undef %5:any
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/p-320-04 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll'.
+2.	Running pass 'Verify generated machine code' on function '@walk'
+ #0 0x0000593b5ec85dab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/p-320-04+0x454edab)
+ #1 0x0000593b5ec82c31 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/p-320-04+0x454bc31)
+ #2 0x0000593b5ec86bbb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007eecf7aa6cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007eecf7b071ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007eecf7aa6b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007eecf7a898ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x0000593b5ebe1115 llvm::report_fatal_error(llvm::Twine const&, bool) (build/split-320-321/llc/p-320-04+0x44aa115)
+ #8 0x0000593b5da3bdb2 (anonymous namespace)::MachineVerifier::~MachineVerifier() MachineVerifier.cpp:0:0
+ #9 0x0000593b5da3d3ca (anonymous namespace)::MachineVerifierLegacyPass::runOnMachineFunction(llvm::MachineFunction&) MachineVerifier.cpp:0:0
+#10 0x0000593b5d920899 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/p-320-04+0x31e9899)
+#11 0x0000593b5deb2bd0 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/p-320-04+0x377bbd0)
+#12 0x0000593b5debacd2 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/p-320-04+0x3783cd2)
+#13 0x0000593b5deb3994 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/p-320-04+0x377c994)
+#14 0x0000593b5c86a2cb compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#15 0x0000593b5c867593 main (build/split-320-321/llc/p-320-04+0x2130593)
+#16 0x00007eecf7a8b601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#17 0x00007eecf7a8b718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#18 0x0000593b5c8667a5 _start (build/split-320-321/llc/p-320-04+0x212f7a5)
+exit_code=134

@@ -1,4 +1,4 @@
-From a3d4256328f1b8e2d55af7de162d2485c9fc0bfe Mon Sep 17 00:00:00 2001
+From a5515aab9219a137d5d516b58bf00a7a9aa037de Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:17:45 +0700
 Subject: [PATCH 32/32] Assert shared base and index for mixed far loads

@@ -9,7 +9,8 @@
  "attribution": [
   "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
   "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
-  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+  "Split-series carry (additional runs): Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); dispatched from session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
  ],
  "unknowns": [
   "The baseline log also flags len64k as deleted; that half of the baseline runner describes undefined behaviour (see summary) and is not part of the repaired defect."
@@ -75,6 +76,22 @@
   {
    "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/candidate-identity.json",
    "sha256": "ea628cd0c19a6c737e409303a068c860f627a992284fdce894f87d19f26b674c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "sha256": "33bd49691e5eec36ea5420f3284539bb160cc9df5413d211c64159d1c405b5b8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b2-unrepaired-320-03.log",
+   "sha256": "09958eacc55a87e59ae674fafdf1093a0dc00fb7762991d1da4fa42ecd701e16"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b2-carried-320-03.log",
+   "sha256": "7f21e8f921d076f1c3e13a198c2810da579e0fd6f6c0322825905ec248b3fd13"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b2-carried-fw-14.log",
+   "sha256": "42dfb8664bd4f51418b688b604b2432b624e028d305b82489c8f6fb28f436de5"
   }
  ],
  "resolution": {
@@ -115,5 +132,88 @@
    "exit_code": 0
   },
   "validation": "Full MOS CodeGen/MC lit suites on the candidate llc: 190 passed, 3 unsupported, 0 failed; the same suites with the baseline llc bind-mounted over build/llvm-mos/bin/llc fail exactly the four new tests (186 passed, 3 unsupported, 4 failed). Codegen of the same frontend IR for 277 SNES corpus and demo sources in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16 at -Os (831 source/mode pairs) is byte-identical between baseline and candidate llc wherever both compile; the 15 pairs that fail fail identically on both, and 12 pairs are frontend skips. dev/run.sh far_memops32: 4 of 4 ROMs read 0xFFFF on MAME and on bsnes-jg. dev/run.sh far_memops, dev/run.sh xcheck and dev/check-far-memset.py (a16/xy16 x Os/O2) still pass."
- }
+ },
+ "additional_runs": [
+  {
+   "label": "Split #320-3 before the carry (36f196cbf112), with the resolution runner (the oracle for the repaired contract)",
+   "command": "set -euo pipefail; out=$(build/split-320-321/llc/p-320-03 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll -o - | grep -v -E \"^[[:space:]]*[.;]\"); printf \"%s\\n\" \"$out\"; bad=0; if ! printf \"%s\\n\" \"$out\" | grep -A8 \"^big_const:\" | grep -q -E \"(jmp|jsr)[[:space:]]+__memset_far32$\"; then echo \"FAIL: 70000-byte far memset does not call __memset_far32\"; bad=1; fi; if ! printf \"%s\\n\" \"$out\" | grep -A2 \"^big_var:\" | grep -q -E \"(jmp|jsr)[[:space:]]+__memcpy_far32$\"; then echo \"FAIL: unbounded i32 far memcpy does not call __memcpy_far32\"; bad=1; fi; [ $bad = 0 ] && echo \"PASS: lengths above 0xFFFF reach the 32-bit-length far runtime\"; exit $bad",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "lengths above 0xFFFF are rejected, split or passed to a 32-bit-length entry"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-320-03 (unrepaired #320-3, commit 36f196cbf112); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "9176eb386b7a66274b55ef51de469791474654ad7f5f33c0ed1e9f03fd94b896",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll",
+    "sha256": "c5c669c56d04a420914dc88d55c52ce0d42d5ed62e99039e49f08652c277269f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b2-unrepaired-320-03.log",
+    "sha256": "09958eacc55a87e59ae674fafdf1093a0dc00fb7762991d1da4fa42ecd701e16"
+   },
+   "exit_code": 1,
+   "observed": "fails, as on the baseline"
+  },
+  {
+   "label": "Split #320-3 with the carried repair (eab4edb9dc32), resolution runner",
+   "command": "set -euo pipefail; out=$(build/split-320-321/llc/c-320-03 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll -o - | grep -v -E \"^[[:space:]]*[.;]\"); printf \"%s\\n\" \"$out\"; bad=0; if ! printf \"%s\\n\" \"$out\" | grep -A8 \"^big_const:\" | grep -q -E \"(jmp|jsr)[[:space:]]+__memset_far32$\"; then echo \"FAIL: 70000-byte far memset does not call __memset_far32\"; bad=1; fi; if ! printf \"%s\\n\" \"$out\" | grep -A2 \"^big_var:\" | grep -q -E \"(jmp|jsr)[[:space:]]+__memcpy_far32$\"; then echo \"FAIL: unbounded i32 far memcpy does not call __memcpy_far32\"; bad=1; fi; [ $bad = 0 ] && echo \"PASS: lengths above 0xFFFF reach the 32-bit-length far runtime\"; exit $bad",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "lengths above 0xFFFF are rejected, split or passed to a 32-bit-length entry"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-320-03 (carried #320-3, commit eab4edb9dc32); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "f4ee31914e40af9fb223d6ab150f73987a8b78e67ab72b29472a3036554b0537",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll",
+    "sha256": "c5c669c56d04a420914dc88d55c52ce0d42d5ed62e99039e49f08652c277269f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b2-carried-320-03.log",
+    "sha256": "7f21e8f921d076f1c3e13a198c2810da579e0fd6f6c0322825905ec248b3fd13"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Far-word packet candidate on the carried split (a5515aab9219), resolution runner",
+   "command": "set -euo pipefail; out=$(build/split-320-321/llc/c-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll -o - | grep -v -E \"^[[:space:]]*[.;]\"); printf \"%s\\n\" \"$out\"; bad=0; if ! printf \"%s\\n\" \"$out\" | grep -A8 \"^big_const:\" | grep -q -E \"(jmp|jsr)[[:space:]]+__memset_far32$\"; then echo \"FAIL: 70000-byte far memset does not call __memset_far32\"; bad=1; fi; if ! printf \"%s\\n\" \"$out\" | grep -A2 \"^big_var:\" | grep -q -E \"(jmp|jsr)[[:space:]]+__memcpy_far32$\"; then echo \"FAIL: unbounded i32 far memcpy does not call __memcpy_far32\"; bad=1; fi; [ $bad = 0 ] && echo \"PASS: lengths above 0xFFFF reach the 32-bit-length far runtime\"; exit $bad",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "lengths above 0xFFFF are rejected, split or passed to a 32-bit-length entry"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-fw-14 (carried far-word candidate (patch 14), commit a5515aab9219); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll",
+    "sha256": "c5c669c56d04a420914dc88d55c52ce0d42d5ed62e99039e49f08652c277269f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b2-carried-fw-14.log",
+    "sha256": "42dfb8664bd4f51418b688b604b2432b624e028d305b82489c8f6fb28f436de5"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  }
+ ]
 }

@@ -9,7 +9,8 @@
  "attribution": [
   "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
   "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
-  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+  "Repair, regressions, runtime entries and closure: Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition); dispatched from session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+  "Split-series carry (additional runs): Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); dispatched from session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
  ],
  "unknowns": [
   "The location is dropped, not salvaged; a DBG_VALUE_LIST over base and offset would keep it and is out of scope."
@@ -88,6 +89,30 @@
   {
    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/candidate-dbg-values.log",
    "sha256": "6293e656791a8dc49f487b583bbcccff10654f1701eb46950b0016e337e37007"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "sha256": "33bd49691e5eec36ea5420f3284539bb160cc9df5413d211c64159d1c405b5b8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b4-unrepaired-320-04.log",
+   "sha256": "d4d6be5165a863d5dc687ac058d59317d81e7768fe2b31ea4a3940387b950a77"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b4-carried-320-04.log",
+   "sha256": "90d3a6d6d171d34ddbad809929b4fbf980cdfa6109e42ca1456b450d25159b81"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b4-carried-fw-14.log",
+   "sha256": "9fbf6b6755909508f735e25d237a9c1a9d26873facaefd4ac02aaff4ac0878b7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b4-word-unrepaired-fw-old.log",
+   "sha256": "d4fbdb1881052af7c22ed9936dcf4b0e971100b85b46167bebaf7b21c7f1915a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b4-word-carried-fw-14.log",
+   "sha256": "febd8c8adbbd514321cda64d05758c7b62f88fd0ce8e7b601479d25a53880c5d"
   }
  ],
  "resolution": {
@@ -127,5 +152,142 @@
    "exit_code": 0
   },
   "validation": "Full MOS CodeGen/MC lit suites on the candidate llc: 190 passed, 3 unsupported, 0 failed; the same suites with the baseline llc bind-mounted over build/llvm-mos/bin/llc fail exactly the four new tests (186 passed, 3 unsupported, 4 failed). Codegen of the same frontend IR for 277 SNES corpus and demo sources in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16 at -Os (831 source/mode pairs) is byte-identical between baseline and candidate llc wherever both compile; the 15 pairs that fail fail identically on both, and 12 pairs are frontend skips."
- }
+ },
+ "additional_runs": [
+  {
+   "label": "Split #320-4 before the carry (1a616f08ea67): byte fold, same input and configuration as the baseline",
+   "command": "build/split-320-321/llc/p-320-04 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, location dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-320-04 (unrepaired #320-4, commit 1a616f08ea67); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "5b7d45e7da478195c8e597867b0b0a8ae53126227e3265787ac6fe199549825f",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll",
+    "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b4-unrepaired-320-04.log",
+    "sha256": "d4d6be5165a863d5dc687ac058d59317d81e7768fe2b31ea4a3940387b950a77"
+   },
+   "exit_code": 134,
+   "observed": "fails, as on the baseline"
+  },
+  {
+   "label": "Split #320-4 with the carried repair (59d98c37ab77): byte fold",
+   "command": "build/split-320-321/llc/c-320-04 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, location dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-320-04 (carried #320-4, commit 59d98c37ab77); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "bbc982dd14d476d37e192518830ec67cf80b02c14da6e94527a5af97dcb2912e",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll",
+    "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b4-carried-320-04.log",
+    "sha256": "90d3a6d6d171d34ddbad809929b4fbf980cdfa6109e42ca1456b450d25159b81"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Far-word packet candidate on the carried split (a5515aab9219): byte fold",
+   "command": "build/split-320-321/llc/c-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, location dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-fw-14 (carried far-word candidate (patch 14), commit a5515aab9219); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll",
+    "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b4-carried-fw-14.log",
+    "sha256": "9fbf6b6755909508f735e25d237a9c1a9d26873facaefd4ac02aaff4ac0878b7"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Word fold (dbg.ll) on the unrepaired monolithic-prerequisite far-word candidate d7fde754",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata; word fold (dbg.ll)",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, location dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/far-word-rebase/candidate/llc (unrepaired monolithic-prerequisite far-word candidate (patches 1-14 on 06bc967d2668), commit 77dc044c39bb); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll",
+    "sha256": "4cb6dd64863871aad13b2b6480eae7cb2b5b34353917e6e76038247b6874d445"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b4-word-unrepaired-fw-old.log",
+    "sha256": "d4fbdb1881052af7c22ed9936dcf4b0e971100b85b46167bebaf7b21c7f1915a"
+   },
+   "exit_code": 134,
+   "observed": "fails, as on the baseline"
+  },
+  {
+   "label": "Word fold (dbg.ll) on the far-word packet candidate over the carried split (a5515aab9219)",
+   "command": "build/split-320-321/llc/c-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-word-rebase mounted at /work/build/...)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata; word fold (dbg.ll)",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, location dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-fw-14 (carried far-word candidate (patch 14), commit a5515aab9219); identity in docs/defects/evidence/2026-10-01-split-carry/identity.json",
+   "toolchain_sha256": "cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll",
+    "sha256": "4cb6dd64863871aad13b2b6480eae7cb2b5b34353917e6e76038247b6874d445"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b4-word-carried-fw-14.log",
+    "sha256": "febd8c8adbbd514321cda64d05758c7b62f88fd0ce8e7b601479d25a53880c5d"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  }
+ ]
 }

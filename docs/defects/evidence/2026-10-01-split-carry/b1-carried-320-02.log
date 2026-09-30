@@ -1,0 +1,3 @@
+$ build/split-320-321/llc/c-320-02 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null
+# llc sha256 58540bdeab7b6ef59ff4180b8008873864cb3cb8af1c0adf95b35c71f9010095
+exit_code=0

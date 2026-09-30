@@ -1,4 +1,4 @@
-From cb81481c40a3aa58fb982fc3141562b347a4c3c2 Mon Sep 17 00:00:00 2001
+From cf2e7a5df7fb628520fd2e8c59f71466cc22e9f3 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:12:12 +0700
 Subject: [PATCH 28/32] Preserve all four bytes when spilling far-pointer quads
@@ -95,10 +95,10 @@ index c8352d789198..4aee86104e0a 100644
           MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Ac16RegClass))) {
        // Spill the accumulator with a word load/store. Byte GPR copies cannot
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 9f68b8a7dc99..d3cc15e8a58f 100644
+index 6027d18896b7..3499df6ad100 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -886,6 +886,38 @@ void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
+@@ -887,6 +887,38 @@ void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
      return;
    }
  

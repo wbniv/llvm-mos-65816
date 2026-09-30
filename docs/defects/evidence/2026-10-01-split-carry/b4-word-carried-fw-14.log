@@ -1,0 +1,3 @@
+$ build/split-320-321/llc/c-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll -o /dev/null
+# llc sha256 cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7
+exit_code=0

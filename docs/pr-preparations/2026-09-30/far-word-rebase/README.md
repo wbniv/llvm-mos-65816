@@ -4,16 +4,29 @@ Prepared September 30, 2026. This packet rebases the [September 28 extracted ser
 
 ## Split series (current)
 
-The #321 and #320 prerequisites are no longer submitted as one patch each (patches 1 and 4 below). They are now the [split series](../split-320-321/README.md): #321 in 16 commits, the two unchanged MC commits, and #320 in 4 commits, followed by this packet's patches 5–14 applied unchanged with `git am -3`. [`patches-split/`](patches-split/) holds all 32 patches in that order. The #321 commits come before the MC commits, as patch 1 did before patches 2–3; the split evidence was built in that order. On 2026‑09‑30 the split was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application) (#321‑1 and #321‑8), and this section records the rerun on the regenerated commits.
+Status (2026‑10‑01): **ready for a second independent review, not for filing.** The far-prerequisite repairs B1–B4, the missing B6 trunc pattern and the #320 parts of N3/N4 are now in the #320 commits of the [split series](../split-320-321/README.md#far-prerequisite-carry-2026-10-01), each in the commit whose code it corrects ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md)). Two blockers remain open and are escalated: the #594 alignment of #320‑1 (B7) and the far-quad DWARF numbering (B5).
+
+The series is #321 in 16 commits, the two unchanged MC commits, #320 in 4 commits, then this packet's patches 5–14. [`patches-split/`](patches-split/) holds all 32 patches in that order. Patches 5–14 were cherry-picked onto the carried #320‑4. Patches 5 and 12 met context changed by the carried #320 comments and formatting and were resolved by hand. Patch 12 no longer reformats #320‑4 lines (the review's N3 request), so it now carries only its semantic change. Patch 12 also extends `far-index-fold-debug.ll` with the word fold, because the 0070 word fold reuses #320‑4's repaired fold path.
 
 | Check | Result |
 | --- | --- |
-| Patches 5–14 on the split | Applied with `git am -3`, no conflicts |
-| Final tree | `c8fb49d93087`: the previous candidate `77dc044c39bb` plus the pressure-set change (`MOSRegisterInfo.{cpp,h,td}`, `MOSSubtarget.cpp`) and the 13 test files the split adds under `llvm/test/`; no other path differs |
-| Round trip | Each of the 32 patches applied in order to `06bc967d2668` reproduces its commit's tree ([record](evidence/split-series.json)) |
-| MOS CodeGen + MC | 174 passed, 1 unsupported (163 before, less the 2 X86 tests counted there, plus the 13 added tests) |
-| X86 0028 regressions | Both passed on the first split; not rerun, because the pressure-set change touches only MOS files |
-| `llc` | sha256 `fd38e1c16b78…`; it differs from the previous candidate's `d7fde754bb02…` by the pressure-set change. The packet's replay and runtime measurements were taken before that change and have not been repeated |
+| Round trip | Each of the 32 patches applied in order to `06bc967d2668` reproduces its commit's tree; final tree `f3aba3593673` ([record](evidence/split-series.json)) |
+| Final tree vs the previous candidate `77dc044c39bb` | the pressure-set change, the carried repairs (11 library files) and 18 added test files; no other path |
+| MOS CodeGen + MC | candidate (patch 14): 179 passed, 1 unsupported; pre-0070 (patch 11): 175 passed, 1 unsupported; no MOS build warnings |
+| Pre-0070 `llc` on the candidate's tests | fails exactly `far-word-policy.mir`, `far-word-index-integration.ll`, `far-word-index-boundaries.mir` and the word-fold half of `far-index-fold-debug.ll` ([results](../split-320-321/evidence/carry/pre0070-tests.txt)) |
+| X86 0028 regressions | not rerun: patch 11 and the generic `VirtRegMap.cpp` are unchanged |
+| Replay objects | the 58 frozen post-LTO IR configurations give byte-identical objects with and without the carry; 34 of them differ from September 28 because of the pressure-set change ([comparison](evidence/split-carry-replay.json)) |
+| MAME and bsnes | all 58 configurations pass on both emulators, with repeat bsnes profiles equal ([results](evidence/split-carry-runtime-results.json)) |
+| `llc` | candidate `cce5eb24ccd61411…`, pre-0070 `3626b2ca18d2fd22…` (`build/split-320-321/llc/c-fw-14`, `c-fw-11`; assertions Release build of `build/split-320-321/build`) |
+
+0070 on the current series (default vs baseline `main`, the level gate unchanged):
+
+| Farblit `main` | Os | Oz | O2 | O3 |
+| --- | --- | --- | --- | --- |
+| A16 | identical | identical | +9 bytes, 7.25% faster | −21 bytes, 7.07% faster |
+| XY16 | identical | identical | +23 bytes, 9.70% faster | −19 bytes, 7.33% faster |
+
+The pressure-set change moved these from September 28's O2 results (A16 −111 bytes and 7.78% faster; XY16 −29 bytes and 7.81% faster). At O2 the policy now trades a few bytes for speed, which is the objective of that level. The `bounds` and `farblit_press` fixtures are unchanged by 0070, as before. The 0069 effect was not isolated: every replay configuration contains patch 8.
 
 Everything below this section describes the monolithic-prerequisite series and remains its dated record.
 
@@ -91,15 +104,15 @@ All but N6 apply to the patch text itself, so they belong to the split series be
 
 - **Split the prerequisites.** Rebuild the prerequisites as reviewable #321 and #320 commit series ([plan](../../../plans/2026-09-30-split-320-321-series.md)). The repairs below land in those commits, not as fixes on top of monolithic patches 1 and 4.
 - **Repair and re-review.**
-  - Repair B1–B4 downstream with same-input red/green regressions, and carry the repairs into the #320 series.
-  - Restore the omitted trunc pattern (B6).
-  - Decide the far-quad DWARF representation (B5).
-  - Apply N1–N5 and N7–N9.
-  - Rerun this packet's checks and the runtime replay, then have the series independently reviewed again.
+  - ~~Repair B1–B4 downstream with same-input red/green regressions, and carry the repairs into the #320 series.~~ Done: downstream in `664b877a`, split carry on 2026‑10‑01.
+  - ~~Restore the omitted trunc pattern (B6).~~ Done in #320‑2.
+  - Decide the far-quad DWARF representation (B5); escalated with B7.
+  - ~~Apply N3 and N4 to the #320 commits.~~ Done. N3/N4 in the #321 commits and far-word patches 5, 6 and 10, and N1, N2, N5 and N7–N9, remain.
+  - ~~Rerun this packet's checks and the runtime replay.~~ Done on the carried split. Then have the series independently reviewed again.
 - **Reconcile with #594 (B7).** Settle this with its author and the maintainers before filing a competing register definition.
 - **Settle the #320/#321 scope.** This rebased series does not certify either feature issue. Compiler overhead and independent-application profitability remain unmeasured.
 - **Before posting,** publish immutable evidence links and recheck the destination.
 
 ## Attribution
 
-Rebase, validation, reconciliation and packet preparation: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. The September 28 extraction, copy-cost repair and measurements: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The independent review names its own attribution. Downstream replay of the review findings and the four defect records: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
+Rebase, validation, reconciliation and packet preparation: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. The September 28 extraction, copy-cost repair and measurements: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The independent review names its own attribution. Carry of the far-prerequisite repairs into the split, the packet rebuild and the 2026‑10‑01 replay: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Downstream replay of the review findings and the four defect records: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.

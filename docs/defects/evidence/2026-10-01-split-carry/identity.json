@@ -1,0 +1,64 @@
+{
+ "purpose": "Replay of the B1-B4 records on the #320/#321 split series: the same inputs and runner commands on the unrepaired and carried split commits",
+ "source_repository": "/home/will/llvm-mos-65816/build/split-320-321/source (worktree of .scratch/carry-clang-upstream/source); llvm-mos destination 06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+ "build": "build/split-320-321/build: Release with assertions, built per commit in the dev container (ninja -j3 under build/.heavy-build.lock); each llc frozen as a hard link in build/split-320-321/llc/",
+ "container_image": "llvm-mos-65816-dev sha256:cb68cd10221aa87aeb399a3180af5aa781bcf0e3f749b580584fb7c497d48c23",
+ "runner": "build/split-320-321/spec/carry-record-replay.sh (copy: docs/pr-preparations/2026-09-30/split-320-321/spec/carry-record-replay.sh)",
+ "llc": {
+  "p-320-02": {
+   "description": "unrepaired #320-2 (previous split, pressure-set series)",
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-320-02",
+   "sha256": "053193836fc67412772a1511a15f21ab2190050e5f84f1a1c61fcb9d62de778c",
+   "commit": "df00169bd7b189b19ca9e271aaa3852fe2ef624b",
+   "tree": "4bea4d3abfa61485f48dda61cade5428cffea8d1"
+  },
+  "p-320-03": {
+   "description": "unrepaired #320-3",
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-320-03",
+   "sha256": "9176eb386b7a66274b55ef51de469791474654ad7f5f33c0ed1e9f03fd94b896",
+   "commit": "36f196cbf1126d35f260bdeccd1dc986d484b596",
+   "tree": "7f24829afc99727ff53644457d9b71b27d33287f"
+  },
+  "p-320-04": {
+   "description": "unrepaired #320-4",
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-320-04",
+   "sha256": "5b7d45e7da478195c8e597867b0b0a8ae53126227e3265787ac6fe199549825f",
+   "commit": "1a616f08ea6774b220fd43e635e4edd9ae4e285f",
+   "tree": "f361927e32015977cbc5dad304262b30fa220ebb"
+  },
+  "c-320-02": {
+   "description": "carried #320-2",
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-320-02",
+   "sha256": "58540bdeab7b6ef59ff4180b8008873864cb3cb8af1c0adf95b35c71f9010095",
+   "commit": "3576ad627b5ba51066c6520d2fe6164aa21073c5",
+   "tree": "881f4cc1c4a480579ca671fd6a4bff54a078b634"
+  },
+  "c-320-03": {
+   "description": "carried #320-3",
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-320-03",
+   "sha256": "f4ee31914e40af9fb223d6ab150f73987a8b78e67ab72b29472a3036554b0537",
+   "commit": "eab4edb9dc32ce0ce85fdd92a26c9bfe2e641816",
+   "tree": "08b702fa0a9ae3489cbf37ffb82c51182a8f1fd7"
+  },
+  "c-320-04": {
+   "description": "carried #320-4",
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-320-04",
+   "sha256": "bbc982dd14d476d37e192518830ec67cf80b02c14da6e94527a5af97dcb2912e",
+   "commit": "59d98c37ab77bb6939cb69d31a9136b193b0010e",
+   "tree": "c80a2ee108f3865c938d4ed3efc96c6dafa00e41"
+  },
+  "c-fw-14": {
+   "description": "carried far-word candidate (patch 14)",
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-fw-14",
+   "sha256": "cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7",
+   "commit": "a5515aab9219a137d5d516b58bf00a7a9aa037de",
+   "tree": "f3aba359367319e9e0651e97f4e7d0f3fff47765"
+  },
+  "fw-old-candidate": {
+   "description": "unrepaired monolithic-prerequisite far-word candidate (patches 1-14 on 06bc967d2668)",
+   "host_path": "/home/will/llvm-mos-65816/build/far-word-rebase/candidate/llc",
+   "sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "commit": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8"
+  }
+ }
+}

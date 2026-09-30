@@ -1,4 +1,4 @@
-From 68c78f6e9c7fc18dfb87cf8fe1d4ae57e5991846 Mon Sep 17 00:00:00 2001
+From 259def83f5ac925e0c9b3590a831454ba208bf5e Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:05:07 +0700
 Subject: [PATCH 30/32] Fold bounded native far word loads in speed-optimized
@@ -9,6 +9,10 @@ Require the final byte of every sibling to fit Y8; reject atomic,
 escaping, call-separated, and unsupported uses. Reuse the original
 bounded offset expression and existing M16/Y8 pseudo.
 
+Extend far-index-fold-debug.ll with a -g word fold: the fold drops
+the dead pointer's debug location through the same path as the byte
+fold.
+
 Default to speed at O2/O3, excluding optsize/minsize/optnone. Retain
 hidden off/all controls for experiments. The downstream evidence and
 its size tradeoffs are retained in the far-word-index preparation packet;
@@ -17,17 +21,22 @@ they are not measurements of this rebased compiler.
 Implementation, extraction, and validation: OpenAI Codex CLI 0.157.1
 (session source vscode), model gpt-6-astra, xhigh reasoning effort;
 verified session 01a0e67f-298f-7a21-80af-06f867085f84.
+
+Word-fold debug-location test added while carrying the far-prerequisite
+repairs: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5
+(claude-opus-5-5), high reasoning effort.
 ---
- llvm/lib/Target/MOS/MOSLegalizerInfo.cpp  | 110 +++--
- llvm/test/CodeGen/MOS/far-word-policy.mir | 530 ++++++++++++++++++++++
- 2 files changed, 603 insertions(+), 37 deletions(-)
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      |  69 ++-
+ llvm/test/CodeGen/MOS/far-index-fold-debug.ll |  54 +-
+ llvm/test/CodeGen/MOS/far-word-policy.mir     | 530 ++++++++++++++++++
+ 3 files changed, 629 insertions(+), 24 deletions(-)
  create mode 100644 llvm/test/CodeGen/MOS/far-word-policy.mir
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 7a0de406eff0..bd442bc90c88 100644
+index e5078caca96e..494c36729344 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -56,6 +56,7 @@
+@@ -57,6 +57,7 @@
  #include "llvm/Support/CommandLine.h"
  #include "llvm/Support/ErrorHandling.h"
  #include "llvm/Support/MathExtras.h"
@@ -35,7 +44,7 @@ index 7a0de406eff0..bd442bc90c88 100644
  
  using namespace llvm;
  using namespace TargetOpcode;
-@@ -2943,36 +2944,57 @@ static uint64_t getFarOffsetMax(Register Reg, const MachineRegisterInfo &MRI,
+@@ -2995,16 +2996,32 @@ static uint64_t getFarOffsetMax(Register Reg, const MachineRegisterInfo &MRI,
    }
    return Max;
  }
@@ -65,8 +74,8 @@ index 7a0de406eff0..bd442bc90c88 100644
 -                                          const MachineInstr &VDef,
 -                                          Register Ptr, uint64_t Disp,
 -                                          uint64_t &MaxEnd,
--                                          unsigned &NumAccesses,
--                                          bool FnMayCall, unsigned Depth) {
+-                                          unsigned &NumAccesses, bool FnMayCall,
+-                                          unsigned Depth) {
 +static bool allUsesAreFoldableFarAccesses(
 +    const MachineRegisterInfo &MRI, const MachineInstr &VDef, Register Ptr,
 +    uint64_t Disp, uint64_t &MaxEnd, unsigned &NumAccesses, bool FnMayCall,
@@ -74,38 +83,19 @@ index 7a0de406eff0..bd442bc90c88 100644
    // Bound the walk and the displacement; neither limit can admit a fold that a
    // deeper/larger walk would reject — hitting one just declines.
    if (Depth > 4 || Disp > 0xFFFF)
-     return false;
-   for (const MachineInstr &U : MRI.use_nodbg_instructions(Ptr)) {
+@@ -3013,8 +3030,10 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
      if (const auto *LS = dyn_cast<GLoadStore>(&U)) {
--      if (LS->getPointerReg() != Ptr || !U.hasOneMemOperand() || LS->isAtomic() ||
+       if (LS->getPointerReg() != Ptr || !U.hasOneMemOperand() ||
+           LS->isAtomic() ||
 -          MRI.getType(U.getOperand(0).getReg()) != LLT::scalar(8))
-+      if (LS->getPointerReg() != Ptr || !U.hasOneMemOperand() ||
-+          LS->isAtomic() ||
 +          (MRI.getType(U.getOperand(0).getReg()) != LLT::scalar(8) &&
 +           !(AllowWord && isPlainFarWordLoad(U, MRI))))
          return false;
 +      HasWord |= isPlainFarWordLoad(U, MRI);
        if (const auto *St = dyn_cast<GStore>(LS))
--        if (St->getValueReg() == Ptr) // the pointer is the stored VALUE: escapes
-+        if (St->getValueReg() ==
-+            Ptr) // the pointer is the stored VALUE: escapes
-           return false;
-       LocationSize Sz = LS->getMemSize();
--      if (!Sz.hasValue() || Sz.isScalable() || Sz.getValue().getFixedValue() == 0)
-+      if (!Sz.hasValue() || Sz.isScalable() ||
-+          Sz.getValue().getFixedValue() == 0)
-         return false;
-       if (FnMayCall && !noCallBetween(VDef, U, MRI)) // (e)
-         return false;
-       ++NumAccesses;
--      MaxEnd = std::max<uint64_t>(MaxEnd,
--                                  Disp + Sz.getValue().getFixedValue() - 1);
-+      MaxEnd =
-+          std::max<uint64_t>(MaxEnd, Disp + Sz.getValue().getFixedValue() - 1);
-       continue;
-     }
-     if (const auto *PA = dyn_cast<GPtrAdd>(&U)) {
-@@ -2981,9 +3003,9 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
+         if (St->getValueReg() ==
+             Ptr) // the pointer is the stored VALUE: escapes
+@@ -3036,9 +3055,9 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
        auto C = getIConstantVRegValWithLookThrough(PA->getOffsetReg(), MRI);
        if (!C || C->Value.isNegative() || C->Value.getActiveBits() > 16)
          return false;
@@ -118,18 +108,7 @@ index 7a0de406eff0..bd442bc90c88 100644
          return false;
        continue;
      }
-@@ -3000,16 +3022,22 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
- // pressure. Calls must not separate the add from its accesses; multiple
- // accesses require a call-free function to avoid repeated spilled-base reloads.
- // Prefer an 8-bit Y whenever the remaining users fit it.
--static bool tryFarRuntimeIndexFold(
--    LegalizerHelper &Helper, MachineRegisterInfo &MRI, GLoadStore &MI,
--    Register Addr, int64_t ConstOffset,
--    function_ref<bool(Register)> IsAbsoluteAddress) {
-+static bool
-+tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
-+                       GLoadStore &MI, Register Addr, int64_t ConstOffset,
-+                       function_ref<bool(Register)> IsAbsoluteAddress) {
+@@ -3062,9 +3081,15 @@ tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
  
@@ -148,7 +127,7 @@ index 7a0de406eff0..bd442bc90c88 100644
      return false;
  
    // (a)
-@@ -3028,7 +3056,7 @@ static bool tryFarRuntimeIndexFold(
+@@ -3083,7 +3108,7 @@ tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
      return false;
  
    // (b) range proof on the offset itself, before the (costlier) user walk.
@@ -157,7 +136,7 @@ index 7a0de406eff0..bd442bc90c88 100644
    const uint64_t MaxOff =
        FarLoopRange ? getFarOffsetMax(Off, MRI, *VT, *MI.getParent())
                     : VT->getKnownBits(Off).getMaxValue().getLimitedValue();
-@@ -3043,12 +3071,17 @@ static bool tryFarRuntimeIndexFold(
+@@ -3098,12 +3123,17 @@ tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
        FnMayCall |= mayBecomeCall(I, MRI);
    uint64_t MaxEnd = 0;
    unsigned NumAccesses = 0;
@@ -176,19 +155,13 @@ index 7a0de406eff0..bd442bc90c88 100644
    if (MaxOff + MaxEnd > Limit)
      return false;
    // This access is one of V's users, so its displacement is inside the walk.
-@@ -3058,15 +3091,18 @@ static bool tryFarRuntimeIndexFold(
-   const LLT IdxTy = LLT::scalar(Wide ? 16 : 8);
-   Register Idx = Builder.buildZExtOrTrunc(IdxTy, Off).getReg(0);
-   if (ConstOffset)
--    Idx = Builder.buildAdd(IdxTy, Idx, Builder.buildConstant(IdxTy, ConstOffset))
--              .getReg(0);
-+    Idx =
-+        Builder.buildAdd(IdxTy, Idx, Builder.buildConstant(IdxTy, ConstOffset))
-+            .getReg(0);
+@@ -3118,10 +3148,11 @@ tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+             .getReg(0);
  
    const bool IsLoad = isa<GLoad>(MI);
 -  unsigned Opcode =
--      Wide ? (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX16 : MOS::G_STORE_FAR_INDIR_IDX16)
+-      Wide ? (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX16
+-                     : MOS::G_STORE_FAR_INDIR_IDX16)
 -           : (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX : MOS::G_STORE_FAR_INDIR_IDX);
 +  unsigned Opcode = Word   ? MOS::G_LOAD16_FAR_INDIR_IDX
 +                    : Wide ? (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX16
@@ -196,39 +169,87 @@ index 7a0de406eff0..bd442bc90c88 100644
 +                           : (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX
 +                                     : MOS::G_STORE_FAR_INDIR_IDX);
    Builder.buildInstr(Opcode)
--      .add(MI.getOperand(0))  // dst (load) / value (store)
-+      .add(MI.getOperand(0))   // dst (load) / value (store)
+       .add(MI.getOperand(0))   // dst (load) / value (store)
        .addUse(V->getBaseReg()) // far pointer -> Imag32 ZP quad
-       .addUse(Idx)             // proven-in-range byte offset -> Y
-       .addMemOperand(*MI.memoperands_begin());
-@@ -3074,8 +3110,9 @@ static bool tryFarRuntimeIndexFold(
-   return true;
+diff --git a/llvm/test/CodeGen/MOS/far-index-fold-debug.ll b/llvm/test/CodeGen/MOS/far-index-fold-debug.ll
+index 5642ea60ca6d..51f155fd2b77 100644
+--- a/llvm/test/CodeGen/MOS/far-index-fold-debug.ll
++++ b/llvm/test/CodeGen/MOS/far-index-fold-debug.ll
+@@ -1,18 +1,21 @@
+ ; RUN: split-file %s %t
+ ; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -stop-after=legalizer %t/byte.ll -o - | FileCheck %s --check-prefixes=CHECK,BYTE
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -stop-after=legalizer %t/word.ll -o - | FileCheck %s --check-prefixes=CHECK,WORD
+ ; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %t/byte.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %t/word.ll -o /dev/null
+ ; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs %t/byte.ll -o /dev/null
+ 
+-; When the far runtime-index fold absorbs every access through a far pointer
+-; add, the add dies. salvageDebugInfo cannot express base + zext(offset), so the
+-; fold drops the location of the remaining DBG_VALUE ($noreg) instead of leaving
+-; it on the erased vreg, where DetectDeadLanes would mark it undef and the
+-; verifier would reject it.
++; When the far runtime-index fold (a byte, or a native word load) absorbs every
++; access through a far pointer add, the add dies. salvageDebugInfo cannot
++; express base + zext(offset), so the fold drops the location of the remaining
++; DBG_VALUE ($noreg) instead of leaving it on the erased vreg, where
++; DetectDeadLanes would mark it undef and the verifier would reject it.
+ 
+ ; CHECK-LABEL: name: walk
+ ; CHECK: DBG_VALUE %0(p2), $noreg, ![[BASE:[0-9]+]], !DIExpression()
+ ; CHECK: DBG_VALUE $noreg, $noreg, ![[P:[0-9]+]], !DIExpression()
+ ; BYTE-NEXT: G_LOAD_FAR_INDIR_IDX %0(p2)
++; WORD-NEXT: G_LOAD16_FAR_INDIR_IDX %0(p2)
+ ; CHECK-NOT: G_PTR_ADD
+ 
+ ;--- byte.ll
+@@ -40,6 +43,47 @@ exit:
  }
  
--bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(
--    LegalizerHelper &Helper, MachineRegisterInfo &MRI, GLoadStore &MI) const {
-+bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(LegalizerHelper &Helper,
-+                                                       MachineRegisterInfo &MRI,
-+                                                       GLoadStore &MI) const {
-   MachineIRBuilder &Builder = Helper.MIRBuilder;
  
-   Register Addr = MI.getPointerReg();
-@@ -3099,11 +3136,10 @@ bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(
++declare void @llvm.dbg.value(metadata, metadata, metadata)
++
++!llvm.dbg.cu = !{!0}
++!llvm.module.flags = !{!2, !3}
++!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: "probe", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)
++!1 = !DIFile(filename: "dbg.c", directory: "/tmp")
++!2 = !{i32 2, !"Dwarf Version", i32 4}
++!3 = !{i32 2, !"Debug Info Version", i32 3}
++!10 = distinct !DISubprogram(name: "walk", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)
++!11 = !DISubroutineType(types: !12)
++!12 = !{null}
++!13 = !DIBasicType(name: "char", size: 8, encoding: DW_ATE_unsigned_char)
++!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)
++!15 = !DILocalVariable(name: "base", arg: 1, scope: !10, file: !1, line: 1, type: !14)
++!16 = !DILocalVariable(name: "p", scope: !10, file: !1, line: 2, type: !14)
++!20 = !DILocation(line: 2, scope: !10)
++
++;--- word.ll
++@sink = external global i16
++
++define void @walk(ptr addrspace(2) %base, i8 %n) !dbg !10 {
++entry:
++  call void @llvm.dbg.value(metadata ptr addrspace(2) %base, metadata !15, metadata !DIExpression()), !dbg !20
++  br label %loop
++loop:
++  %i = phi i8 [ 0, %entry ], [ %next, %loop ]
++  %acc = phi i16 [ 0, %entry ], [ %sum, %loop ]
++  %off = zext i8 %i to i32
++  %p = getelementptr i8, ptr addrspace(2) %base, i32 %off
++  call void @llvm.dbg.value(metadata ptr addrspace(2) %p, metadata !16, metadata !DIExpression()), !dbg !20
++  %w = load i16, ptr addrspace(2) %p, align 1, !dbg !20
++  %sum = add i16 %acc, %w, !dbg !20
++  %next = add i8 %i, 1
++  %done = icmp eq i8 %next, 100
++  br i1 %done, label %exit, label %loop
++exit:
++  store volatile i16 %sum, ptr @sink, !dbg !20
++  ret void, !dbg !20
++}
++
++
+ declare void @llvm.dbg.value(metadata, metadata, metadata)
  
-   // Fold the range-proven runtime offset and displacement together when the
-   // pointer add can disappear, preserving the offset's integer arithmetic.
--  if (tryFarRuntimeIndexFold(Helper, MRI, MI, Addr, ConstOffset,
--                             [&](Register R) {
--                               return matchAbsoluteAddressing(MRI, R)
--                                   .has_value();
--                             }))
-+  if (tryFarRuntimeIndexFold(
-+          Helper, MRI, MI, Addr, ConstOffset, [&](Register R) {
-+            return matchAbsoluteAddressing(MRI, R).has_value();
-+          }))
-     return true;
- 
-   // (b) Only the zero-proof displacement window.
+ !llvm.dbg.cu = !{!0}
 diff --git a/llvm/test/CodeGen/MOS/far-word-policy.mir b/llvm/test/CodeGen/MOS/far-word-policy.mir
 new file mode 100644
 index 000000000000..3d4d61b30081

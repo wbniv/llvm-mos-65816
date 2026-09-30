@@ -1,0 +1,42 @@
+test	commit	role	llc	llc_sha256_16	result	first_diagnostic
+far-ptr-arg-exhaustion.ll	320-02	red-parent	c-320-01	d5022893511ee122	FAIL	RUN 1: Assertion `TmpVec.size() > 1' failed.
+far-ptr-arg-exhaustion.ll	320-02	red-unrepaired	p-320-02	053193836fc67412	FAIL	RUN 1: LLVM ERROR: Found 1 machine code errors.
+far-ptr-arg-exhaustion.ll	320-02	green	c-320-02	58540bdeab7b6ef5	PASS	
+far-ptr-arg-exhaustion.ll	320-02	green	c-320-03	f4ee31914e40af9f	PASS	
+far-ptr-arg-exhaustion.ll	320-02	green	c-320-04	bbc982dd14d476d3	PASS	
+far-ptr-arg-exhaustion.ll	320-02	green	c-fw-11	3626b2ca18d2fd22	PASS	
+far-ptr-arg-exhaustion.ll	320-02	green	c-fw-14	cce5eb24ccd61411	PASS	
+far-access-non-65816.ll	320-02	red-parent	c-320-01	d5022893511ee122	FAIL	RUN 2: Assertion `TmpVec.size() > 1' failed.
+far-access-non-65816.ll	320-02	red-unrepaired	p-320-02	053193836fc67412	FAIL	RUN 2: error: '<stdin>' is empty.
+far-access-non-65816.ll	320-02	green	c-320-02	58540bdeab7b6ef5	PASS	
+far-access-non-65816.ll	320-02	green	c-320-03	f4ee31914e40af9f	PASS	
+far-access-non-65816.ll	320-02	green	c-320-04	bbc982dd14d476d3	PASS	
+far-access-non-65816.ll	320-02	green	c-fw-11	3626b2ca18d2fd22	PASS	
+far-access-non-65816.ll	320-02	green	c-fw-14	cce5eb24ccd61411	PASS	
+far-ptr-trunc.ll	320-02	red-parent	c-320-01	d5022893511ee122	FAIL	RUN 1: Assertion `TmpVec.size() > 1' failed.
+far-ptr-trunc.ll	320-02	red-unrepaired	p-320-02	053193836fc67412	FAIL	RUN 1: Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed.
+far-ptr-trunc.ll	320-02	green	c-320-02	58540bdeab7b6ef5	PASS	
+far-ptr-trunc.ll	320-02	green	c-320-03	f4ee31914e40af9f	PASS	
+far-ptr-trunc.ll	320-02	green	c-320-04	bbc982dd14d476d3	PASS	
+far-ptr-trunc.ll	320-02	green	c-fw-11	3626b2ca18d2fd22	PASS	
+far-ptr-trunc.ll	320-02	green	c-fw-14	cce5eb24ccd61411	PASS	
+far-memop-length.ll	320-03	red-parent	c-320-02	58540bdeab7b6ef5	FAIL	RUN 1: error: CHECK: expected string not found in input
+far-memop-length.ll	320-03	red-unrepaired	p-320-03	9176eb386b7a6627	FAIL	RUN 1: error: CHECK: expected string not found in input
+far-memop-length.ll	320-03	green	c-320-03	f4ee31914e40af9f	PASS	
+far-memop-length.ll	320-03	green	c-320-04	bbc982dd14d476d3	PASS	
+far-memop-length.ll	320-03	green	c-fw-11	3626b2ca18d2fd22	PASS	
+far-memop-length.ll	320-03	green	c-fw-14	cce5eb24ccd61411	PASS	
+far-access-non-65816.ll	320-03	red-parent	c-320-02	58540bdeab7b6ef5	FAIL	RUN 2: error: ERR: expected string not found in input
+far-access-non-65816.ll	320-03	red-unrepaired	p-320-03	9176eb386b7a6627	FAIL	RUN 2: error: '<stdin>' is empty.
+far-access-non-65816.ll	320-03	green	c-320-03	f4ee31914e40af9f	PASS	
+far-access-non-65816.ll	320-03	green	c-320-04	bbc982dd14d476d3	PASS	
+far-access-non-65816.ll	320-03	green	c-fw-11	3626b2ca18d2fd22	PASS	
+far-access-non-65816.ll	320-03	green	c-fw-14	cce5eb24ccd61411	PASS	
+far-index-fold-debug.ll	320-04	red-parent	c-320-03	f4ee31914e40af9f	FAIL	RUN 2: error: CHECK: expected string not found in input
+far-index-fold-debug.ll	320-04	red-unrepaired	p-320-04	5b7d45e7da478195	FAIL	RUN 2: error: CHECK: expected string not found in input
+far-index-fold-debug.ll	320-04	green	c-320-04	bbc982dd14d476d3	PASS	
+far-index-fold-debug.ll	320-04	green	c-fw-11	3626b2ca18d2fd22	PASS	
+far-index-fold-debug.ll	320-04	green	c-fw-14	cce5eb24ccd61411	PASS	
+far-index-fold-debug.ll	fw-12	red-parent	c-fw-11	3626b2ca18d2fd22	FAIL	RUN 3: error: CHECK: expected string not found in input
+far-index-fold-debug.ll	fw-12	red-unrepaired	fw-old-candidate	d7fde754bb0222b4	FAIL	RUN 2: error: CHECK: expected string not found in input
+far-index-fold-debug.ll	fw-12	green	c-fw-14	cce5eb24ccd61411	PASS	

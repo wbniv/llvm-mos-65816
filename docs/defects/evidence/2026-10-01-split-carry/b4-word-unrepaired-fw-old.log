@@ -1,0 +1,76 @@
+$ build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll -o /dev/null
+# llc sha256 d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf
+
+# After Detect Dead Lanes
+# Machine code for function walk: IsSSA, TracksLiveness, Legalized, RegBankSelected, Selected
+
+bb.1.entry:
+  successors: %bb.2(0x80000000); %bb.2(100.00%)
+  liveins: $a, $rl1
+  %0:imag32 = COPY $rl1
+  DBG_VALUE %0:imag32, $noreg, !"base", !DIExpression(), debug-location !10; dbg.c:2 line no:1
+  %13:anyi8 = LDZ
+  %36:cc = LDImm1 0
+
+bb.2.loop:
+; predecessors: %bb.1, %bb.2
+  successors: %bb.3(0x04000000), %bb.2(0x7c000000); %bb.3(3.12%), %bb.2(96.88%)
+
+  %2:yc = PHI %13:anyi8, %bb.1, %9:gpr, %bb.2
+  %30:anyi8 = PHI %13:anyi8, %bb.1, %28:anyi8, %bb.2
+  %31:anyi8 = PHI %13:anyi8, %bb.1, %29:anyi8, %bb.2
+  %3:imag16 = REG_SEQUENCE %30:anyi8, %subreg.sublo, %31:anyi8, %subreg.subhi
+  DBG_VALUE undef %5:any, $noreg, !"p", !DIExpression(), debug-location !10; dbg.c:2 line no:2
+  %40:ac16 = LDIndirLongIdx16 %0:imag32, %2:yc, debug-location !10 :: (load (s16) from %ir.p, align 1, addrspace 2); dbg.c:2
+  %6:imag16 = STAImag16 %40:ac16, debug-location !10; dbg.c:2
+  %35:ac16 = LDAImag16 %3:imag16, debug-location !10; dbg.c:2
+  %37:ac16, dead %38:cc, dead %39:vc = ADCImag16 %35:ac16(tied-def 0), %6:imag16, %36:cc, debug-location !10; dbg.c:2
+  %7:imag16 = STAImag16 %37:ac16, debug-location !10; dbg.c:2
+  %41:anyi8 = COPY %2:yc
+  %42:anyi8 = INC %41:anyi8(tied-def 0)
+  %9:gpr = COPY %42:anyi8
+  %28:anyi8 = COPY %7.sublo:imag16
+  %29:anyi8 = COPY %7.subhi:imag16
+  CmpBrImm %bb.2, undef $z, 0, %9:gpr, 100, implicit-def $c
+  BRA %bb.3
+
+bb.3.exit:
+; predecessors: %bb.2
+
+  %34:ac16 = LDAImag16 %7:imag16, debug-location !10; dbg.c:2
+  STAbs16 %34:ac16, @sink, debug-location !10 :: (volatile store (s16) into @sink, align 1); dbg.c:2
+  RTS debug-location !10; dbg.c:2
+
+# End machine code for function walk.
+
+*** Bad machine code: Generic virtual register use cannot be undef ***
+- function:    walk
+- basic block: %bb.2 loop (0x61ffb1772538)
+- instruction: DBG_VALUE undef %5:any, $noreg, !"p", !DIExpression(), debug-location !10; dbg.c:2 line no:2
+- operand 0:   undef %5:any
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll'.
+2.	Running pass 'Verify generated machine code' on function '@walk'
+ #0 0x000061ff9c1b760b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/far-word-rebase/candidate/llc+0x455260b)
+ #1 0x000061ff9c1b4491 llvm::sys::RunSignalHandlers() (build/far-word-rebase/candidate/llc+0x454f491)
+ #2 0x000061ff9c1b841b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007ee46c312cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007ee46c3731ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007ee46c312b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007ee46c2f58ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x000061ff9c112975 llvm::report_fatal_error(llvm::Twine const&, bool) (build/far-word-rebase/candidate/llc+0x44ad975)
+ #8 0x000061ff9af6d922 (anonymous namespace)::MachineVerifier::~MachineVerifier() MachineVerifier.cpp:0:0
+ #9 0x000061ff9af6ef3a (anonymous namespace)::MachineVerifierLegacyPass::runOnMachineFunction(llvm::MachineFunction&) MachineVerifier.cpp:0:0
+#10 0x000061ff9ae52409 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/far-word-rebase/candidate/llc+0x31ed409)
+#11 0x000061ff9b3e4430 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/far-word-rebase/candidate/llc+0x377f430)
+#12 0x000061ff9b3ec532 llvm::FPPassManager::runOnModule(llvm::Module&) (build/far-word-rebase/candidate/llc+0x3787532)
+#13 0x000061ff9b3e51f4 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/far-word-rebase/candidate/llc+0x37801f4)
+#14 0x000061ff99d992cb compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#15 0x000061ff99d96593 main (build/far-word-rebase/candidate/llc+0x2131593)
+#16 0x00007ee46c2f7601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#17 0x00007ee46c2f7718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#18 0x000061ff99d957a5 _start (build/far-word-rebase/candidate/llc+0x21307a5)
+exit_code=134

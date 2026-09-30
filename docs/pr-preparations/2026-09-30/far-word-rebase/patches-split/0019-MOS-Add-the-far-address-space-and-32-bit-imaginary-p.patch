@@ -1,4 +1,4 @@
-From 42785c3bef215c91d119b24a823375fb528ad5b9 Mon Sep 17 00:00:00 2001
+From abfb29168fcad314ea482b8ea3a705efda13892a Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 19/32] [MOS] Add the far address space and 32-bit imaginary
@@ -16,22 +16,23 @@ Tests: imag32-copy.mir checks that a quad copy lowers to four byte copies in add
 
 Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/imag32-copy.mir`.
 
-Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort. Review formatting and comment follow-ups carried into this commit: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
 ---
  llvm/lib/Target/MOS/MOSInstrInfo.cpp       |  7 +++
- llvm/lib/Target/MOS/MOSInstrInfo.h         |  6 ++-
+ llvm/lib/Target/MOS/MOSInstrInfo.h         |  8 ++-
  llvm/lib/Target/MOS/MOSMCInstLower.cpp     |  5 +-
  llvm/lib/Target/MOS/MOSRegisterBanks.td    |  9 +++-
- llvm/lib/Target/MOS/MOSRegisterInfo.cpp    | 20 ++++++++
- llvm/lib/Target/MOS/MOSRegisterInfo.td     | 34 +++++++++++-
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp    | 21 ++++++++
+ llvm/lib/Target/MOS/MOSRegisterInfo.td     | 32 ++++++++++++
  llvm/lib/Target/MOS/MOSTargetMachine.cpp   |  2 +-
  llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp   | 60 +++++++++++++++++++++-
- llvm/lib/TargetParser/TargetDataLayout.cpp |  2 +-
+ llvm/lib/TargetParser/TargetDataLayout.cpp |  3 +-
  llvm/test/CodeGen/MOS/imag32-copy.mir      | 25 +++++++++
- 10 files changed, 163 insertions(+), 7 deletions(-)
+ 10 files changed, 166 insertions(+), 6 deletions(-)
  create mode 100644 llvm/test/CodeGen/MOS/imag32-copy.mir
 
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
@@ -53,24 +54,26 @@ index ef09d4e8bae6..c8352d789198 100644
      assert(SrcReg.isPhysical() && DestReg.isPhysical());
      copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::sublo),
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
-index 5dcd2b5063b8..39dc4abee67e 100644
+index 5dcd2b5063b8..9a0c517ddfdf 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.h
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
-@@ -153,7 +153,11 @@ private:
+@@ -153,7 +153,13 @@ private:
  
  namespace MOS {
  
 -enum AddressSpace { AS_Memory, AS_ZeroPage, NumAddrSpaces };
-+// AS_Memory  (0): 16-bit absolute pointer (6502 default; data-bank-relative on 65816).
-+// AS_ZeroPage(1): 8-bit direct-page pointer.
-+// AS_Far     (2): 32-bit "far" pointer — 65816 24-bit address in the low 3 bytes,
-+//                 top byte unused (32-bit stays a simple MVT type; there is no MVT::i24).
++// Address spaces:
++// - AS_Memory (0): 16-bit absolute pointer (data-bank-relative on the 65816).
++// - AS_ZeroPage (1): 8-bit direct-page pointer.
++// - AS_Far (2): 32-bit far pointer whose low three bytes are a 65816 24-bit
++//   address; the top byte is unused. 32 bits keep it a simple MVT, since there
++//   is no MVT::i24.
 +enum AddressSpace { AS_Memory, AS_ZeroPage, AS_Far, NumAddrSpaces };
  
  enum TargetIndex {
    TI_STATIC_STACK,
 diff --git a/llvm/lib/Target/MOS/MOSMCInstLower.cpp b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
-index 75fc2ea7bded..91259dc48d72 100644
+index 75fc2ea7bded..e54d725dbbf2 100644
 --- a/llvm/lib/Target/MOS/MOSMCInstLower.cpp
 +++ b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
 @@ -862,7 +862,10 @@ bool MOSMCInstLower::lowerOperand(const MachineOperand &MO, MCOperand &MCOp) {
@@ -78,8 +81,8 @@ index 75fc2ea7bded..91259dc48d72 100644
      }
  
 -    if (MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg)) {
-+    if (MOS::Imag32RegClass.contains(Reg) || MOS::Imag16RegClass.contains(Reg) ||
-+        MOS::Imag8RegClass.contains(Reg)) {
++    if (MOS::Imag32RegClass.contains(Reg) ||
++        MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg)) {
 +      // Imag32 (far-pointer ZP quad) lowers to its low __rc
 +      // symbol, just like the Imag16/Imag8 zero-page forms.
        const MCExpr *Expr = MCSymbolRefExpr::create(
@@ -103,7 +106,7 @@ index d7e981ef61dc..eeea52ad87a5 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index ca45b5d5878e..cf73f1bb1d92 100644
+index ca45b5d5878e..e5003dc00492 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -69,6 +69,10 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
@@ -117,16 +120,17 @@ index ca45b5d5878e..cf73f1bb1d92 100644
      if (MOS::Imag16RegClass.contains(R))
        R = getSubReg(R, MOS::sublo);
      if (!MOS::Imag8RegClass.contains(R))
-@@ -223,6 +227,17 @@ BitVector MOSRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
+@@ -223,6 +227,18 @@ BitVector MOSRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
    BitVector Reserved = this->Reserved;
    if (TFI->hasFP(MF))
      reserveAllSubregs(&Reserved, getFrameRegister(MF));
 +  // an Imag32 quad (RL = RS:RS pair) is unallocatable whenever
 +  // either of its 16-bit RS words is reserved — the stack pointer (RS0), the
 +  // scavenger slot (RS8), the frame pointer, or any RS beyond the imaginary
-+  // window. Reserve the QUAD itself only; its free RS sibling must stay available
-+  // for ordinary 16-bit allocation (so we can't reserveAllSubregs it). Without
-+  // this the allocator would happily place a far pointer over the stack pointer.
++  // window. Reserve the QUAD itself only; its free RS sibling must stay
++  // available for ordinary 16-bit allocation (so we can't reserveAllSubregs
++  // it). Without this the allocator would happily place a far pointer over the
++  // stack pointer.
 +  for (MCPhysReg Q : MOS::Imag32RegClass) {
 +    if (Reserved.test(getSubReg(Q, MOS::sublo16)) ||
 +        Reserved.test(getSubReg(Q, MOS::subhi16)))
@@ -135,7 +139,7 @@ index ca45b5d5878e..cf73f1bb1d92 100644
    return Reserved;
  }
  
-@@ -1456,6 +1471,11 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+@@ -1456,6 +1472,11 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
    if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
      return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
    }
@@ -148,7 +152,7 @@ index ca45b5d5878e..cf73f1bb1d92 100644
      Register SrcReg8 =
          getMatchingSuperReg(SrcReg, MOS::sublsb, &MOS::Anyi8RegClass);
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index 52d4cbc453be..438aac92f709 100644
+index 52d4cbc453be..894566f03436 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 @@ -27,6 +27,12 @@ def sublo : MOSSubRegIndex<8>;
@@ -200,7 +204,7 @@ index 52d4cbc453be..438aac92f709 100644
  
  // Single register classes.
  let isPressureFineGrained = true in {
-@@ -234,12 +262,16 @@ let isPressureFineGrained = true in {
+@@ -234,6 +262,10 @@ let isPressureFineGrained = true in {
  def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
  def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
  
@@ -211,13 +215,6 @@ index 52d4cbc453be..438aac92f709 100644
  // The native-width classes below are opt-in and must not create register
  // pressure sets: MachineLICM, MachineSink and the scheduler read the pressure
  // tables in every mode, so new sets would change code for programs that never
- // enable +mos-a16 or +mos-xy16.
- let GeneratePressureSet = 0 in {
--// Native widths: the 16-bit accumulator as a register class (single member,
-+// #321 Increment 1b: the 16-bit accumulator as a register class (single member,
- // A16 = B:A — NOT the carry flag C). Target of 16-bit-accumulator load/add/store
- // under +mos-a16. Named Ac16 to parallel the 8-bit accumulator class `Ac`.
- def Ac16 : MOSReg16Class<(add A16)>;
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 index bdee4974c55f..73e853b1de48 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
@@ -232,7 +229,7 @@ index bdee4974c55f..73e853b1de48 100644
  /// Processes a CPU name.
  static StringRef getCPU(StringRef CPU) {
 diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
-index d5908928d20d..600aeb64b88d 100644
+index d5908928d20d..14781b292fa5 100644
 --- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
 +++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
 @@ -387,7 +387,21 @@ bool MOSZeroPageAlloc::runOnModule(Module &M) {
@@ -251,8 +248,8 @@ index d5908928d20d..600aeb64b88d 100644
 +          CSRZPOffsets[Cand->CSR] = CSRZPOffsets[Lo16] =
 +              CSRZPOffsets[TRI.getSubReg(Lo16, MOS::sublo)] = Offset++;
 +          CSRZPOffsets[TRI.getSubReg(Lo16, MOS::subhi)] = Offset++;
-+          CSRZPOffsets[Hi16] =
-+              CSRZPOffsets[TRI.getSubReg(Hi16, MOS::sublo)] = Offset++;
++          CSRZPOffsets[Hi16] = CSRZPOffsets[TRI.getSubReg(Hi16, MOS::sublo)] =
++              Offset++;
 +          CSRZPOffsets[TRI.getSubReg(Hi16, MOS::subhi)] = Offset++;
 +        } else if (MOS::Imag16RegClass.contains(Cand->CSR)) {
            CSRZPOffsets[Cand->CSR] =
@@ -296,11 +293,11 @@ index d5908928d20d..600aeb64b88d 100644
 +      // Account for the remaining three bytes.
 +      for (int Byte = 0; Byte != 3; ++Byte) {
 +        if (Idx++ < 4) {
-+          Benefit += 9 * SaveFreq;      // LDA ZP,PHA
-+          Benefit += 10 * RestoreFreq;  // PLA,STA ZP
++          Benefit += 9 * SaveFreq;     // LDA ZP,PHA
++          Benefit += 10 * RestoreFreq; // PLA,STA ZP
 +        } else {
-+          Benefit += 12 * SaveFreq;     // LDA ZP,STA ABS
-+          Benefit += 12 * RestoreFreq;  // LDA ABS,STA ZP
++          Benefit += 12 * SaveFreq;    // LDA ZP,STA ABS
++          Benefit += 12 * RestoreFreq; // LDA ABS,STA ZP
 +        }
 +        ++Size;
 +      }
@@ -317,15 +314,16 @@ index d5908928d20d..600aeb64b88d 100644
      // assigned independently. Thus, instead of two size-1 candidates, one
      // size-2 candidate is used.
 diff --git a/llvm/lib/TargetParser/TargetDataLayout.cpp b/llvm/lib/TargetParser/TargetDataLayout.cpp
-index d691b4b39537..4e19aa646ef6 100644
+index d691b4b39537..c5830ba062e3 100644
 --- a/llvm/lib/TargetParser/TargetDataLayout.cpp
 +++ b/llvm/lib/TargetParser/TargetDataLayout.cpp
-@@ -601,7 +601,7 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {
+@@ -601,7 +601,8 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {
    case Triple::mips64el:
      return computeMipsDataLayout(*this, ABIName);
    case Triple::mos:
 -    return "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
-+    return "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
++    return "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-"
++           "n8";
    case Triple::msp430:
      return "e-m:e-p:16:16-i32:16-i64:16-f32:16-f64:16-a:8-n8:16-S16";
    case Triple::ppc:

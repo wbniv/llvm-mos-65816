@@ -1,0 +1,51 @@
+$ build/split-320-321/llc/p-320-02 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null
+# llc sha256 053193836fc67412772a1511a15f21ab2190050e5f84f1a1c61fcb9d62de778c
+
+# After IRTranslator
+# Machine code for function callee4: IsSSA, TracksLiveness
+
+bb.1 (%ir-block.0):
+  liveins: $rl1, $rl2, $rl3, $rs1
+  %0:_(p2) = COPY $rl1
+  %1:_(p2) = COPY $rl2
+  %2:_(p2) = COPY $rl3
+  %3:_(p2) = COPY $rs1
+  %4:_(s8) = G_LOAD %0:_(p2) :: (volatile load (s8) from %ir.a, addrspace 2)
+  %5:_(s8) = G_LOAD %3:_(p2) :: (volatile load (s8) from %ir.d, addrspace 2)
+  %6:_(s8) = G_ADD %4:_, %5:_
+  $a = COPY %6:_(s8)
+  RTS implicit $a
+
+# End machine code for function callee4.
+
+*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***
+- function:    callee4
+- basic block: %bb.1  (0x58e9e7aae270)
+- instruction: %3:_(p2) = COPY $rs1
+Def Size = 32, Src Size = 16
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/p-320-02 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll'.
+2.	Running pass 'Verify generated machine code' on function '@callee4'
+ #0 0x000058e9cb6991cb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/p-320-02+0x454c1cb)
+ #1 0x000058e9cb696051 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/p-320-02+0x4549051)
+ #2 0x000058e9cb699fdb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x0000723706173cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007237061d41ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x0000723706173b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007237061568ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x000058e9cb5f4535 llvm::report_fatal_error(llvm::Twine const&, bool) (build/split-320-321/llc/p-320-02+0x44a7535)
+ #8 0x000058e9ca44f1d2 (anonymous namespace)::MachineVerifier::~MachineVerifier() MachineVerifier.cpp:0:0
+ #9 0x000058e9ca4507ea (anonymous namespace)::MachineVerifierLegacyPass::runOnMachineFunction(llvm::MachineFunction&) MachineVerifier.cpp:0:0
+#10 0x000058e9ca333cb9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/p-320-02+0x31e6cb9)
+#11 0x000058e9ca8c5ff0 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/p-320-02+0x3778ff0)
+#12 0x000058e9ca8ce0f2 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/p-320-02+0x37810f2)
+#13 0x000058e9ca8c6db4 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/p-320-02+0x3779db4)
+#14 0x000058e9c927facb compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#15 0x000058e9c927cd93 main (build/split-320-321/llc/p-320-02+0x212fd93)
+#16 0x0000723706158601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#17 0x0000723706158718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#18 0x000058e9c927bfa5 _start (build/split-320-321/llc/p-320-02+0x212efa5)
+exit_code=134

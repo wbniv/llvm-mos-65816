@@ -1,0 +1,17 @@
+$ set -euo pipefail; out=$(build/split-320-321/llc/c-320-03 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll -o - | grep -v -E "^[[:space:]]*[.;]"); printf "%s\n" "$out"; bad=0; if ! printf "%s\n" "$out" | grep -A8 "^big_const:" | grep -q -E "(jmp|jsr)[[:space:]]+__memset_far32$"; then echo "FAIL: 70000-byte far memset does not call __memset_far32"; bad=1; fi; if ! printf "%s\n" "$out" | grep -A2 "^big_var:" | grep -q -E "(jmp|jsr)[[:space:]]+__memcpy_far32$"; then echo "FAIL: unbounded i32 far memcpy does not call __memcpy_far32"; bad=1; fi; [ $bad = 0 ] && echo "PASS: lengths above 0xFFFF reach the 32-bit-length far runtime"; exit $bad
+# llc sha256 f4ee31914e40af9fb223d6ab150f73987a8b78e67ab72b29472a3036554b0537
+big_const:                              ; @big_const
+	ldx	#112
+	ldy	#17
+	lda	#1
+	sty	__rc2
+	sta	__rc3
+	stz	__rc8
+	dec
+	jmp	__memset_far32
+big_var:                                ; @big_var
+	jmp	__memcpy_far32
+len64k:                                 ; @len64k
+	rts
+PASS: lengths above 0xFFFF reach the 32-bit-length far runtime
+exit_code=0
