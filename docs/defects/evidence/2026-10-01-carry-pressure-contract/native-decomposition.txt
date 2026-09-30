@@ -1,0 +1,40 @@
+# +mos-a16, -Os IR, llc -O2, 276 inputs (274 where an exploration variant fails; see the input count per block).
+# A = old sets (f1fa50a2); B = upstream design (9f9b74f9); X1/X2/X3 = exploration llc with default options equal to B.
+# first = -mos-gpr-psets-first; low-score = -mos-gpr-psets-low-score; a/axyj/none = -mos-native-gpr-psets; noborrow = -mos-native-borrow=false; lim<N> = A16 limit.
+
+A-a16-always.tsv: 276 inputs, 2441232 B
+  A-a16-off.tsv: 2441232 -> 2448479 (+7247, +0.30%), larger 55, smaller 5
+  B-a16-always.tsv: 2441232 -> 2444235 (+3003, +0.12%), larger 148, smaller 13
+  B-a16-off.tsv: 2441232 -> 2450117 (+8885, +0.36%), larger 158, smaller 13
+  A-a16-nolicm-always.tsv: 2441232 -> 2360123 (-81109, -3.32%), larger 8, smaller 252
+  B-a16-nolicm-always.tsv: 2441232 -> 2364293 (-76939, -3.15%), larger 15, smaller 246
+  A-a16-nl-always.tsv: 2441232 -> 2349372 (-91860, -3.76%), larger 10, smaller 253
+  B-a16-nl-always.tsv: 2441232 -> 2353511 (-87721, -3.59%), larger 15, smaller 249
+  A-a16-nl-off.tsv: 2441232 -> 2357235 (-83997, -3.44%), larger 16, smaller 248
+  B-a16-nl-off.tsv: 2441232 -> 2359135 (-82097, -3.36%), larger 23, smaller 242
+  A-a16-norp-off.tsv: 2441232 -> 2443550 (+2318, +0.09%), larger 145, smaller 80
+  B-a16-norp-off.tsv: 2441232 -> 2443550 (+2318, +0.09%), larger 145, smaller 80
+
+A-a16-always.tsv: 276 inputs, 2441232 B
+  X3-a16.tsv: 2441232 -> 2444235 (+3003, +0.12%), larger 148, smaller 13
+  X1-a16-a.tsv: 2441232 -> 2443740 (+2508, +0.10%), larger 144, smaller 11
+  X1-a16-axyj.tsv: 2441232 -> 2443740 (+2508, +0.10%), larger 144, smaller 11
+  X1-a16-none.tsv: 2441232 -> 2449154 (+7922, +0.32%), larger 178, smaller 42
+  X2-a16-first.tsv: 2441232 -> 2442204 (+972, +0.04%), larger 34, smaller 12
+  X2-a16-low-score.tsv: 2441232 -> 2446853 (+5621, +0.23%), larger 154, smaller 12
+  X2-a16-a-first.tsv: 2441232 -> 2441634 (+402, +0.02%), larger 17, smaller 8
+  X2-a16-a-low-score.tsv: 2441232 -> 2444265 (+3033, +0.12%), larger 146, smaller 16
+  N-noborrow.tsv: 2441232 -> 2449728 (+8496, +0.35%), larger 150, smaller 17
+  N-noborrow-afirst.tsv: 2441232 -> 2441442 (+210, +0.01%), larger 22, smaller 12
+  N-gated.tsv: 2441232 -> 2444294 (+3062, +0.13%), larger 148, smaller 16
+  N-lim3.tsv: 2441232 -> 2446212 (+4980, +0.20%), larger 170, smaller 35
+
+A-a16-off.tsv: 276 inputs, 2448479 B
+  B-a16-off.tsv: 2448479 -> 2450117 (+1638, +0.07%), larger 139, smaller 25
+  N-off-first.tsv: 2448479 -> 2449386 (+907, +0.04%), larger 35, smaller 12
+  N-off-afirst.tsv: 2448479 -> 2448854 (+375, +0.02%), larger 18, smaller 8
+
+# Limit 1 on the native A16 set: 2 inputs fail (ran out of registers during register allocation in dpend_step; corpus_dpend_sim, double-pendulum).
+A-a16-always.tsv: 274 inputs, 2422070 B
+  N-lim1.tsv: 2422070 -> 2428540 (+6470, +0.27%), larger 169, smaller 62
+  N-first-lim1.tsv: 2422070 -> 2429565 (+7495, +0.31%), larger 174, smaller 57

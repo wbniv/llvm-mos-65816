@@ -1,0 +1,15 @@
+# llvm-lit -s over CodeGen/MOS and MC/MOS, candidate toolchain (worktree build/llvm-mos, llc 6f303945beb17ab3)
+## before regenerating char-stats.ll and native-width-default-pressure.ll (-j4)
+-- Testing: 196 tests, 4 workers --
+FAIL: LLVM :: CodeGen/MOS/char-stats.ll (68 of 196)
+FAIL: LLVM :: CodeGen/MOS/native-width-default-pressure.ll (78 of 196)
+Failed Tests (2):
+  Unsupported:   4 (2.04%)
+  Passed     : 190 (96.94%)
+  Failed     :   2 (1.02%)
+lit-rc=1
+## after (-j2)
+-- Testing: 196 tests, 2 workers --
+  Unsupported:   4 (2.04%)
+  Passed     : 192 (97.96%)
+lit-rc=0

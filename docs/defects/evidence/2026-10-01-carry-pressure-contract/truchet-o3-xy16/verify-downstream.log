@@ -1,0 +1,12 @@
+$ zcat truchet.c.a16xy16.ll.gz | llc -O3 -verify-machineinstrs -filetype=obj -o /dev/null   # /home/will/llvm-mos-65816/build/far-review-defects/candidate/llc, sha256 f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1
+# After MOS Insert REP/SEP
+*** Bad machine code: Using an undefined physical register ***
+- function:    main
+- basic block: %bb.205 
+- instruction: PH $p
+*** Bad machine code: Using an undefined physical register ***
+- function:    main
+- basic block: %bb.296 
+- instruction: PH $p
+LLVM ERROR: Found 2 machine code errors.
+rc=134

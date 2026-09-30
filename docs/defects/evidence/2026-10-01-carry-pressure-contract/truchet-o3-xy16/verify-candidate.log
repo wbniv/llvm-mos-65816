@@ -1,0 +1,12 @@
+$ zcat truchet.c.a16xy16.ll.gz | llc -O3 -verify-machineinstrs -filetype=obj -o /dev/null   # /home/will/llvm-mos-65816/build/carry-press-ir/cand/llc, sha256 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+# After MOS Insert REP/SEP
+*** Bad machine code: Using an undefined physical register ***
+- function:    main
+- basic block: %bb.205 
+- instruction: PH $p
+*** Bad machine code: Using an undefined physical register ***
+- function:    main
+- basic block: %bb.296 
+- instruction: PH $p
+LLVM ERROR: Found 2 machine code errors.
+rc=134

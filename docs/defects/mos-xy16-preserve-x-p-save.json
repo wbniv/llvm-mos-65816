@@ -113,6 +113,18 @@
     {
       "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/recovered-ir-candidate.log",
       "sha256": "7664c4afd8dd2cd628fccfefe79975936b854cc6f5d3a6041bb4b1d0a8619374"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/truchet.c.a16xy16.ll.gz",
+      "sha256": "edbadeed52d84ac0589d4d414f48a56d4b1e4bd04423724380531a3c6f832f0a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/verify-downstream.log",
+      "sha256": "1f5cc9a23b06665ebb15d82f852a10d30322791c3a5a4808f4bbf142fce83f06"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/verify-candidate.log",
+      "sha256": "220d0a7edf76aa92b134924c124553fbfb0d8164520144639a15dab74029b5e7"
     }
   ],
   "additional_runs": [
@@ -138,6 +150,27 @@
         }
       },
       "result": "All three compilers exit 134 with Using an undefined physical register at PH $p in main after MOS Insert REP/SEP. The defect needs only IR carrying the recovered flags, not the recovery pass itself. Independent review reached the same result."
+    },
+    {
+      "kind": "repeat_sighting",
+      "date": "2026-10-01",
+      "input": {
+        "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/truchet.c.a16xy16.ll.gz",
+        "sha256": "edbadeed52d84ac0589d4d414f48a56d4b1e4bd04423724380531a3c6f832f0a"
+      },
+      "runs": {
+        "downstream": {
+          "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/verify-downstream.log",
+          "sha256": "1f5cc9a23b06665ebb15d82f852a10d30322791c3a5a4808f4bbf142fce83f06"
+        },
+        "candidate": {
+          "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/verify-candidate.log",
+          "sha256": "220d0a7edf76aa92b134924c124553fbfb0d8164520144639a15dab74029b5e7"
+        }
+      },
+      "result": "truchet.c at clang -O3 with +mos-a16,+mos-xy16 (frontend clang-23 254624ba26462f49), compiled by llc -O3 -verify-machineinstrs: the current downstream llc f1fa50a225c36607 and the carry-pressure-contract candidate llc 6f303945beb17ab3 both exit 134 with 'Using an undefined physical register' on PH $p in main (%bb.205 and %bb.296) after MOS Insert REP/SEP. Without -verify-machineinstrs both compile it. The candidate changes only 8-bit-mode pressure sets, so this XY16 input is outside its reach. Recorded as a repeat sighting of this defect's signature; the mechanism was not re-derived for this input.",
+      "report": "docs/plans/2026-10-01-carry-pressure-contract.md",
+      "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d."
     }
   ]
 }

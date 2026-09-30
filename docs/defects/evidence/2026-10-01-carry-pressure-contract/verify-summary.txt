@@ -1,0 +1,17 @@
+# llc -verify-machineinstrs over build/carry-press-ir (277 sources x 3 modes x 4 levels); failures per level/mode
+# candverify = candidate llc 6f303945 (clean); baseverify = current downstream f1fa50a2; plain = same llc without the verifier (matrix/)
+Os default: candidate verify=15 plain=15 | downstream verify=15 plain=15
+Os a16: candidate verify=1 plain=1 | downstream verify=1 plain=1
+Os a16xy16: candidate verify=1 plain=1 | downstream verify=1 plain=1
+Oz default: candidate verify=15 plain=15 | downstream verify=15 plain=15
+Oz a16: candidate verify=3 plain=3 | downstream verify=3 plain=3
+Oz a16xy16: candidate verify=3 plain=3 | downstream verify=3 plain=3
+O2 default: candidate verify=15 plain=15 | downstream verify=15 plain=15
+O2 a16: candidate verify=3 plain=3 | downstream verify=3 plain=3
+O2 a16xy16: candidate verify=4 plain=4 | downstream verify=4 plain=4
+O3 default: candidate verify=15 plain=15 | downstream verify=15 plain=15
+O3 a16: candidate verify=0 plain=0 | downstream verify=2 plain=2
+O3 a16xy16: candidate verify=2 plain=1 | downstream verify=4 plain=3
+# verifier-only failures:
+candverify O3 a16xy16: truchet.c.a16xy16.ll
+baseverify O3 a16xy16: truchet.c.a16xy16.ll

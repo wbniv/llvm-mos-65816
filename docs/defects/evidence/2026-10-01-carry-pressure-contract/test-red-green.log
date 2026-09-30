@@ -1,0 +1,8 @@
+base mos6502: PASS
+base mosw65816: PASS
+up-9f9b74f9 mos6502: FAIL
+up-9f9b74f9 mosw65816: FAIL
+cand-6f303945 mos6502: PASS
+cand-6f303945 mosw65816: PASS
+cand-carry-off mos6502: FAIL
+cand-carry-off mosw65816: FAIL

@@ -1,0 +1,375 @@
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.h	2026-10-01 01:24:49.115784081 +0700
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h	2026-10-01 01:24:49.118912925 +0700
+@@ -33,17 +33,23 @@
+   std::unique_ptr<std::string[]> Imag8SymbolNames;
+   BitVector Reserved;
+ 
+-  // Whether native widths append the A16, X16 and Y16 pressure sets. Fixed at
+-  // construction from the target machine's optimization level; see the
+-  // constructor.
+-  const bool AppendNativePressureSets;
+-
+-  // Pressure-set lists (-1 terminated) used under native widths, by register
+-  // class ID and by register unit. An empty list defers to the generated one.
+-  SmallVector<SmallVector<int, 8>, 0> NativeClassPSets;
+-  SmallVector<SmallVector<int, 8>, 0> NativeUnitPSets;
+-
+-  bool hasNativePressureSets() const;
++  // Pressure-set lists (-1 terminated) by register class ID and by register
++  // unit; an empty list defers to the generated one. Groups holds the 16-bit
++  // registers of each appended set. Tables[0] is used without native widths,
++  // Tables[1] with them. Fixed at construction; see the constructor.
++  struct PressureTables {
++    SmallVector<SmallVector<MCPhysReg, 2>, 3> Groups;
++    SmallVector<SmallVector<int, 8>, 0> ClassPSets;
++    SmallVector<SmallVector<int, 8>, 0> UnitPSets;
++    bool First = false;
++  };
++  PressureTables Tables[2];
++
++  void buildPressureSets(PressureTables &T,
++                         ArrayRef<SmallVector<MCPhysReg, 2>> Groups,
++                         bool Append, bool Native);
++  const PressureTables &tables() const;
++  int pressureSet(unsigned Idx) const;
+ 
+ public:
+   MOSRegisterInfo(const MOSSubtarget &STI, CodeGenOptLevel OptLevel);
+@@ -69,6 +75,8 @@
+   const char *getRegPressureSetName(unsigned Idx) const override;
+   unsigned getRegPressureSetLimit(const MachineFunction &MF,
+                                   unsigned Idx) const override;
++  unsigned getRegPressureSetScore(const MachineFunction &MF,
++                                  unsigned Idx) const override;
+   const int *
+   getRegClassPressureSets(const TargetRegisterClass *RC) const override;
+   const int *getRegUnitPressureSets(MCRegUnit RegUnit) const override;
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp	2026-10-01 01:24:49.115655126 +0700
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp	2026-10-01 01:24:49.118745231 +0700
+@@ -38,6 +38,7 @@
+ #include "llvm/CodeGen/VirtRegMap.h"
+ #include "llvm/IR/CallingConv.h"
+ #include "llvm/MC/MCRegisterInfo.h"
++#include "llvm/Support/CommandLine.h"
+ #include "llvm/Support/ErrorHandling.h"
+ 
+ #define DEBUG_TYPE "mos-reginfo"
+@@ -47,24 +48,70 @@
+ 
+ using namespace llvm;
+ 
+-// The native 16-bit registers, in the order of their appended pressure sets.
+-static constexpr MCPhysReg NativePressureRegs[] = {MOS::A16, MOS::X16,
+-                                                   MOS::Y16};
+-
+-// The appended sets are left out at -O3 (CodeGenOptLevel::Aggressive), where
+-// they cost speed. The decision is made once, here, because it has to hold for
+-// the subtarget's lifetime: RegisterClassInfo caches the set limits per
+-// register info, and the pressure trackers size their tables from
+-// getNumRegPressureSets. The level does not change after construction: the
+-// only TargetMachine::setOptLevel caller in codegen is SelectionDAGISel's
+-// per-function optnone override, and MOS selects with GlobalISel only.
++namespace {
++// Which target-defined pressure sets are appended to the generated ones.
++// Each group is one set over the units of its 16-bit registers.
++enum class GPRPressureSets { None, A, AXY, AXYJoint };
++cl::opt<GPRPressureSets> DefaultGPRPressureSets(
++    "mos-default-gpr-psets", cl::Hidden, cl::init(GPRPressureSets::None),
++    cl::desc("Pressure sets appended without native widths"),
++    cl::values(clEnumValN(GPRPressureSets::None, "none", "None"),
++               clEnumValN(GPRPressureSets::A, "a", "A16"),
++               clEnumValN(GPRPressureSets::AXY, "axy", "A16, X16, Y16"),
++               clEnumValN(GPRPressureSets::AXYJoint, "axyj",
++                          "A16, X16+Y16")));
++cl::opt<GPRPressureSets> NativeGPRPressureSets(
++    "mos-native-gpr-psets", cl::Hidden, cl::init(GPRPressureSets::AXY),
++    cl::desc("Pressure sets appended under native widths"),
++    cl::values(clEnumValN(GPRPressureSets::None, "none", "None"),
++               clEnumValN(GPRPressureSets::A, "a", "A16"),
++               clEnumValN(GPRPressureSets::AXY, "axy", "A16, X16, Y16"),
++               clEnumValN(GPRPressureSets::AXYJoint, "axyj",
++                          "A16, X16+Y16")));
++cl::opt<bool> DefaultGPRPressureSetsAtO3(
++    "mos-default-gpr-psets-o3", cl::Hidden, cl::init(false),
++    cl::desc("Keep the default-mode appended sets at -O3"));
++cl::opt<bool> GPRPressureSetsFirst(
++    "mos-gpr-psets-first", cl::Hidden, cl::init(false),
++    cl::desc("Number the appended sets before the generated ones"));
++cl::opt<bool> GPRPressureSetsLowScore(
++    "mos-gpr-psets-low-score", cl::Hidden, cl::init(false),
++    cl::desc("Rank the appended sets below the generated ones"));
++cl::opt<unsigned> GPRPressureSetALimit(
++    "mos-gpr-pset-a-limit", cl::Hidden, cl::init(0),
++    cl::desc("Override the A16 set limit (0: its unit count)"));
++cl::opt<unsigned> GPRPressureSetXYLimit(
++    "mos-gpr-pset-xy-limit", cl::Hidden, cl::init(0),
++    cl::desc("Override the default-mode X16/Y16 set limits (0: unit count)"));
++cl::opt<bool> NativeBorrow(
++    "mos-native-borrow", cl::Hidden, cl::init(true),
++    cl::desc("Native classes count toward their low byte's generated sets"));
++cl::opt<bool> NativeGPRPressureSetsAtO3(
++    "mos-native-gpr-psets-o3", cl::Hidden, cl::init(false),
++    cl::desc("Keep the native appended sets at -O3"));
++
++SmallVector<SmallVector<MCPhysReg, 2>, 3> groupsFor(GPRPressureSets S) {
++  switch (S) {
++  case GPRPressureSets::None:
++    return {};
++  case GPRPressureSets::A:
++    return {{MOS::A16}};
++  case GPRPressureSets::AXY:
++    return {{MOS::A16}, {MOS::X16}, {MOS::Y16}};
++  case GPRPressureSets::AXYJoint:
++    return {{MOS::A16}, {MOS::X16, MOS::Y16}};
++  }
++  llvm_unreachable("bad GPRPressureSets");
++}
++} // namespace
++
++
+ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
+                                  CodeGenOptLevel OptLevel)
+     : MOSGenRegisterInfo(/*RA=*/0, /*DwarfFlavor=*/0, /*EHFlavor=*/0,
+                          /*PC=*/0, /*HwMode=*/0),
+       STI(STI), Imag8SymbolNames(new std::string[getNumRegs()]),
+-      Reserved(getNumRegs()),
+-      AppendNativePressureSets(OptLevel != CodeGenOptLevel::Aggressive) {
++      Reserved(getNumRegs()) {
+   for (unsigned Reg : seq(0u, getNumRegs())) {
+     // Pointers are referred to by their low byte in the addressing modes that
+     // use them.
+@@ -93,112 +140,173 @@
+   // Reserve one temporary register for use by register scavenger.
+   reserveAllSubregs(&Reserved, MOS::RS8);
+ 
+-  // Build the native-width pressure-set lists; see getNumRegPressureSets.
++  // Build the appended pressure-set lists; see getNumRegPressureSets.
++  bool Aggressive = OptLevel == CodeGenOptLevel::Aggressive;
++  buildPressureSets(Tables[0], groupsFor(DefaultGPRPressureSets),
++                    !Aggressive || DefaultGPRPressureSetsAtO3,
++                    /*Native=*/false);
++  buildPressureSets(Tables[1], groupsFor(NativeGPRPressureSets),
++                    !Aggressive || NativeGPRPressureSetsAtO3,
++                    /*Native=*/true);
++}
++
++void MOSRegisterInfo::buildPressureSets(
++    PressureTables &T, ArrayRef<SmallVector<MCPhysReg, 2>> Groups,
++    bool Append, bool Native) {
+   auto Generated = [](const int *PSets) {
+     SmallVector<int, 8> L;
+     for (; *PSets != -1; ++PSets)
+       L.push_back(*PSets);
+     return L;
+   };
+-  NativeClassPSets.resize(getNumRegClasses());
+-  NativeUnitPSets.resize(getNumRegUnits());
++  T.ClassPSets.assign(getNumRegClasses(), {});
++  T.UnitPSets.assign(getNumRegUnits(), {});
++  T.Groups.clear();
++  if (Append)
++    T.Groups.assign(Groups.begin(), Groups.end());
+   const int NumGenerated = MOSGenRegisterInfo::getNumRegPressureSets();
+-  for (unsigned I = 0; I < std::size(NativePressureRegs); ++I) {
+-    const MCPhysReg Wide = NativePressureRegs[I];
+-    const int PSet = NumGenerated + I;
+-    // Each unit of the wide register counts toward its set.
+-    if (AppendNativePressureSets) {
++  // With the appended sets numbered first, every generated ID moves up.
++  T.First = GPRPressureSetsFirst && !T.Groups.empty();
++  const int Shift = T.First ? T.Groups.size() : 0;
++  auto Remap = [&](SmallVector<int, 8> L) {
++    for (int &P : L)
++      P += Shift;
++    return L;
++  };
++  if (T.First) {
++    for (unsigned ID = 0; ID < getNumRegClasses(); ++ID)
++      T.ClassPSets[ID] = Remap(
++          Generated(MOSGenRegisterInfo::getRegClassPressureSets(getRegClass(ID))));
++    for (unsigned U = 0; U < getNumRegUnits(); ++U)
++      T.UnitPSets[U] = Remap(Generated(
++          MOSGenRegisterInfo::getRegUnitPressureSets(static_cast<MCRegUnit>(U))));
++  }
++  // The native classes have GeneratePressureSet = 0 and so no generated sets;
++  // each counts toward its low byte's sets, like the 8-bit register it
++  // contains, with or without appended sets. Without native widths there are
++  // no such values, and the generated tables are left as they are.
++  for (MCPhysReg Wide : {MOS::A16, MOS::X16, MOS::Y16}) {
++    if (!Native || !NativeBorrow)
++      break;
++    const TargetRegisterClass *LoRC =
++        getMinimalPhysRegClass(getSubReg(Wide, MOS::sublo));
++    for (unsigned ID = 0; ID < getNumRegClasses(); ++ID) {
++      const TargetRegisterClass *RC = getRegClass(ID);
++      if (RC->getNumRegs() && RC->contains(Wide) &&
++          all_of(*RC, [&](MCPhysReg R) { return isSubRegisterEq(Wide, R); }))
++        T.ClassPSets[ID] =
++            Remap(Generated(MOSGenRegisterInfo::getRegClassPressureSets(LoRC)));
++    }
++  }
++  for (unsigned I = 0; I < T.Groups.size(); ++I) {
++    const auto &G = T.Groups[I];
++    const int PSet = T.First ? I : NumGenerated + I;
++    // Each unit of the group's registers counts toward its set.
++    for (MCPhysReg Wide : G)
+       for (MCRegUnit Unit : regunits(Wide)) {
+-        auto &L = NativeUnitPSets[static_cast<unsigned>(Unit)];
++        auto &L = T.UnitPSets[static_cast<unsigned>(Unit)];
+         if (L.empty())
+-          L = Generated(MOSGenRegisterInfo::getRegUnitPressureSets(Unit));
++          L = Remap(Generated(MOSGenRegisterInfo::getRegUnitPressureSets(Unit)));
+         L.push_back(PSet);
+       }
+-    }
+-    // So does each class whose registers all lie within the wide register:
+-    // its low byte's class (Ac, Xc, Yc) and its own class (Ac16, Xc16, Yc16).
+-    // The latter has GeneratePressureSet = 0 and so no generated sets; it
+-    // counts toward its low byte's sets, like the 8-bit register it contains,
+-    // with or without the appended set.
+-    const TargetRegisterClass *LoRC =
+-        getMinimalPhysRegClass(getSubReg(Wide, MOS::sublo));
++    // So does each class whose registers all lie within the group.
+     for (unsigned ID = 0; ID < getNumRegClasses(); ++ID) {
+       const TargetRegisterClass *RC = getRegClass(ID);
+       if (!RC->getNumRegs() || !all_of(*RC, [&](MCPhysReg Reg) {
+-            return isSubRegisterEq(Wide, Reg);
++            return any_of(G, [&](MCPhysReg W) {
++              return isSubRegisterEq(W, Reg);
++            });
+           }))
+         continue;
+-      if (!AppendNativePressureSets && !RC->contains(Wide))
+-        continue;
+-      auto &L = NativeClassPSets[ID];
++      auto &L = T.ClassPSets[ID];
+       if (L.empty())
+-        L = Generated(MOSGenRegisterInfo::getRegClassPressureSets(
+-            RC->contains(Wide) ? LoRC : RC));
+-      if (AppendNativePressureSets)
+-        L.push_back(PSet);
++        L = Remap(Generated(MOSGenRegisterInfo::getRegClassPressureSets(RC)));
++      L.push_back(PSet);
+     }
+   }
+-  for (auto &L : NativeClassPSets)
++  for (auto &L : T.ClassPSets)
+     if (!L.empty())
+       L.push_back(-1);
+-  for (auto &L : NativeUnitPSets)
++  for (auto &L : T.UnitPSets)
+     if (!L.empty())
+       L.push_back(-1);
+ }
+ 
+-// Register pressure under native widths.
++// Register pressure sets.
+ //
+ // Ac16, Xc16 and Yc16 set GeneratePressureSet = 0, so the generated pressure
+-// sets are exactly those of the 8-bit register file: the opt-in 16-bit
+-// registers leave MachineLICM, MachineSink and the scheduler unchanged for
+-// every subtarget that doesn't enable them. Under +mos-a16 (and so +mos-xy16),
+-// each native class counts toward its low byte's generated sets, and below
+-// -O3 these hooks also append one set per 16-bit register, holding its two
+-// byte units with a limit of 2. The 8-bit A, X or Y and the 16-bit register
+-// that contains it count toward the same set, so the heuristics see that an
+-// 8-bit value live across a 16-bit one competes for the same physical
+-// register. That saves code size but costs cycles, so -O3 leaves it out.
+-bool MOSRegisterInfo::hasNativePressureSets() const { return STI.hasAccum16(); }
++// sets are exactly those of the 8-bit register file. Target-defined sets are
++// appended per mode: one per group of 16-bit registers, over the group's byte
++// units, with the unit count as its limit. A class counts toward a group's set
++// when all its registers lie within the group.
++const MOSRegisterInfo::PressureTables &MOSRegisterInfo::tables() const {
++  return Tables[STI.hasAccum16() ? 1 : 0];
++}
+ 
+ unsigned MOSRegisterInfo::getNumRegPressureSets() const {
++  return MOSGenRegisterInfo::getNumRegPressureSets() + tables().Groups.size();
++}
++
++// Maps a pressure-set index to a generated set (>= 0) or to an appended
++// group (-1 - group).
++int MOSRegisterInfo::pressureSet(unsigned Idx) const {
++  const auto &T = tables();
+   unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
+-  return hasNativePressureSets() && AppendNativePressureSets
+-             ? N + std::size(NativePressureRegs)
+-             : N;
++  unsigned K = T.Groups.size();
++  if (T.First)
++    return Idx < K ? -1 - int(Idx) : int(Idx - K);
++  return Idx < N ? int(Idx) : -1 - int(Idx - N);
+ }
+ 
+ const char *MOSRegisterInfo::getRegPressureSetName(unsigned Idx) const {
+-  unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
+-  if (Idx < N)
+-    return MOSGenRegisterInfo::getRegPressureSetName(Idx);
+-  return getName(NativePressureRegs[Idx - N]);
++  int P = pressureSet(Idx);
++  if (P >= 0)
++    return MOSGenRegisterInfo::getRegPressureSetName(P);
++  const auto &G = tables().Groups[-1 - P];
++  return G.size() == 1 ? getName(G[0]) : "XY16";
+ }
+ 
+ unsigned MOSRegisterInfo::getRegPressureSetLimit(const MachineFunction &MF,
+                                                  unsigned Idx) const {
+-  unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
+-  if (Idx < N)
+-    return MOSGenRegisterInfo::getRegPressureSetLimit(MF, Idx);
+-  auto Units = regunits(NativePressureRegs[Idx - N]);
+-  return std::distance(Units.begin(), Units.end());
++  int P = pressureSet(Idx);
++  if (P >= 0)
++    return MOSGenRegisterInfo::getRegPressureSetLimit(MF, P);
++  const auto &G = tables().Groups[-1 - P];
++  if (GPRPressureSetALimit && &tables() == &Tables[0] && G.size() == 1 &&
++      G[0] == MOS::A16)
++    return GPRPressureSetALimit;
++  if (GPRPressureSetXYLimit && &tables() == &Tables[0] &&
++      !(G.size() == 1 && G[0] == MOS::A16))
++    return GPRPressureSetXYLimit * G.size();
++  unsigned Limit = 0;
++  for (MCPhysReg Wide : G) {
++    auto Units = regunits(Wide);
++    Limit += std::distance(Units.begin(), Units.end());
++  }
++  return Limit;
++}
++
++unsigned MOSRegisterInfo::getRegPressureSetScore(const MachineFunction &MF,
++                                                 unsigned Idx) const {
++  if (!GPRPressureSetsLowScore)
++    return Idx;
++  int P = pressureSet(Idx);
++  unsigned K = tables().Groups.size();
++  return P >= 0 ? K + P : -1 - P;
+ }
+ 
+ const int *
+ MOSRegisterInfo::getRegClassPressureSets(const TargetRegisterClass *RC) const {
+-  if (hasNativePressureSets()) {
+-    const auto &L = NativeClassPSets[RC->getID()];
+-    if (!L.empty())
+-      return L.data();
+-  }
++  const auto &L = tables().ClassPSets[RC->getID()];
++  if (!L.empty())
++    return L.data();
+   return MOSGenRegisterInfo::getRegClassPressureSets(RC);
+ }
+ 
+ const int *MOSRegisterInfo::getRegUnitPressureSets(MCRegUnit RegUnit) const {
+-  if (hasNativePressureSets()) {
+-    const auto &L = NativeUnitPSets[static_cast<unsigned>(RegUnit)];
+-    if (!L.empty())
+-      return L.data();
+-  }
++  const auto &L = tables().UnitPSets[static_cast<unsigned>(RegUnit)];
++  if (!L.empty())
++    return L.data();
+   return MOSGenRegisterInfo::getRegUnitPressureSets(RegUnit);
+ }
+ 

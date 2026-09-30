@@ -1,0 +1,47 @@
+== O2 a16: 17 sims pass under every variant
+   base   clocks 352,265,270  bytes 27,280 | vs up: +130,856 clk (+0.04%), +27 B, faster 0 slower 3
+   cand   clocks 352,134,414  bytes 27,253 | vs base: -130,856 clk (-0.04%), -27 B, faster 3 slower 0 | vs up: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   up     clocks 352,134,414  bytes 27,253 | vs base: -130,856 clk (-0.04%), -27 B, faster 3 slower 0
+   upfirst clocks 352,265,270  bytes 27,280 | vs base: +0 clk (+0.00%), +0 B, faster 0 slower 0 | vs up: +130,856 clk (+0.04%), +27 B, faster 0 slower 3
+     cand vs base per sim: tea_sim -112,336; avalanche_sim -16,880; perlin_sim -1,640
+     up vs base per sim: tea_sim -112,336; avalanche_sim -16,880; perlin_sim -1,640
+== O2 a16xy16: 17 sims pass under every variant
+   base   clocks 349,073,278  bytes 27,092 | vs up: +129,592 clk (+0.04%), +31 B, faster 0 slower 3
+   cand   clocks 348,943,686  bytes 27,061 | vs base: -129,592 clk (-0.04%), -31 B, faster 3 slower 0 | vs up: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   up     clocks 348,943,686  bytes 27,061 | vs base: -129,592 clk (-0.04%), -31 B, faster 3 slower 0
+   upfirst clocks 349,073,278  bytes 27,092 | vs base: +0 clk (+0.00%), +0 B, faster 0 slower 0 | vs up: +129,592 clk (+0.04%), +31 B, faster 0 slower 3
+     cand vs base per sim: tea_sim -112,336; avalanche_sim -16,880; perlin_sim -376
+     up vs base per sim: tea_sim -112,336; avalanche_sim -16,880; perlin_sim -376
+== O2 default: 17 sims pass under every variant
+   base   clocks 351,187,956  bytes 26,823 | vs up: -253,302 clk (-0.07%), -236 B, faster 8 slower 5
+   cand   clocks 351,733,834  bytes 26,475 | vs base: +545,878 clk (+0.16%), -348 B, faster 9 slower 3 | vs up: +292,576 clk (+0.08%), -584 B, faster 10 slower 3
+   up     clocks 351,441,258  bytes 27,059 | vs base: +253,302 clk (+0.07%), +236 B, faster 5 slower 8
+   upfirst clocks 351,441,258  bytes 27,059 | vs base: +253,302 clk (+0.07%), +236 B, faster 5 slower 8 | vs up: +0 clk (+0.00%), +0 B, faster 0 slower 0
+     cand vs base per sim: critters_sim -119,056; sodo_sim -52,920; nmitally_sim -48,004; perlin_sim -38,508; jt256_sim -33,976; lzdec_sim -18,486; rangecode_sim -14,840; tea_sim -12,136; avalanche_sim -4,956; boids_sim +19,098; grid3d_sim +120,446; fenwick_sim +749,216
+     up vs base per sim: critters_sim -459,016; perlin_sim -41,024; sodo_sim -26,624; lzdec_sim -17,834; rangecode_sim -11,250; cgrade_sim +4,960; nmitally_sim +17,276; fenwick_sim +23,760; jt256_sim +52,476; avalanche_sim +82,770; grid3d_sim +148,654; boids_sim +152,568; tea_sim +326,586
+     upfirst vs base per sim: critters_sim -459,016; perlin_sim -41,024; sodo_sim -26,624; lzdec_sim -17,834; rangecode_sim -11,250; cgrade_sim +4,960; nmitally_sim +17,276; fenwick_sim +23,760; jt256_sim +52,476; avalanche_sim +82,770; grid3d_sim +148,654; boids_sim +152,568; tea_sim +326,586
+== O3 a16: 17 sims pass under every variant
+   base   clocks 316,112,188  bytes 42,285 | vs up: -448,302 clk (-0.14%), -233 B, faster 5 slower 5
+   cand   clocks 316,560,490  bytes 42,518 | vs base: +448,302 clk (+0.14%), +233 B, faster 5 slower 5 | vs up: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   up     clocks 316,560,490  bytes 42,518 | vs base: +448,302 clk (+0.14%), +233 B, faster 5 slower 5
+   upfirst clocks 316,560,490  bytes 42,518 | vs base: +448,302 clk (+0.14%), +233 B, faster 5 slower 5 | vs up: +0 clk (+0.00%), +0 B, faster 0 slower 0
+     cand vs base per sim: critters_sim -129,944; nmitally_sim -20,760; rangecode_sim -15,428; perlin_sim -15,260; lzdec_sim -2,012; boids_sim +24; jt256_sim +14,784; avalanche_sim +15,280; cgrade_sim +15,880; grid3d_sim +585,738
+     up vs base per sim: critters_sim -129,944; nmitally_sim -20,760; rangecode_sim -15,428; perlin_sim -15,260; lzdec_sim -2,012; boids_sim +24; jt256_sim +14,784; avalanche_sim +15,280; cgrade_sim +15,880; grid3d_sim +585,738
+     upfirst vs base per sim: critters_sim -129,944; nmitally_sim -20,760; rangecode_sim -15,428; perlin_sim -15,260; lzdec_sim -2,012; boids_sim +24; jt256_sim +14,784; avalanche_sim +15,280; cgrade_sim +15,880; grid3d_sim +585,738
+== O3 a16xy16: 17 sims pass under every variant
+   base   clocks 314,118,098  bytes 42,076 | vs up: -47,212 clk (-0.02%), -178 B, faster 4 slower 4
+   cand   clocks 314,165,310  bytes 42,254 | vs base: +47,212 clk (+0.02%), +178 B, faster 4 slower 4 | vs up: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   up     clocks 314,165,310  bytes 42,254 | vs base: +47,212 clk (+0.02%), +178 B, faster 4 slower 4
+   upfirst clocks 314,165,310  bytes 42,254 | vs base: +47,212 clk (+0.02%), +178 B, faster 4 slower 4 | vs up: +0 clk (+0.00%), +0 B, faster 0 slower 0
+     cand vs base per sim: perlin_sim -89,140; critters_sim -64,664; nmitally_sim -20,760; rangecode_sim -15,428; boids_sim +24; avalanche_sim +15,280; cgrade_sim +15,880; grid3d_sim +206,020
+     up vs base per sim: perlin_sim -89,140; critters_sim -64,664; nmitally_sim -20,760; rangecode_sim -15,428; boids_sim +24; avalanche_sim +15,280; cgrade_sim +15,880; grid3d_sim +206,020
+     upfirst vs base per sim: perlin_sim -89,140; critters_sim -64,664; nmitally_sim -20,760; rangecode_sim -15,428; boids_sim +24; avalanche_sim +15,280; cgrade_sim +15,880; grid3d_sim +206,020
+== O3 default: 17 sims pass under every variant
+   base   clocks 310,146,318  bytes 39,610 | vs up: -943,748 clk (-0.30%), +419 B, faster 7 slower 5
+   cand   clocks 309,515,692  bytes 38,660 | vs base: -630,626 clk (-0.20%), -950 B, faster 10 slower 1 | vs up: -1,574,374 clk (-0.51%), -531 B, faster 10 slower 2
+   up     clocks 311,090,066  bytes 39,191 | vs base: +943,748 clk (+0.30%), -419 B, faster 5 slower 7
+   upfirst clocks 311,090,066  bytes 39,191 | vs base: +943,748 clk (+0.30%), -419 B, faster 5 slower 7 | vs up: +0 clk (+0.00%), +0 B, faster 0 slower 0
+     cand vs base per sim: fenwick_sim -400,784; critters_sim -119,056; sodo_sim -52,920; nmitally_sim -48,004; perlin_sim -38,508; jt256_sim -31,748; lzdec_sim -18,446; rangecode_sim -14,840; avalanche_sim -4,956; boids_sim -710; grid3d_sim +99,346
+     up vs base per sim: critters_sim -459,016; perlin_sim -41,024; sodo_sim -26,624; lzdec_sim -17,834; rangecode_sim -11,016; cgrade_sim +4,960; nmitally_sim +17,276; boids_sim +32,528; fenwick_sim +46,240; jt256_sim +57,792; avalanche_sim +82,770; grid3d_sim +1,257,696
+     upfirst vs base per sim: critters_sim -459,016; perlin_sim -41,024; sodo_sim -26,624; lzdec_sim -17,834; rangecode_sim -11,016; cgrade_sim +4,960; nmitally_sim +17,276; boids_sim +32,528; fenwick_sim +46,240; jt256_sim +57,792; avalanche_sim +82,770; grid3d_sim +1,257,696
+== status counts (level mode variant status: n)

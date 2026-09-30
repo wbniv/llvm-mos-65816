@@ -1858,6 +1858,102 @@
     {
       "path": "docs/defects/evidence/2026-09-27-carry-profitability/tradeoff-timing.json.gz",
       "sha256": "192701669e5515c553af31673b0adaabccf2e4e077bbc0e2d710a7622cbf8ec1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/README.md",
+      "sha256": "6e4e1b9f71d3afa143b2ab09eff463c4c56cd2ee1e02d22ea448993003cf253c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/candidate-accumulator-pressure-set.patch",
+      "sha256": "2a50f8e119dc0ac68cd736cbf1562842b909354853163a62b7c27a65b82f82c6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/clocks/identity.json",
+      "sha256": "91dddc679f8b5af2d8c58861f1c529aca78ce5bc300ed1eb38604856e1acd27b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/clocks/results.tsv",
+      "sha256": "693c8d5feb20ead287a4db40ea9d48954d6bff9f6f97d19591fb899bd6a64c1f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/clocks/summary.txt",
+      "sha256": "830d6e2927ede8879c948375176a1b45c0881ce7fd20c2458461008e4308d4bd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/corpus-a16.log",
+      "sha256": "881a79254124594d630be44cfe9ba410b5f09fb829c5164801f31b18fbf570dc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/default-decomposition.txt",
+      "sha256": "9c2d4c7511936cbafe1c5fd074d8e9cac23a5966b9bc708794ee2a056b892080"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/explore-MOSRegisterInfo.diff",
+      "sha256": "e533e756efcf2bda12d49bfa2c62de5bdb40cf471bf254232492c069da0c4872"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/identity.sha256",
+      "sha256": "f4d5279a7830b5279274899efa96ee6393b422a917b72214b831708b9f7ec519"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/lit.log",
+      "sha256": "860fd14dfae528e76b58cb3f78bcfa515c9b57d245b9d6c8c85bf35ab027fc3b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/native-decomposition.txt",
+      "sha256": "a97508cdbf9c282f6677179944629c88f61f796939c534c6b5a6e5a467044821"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/sizes.tar.gz",
+      "sha256": "bf74b14fe83cdf144458e2b37582ff491145afdcded9f1a2b7a65b32772ebf72"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/test-red-green.log",
+      "sha256": "588e01701c9ea2348a15f0e2bfa8463ff5c76a1765254173d78918cc222bd1b8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/tools/clocks-summary.py",
+      "sha256": "299ea8daec85f90ad2213bedcf02adf3d0c0a641a15973043d14b8ef2b84cece"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/tools/gen-ir.sh",
+      "sha256": "5bd4a9c55b1f1ebbcdccced83b43e35c4dcdfa25b1cb5bc17d1a0e3f784c5d82"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/tools/llc-sizes.sh",
+      "sha256": "4316507d7b54ff3f0929aa32da87d714c8570c6234de6ce1e793e6b250b34b92"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/tools/matrix-summary.py",
+      "sha256": "a3fe768635841572f950c6fbf31c58625561952e880d7ea47ceefd1b10d5fa7f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/tools/runtime-clocks.py",
+      "sha256": "dcd36ad3450982aa4efbdca7723893e17b1afded9887ed2f58facc522c9574a8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/tools/size-cmp.py",
+      "sha256": "7f2e6b2b00a318fa5cd7b2dadf8e550eb2e88066b1fa521a0254f629cc7696ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/tools/size-matrix.sh",
+      "sha256": "fed8b1b01621c108817e6d3230a6047291039b45b0bbfebec3d22b17e2bfa243"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/truchet.c.a16xy16.ll.gz",
+      "sha256": "edbadeed52d84ac0589d4d414f48a56d4b1e4bd04423724380531a3c6f832f0a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/verify-candidate.log",
+      "sha256": "220d0a7edf76aa92b134924c124553fbfb0d8164520144639a15dab74029b5e7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/truchet-o3-xy16/verify-downstream.log",
+      "sha256": "1f5cc9a23b06665ebb15d82f852a10d30322791c3a5a4808f4bbf142fce83f06"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/verify-summary.txt",
+      "sha256": "f56e39048a3513637eb20d61cee89bbf2c0dfc50ee0e3d6deccc2bb0228249b1"
     }
   ],
   "baseline": {
@@ -1939,6 +2035,22 @@
       "report": "docs/investigations/2026-09-27-carry-profitability-model.md",
       "evidence": "docs/defects/evidence/2026-09-27-carry-profitability/receipt.json",
       "scope": "Investigated and retained for discussion. Default unchanged; generic pressure contract remains a workaround. No upstream submission."
+    },
+    {
+      "date": "2026-10-01",
+      "kind": "pressure-contract-root-cause-and-candidate",
+      "report": "docs/plans/2026-10-01-carry-pressure-contract.md",
+      "evidence": "docs/defects/evidence/2026-10-01-carry-pressure-contract/README.md",
+      "toolchains": {
+        "current_downstream_llc": "f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1",
+        "upstream_design_llc": "9f9b74f91eab29e17ed0c25f46af803e5cad3dbaf2f4a29847cf0ff868948f47",
+        "candidate_llc": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+        "candidate_location": "build/carry-press-ir/cand/ (llc, clang-23, lld, llvm-objdump); source: 0002 + the upstream native-width design (docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/vendor-candidate.diff) + docs/defects/evidence/2026-10-01-carry-pressure-contract/candidate-accumulator-pressure-set.patch"
+      },
+      "observation": "0064/0067 read no pressure set: the carry model counts live computed Cc vregs from DAG edges, first in MOSSchedStrategy::tryCandidate. What the old 14 generated sets supplied was an accumulator dimension (Ac16 set, limit 2, set 0; Ac counts toward it). With it, carry scheduling saved 39,209 B at -Os (default mode, 262 inputs), mostly by repairing that set's side effect in the scheduler (with MachineLICM and MachineSink off, the old sets are 38,066 B worse than upstream's without carry scheduling and 1,279 B better with it). The set's own gain came through MachineLICM (with MachineLICM off the set change costs 1,800 B instead of 13,427 B). Under upstream's 6 sets carry scheduling saves 492 B. An appended A16 set alone reproduces the old default-mode MachineLICM/MachineSink behaviour (same size for every input with scheduler pressure tracking off). Native residue: set numbering (appended after the generated sets) and the split X16/Y16 sets account for 1,263 of 1,638 B (carry off); 375 B remain unisolated.",
+      "candidate": "An explicit accumulator pressure set appended in 8-bit mode with limit 1, at every level, beside 0064/0067 (unchanged). Against the current downstream, default mode: -0.65% (-Os), -0.45% (-Oz), -0.74% (-O2), -0.46% (-O3) bytes; clocks -0.20% at -O3 and +0.16% at -O2 (fenwick_sim +749,216). Native modes equal the upstream design: +0.05% to +0.13% bytes at -Os/-Oz/-O2, +0.42% at -O3. lit 192 pass/4 unsupported; verifier sweep adds no failure; corpus-a16 83/83 on MAME and bsnes-jg with the SDK rebuilt by the candidate.",
+      "scope": "Investigation and unlanded candidate. 0002, vendor/ and the posted 0064 PR are unchanged. The native bar (not worse than the current downstream) is not met and is escalated. Status stays workaround: the generic TableGen fine-grained pressure-set contract is not corrected.",
+      "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d."
     }
   ]
 }

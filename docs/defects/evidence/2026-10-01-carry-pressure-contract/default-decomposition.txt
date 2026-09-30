@@ -1,0 +1,46 @@
+# Default mode, -Os IR (build/pressure-sets/final/downstream/codegen/ir), llc -O2, 262 inputs.
+# A = old 14 sets (llc f1fa50a2, current downstream); B = upstream 6 sets (llc 9f9b74f9); X1..X4 = exploration llc (see ../README.md).
+# Suffixes: always/off = -mos-carry-sched; nolicm = -disable-machine-licm; nosink = -disable-machine-sink; nl = both;
+# norp = -misched-regpressure=false; def-<g> = -mos-default-gpr-psets=<g>; lim<N> = -mos-gpr-pset-a-limit=<N>.
+
+$ size-cmp.py A-always.tsv <consumer matrix>
+A-always.tsv: 262 inputs, 2315097 B
+  A-off.tsv: 2315097 -> 2354306 (+39209, +1.69%), larger 202, smaller 3
+  B-always.tsv: 2315097 -> 2328524 (+13427, +0.58%), larger 207, smaller 35
+  B-off.tsv: 2315097 -> 2329016 (+13919, +0.60%), larger 209, smaller 33
+  A-nolicm-always.tsv: 2315097 -> 2264170 (-50927, -2.20%), larger 12, smaller 232
+  A-nolicm-off.tsv: 2315097 -> 2303833 (-11264, -0.49%), larger 80, smaller 171
+  B-nolicm-always.tsv: 2315097 -> 2265970 (-49127, -2.12%), larger 28, smaller 228
+  B-nolicm-off.tsv: 2315097 -> 2266886 (-48211, -2.08%), larger 29, smaller 227
+  A-nl-always.tsv: 2315097 -> 2288767 (-26330, -1.14%), larger 42, smaller 207
+  A-nl-off.tsv: 2315097 -> 2329064 (+13967, +0.60%), larger 155, smaller 99
+  B-nl-always.tsv: 2315097 -> 2290046 (-25051, -1.08%), larger 63, smaller 195
+  B-nl-off.tsv: 2315097 -> 2290998 (-24099, -1.04%), larger 64, smaller 194
+  A-nosink-always.tsv: 2315097 -> 2339847 (+24750, +1.07%), larger 185, smaller 33
+  B-nosink-always.tsv: 2315097 -> 2354069 (+38972, +1.68%), larger 223, smaller 28
+  A-norp-always.tsv: 2315097 -> 2336012 (+20915, +0.90%), larger 213, smaller 32
+  A-norp-off.tsv: 2315097 -> 2336206 (+21109, +0.91%), larger 213, smaller 32
+  B-norp-always.tsv: 2315097 -> 2340300 (+25203, +1.09%), larger 213, smaller 33
+  B-norp-off.tsv: 2315097 -> 2340488 (+25391, +1.10%), larger 213, smaller 33
+
+$ size-cmp.py A-always.tsv <appended default-mode sets>
+A-always.tsv: 262 inputs, 2315097 B
+  X1-none.tsv: 2315097 -> 2328524 (+13427, +0.58%), larger 207, smaller 35
+  X1-def-a.tsv: 2315097 -> 2313831 (-1266, -0.05%), larger 67, smaller 120
+  X1-def-axy.tsv: 2315097 -> 2313507 (-1590, -0.07%), larger 66, smaller 123
+  X1-def-axyj.tsv: 2315097 -> 2313831 (-1266, -0.05%), larger 67, smaller 120
+  X1-def-a-off.tsv: 2315097 -> 2343628 (+28531, +1.23%), larger 209, smaller 13
+  X1-def-axy-off.tsv: 2315097 -> 2343249 (+28152, +1.22%), larger 209, smaller 13
+  X1-def-axyj-off.tsv: 2315097 -> 2343628 (+28531, +1.23%), larger 209, smaller 13
+  X1-def-a-nolicm.tsv: 2315097 -> 2262086 (-53011, -2.29%), larger 17, smaller 232
+  X1-def-a-norp.tsv: 2315097 -> 2336012 (+20915, +0.90%), larger 213, smaller 32
+  X2-def-a-first.tsv: 2315097 -> 2315413 (+316, +0.01%), larger 114, smaller 6
+  X2-def-a-low-score.tsv: 2315097 -> 2317417 (+2320, +0.10%), larger 150, smaller 37
+  X2-def-a-lim1.tsv: 2315097 -> 2299980 (-15117, -0.65%), larger 36, smaller 202
+  X2-def-a-lim3.tsv: 2315097 -> 2319991 (+4894, +0.21%), larger 180, smaller 46
+  X2-l1-off.tsv: 2315097 -> 2347204 (+32107, +1.39%), larger 214, smaller 31
+  X2-l1-gated.tsv: 2315097 -> 2305348 (-9749, -0.42%), larger 62, smaller 179
+  X2-l1-nolicm.tsv: 2315097 -> 2250589 (-64508, -2.79%), larger 14, smaller 243
+  X2-l1-norp.tsv: 2315097 -> 2335731 (+20634, +0.89%), larger 213, smaller 32
+  X2-l1-first.tsv: 2315097 -> 2299229 (-15868, -0.69%), larger 33, smaller 203
+  X2-axy-l1.tsv: 2315097 -> 2299638 (-15459, -0.67%), larger 37, smaller 201
