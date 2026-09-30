@@ -96,6 +96,8 @@ Because the executed programs are byte-identical, the September 28 [size and mas
 
 ## Independent review
 
+**Third review (2026‑10‑01), of the second round on #594:** [independent-review-3.md](independent-review-3.md). No new blocker: #594 is carried faithfully, and B8, B9, N10 and N12–N15 are fixed. The #320 prerequisite and 0069/0070 can file once mlund answers the #594 points (B5 numbering, B7 alignment including the 1b reservation fix). Nonblocking N17–N22 remain, notably N17: #320‑2 silently fixes an upstream SPC700 segfault.
+
 **Second review (2026‑10‑01), after the far-prerequisite carry:** [independent-review-2.md](independent-review-2.md). B1, B2, B3 and B6 are fixed and B4 is fixed at its site, but two new blockers remain: B8 (the same dangling `DBG_VALUE` at three other far fold sites) and B9 (#320 asserts on Imag32 spills until far-word patch 10). Filing still waits on those as well as B5/B7.
 
 [Verdict](independent-review.md): **do not file this series yet.** The reviewer confirmed every coordinator result above with its own runner on the frozen tools. It found the rebase faithful and upheld the optimizations:
