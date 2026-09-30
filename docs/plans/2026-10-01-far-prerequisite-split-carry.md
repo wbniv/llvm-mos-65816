@@ -41,7 +41,9 @@ Aligning #320‑1 means choosing one of these, and each option changes the far A
 2. Wait for #594's SDK contiguity contract, then gate RL allocation and the RL calling convention on it. The far series stays blocked until then.
 3. Keep far pointers out of RL allocation by passing them on the stack or in `A`/`X`/`Y`. This is an ABI redesign.
 
-That is a design choice between incompatible options that needs the user, and #594's author and maintainers. It is escalated rather than decided here. #320‑1 is carried with its register definitions unchanged; only N3/N4 are applied to it. Every repair above is independent of that choice.
+That is a design choice between incompatible options that needs the user, and #594's author and maintainers. It is escalated rather than decided here.
+
+**Decision (user, 2026‑10‑01): option 1, with a coordination comment on #594 before filing.** Carry #594 unchanged as #320‑1a with mlund's authorship, and adopt its numbering (`Imag16RegsOffset + MaxImag16Regs`, which settles B5). Add RL allocation and the RL calling convention as #320‑1b. Read on 2026‑10‑01, #594's own roadmap puts an SDK linker contract for contiguous four-byte imaginary registers first (`mlund/llvm-mos-sdk:imag32-contract`) and allocation after it. The [drafted comment](../pr-preparations/2026-10-01/594-comment.md) therefore proposes gating allocation on that contract, with the SNES platform declaring it, and keeps a 65816-only gate as the fallback. It also proposes agreeing on one far address space with mlund's planned MEGA65 `[ptr],z` work. Implementation starts after the second independent review of the carried #320 commits, and follows mlund's reply if one arrives first. #320‑1 is carried with its register definitions unchanged; only N3/N4 are applied to it. Every repair above is independent of that choice.
 
 ## Method
 

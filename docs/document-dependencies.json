@@ -2616,10 +2616,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "ae18b63d8b243b1eafadae9ff332c582f671d175a64e6f730f6d1f2d4395d993"
+          "TODO.md": "37c1ac743021fd0b02ec16fd020006371096fcc3f0a1406dcca7d440b51909c2"
         },
-        "reviewed_at": "2026-09-30T19:10:14.401677+00:00",
-        "note": "TODO gained the T4 dither -O3 defect-capture item (ranked by the user); the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-09-30T19:17:33.795262+00:00",
+        "note": "The 0069/0070 items record the user's #594 choice (build on #594) and the drafted coordination comment; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
