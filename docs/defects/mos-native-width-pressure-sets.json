@@ -11,7 +11,8 @@
   "T4 design, experiments and evidence (t4-design/): Claude Code 2.1.285 (claude --version at run time; t4-opus-high subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk.",
   "Optimization-level gating run and evidence (opt-levels/): Claude Code 2.1.285 (claude --version at run time; T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition; not readable from session metadata); session https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F.",
   "Application to the #320/#321 split series and downstream 0002, -O3 gate, regression tests, measurements and closure (final/): Claude Code 2.1.285 (claude --version at run time; T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition; not readable from session metadata); session https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F.",
-  "Closure (status fixed from the prepared closure_ready block, split-series scope, downstream held per the user decision of 2026-10-01): Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5); reasoning effort not recorded in session metadata; session https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F."
+  "Closure (status fixed from the prepared closure_ready block, split-series scope, downstream held per the user decision of 2026-10-01): Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5); reasoning effort not recorded in session metadata; session https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F.",
+  "-O2 speed-gate measurement on the large programs (o2-large/): Claude Code 2.1.285 (claude --version at run time; T3 plan-execution subagent), model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (t3-opus-med agent definition; not readable from session metadata); session https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F."
  ],
  "prior_work": {
   "disposition": "distinct_from_related",
@@ -387,6 +388,74 @@
    },
    "exit_code": 0,
    "observed": "default: 251 changed, 11 identical, 15 fail on both; 2,315,097 -> 2,328,524 B (+13,427). +mos-a16 +3,003 B; +mos-a16,+mos-xy16 +3,070 B. With -mos-carry-sched=off: default -25,290 B."
+  },
+  {
+   "label": "-O2 speed gate on large programs (o2-large/): master clocks of dither, mvscrl and packrec runtime harnesses (unchanged demo TU, v-blank wait hooked out, host-oracle-checked fold) via the SDK's -flto build, each llc compiling the link's precodegen module",
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/tools/run-all.sh /home/will/llvm-mos-65816/build/pressure-sets/o2-large/run1 (LTO phase: tools/runtime-clocks-large.py --lto)",
+   "working_directory": "/home/will/llvm-mos-65816",
+   "configuration": {
+    "tool": "mos-clang -flto -O2|-O3 --save-temps; llc -O2|-O3 on the precodegen module with the LTO driver codegen options (-zp-avail=224); link with the installed SDK at -Os; bsnes-jg cycle probe, main entry to the expected corpus_result write, 2 runs per ROM",
+    "triple": "mos",
+    "cpus": [
+     "mosw65816"
+    ],
+    "features": [
+     "+mos-a16",
+     "+mos-a16,+mos-xy16"
+    ],
+    "optimization": "O2, O3",
+    "lto": true,
+    "outputs": [
+     "master clocks",
+     "obj size (.text+.data+.rodata)"
+    ]
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/llc/321-16 (head), build/pressure-sets/t4/llc/321-16-t4 (t4), build/pressure-sets/final/llc/321-16 (final, da1a6f4ba69c97f3776280e7cff07345175da4d385c92eafd820bc6f24c9bc10), build/pressure-sets/t4/llc/head-probe -mos-native-pressure-probe=1 (memb1, d0e46c1353ba5d0d45e81d201ca3cf4ce171e0292b29bea4b810f70a98cca8be); frontend/link: installed clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c; probe jgxcycles 3c04775feb68c4d25d904df8b079f0de5a8a58a8e20c7e62adde31060cb5bec3",
+   "toolchain_sha256": "da1a6f4ba69c97f3776280e7cff07345175da4d385c92eafd820bc6f24c9bc10",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/lto/identity.json",
+    "sha256": "f98acb79a334f3dfb1eb63fbd35d74e596f0174cdd90d866d9d233a24f639ea5"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/lto/summary.txt",
+    "sha256": "97b71c88926981a40c3a9c97ee5d8318308fd37e591a4d57d0f8803af9e2f6e6"
+   },
+   "exit_code": 0,
+   "observed": "-O2, memb1 (appended sets off) vs t4 (= final #321-16): +mos-a16 total +232,206 clocks (+0.04%) of 654.3 M (dither +0.02%, mvscrl +0.04%, packrec +0.11%; steady-state loop -0.02%, only mvscrl -0.09%; setup +0.22%), +98 B; +mos-a16,+mos-xy16 +235,278 (+0.03%), +92 B. 64 of 64 -O2 rows PASS and deterministic. Library functions unchanged between t4 and memb1 (only demo/snesgfx functions move). -O3: packrec only (memb1 = final +0.14%/+0.13% vs t4); mvscrl -O3 overflows the 32 KB near ROM bank; dither -O3 writes a wrong fold under every variant (pre-existing -O3 failure of the dither demo on the installed toolchain, o3-dither/report.txt). Verdict: the -O2 gain does not hold; do not build the per-level subtarget."
+  },
+  {
+   "label": "-O2 speed gate on large programs (o2-large/): non-LTO cross-check with the frozen opt-levels method, mvscrl and packrec (dither's non-LTO object overflows low WRAM by 109 B)",
+   "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/tools/run-all.sh /home/will/llvm-mos-65816/build/pressure-sets/o2-large/run1 (non-LTO phase: tools/runtime-clocks-large.py)",
+   "working_directory": "/home/will/llvm-mos-65816",
+   "configuration": {
+    "tool": "installed clang -O2|-O3 -fno-lto (IR, target attributes stripped) + llc -O2|-O3; link with the installed SDK at -Os; bsnes-jg cycle probe, 2 runs per ROM",
+    "triple": "mos",
+    "cpus": [
+     "mosw65816"
+    ],
+    "features": [
+     "+mos-a16",
+     "+mos-a16,+mos-xy16"
+    ],
+    "optimization": "O2, O3",
+    "lto": false,
+    "outputs": [
+     "master clocks",
+     "obj size (.text+.data+.rodata)"
+    ]
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/llc/321-16 (head), build/pressure-sets/t4/llc/321-16-t4 (t4), build/pressure-sets/final/llc/321-16 (final, da1a6f4ba69c97f3776280e7cff07345175da4d385c92eafd820bc6f24c9bc10), build/pressure-sets/t4/llc/head-probe -mos-native-pressure-probe=1 (memb1, d0e46c1353ba5d0d45e81d201ca3cf4ce171e0292b29bea4b810f70a98cca8be); frontend/link: installed clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c; probe jgxcycles 3c04775feb68c4d25d904df8b079f0de5a8a58a8e20c7e62adde31060cb5bec3",
+   "toolchain_sha256": "da1a6f4ba69c97f3776280e7cff07345175da4d385c92eafd820bc6f24c9bc10",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/nolto/identity.json",
+    "sha256": "bd1e3abb15f7fe6cb41715d6e0afd471f496195e88a5d35ada18274e0d50861b"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/nolto/summary.txt",
+    "sha256": "f692a203b43936f0bbbbe500054eac89741d302b6cb33ed5c02854d4b12bf520"
+   },
+   "exit_code": 0,
+   "observed": "-O2, memb1 vs t4 over mvscrl + packrec: +mos-a16 +71,196 clocks (+0.04%; loop -0.06%, setup +0.15%); +mos-a16,+mos-xy16 +74,008 (+0.04%). -O3 packrec +0.08%. mvscrl -O3 link-fail (ROM bank overflow) under every variant. All passing rows deterministic."
   }
  ],
  "candidate_change": {
@@ -397,7 +466,7 @@
   },
   "pressure_tables": "tables/candidate-321-01.txt and tables/candidate-321-16.txt equal tables/upstream-06bc967d2668.txt"
  },
- "unknowns": "Resolved: native growth (T4 design), placement (#321-1 flag, #321-8 hooks), opt-level gate (-O3, target-machine-wide; the level cannot change after the subtarget is built because MOS never runs SelectionDAGISel). Remaining: per-input growth under shrinking totals is recorded but does not block (user decision); the SDK -flto link without -O or with -Os/-Oz/-O2 codegens at Default and keeps the appended sets (accepted); the downstream -debug-only gate test is UNSUPPORTED in the Release toolchain (assertions builds run it); Downstream application is held: with 0064/0067 carry scheduling (default always), removing the Ac16/Xc16/Yc16-derived sets grows default-mode code by 13,427 B (+0.58%) and native code by about 3 KB at -Os over 262-276 SNES sources; the carry model's dependence on those incidental sets needs a user decision (apply anyway, retune carry scheduling first, or keep downstream's sets). Native growth with carry scheduling off (+1,638 B, +mos-a16) is not yet explained.",
+ "unknowns": "Resolved: native growth (T4 design), placement (#321-1 flag, #321-8 hooks), opt-level gate (-O3, target-machine-wide; the level cannot change after the subtarget is built because MOS never runs SelectionDAGISel). Remaining: per-input growth under shrinking totals is recorded but does not block (user decision); the SDK -flto link without -O or with -Os/-Oz/-O2 codegens at Default and keeps the appended sets (accepted); the downstream -debug-only gate test is UNSUPPORTED in the Release toolchain (assertions builds run it); Downstream application is held: with 0064/0067 carry scheduling (default always), removing the Ac16/Xc16/Yc16-derived sets grows default-mode code by 13,427 B (+0.58%) and native code by about 3 KB at -Os over 262-276 SNES sources; the carry model's dependence on those incidental sets needs a user decision (apply anyway, retune carry scheduling first, or keep downstream's sets). Native growth with carry scheduling off (+1,638 B, +mos-a16) is not yet explained. The -O2 speed gate (per-level subtarget) was measured on dither, mvscrl and packrec (o2-large/, 2026-10-01): sets off is +0.03-0.04% clocks and larger there, so it is not built. Seen, not diagnosed: the dither demo at -O3 on the installed toolchain never writes its gate CRC (default and +mos-a16), a separate defect candidate.",
  "observations": [
   {
    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/README.md",
@@ -1198,6 +1267,98 @@
   {
    "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/change/pressure-targets.txt",
    "sha256": "fbdf18efa7d7e64f706febf902304cce57260488d744f88bed1ce0a85c38fbe2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/README.md",
+   "sha256": "e49ea4351659ecbb8bcddaea87912c2bf3476b046ed9f45f42eb50d75bcaa0db"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/harness/dither_run.c",
+   "sha256": "826475cf0825a43dd4d81530b03bf742d7de9ec8e850b368955b440e85e755f2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/harness/harness_hook.h",
+   "sha256": "8732eb4ea764bc0901fb671ad32f0ce326f197549045df2294191bdf3c341286"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/harness/mvscrl_run.c",
+   "sha256": "a2ecc904501e29db0c4e546a83252290f2df6e7d27a89cc9fd16836af89b96b0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/harness/packrec_run.c",
+   "sha256": "a24e000233a258011a379d4b0436b12c15d89de1a3ff3464d45be8f607830822"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/o3-dither/report.txt",
+   "sha256": "bc7a076ba6b0e5d5d152a5a52e4c2e983a643eddfcfe395ef832145997f651fe"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/lto/fn-diff-O2-t4-memb1.txt",
+   "sha256": "8d903fe36ff6426f89c3b34c39030daad15066d3d2b3bbeccd2be22b60f9f574"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/lto/identity.json",
+   "sha256": "f98acb79a334f3dfb1eb63fbd35d74e596f0174cdd90d866d9d233a24f639ea5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/lto/ir.sha256",
+   "sha256": "8b25e7ccf07a8a3a236907cbd29cd55e0cae1608493e6cb27c04b688c3fb1613"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/lto/results.tsv",
+   "sha256": "854cdd1179becc46c4dd291cb5c9a1efb82d8f1c2a15cfb47dd50c51dd69b25c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/lto/runtime.log",
+   "sha256": "930631f5388925435addf07aaca449477592e83693f1886d9d9633fca3b3ca5c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/lto/summary.txt",
+   "sha256": "97b71c88926981a40c3a9c97ee5d8318308fd37e591a4d57d0f8803af9e2f6e6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/nolto/identity.json",
+   "sha256": "bd1e3abb15f7fe6cb41715d6e0afd471f496195e88a5d35ada18274e0d50861b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/nolto/ir.sha256",
+   "sha256": "d710da8a9f37bbd81dc5313516c71417b31c0c7c784ca6aaa5eb3f767d7c135b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/nolto/results.tsv",
+   "sha256": "2256b35736fe55575d5e3c2cc6ea99ec414c3ca4770abccbd99c7dcd288d9458"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/nolto/runtime.log",
+   "sha256": "8a97035744a94b01adeb3add92c2054fe4f45cc3b170374844c088c775cc1725"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/nolto/summary.txt",
+   "sha256": "f692a203b43936f0bbbbe500054eac89741d302b6cb33ed5c02854d4b12bf520"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/runtime/oracle.txt",
+   "sha256": "e86e0bbc84dfee2f783c080a418c560e5cdc1e40301afda51dfb08668407e825"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/tools/fn-diff.py",
+   "sha256": "5201f5b535e6fe4aa62dd1fda0a852af8d8974212cbe7101e966046c1b8d104f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/tools/host-oracle.sh",
+   "sha256": "1d50c44fa1c810af78edfd542746d1ad9ae05f636ca289fefd7e3e08eb628373"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/tools/large-summary.py",
+   "sha256": "a81c4818ad5fbceaafdc6409f0de6388a6246058c300b75b9c7aeb62f5aacae9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/tools/run-all.sh",
+   "sha256": "96fee2b44155bd7023363c111c20e672ea0dc30fdd26740137b8fceceecb7fc6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/tools/runtime-clocks-large.py",
+   "sha256": "6fba87b0fc221b141e7bcbf2b6c3ed3758fd2d69c138a9b5d281d571ef03c0f7"
   }
  ],
  "t4_design": {

@@ -1,0 +1,208 @@
+dither:DITHER_RUN_FRAMES=6	O2	a16	head	PASS	18067	248741806	-	-
+dither:DITHER_RUN_FRAMES=6	O2	a16xy16	head	PASS	18221	266133646	-	-
+dither:DITHER_RUN_FRAMES=6	O3	a16	head	FAIL got=0xa7d4	23964	None	-	-
+dither:DITHER_RUN_FRAMES=6	O3	a16xy16	head	FAIL got=0xa7d4	24034	None	-	-
+dither:DITHER_RUN_FRAMES=12	O2	a16	head	PASS	18067	454788402	-	-
+dither:DITHER_RUN_FRAMES=12	O2	a16xy16	head	PASS	18221	489718358	-	-
+dither:DITHER_RUN_FRAMES=12	O3	a16	head	FAIL got=0xcd67	23964	None	-	-
+dither:DITHER_RUN_FRAMES=12	O3	a16xy16	head	FAIL got=0xcd67	24034	None	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O2	a16	head	PASS	24246	50001508	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O2	a16xy16	head	PASS	24207	49931230	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O3	a16	head	clang-fail	-	-	-	lto link rc=1: E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=32	O3	a16xy16	head	clang-fail	-	-	-	lto link rc=1: E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=128	O2	a16	head	PASS	24239	101575744	-	-
+mvscrl:MVSCRL_RUN_STEPS=128	O2	a16xy16	head	PASS	24200	101050100	-	-
+mvscrl:MVSCRL_RUN_STEPS=128	O3	a16	head	clang-fail	-	-	-	lto link rc=1: FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=128	O3	a16xy16	head	clang-fail	-	-	-	lto link rc=1: FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+packrec:PACKREC_RUN_FRAMES=240	O2	a16	head	PASS	20739	67384440	-	-
+packrec:PACKREC_RUN_FRAMES=240	O2	a16xy16	head	PASS	20532	67355766	-	-
+packrec:PACKREC_RUN_FRAMES=240	O3	a16	head	PASS	30044	57246898	-	-
+packrec:PACKREC_RUN_FRAMES=240	O3	a16xy16	head	PASS	29838	57219346	-	-
+packrec:PACKREC_RUN_FRAMES=960	O2	a16	head	PASS	20740	97848214	-	-
+packrec:PACKREC_RUN_FRAMES=960	O2	a16xy16	head	PASS	20533	97775410	-	-
+packrec:PACKREC_RUN_FRAMES=960	O3	a16	head	PASS	30032	82736076	-	-
+packrec:PACKREC_RUN_FRAMES=960	O3	a16xy16	head	PASS	29826	82665080	-	-
+dither:DITHER_RUN_FRAMES=6	O2	a16	t4	PASS	18074	248763528	-	-
+dither:DITHER_RUN_FRAMES=6	O2	a16	final	PASS	18074	248763528	-	-
+dither:DITHER_RUN_FRAMES=6	O2	a16	memb1	PASS	18101	248842920	-	-
+dither:DITHER_RUN_FRAMES=6	O2	a16xy16	t4	PASS	18227	266155242	-	-
+dither:DITHER_RUN_FRAMES=6	O2	a16xy16	final	PASS	18227	266155242	-	-
+dither:DITHER_RUN_FRAMES=6	O2	a16xy16	memb1	PASS	18247	266235046	-	-
+dither:DITHER_RUN_FRAMES=6	O3	a16	t4	FAIL got=0xa7d4	23975	None	-	-
+dither:DITHER_RUN_FRAMES=6	O3	a16	final	FAIL got=0xa7d4	24096	None	-	-
+dither:DITHER_RUN_FRAMES=6	O3	a16	memb1	FAIL got=0xa7d4	24096	None	-	-
+dither:DITHER_RUN_FRAMES=6	O3	a16xy16	t4	FAIL got=0xa7d4	24040	None	-	-
+dither:DITHER_RUN_FRAMES=6	O3	a16xy16	final	FAIL got=0xa7d4	24079	None	-	-
+dither:DITHER_RUN_FRAMES=6	O3	a16xy16	memb1	FAIL got=0xa7d4	24079	None	-	-
+dither:DITHER_RUN_FRAMES=12	O2	a16	t4	PASS	18074	454810092	-	-
+dither:DITHER_RUN_FRAMES=12	O2	a16	final	PASS	18074	454810092	-	-
+dither:DITHER_RUN_FRAMES=12	O2	a16	memb1	PASS	18101	454889524	-	-
+dither:DITHER_RUN_FRAMES=12	O2	a16xy16	t4	PASS	18227	489739898	-	-
+dither:DITHER_RUN_FRAMES=12	O2	a16xy16	final	PASS	18227	489739898	-	-
+dither:DITHER_RUN_FRAMES=12	O2	a16xy16	memb1	PASS	18247	489819718	-	-
+dither:DITHER_RUN_FRAMES=12	O3	a16	t4	FAIL got=0xcd67	23975	None	-	-
+dither:DITHER_RUN_FRAMES=12	O3	a16	final	FAIL got=0xcd67	24096	None	-	-
+dither:DITHER_RUN_FRAMES=12	O3	a16	memb1	FAIL got=0xcd67	24096	None	-	-
+dither:DITHER_RUN_FRAMES=12	O3	a16xy16	t4	FAIL got=0xcd67	24040	None	-	-
+dither:DITHER_RUN_FRAMES=12	O3	a16xy16	final	FAIL got=0xcd67	24079	None	-	-
+dither:DITHER_RUN_FRAMES=12	O3	a16xy16	memb1	FAIL got=0xcd67	24079	None	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O2	a16	t4	PASS	24233	50021634	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O2	a16	final	PASS	24233	50021634	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O2	a16	memb1	PASS	24246	50109650	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O2	a16xy16	t4	PASS	24193	49950402	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O2	a16xy16	final	PASS	24193	49950402	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O2	a16xy16	memb1	PASS	24207	50041034	-	-
+mvscrl:MVSCRL_RUN_STEPS=32	O3	a16	t4	clang-fail	-	-	-	lto link rc=1: E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=32	O3	a16	final	clang-fail	-	-	-	lto link rc=1: E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=32	O3	a16	memb1	clang-fail	-	-	-	lto link rc=1: E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=32	O3	a16xy16	t4	clang-fail	-	-	-	lto link rc=1: E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=32	O3	a16xy16	final	clang-fail	-	-	-	lto link rc=1: E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=32	O3	a16xy16	memb1	clang-fail	-	-	-	lto link rc=1: E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6E8, 0x10B17]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=128	O2	a16	t4	PASS	24226	101596462	-	-
+mvscrl:MVSCRL_RUN_STEPS=128	O2	a16	final	PASS	24226	101596462	-	-
+mvscrl:MVSCRL_RUN_STEPS=128	O2	a16	memb1	PASS	24239	101637550	-	-
+mvscrl:MVSCRL_RUN_STEPS=128	O2	a16xy16	t4	PASS	24186	101070078	-	-
+mvscrl:MVSCRL_RUN_STEPS=128	O2	a16xy16	final	PASS	24186	101070078	-	-
+mvscrl:MVSCRL_RUN_STEPS=128	O2	a16xy16	memb1	PASS	24200	101113750	-	-
+mvscrl:MVSCRL_RUN_STEPS=128	O3	a16	t4	clang-fail	-	-	-	lto link rc=1: FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=128	O3	a16	final	clang-fail	-	-	-	lto link rc=1: FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=128	O3	a16	memb1	clang-fail	-	-	-	lto link rc=1: FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=128	O3	a16xy16	t4	clang-fail	-	-	-	lto link rc=1: FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=128	O3	a16xy16	final	clang-fail	-	-	-	lto link rc=1: FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+mvscrl:MVSCRL_RUN_STEPS=128	O3	a16xy16	memb1	clang-fail	-	-	-	lto link rc=1: FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .rodata load address range overlaps with .snes_header
+>>> .rodata range is [0xF6FD, 0x10B2C]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+packrec:PACKREC_RUN_FRAMES=240	O2	a16	t4	PASS	20807	67429554	-	-
+packrec:PACKREC_RUN_FRAMES=240	O2	a16	final	PASS	20807	67429554	-	-
+packrec:PACKREC_RUN_FRAMES=240	O2	a16	memb1	PASS	20865	67541264	-	-
+packrec:PACKREC_RUN_FRAMES=240	O2	a16xy16	t4	PASS	20538	67375670	-	-
+packrec:PACKREC_RUN_FRAMES=240	O2	a16xy16	final	PASS	20538	67375670	-	-
+packrec:PACKREC_RUN_FRAMES=240	O2	a16xy16	memb1	PASS	20596	67487176	-	-
+packrec:PACKREC_RUN_FRAMES=240	O3	a16	t4	PASS	30132	57322316	-	-
+packrec:PACKREC_RUN_FRAMES=240	O3	a16	final	PASS	30185	57433994	-	-
+packrec:PACKREC_RUN_FRAMES=240	O3	a16	memb1	PASS	30185	57433994	-	-
+packrec:PACKREC_RUN_FRAMES=240	O3	a16xy16	t4	PASS	29864	57269742	-	-
+packrec:PACKREC_RUN_FRAMES=240	O3	a16xy16	final	PASS	29915	57380298	-	-
+packrec:PACKREC_RUN_FRAMES=240	O3	a16xy16	memb1	PASS	29915	57380298	-	-
+packrec:PACKREC_RUN_FRAMES=960	O2	a16	t4	PASS	20808	97893352	-	-
+packrec:PACKREC_RUN_FRAMES=960	O2	a16	final	PASS	20808	97893352	-	-
+packrec:PACKREC_RUN_FRAMES=960	O2	a16	memb1	PASS	20866	98005038	-	-
+packrec:PACKREC_RUN_FRAMES=960	O2	a16xy16	t4	PASS	20539	97795314	-	-
+packrec:PACKREC_RUN_FRAMES=960	O2	a16xy16	final	PASS	20539	97795314	-	-
+packrec:PACKREC_RUN_FRAMES=960	O2	a16xy16	memb1	PASS	20597	97907100	-	-
+packrec:PACKREC_RUN_FRAMES=960	O3	a16	t4	PASS	30120	82826922	-	-
+packrec:PACKREC_RUN_FRAMES=960	O3	a16	final	PASS	30173	82939060	-	-
+packrec:PACKREC_RUN_FRAMES=960	O3	a16	memb1	PASS	30173	82939060	-	-
+packrec:PACKREC_RUN_FRAMES=960	O3	a16xy16	t4	PASS	29852	82731276	-	-
+packrec:PACKREC_RUN_FRAMES=960	O3	a16xy16	final	PASS	29903	82841856	-	-
+packrec:PACKREC_RUN_FRAMES=960	O3	a16xy16	memb1	PASS	29903	82841856	-	-

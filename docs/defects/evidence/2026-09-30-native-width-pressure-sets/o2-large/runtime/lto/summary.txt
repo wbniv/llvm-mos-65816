@@ -1,0 +1,97 @@
+rows 96; not PASS or not deterministic: 32
+   dither:DITHER_RUN_FRAMES=12 O3 a16 final FAIL got=0xcd67 True
+   dither:DITHER_RUN_FRAMES=12 O3 a16 head FAIL got=0xcd67 True
+   dither:DITHER_RUN_FRAMES=12 O3 a16 memb1 FAIL got=0xcd67 True
+   dither:DITHER_RUN_FRAMES=12 O3 a16 t4 FAIL got=0xcd67 True
+   dither:DITHER_RUN_FRAMES=12 O3 a16xy16 final FAIL got=0xcd67 True
+   dither:DITHER_RUN_FRAMES=12 O3 a16xy16 head FAIL got=0xcd67 True
+   dither:DITHER_RUN_FRAMES=12 O3 a16xy16 memb1 FAIL got=0xcd67 True
+   dither:DITHER_RUN_FRAMES=12 O3 a16xy16 t4 FAIL got=0xcd67 True
+   dither:DITHER_RUN_FRAMES=6 O3 a16 final FAIL got=0xa7d4 True
+   dither:DITHER_RUN_FRAMES=6 O3 a16 head FAIL got=0xa7d4 True
+   dither:DITHER_RUN_FRAMES=6 O3 a16 memb1 FAIL got=0xa7d4 True
+   dither:DITHER_RUN_FRAMES=6 O3 a16 t4 FAIL got=0xa7d4 True
+   dither:DITHER_RUN_FRAMES=6 O3 a16xy16 final FAIL got=0xa7d4 True
+   dither:DITHER_RUN_FRAMES=6 O3 a16xy16 head FAIL got=0xa7d4 True
+   dither:DITHER_RUN_FRAMES=6 O3 a16xy16 memb1 FAIL got=0xa7d4 True
+   dither:DITHER_RUN_FRAMES=6 O3 a16xy16 t4 FAIL got=0xa7d4 True
+   mvscrl:MVSCRL_RUN_STEPS=128 O3 a16 final clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=128 O3 a16 head clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=128 O3 a16 memb1 clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=128 O3 a16 t4 clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=128 O3 a16xy16 final clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=128 O3 a16xy16 head clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=128 O3 a16xy16 memb1 clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=128 O3 a16xy16 t4 clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=32 O3 a16 final clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=32 O3 a16 head clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=32 O3 a16 memb1 clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=32 O3 a16 t4 clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=32 O3 a16xy16 final clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=32 O3 a16xy16 head clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=32 O3 a16xy16 memb1 clang-fail -
+   mvscrl:MVSCRL_RUN_STEPS=32 O3 a16xy16 t4 clang-fail -
+== O2 a16: 3 programs pass under every variant at both lengths
+  dither (K 6 -> 12)
+    final  whole  454,810,092  loop  206,046,564  setup  42,716,964  bytes 18,074 | vs head: whole +21,690 (+0.00%) loop -32 (-0.00%) +7 B | vs t4: whole +0 (+0.00%) loop +0 (+0.00%) setup +0 (+0.00%) +0 B
+    head   whole  454,788,402  loop  206,046,596  setup  42,695,210  bytes 18,067
+    memb1  whole  454,889,524  loop  206,046,604  setup  42,796,316  bytes 18,101 | vs head: whole +101,122 (+0.02%) loop +8 (+0.00%) +34 B | vs t4: whole +79,432 (+0.02%) loop +40 (+0.00%) setup +79,352 (+0.19%) +27 B
+    t4     whole  454,810,092  loop  206,046,564  setup  42,716,964  bytes 18,074 | vs head: whole +21,690 (+0.00%) loop -32 (-0.00%) +7 B
+  mvscrl (K 32 -> 128)
+    final  whole  101,596,462  loop   51,574,828  setup  32,830,025  bytes 24,226 | vs head: whole +20,718 (+0.02%) loop +592 (+0.00%) -13 B | vs t4: whole +0 (+0.00%) loop +0 (+0.00%) setup +0 (+0.00%) +0 B
+    head   whole  101,575,744  loop   51,574,236  setup  32,810,096  bytes 24,239
+    memb1  whole  101,637,550  loop   51,527,900  setup  32,933,684  bytes 24,239 | vs head: whole +61,806 (+0.06%) loop -46,336 (-0.09%) +0 B | vs t4: whole +41,088 (+0.04%) loop -46,928 (-0.09%) setup +103,659 (+0.32%) +13 B
+    t4     whole  101,596,462  loop   51,574,828  setup  32,830,025  bytes 24,226 | vs head: whole +20,718 (+0.02%) loop +592 (+0.00%) -13 B
+  packrec (K 240 -> 960)
+    final  whole   97,893,352  loop   30,463,798  setup  57,274,955  bytes 20,808 | vs head: whole +45,138 (+0.05%) loop +24 (+0.00%) +68 B | vs t4: whole +0 (+0.00%) loop +0 (+0.00%) setup +0 (+0.00%) +0 B
+    head   whole   97,848,214  loop   30,463,774  setup  57,229,849  bytes 20,740
+    memb1  whole   98,005,038  loop   30,463,774  setup  57,386,673  bytes 20,866 | vs head: whole +156,824 (+0.16%) loop +0 (+0.00%) +126 B | vs t4: whole +111,686 (+0.11%) loop -24 (-0.00%) setup +111,718 (+0.20%) +58 B
+    t4     whole   97,893,352  loop   30,463,798  setup  57,274,955  bytes 20,808 | vs head: whole +45,138 (+0.05%) loop +24 (+0.00%) +68 B
+  total
+    final  whole  654,299,906  loop  288,085,190  setup 132,821,944  bytes 63,108 | vs head: whole +87,546 (+0.01%) loop +584 (+0.00%) | vs t4: whole +0 (+0.00%) loop +0 (+0.00%) setup +0 (+0.00%)
+    head   whole  654,212,360  loop  288,084,606  setup 132,735,155  bytes 63,046
+    memb1  whole  654,532,112  loop  288,038,278  setup 133,116,673  bytes 63,206 | vs head: whole +319,752 (+0.05%) loop -46,328 (-0.02%) | vs t4: whole +232,206 (+0.04%) loop -46,912 (-0.02%) setup +294,729 (+0.22%)
+    t4     whole  654,299,906  loop  288,085,190  setup 132,821,944  bytes 63,108 | vs head: whole +87,546 (+0.01%) loop +584 (+0.00%)
+== O2 a16xy16: 3 programs pass under every variant at both lengths
+  dither (K 6 -> 12)
+    final  whole  489,739,898  loop  223,584,656  setup  42,570,586  bytes 18,227 | vs head: whole +21,540 (+0.00%) loop -56 (-0.00%) +6 B | vs t4: whole +0 (+0.00%) loop +0 (+0.00%) setup +0 (+0.00%) +0 B
+    head   whole  489,718,358  loop  223,584,712  setup  42,548,934  bytes 18,221
+    memb1  whole  489,819,718  loop  223,584,672  setup  42,650,374  bytes 18,247 | vs head: whole +101,360 (+0.02%) loop -40 (-0.00%) +26 B | vs t4: whole +79,820 (+0.02%) loop +16 (+0.00%) setup +79,788 (+0.19%) +20 B
+    t4     whole  489,739,898  loop  223,584,656  setup  42,570,586  bytes 18,227 | vs head: whole +21,540 (+0.00%) loop -56 (-0.00%) +6 B
+  mvscrl (K 32 -> 128)
+    final  whole  101,070,078  loop   51,119,676  setup  32,910,510  bytes 24,186 | vs head: whole +19,978 (+0.02%) loop +806 (+0.00%) -14 B | vs t4: whole +0 (+0.00%) loop +0 (+0.00%) setup +0 (+0.00%) +0 B
+    head   whole  101,050,100  loop   51,118,870  setup  32,891,607  bytes 24,200
+    memb1  whole  101,113,750  loop   51,072,716  setup  33,016,796  bytes 24,200 | vs head: whole +63,650 (+0.06%) loop -46,154 (-0.09%) +0 B | vs t4: whole +43,672 (+0.04%) loop -46,960 (-0.09%) setup +106,286 (+0.32%) +14 B
+    t4     whole  101,070,078  loop   51,119,676  setup  32,910,510  bytes 24,186 | vs head: whole +19,978 (+0.02%) loop +806 (+0.00%) -14 B
+  packrec (K 240 -> 960)
+    final  whole   97,795,314  loop   30,419,644  setup  57,235,789  bytes 20,539 | vs head: whole +19,904 (+0.02%) loop +0 (+0.00%) +6 B | vs t4: whole +0 (+0.00%) loop +0 (+0.00%) setup +0 (+0.00%) +0 B
+    head   whole   97,775,410  loop   30,419,644  setup  57,215,885  bytes 20,533
+    memb1  whole   97,907,100  loop   30,419,924  setup  57,347,202  bytes 20,597 | vs head: whole +131,690 (+0.13%) loop +280 (+0.00%) +64 B | vs t4: whole +111,786 (+0.11%) loop +280 (+0.00%) setup +111,413 (+0.19%) +58 B
+    t4     whole   97,795,314  loop   30,419,644  setup  57,235,789  bytes 20,539 | vs head: whole +19,904 (+0.02%) loop +0 (+0.00%) +6 B
+  total
+    final  whole  688,605,290  loop  305,123,976  setup 132,716,885  bytes 62,952 | vs head: whole +61,422 (+0.01%) loop +750 (+0.00%) | vs t4: whole +0 (+0.00%) loop +0 (+0.00%) setup +0 (+0.00%)
+    head   whole  688,543,868  loop  305,123,226  setup 132,656,426  bytes 62,954
+    memb1  whole  688,840,568  loop  305,077,312  setup 133,014,372  bytes 63,044 | vs head: whole +296,700 (+0.04%) loop -45,914 (-0.02%) | vs t4: whole +235,278 (+0.03%) loop -46,664 (-0.02%) setup +297,487 (+0.22%)
+    t4     whole  688,605,290  loop  305,123,976  setup 132,716,885  bytes 62,952 | vs head: whole +61,422 (+0.01%) loop +750 (+0.00%)
+== O3 a16: 1 programs pass under every variant at both lengths
+  packrec (K 240 -> 960)
+    final  whole   82,939,060  loop   25,505,066  setup  48,932,306  bytes 30,173 | vs head: whole +202,984 (+0.25%) loop +15,888 (+0.06%) +141 B | vs t4: whole +112,138 (+0.14%) loop +460 (+0.00%) setup +111,525 (+0.23%) +53 B
+    head   whole   82,736,076  loop   25,489,178  setup  48,750,506  bytes 30,032
+    memb1  whole   82,939,060  loop   25,505,066  setup  48,932,306  bytes 30,173 | vs head: whole +202,984 (+0.25%) loop +15,888 (+0.06%) +141 B | vs t4: whole +112,138 (+0.14%) loop +460 (+0.00%) setup +111,525 (+0.23%) +53 B
+    t4     whole   82,826,922  loop   25,504,606  setup  48,820,781  bytes 30,120 | vs head: whole +90,846 (+0.11%) loop +15,428 (+0.06%) +88 B
+  total
+    final  whole   82,939,060  loop   25,505,066  setup  48,932,306  bytes 30,173 | vs head: whole +202,984 (+0.25%) loop +15,888 (+0.06%) | vs t4: whole +112,138 (+0.14%) loop +460 (+0.00%) setup +111,525 (+0.23%)
+    head   whole   82,736,076  loop   25,489,178  setup  48,750,506  bytes 30,032
+    memb1  whole   82,939,060  loop   25,505,066  setup  48,932,306  bytes 30,173 | vs head: whole +202,984 (+0.25%) loop +15,888 (+0.06%) | vs t4: whole +112,138 (+0.14%) loop +460 (+0.00%) setup +111,525 (+0.23%)
+    t4     whole   82,826,922  loop   25,504,606  setup  48,820,781  bytes 30,120 | vs head: whole +90,846 (+0.11%) loop +15,428 (+0.06%)
+== O3 a16xy16: 1 programs pass under every variant at both lengths
+  packrec (K 240 -> 960)
+    final  whole   82,841,856  loop   25,461,558  setup  48,893,112  bytes 29,903 | vs head: whole +176,776 (+0.21%) loop +15,824 (+0.06%) +77 B | vs t4: whole +110,580 (+0.13%) loop +24 (+0.00%) setup +110,548 (+0.23%) +51 B
+    head   whole   82,665,080  loop   25,445,734  setup  48,737,435  bytes 29,826
+    memb1  whole   82,841,856  loop   25,461,558  setup  48,893,112  bytes 29,903 | vs head: whole +176,776 (+0.21%) loop +15,824 (+0.06%) +77 B | vs t4: whole +110,580 (+0.13%) loop +24 (+0.00%) setup +110,548 (+0.23%) +51 B
+    t4     whole   82,731,276  loop   25,461,534  setup  48,782,564  bytes 29,852 | vs head: whole +66,196 (+0.08%) loop +15,800 (+0.06%) +26 B
+  total
+    final  whole   82,841,856  loop   25,461,558  setup  48,893,112  bytes 29,903 | vs head: whole +176,776 (+0.21%) loop +15,824 (+0.06%) | vs t4: whole +110,580 (+0.13%) loop +24 (+0.00%) setup +110,548 (+0.23%)
+    head   whole   82,665,080  loop   25,445,734  setup  48,737,435  bytes 29,826
+    memb1  whole   82,841,856  loop   25,461,558  setup  48,893,112  bytes 29,903 | vs head: whole +176,776 (+0.21%) loop +15,824 (+0.06%) | vs t4: whole +110,580 (+0.13%) loop +24 (+0.00%) setup +110,548 (+0.23%)
+    t4     whole   82,731,276  loop   25,461,534  setup  48,782,564  bytes 29,852 | vs head: whole +66,196 (+0.08%) loop +15,800 (+0.06%)

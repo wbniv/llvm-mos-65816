@@ -89,6 +89,8 @@ The user chose **"Hold both, T4 first"**. Apply nothing to the split series or `
 
 - Measure the `-O2` speed gate on the large programs before building it: a per-level subtarget (`optsize` in the `getSubtargetImpl` key) would win about 0.2% of clocks at `-O2`, measured on only 15 small sims; give dither, packrec and mvscrl a runtime harness and re-measure, and build the subtarget change only if the gain holds.
 
+The bullet above was resolved on 2026‑10‑01: the gain does not hold, so the subtarget change is not built. See [`-O2` speed gate on large programs](#-o2-speed-gate-on-large-programs).
+
 ## Optimization-level gating
 
 **2026‑09‑30.** Claude Code 2.1.285, model Claude Opus 5.5 (`claude-opus-5-5`), `high` reasoning effort (t4-opus-high agent definition); session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Evidence: [`opt-levels/`](../defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/README.md). Nothing is applied to the split series or `0002`.
@@ -286,3 +288,30 @@ Run 2026‑09‑30 on the final binaries (evidence: [`final/`](../defects/eviden
     ```
 
     PASS. On nmitally the baseline compiler's `-O2` and `-O3` code is identical, so the new `-O3` difference is the gate. `clang -O3` and an `-O3` LTO link produce exactly the `llc -O3` code, and an `-Os` LTO link produces exactly the `llc -O2` code. lld maps `-plugin-opt=O<n>` to codegen level `clamp(n, 2, 3)`, so the SDK's default link without `-O`, or with `-Os`, `-Oz` or `-O2`, never reaches `-O3` and keeps the appended sets. That is the accepted conservative outcome. No `setOptLevel` caller runs in the MOS pipeline, so the constructor-time read is sound. At `-O3` the clocks equal `memb1`'s. Logs: [`lto/`](../defects/evidence/2026-09-30-native-width-pressure-sets/final/lto/gate-real-builds.txt), [`test-red-green.log`](../defects/evidence/2026-09-30-native-width-pressure-sets/final/test-red-green.log).
+
+## `-O2` speed gate on large programs
+
+**2026‑10‑01.** Claude Code 2.1.285, model Claude Opus 5.5 (`claude-opus-5-5`), `medium` reasoning effort (t3-opus-med agent definition); session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Evidence: [`o2-large/`](../defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/README.md). Measurement only; nothing was built or applied.
+
+- **Harnesses.**
+    - Each harness compiles the unchanged demo (`examples/snes/{dither,mvscrl,packrec}.c`) and runs its own `main`. `display_frame`'s v-blank wait becomes a hook that returns at once, with NMI and HDMA off.
+    - At a fixed demo state (dither `a.t = 3K`, mvscrl `a.t = 7K`, packrec `a.t = K`), the hook folds the demo's WRAM output (algorithm state, canvas, HUD text, gate CRC) into `corpus_result`, and the probe stops there.
+    - The host oracle is the same source built with the host `cc`, with MMIO mapped onto an array. Every ROM wrote the host value, and every run pair was identical.
+    - Each program runs at two lengths, which splits the region into its steady-state **loop** and its **setup** (title, gate, init).
+- **Method.** This is the opt-levels clock method. The primary path is the SDK's real `-flto` build, with each `llc` compiling the link's own precodegen module. It is needed because dither's non-LTO object overflows low WRAM by 109 B, as the unmodified demo's does. In those objects `t4` and `memb1` differ only in demo and snesgfx functions, so `memb1` equals the proposed per-level gate there. The frozen non-LTO method, on mvscrl and packrec, is the cross-check.
+- **`-O2` clocks, sets off (`memb1`) against ungated (`t4` = final #321‑16), LTO.**
+
+    | Mode | dither | mvscrl | packrec | Total whole | Total loop | Total setup | Bytes |
+    |---|---|---|---|---|---|---|---|
+    | `+mos-a16` | +0.02% | +0.04% (loop −0.09%) | +0.11% | **+232,206 (+0.04%)** | −0.02% | +0.22% | +98 B |
+    | `+mos-a16,+mos-xy16` | +0.02% | +0.04% (loop −0.09%) | +0.11% | **+235,278 (+0.03%)** | −0.02% | +0.22% | +92 B |
+
+    The non-LTO cross-check, on mvscrl and packrec, gives +0.04% whole, −0.06% loop and +0.15% setup in both modes. On packrec, the only program that builds and passes at `-O3`, sets off costs +0.13–0.14% against `t4`.
+- **Verdict.** The gain does not hold on the large programs. Sets off is slower on all three and larger on all three.
+    - The loss is in the shared snesgfx title code and the setup inlined into `main`.
+    - Only mvscrl's frame loop gains (−0.09%).
+    - Pooled with the 15 small sims, the net is about −0.045%, almost all of it from nmitally.
+- **Recommendation: do not build the per-level subtarget.** The ungated design stays at `-O2`/`-Os`/`-Oz`, with the existing `-O3` gate.
+- **Seen, not acted on.**
+    - The unmodified dither demo built at `-O3` with the installed project toolchain never writes its gate CRC, in default `mosw65816` and in `+mos-a16`. At `-O2` it passes ([`o3-dither/report.txt`](../defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/o3-dither/report.txt)). No existing record covers it, and it needs its own defect dispatch.
+    - mvscrl at `-O3` does not fit the 32 KB near ROM bank.

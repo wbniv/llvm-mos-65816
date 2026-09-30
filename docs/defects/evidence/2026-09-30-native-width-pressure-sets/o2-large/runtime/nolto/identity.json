@@ -1,0 +1,72 @@
+{
+  "clang": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+  "mos-clang-cfg": "f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205",
+  "probe": "3c04775feb68c4d25d904df8b079f0de5a8a58a8e20c7e62adde31060cb5bec3",
+  "llvm-size": "8c9376085559ce88020e5864547cdd730f61d7a49210eb3f122cd4d6d07f8c4b",
+  "lto": false,
+  "llvm-dis": null,
+  "mos-clang": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+  "lld": "c89b04cb2fb93cd3959ce8a1251ca1a967eb550b1d03e5dbdc81bf12f25323a4",
+  "llcs": {
+    "head": {
+      "path": "/work/build/pressure-sets/llc/321-16",
+      "sha256": "b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45",
+      "flag": ""
+    },
+    "t4": {
+      "path": "/work/build/pressure-sets/t4/llc/321-16-t4",
+      "sha256": "0f3f63bf4d2cc0907979fb1699c02da0654717cdc1c0c3a0fc08250a7933054d",
+      "flag": ""
+    },
+    "final": {
+      "path": "/work/build/pressure-sets/final/llc/321-16",
+      "sha256": "da1a6f4ba69c97f3776280e7cff07345175da4d385c92eafd820bc6f24c9bc10",
+      "flag": ""
+    },
+    "memb1": {
+      "path": "/work/build/pressure-sets/t4/llc/head-probe",
+      "sha256": "d0e46c1353ba5d0d45e81d201ca3cf4ce171e0292b29bea4b810f70a98cca8be",
+      "flag": "-mos-native-pressure-probe=1"
+    }
+  },
+  "sources": {
+    "mvscrl:MVSCRL_RUN_STEPS=32": {
+      "harness": "a2ecc904501e29db0c4e546a83252290f2df6e7d27a89cc9fd16836af89b96b0",
+      "hook": "8732eb4ea764bc0901fb671ad32f0ce326f197549045df2294191bdf3c341286",
+      "demo": "3e4739d15fb85bc2ad9556220b5b907d839882bfeeec79fcd62cd4a3ae1c9003"
+    },
+    "mvscrl:MVSCRL_RUN_STEPS=128": {
+      "harness": "a2ecc904501e29db0c4e546a83252290f2df6e7d27a89cc9fd16836af89b96b0",
+      "hook": "8732eb4ea764bc0901fb671ad32f0ce326f197549045df2294191bdf3c341286",
+      "demo": "3e4739d15fb85bc2ad9556220b5b907d839882bfeeec79fcd62cd4a3ae1c9003"
+    },
+    "packrec:PACKREC_RUN_FRAMES=240": {
+      "harness": "a24e000233a258011a379d4b0436b12c15d89de1a3ff3464d45be8f607830822",
+      "hook": "8732eb4ea764bc0901fb671ad32f0ce326f197549045df2294191bdf3c341286",
+      "demo": "6b91e9d61f28896071614f862f3a2d23fa61e7d3e66c36675c7b058ef18dcff1"
+    },
+    "packrec:PACKREC_RUN_FRAMES=960": {
+      "harness": "a24e000233a258011a379d4b0436b12c15d89de1a3ff3464d45be8f607830822",
+      "hook": "8732eb4ea764bc0901fb671ad32f0ce326f197549045df2294191bdf3c341286",
+      "demo": "6b91e9d61f28896071614f862f3a2d23fa61e7d3e66c36675c7b058ef18dcff1"
+    }
+  },
+  "expected": {
+    "mvscrl:MVSCRL_RUN_STEPS=32": [
+      "0x3e13",
+      "host-oracle.sh"
+    ],
+    "mvscrl:MVSCRL_RUN_STEPS=128": [
+      "0x929d",
+      "host-oracle.sh"
+    ],
+    "packrec:PACKREC_RUN_FRAMES=240": [
+      "0x9697",
+      "host-oracle.sh"
+    ],
+    "packrec:PACKREC_RUN_FRAMES=960": [
+      "0x6fd7",
+      "host-oracle.sh"
+    ]
+  }
+}

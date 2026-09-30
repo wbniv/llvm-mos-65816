@@ -1,0 +1,41 @@
+== dither_DITHER_RUN_FRAMES_12 O2 a16: t4 -> memb1
+  _title_build 803->810 (+7)
+  _title_emit 1378->1388 (+10)
+  _title_reserve 1653->1639 (-14)
+  main 3177->3201 (+24)
+  functions 19 / 19; text total +27
+== dither_DITHER_RUN_FRAMES_12 O2 a16xy16: t4 -> memb1
+  _title_build 803->810 (+7)
+  _title_emit 1402->1413 (+11)
+  _title_reserve 1653->1639 (-14)
+  main 3107->3123 (+16)
+  functions 19 / 19; text total +20
+== mvscrl_MVSCRL_RUN_STEPS_128 O2 a16: t4 -> memb1
+  _title_build 803->810 (+7)
+  _title_emit 1378->1388 (+10)
+  _title_reserve 1653->1639 (-14)
+  build_bands 1566->1540 (-26)
+  main 3581->3625 (+44)
+  mv_step 589->581 (-8)
+  functions 21 / 21; text total +13
+== mvscrl_MVSCRL_RUN_STEPS_128 O2 a16xy16: t4 -> memb1
+  _title_build 803->810 (+7)
+  _title_emit 1402->1413 (+11)
+  _title_reserve 1653->1639 (-14)
+  build_bands 1566->1540 (-26)
+  main 3487->3531 (+44)
+  mv_step 589->581 (-8)
+  functions 21 / 21; text total +14
+== packrec_PACKREC_RUN_FRAMES_960 O2 a16: t4 -> memb1
+  _title_build 803->810 (+7)
+  _title_emit 1378->1388 (+10)
+  _title_reserve 1653->1639 (-14)
+  main 4656->4710 (+54)
+  pk_parse_at 1047->1048 (+1)
+  functions 22 / 22; text total +58
+== packrec_PACKREC_RUN_FRAMES_960 O2 a16xy16: t4 -> memb1
+  _title_build 803->810 (+7)
+  _title_emit 1402->1413 (+11)
+  _title_reserve 1653->1639 (-14)
+  main 4574->4628 (+54)
+  functions 22 / 22; text total +58

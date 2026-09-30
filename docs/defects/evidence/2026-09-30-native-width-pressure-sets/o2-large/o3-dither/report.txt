@@ -1,0 +1,12 @@
+installed toolchain: clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c  lld c89b04cb2fb93cd3959ce8a1251ca1a967eb550b1d03e5dbdc81bf12f25323a4  mos-snes.cfg f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205
+input: examples/snes/dither.c 1be807bc12c4fcb7eceff3d910468b7d7b87479f (blob at origin/main b145a581)
+command: mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 [-Xclang -target-feature -Xclang +mos-a16] -O2|-O3 -I examples/65816 -I examples/snes -I build examples/snes/dither.c -o demo.<L>.sfc (LTO via mos-snes.cfg)
+probe: jgxcycles, main entry to the corpus_result write of 0x80C4 (the demo's own gate CRC, host oracle tools/dither-sim.c), 3000 frames
+demo.O2a16.sfc sha256 ddd0449db11ea28d18f250e860ef6df9ebfa517cd158a38082a21b8e6156835a
+{"pass":true,"got":32964,"expected":32964,"exclusive_master_clocks":24017032,"instructions":879637,"samples":[
+demo.O2.sfc sha256 fc1de17a378006ee5298d0da780f294e889bb1db6fa89a2cea534839d096e47d
+{"pass":true,"got":32964,"expected":32964,"exclusive_master_clocks":23798294,"instructions":879088,"samples":[
+demo.O3a16.sfc sha256 f467cfd88052d34bed3559ca0ac7cf23ded3d0c11126b359056bbec684365ff5
+{"pass":false,"got":0,"expected":32964,"exclusive_master_clocks":881538234,"instructions":33858587,"samples":[
+demo.O3.sfc sha256 ffdc0ff1e6a44bcb84f1f92c714f823e2b7ae37ff825d040a50510eb4f85309b
+{"pass":false,"got":0,"expected":32964,"exclusive_master_clocks":907551466,"instructions":37943881,"samples":[
