@@ -2616,10 +2616,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "a1cbfe99a5ed9a2ab88e1b01d0c8079610fdfc519aa3acea849f1ec78e00f701"
+          "TODO.md": "969477ca0da690037af6522fe3703692e4c02fd43c8faedddfd93919aff333de"
         },
-        "reviewed_at": "2026-09-30T12:32:09.353790+00:00",
-        "note": "The carry-scheduling TODO item gained a sequencing note and per-optimization-level measurement; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-09-30T12:51:53.951354+00:00",
+        "note": "The pressure-set TODO item records the user's -O3 gate choice, and the Inbox gained the deferred -O2 speed-gate measurement; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
