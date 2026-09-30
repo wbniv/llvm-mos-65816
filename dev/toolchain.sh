@@ -272,6 +272,7 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0065-mos-near-store-profitability
   apply_patch 0066-mos-far-extload-worklist
   apply_patch 0067-mos-competing-carry-gate
+  apply_patch 0068-mos-null-output-streamer
   apply_patch 0069-mos-far-loop-range
   apply_patch 0070-mos-far-word-index-policy
 fi
