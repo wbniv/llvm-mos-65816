@@ -2632,10 +2632,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "42ca64e2dafcf323350ed156ae040434c141d35d573d1c73a2ce6f454af18ffc"
+          "TODO.md": "3d873437057239c188797274e0200d7c199f3a97918db189ef8cdda7033b8302"
         },
-        "reviewed_at": "2026-09-30T21:51:45.446067+00:00",
-        "note": "The 0069/0070 items record round two and the third review; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-09-30T22:15:49.050044+00:00",
+        "note": "The 0069/0070 items record the third review (fileable once mlund answers) and the round-three fixes in progress; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
