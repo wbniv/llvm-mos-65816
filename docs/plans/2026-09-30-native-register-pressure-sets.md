@@ -1,6 +1,6 @@
 # Keep the native-width registers out of default-mode register pressure
 
-Status: Phase A done, with one escalation (see [Phase A results](#phase-a-results)). Canonical record: [`mos-native-width-pressure-sets`](../defects/mos-native-width-pressure-sets.json). The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
+Status: Phase A done; T4 design in progress per the [decision](#decision-after-phase-a), after one escalation (see [Phase A results](#phase-a-results)). Canonical record: [`mos-native-width-pressure-sets`](../defects/mos-native-width-pressure-sets.json). The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
 
 Attribution: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
 
@@ -39,6 +39,14 @@ The commit ("[MOS] Model 65816 native-width registers and feature gates", split 
 - **Native mode at #321‑1.** `+mos-a16` and `+mos-a16,+mos-xy16` output equals upstream plain mosw65816 output on 90 of 90 inputs, a change of −3,202 B against unchanged `a359c6b1d73c`.
 - **Series head `c33eb63d65a3`.** Default-mode code shrinks by 3,515 B on mos6502 and 3,379 B on mosw65816 compared with unchanged head. Native code grows by 539 B for `+mos-a16` (80 inputs: 21 larger, 13 smaller) and by 217 B for `+mos-a16,+mos-xy16` (79 inputs: 21 larger, 10 smaller). No compile status changes. **The growth is not yet explained. Verification step 4 is escalated to T4** as a design question: whether native mode needs its own pressure modeling.
 - **Lit.** MOS CodeGen+MC pass: 132 pass and 1 unsupported at `a359c6b1d73c` with and without the change, and 143 pass and 1 unsupported at head with the change.
+
+## Decision after Phase A
+
+The user chose **"Hold both, T4 first"**. Apply nothing to the split series or `0002` yet. The flag makes default mode neutral but costs native mode, with no cause known. At the series head `c33eb63d65a3`, `+mos-a16` grows 321,489 → 322,028 B (+539; 21 larger, 13 smaller) and `+mos-a16,+mos-xy16` grows 300,012 → 300,229 B (+217). A T4 investigation now owns the design:
+
+- **Find the cause.** Identify which heuristic — MachineLICM, MachineSink, the machine scheduler or another pressure consumer — and which generated sets (`Ac16`, `Xc16`, `Yc16` and the inferred `GPR_LSB_with_*`/`Anyi1_with_*` sets) produce the native-mode benefit. Confirm it on the largest movers (dither, mvscrl, boids, sodo, packrec growth; tea_sim and nmitally_sim shrinkage).
+- **Design one change that meets both bars.** Default mos6502 and plain mosw65816 output must be byte-identical to upstream `06bc967d2668` at #321-1, as the flag already achieves. Native `+mos-a16` and `+mos-a16,+mos-xy16` output at the series head must not grow against the unmodified head (`build/pressure-sets/llc/321-16`). Candidates include subtarget-dependent pressure-set limits or scores through the `TargetRegisterInfo` pressure hooks, and native-only modelling of the scarce 16-bit registers. The T4 agent chooses, with evidence.
+- **Then apply one change everywhere.** Put it in #321 commit 1 of the split, or the commit that owns the modelling if that reads better, and in downstream `0002`. Phase B's verification (steps 5–6) then applies unchanged.
 
 ## Verification
 
