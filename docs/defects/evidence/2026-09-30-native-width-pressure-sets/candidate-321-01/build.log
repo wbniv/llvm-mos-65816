@@ -1,0 +1,60 @@
+2026-09-30T01:52:53Z build start a359c6b1d73cf1ca42137fa5b452ac150949919e
+ninja: Entering directory `/work/build/0029-cross-target-build'
+[1/58] Building MOSGenAsmWriter.inc...
+[2/58] Building MOSGenAsmMatcher.inc...
+[3/58] Building MOSGenCallingConv.inc...
+[4/58] Building MOSGenDAGISel.inc...
+[5/58] Building MOSGenDisassemblerTables.inc...
+[6/58] Building MOSGenGICombiner.inc...
+[7/58] Building MOSGenGlobalISel.inc...
+[8/58] Building MOSGenInstrInfo.inc...
+[9/57] Building MOSGenMCPseudoLowering.inc...
+[10/57] Building MOSGenRegisterBank.inc...
+[11/57] Building MOSGenMCCodeEmitter.inc...
+[12/57] Building MOSGenRegisterInfo.inc...
+[13/57] Building MOSGenSearchableTables.inc...
+[14/57] Building MOSGenSubtargetInfo.inc...
+[15/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSInstPrinter.cpp.o
+[16/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSELFObjectWriter.cpp.o
+[17/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSMCAsmInfo.cpp.o
+[18/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSMCCodeEmitter.cpp.o
+[19/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSMCELFStreamer.cpp.o
+[20/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSMCTargetDesc.cpp.o
+[21/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSAsmBackend.cpp.o
+[22/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSMCInstrAnalysis.cpp.o
+[23/56] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSTargetStreamer.cpp.o
+[24/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSCallingConv.cpp.o
+[25/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSCallLowering.cpp.o
+[26/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSAsmPrinter.cpp.o
+[27/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSFrameLowering.cpp.o
+[28/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSCopyOpt.cpp.o
+[29/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSInsertCopies.cpp.o
+[30/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSISelLowering.cpp.o
+[31/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSCombiner.cpp.o
+[32/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSInstrInfo.cpp.o
+[33/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSLateOptimization.cpp.o
+[34/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSInstructionSelector.cpp.o
+[35/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSLowerSelect.cpp.o
+[36/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSLegalizerInfo.cpp.o
+[37/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSMachineScheduler.cpp.o
+[38/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSPostRAScavenging.cpp.o
+[39/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSRegisterBankInfo.cpp.o
+[40/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSMCInstLower.cpp.o
+[41/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSShiftRotateChain.cpp.o
+[42/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSRegisterInfo.cpp.o
+[43/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSStaticStackAlloc.cpp.o
+[44/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSSubtarget.cpp.o
+[45/56] Building CXX object lib/Target/MOS/AsmParser/CMakeFiles/LLVMMOSAsmParser.dir/MOSAsmParser.cpp.o
+[46/56] Linking CXX static library lib/libLLVMMOSDesc.a
+[47/56] Linking CXX static library lib/libLLVMMOSAsmParser.a
+[48/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSZeroPageAlloc.cpp.o
+[49/56] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSTargetMachine.cpp.o
+[50/56] Linking CXX static library lib/libLLVMMOSCodeGen.a
+[51/56] Linking CXX executable bin/llc
+[52/56] Linking CXX executable bin/opt
+[53/56] Building CXX object lib/Target/MOS/Disassembler/CMakeFiles/LLVMMOSDisassembler.dir/MOSDisassembler.cpp.o
+[54/56] Linking CXX static library lib/libLLVMMOSDisassembler.a
+[55/56] Linking CXX executable bin/llvm-mc
+[56/56] Linking CXX executable bin/llvm-objdump
+2026-09-30T01:56:00Z build rc=0
+2026-09-30T01:56:07Z lit rc=0

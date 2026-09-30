@@ -1,0 +1,105 @@
+// Get the number of dimensions of register pressure.
+unsigned MOSGenRegisterInfo::getNumRegPressureSets() const {
+  return 14;
+}
+
+// Get the name of this register unit pressure set.
+const char *MOSGenRegisterInfo::
+getRegPressureSetName(unsigned Idx) const {
+  static const char *PressureNameTable[] = {
+    "Ac16",
+    "Pc",
+    "Xc16",
+    "Yc16",
+    "GPR_LSB",
+    "GPR_LSB_with_Ac16",
+    "GPR_LSB_with_Xc16",
+    "GPR_LSB_with_Yc16",
+    "GPR_LSB_with_Pc",
+    "Anyi1",
+    "Anyi1_with_Ac16",
+    "Anyi1_with_Xc16",
+    "Anyi1_with_Yc16",
+    "Anyi1_with_Pc",
+  };
+  return PressureNameTable[Idx];
+}
+
+// Get the register unit pressure limit for this dimension.
+// This limit must be adjusted dynamically for reserved registers.
+unsigned MOSGenRegisterInfo::
+getRegPressureSetLimit(const MachineFunction &MF, unsigned Idx) const {
+  static const uint16_t PressureLimitTable[] = {
+    2,  	// 0: Ac16
+    4,  	// 1: Pc
+    4,  	// 2: Xc16
+    4,  	// 3: Yc16
+    6,  	// 4: GPR_LSB
+    6,  	// 5: GPR_LSB_with_Ac16
+    6,  	// 6: GPR_LSB_with_Xc16
+    6,  	// 7: GPR_LSB_with_Yc16
+    7,  	// 8: GPR_LSB_with_Pc
+    262,  	// 9: Anyi1
+    262,  	// 10: Anyi1_with_Ac16
+    262,  	// 11: Anyi1_with_Xc16
+    262,  	// 12: Anyi1_with_Yc16
+    263,  	// 13: Anyi1_with_Pc
+  };
+  return PressureLimitTable[Idx];
+}
+
+/// Get the register class for this pressure set with the largest
+/// `RegClassWeight::WeightLimit`.
+const TargetRegisterClass *MOSGenRegisterInfo::
+getLargestRegClassForRegPressureSet(unsigned Idx) const {
+  static const uint8_t PSetRegClassTable[] = {
+    MOS::Ac16RegClassID,  	// 0: Ac16
+    MOS::PcRegClassID,  	// 1: Pc
+    MOS::MOSAsmParamRegClassRegClassID,  	// 2: Xc16
+    MOS::MOSAsmParamRegClassRegClassID,  	// 3: Yc16
+    MOS::CV_GPR_LSBRegClassID,  	// 4: GPR_LSB
+    MOS::CV_GPR_LSBRegClassID,  	// 5: GPR_LSB_with_Ac16
+    MOS::CV_GPR_LSBRegClassID,  	// 6: GPR_LSB_with_Xc16
+    MOS::CV_GPR_LSBRegClassID,  	// 7: GPR_LSB_with_Yc16
+    MOS::CV_GPR_LSBRegClassID,  	// 8: GPR_LSB_with_Pc
+    MOS::Anyi1RegClassID,  	// 9: Anyi1
+    MOS::Anyi1RegClassID,  	// 10: Anyi1_with_Ac16
+    MOS::Anyi1RegClassID,  	// 11: Anyi1_with_Xc16
+    MOS::Anyi1RegClassID,  	// 12: Anyi1_with_Yc16
+    MOS::Anyi1RegClassID,  	// 13: Anyi1_with_Pc
+  };
+  return getRegClass(PSetRegClassTable[Idx]);
+}
+
+/// Table of pressure sets per register class or unit.
+static const int RCSetsTable[] = {
+  /* 0 */ 2, 3, 4, 9, -1,
+  /* 5 */ 0, 5, 10, -1,
+  /* 9 */ 2, 6, 11, -1,
+  /* 13 */ 3, 7, 12, -1,
+  /* 17 */ 1, 8, 13, -1,
+  /* 21 */ 0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, -1,
+  /* 33 */ 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, -1,
+  /* 45 */ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, -1,
+};
+
+/// Get the dimensions of register pressure impacted by this register class.
+/// Returns a -1 terminated array of pressure set IDs
+const int *MOSGenRegisterInfo::
+getRegClassPressureSets(const TargetRegisterClass *RC) const {
+  static const uint8_t RCSetStartTable[] = {
+    27,22,4,22,33,33,33,27,27,27,4,22,0,4,22,45,21,17,45,45,27,5,4,9,13,4,4,};
+  return &RCSetsTable[RCSetStartTable[RC->getID()]];
+}
+
+/// Get the dimensions of register pressure impacted by this register unit.
+/// Returns a -1 terminated array of pressure set IDs
+const int *MOSGenRegisterInfo::
+getRegUnitPressureSets(MCRegUnit RegUnit) const {
+  assert(static_cast<unsigned>(RegUnit) < 269 && "invalid register unit");
+  static const uint8_t RUSetStartTable[] = {
+    21,5,33,4,17,17,33,4,0,45,9,45,13,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,};
+  return &RCSetsTable[RUSetStartTable[static_cast<unsigned>(RegUnit)]];
+}
+
+

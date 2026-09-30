@@ -1,0 +1,24 @@
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+index e64c0860e596..52d4cbc453be 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+@@ -234,6 +234,11 @@ let isPressureFineGrained = true in {
+ def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
+ def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
+ 
++// The native-width classes below are opt-in and must not create register
++// pressure sets: MachineLICM, MachineSink and the scheduler read the pressure
++// tables in every mode, so new sets would change code for programs that never
++// enable +mos-a16 or +mos-xy16.
++let GeneratePressureSet = 0 in {
+ // Native widths: the 16-bit accumulator as a register class (single member,
+ // A16 = B:A — NOT the carry flag C). Target of 16-bit-accumulator load/add/store
+ // under +mos-a16. Named Ac16 to parallel the 8-bit accumulator class `Ac`.
+@@ -243,6 +248,7 @@ def Ac16 : MOSReg16Class<(add A16)>;
+ // +mos-xy16; inert otherwise. Mirror Ac16.
+ def Xc16 : MOSReg16Class<(add X16)>;
+ def Yc16 : MOSReg16Class<(add Y16)>;
++}
+ 
+ // Instruction-specific register classes.
+ def AImag8 : MOSReg8Class<(add Imag8, A)>;

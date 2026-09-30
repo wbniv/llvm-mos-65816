@@ -92,6 +92,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
+          "docs/defects/mos-native-width-pressure-sets.json": "84d385aa6c604750b8845e13aca9fe0df6d329b2426e924b3f1896d42038e13d",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
           "docs/defects/mos-near-nowrap-option-clash.json": "f02673b6a5a6895a2ec4edd8d312ad02cb8813c4e42a411719b353c858ce33b1",
@@ -111,7 +112,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "15d252e541f10cf5e4acc2cfa9e7bb9b23f949efd606784cf834458a39c92165"
+          "docs/upstream-dashboard.json": "ce60c709c46aadb822625a34a7162741ce8df59ad643c0fe5d4ed8164e09605c"
         }
       }
     },
@@ -134,11 +135,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "c1dd697e376d8577ba2bc25713d9e6985ac0694394f700e9e31bcaa85d498482",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "15d252e541f10cf5e4acc2cfa9e7bb9b23f949efd606784cf834458a39c92165",
+          "docs/upstream-dashboard.json": "ce60c709c46aadb822625a34a7162741ce8df59ad643c0fe5d4ed8164e09605c",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "198aaf95bcf64cfa002acb429396ff706c321df47159dd3c0681b959101f138d"
+          "docs/upstream-dashboard-graph.json": "5ab1313a32310b29340488b0f21ad61f4ee9c3cd54de318ccb04d53a40e53eff"
         }
       }
     },
@@ -312,6 +313,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
+          "docs/defects/mos-native-width-pressure-sets.json": "5849b2c8c6594bc311967ea34953d4265492e8d953686d31c3055b052820cd1f",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -353,9 +355,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-30T00:21:06.217305+00:00",
-        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T02:24:32.650595+00:00",
+        "note": "New confirmed record mos-native-width-pressure-sets (Phase A candidate only). TODO already tracks it as the wip T3 native-width pressure item; the upstream summaries do not list the #320/#321 split packet or its #321-1 commit, so no status claim changes. Phase B updates them when the fix is applied to the series.",
+        "attribution": "Claude Code 2.1.285 (t3-opus-med subagent), model claude-opus-5-5, medium reasoning effort; session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk"
       }
     },
     {
@@ -404,6 +406,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
+          "docs/defects/mos-native-width-pressure-sets.json": "5849b2c8c6594bc311967ea34953d4265492e8d953686d31c3055b052820cd1f",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -437,9 +440,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-30T00:21:06.340755+00:00",
-        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T02:24:32.747088+00:00",
+        "note": "New confirmed record mos-native-width-pressure-sets (Phase A candidate only). TODO already tracks it as the wip T3 native-width pressure item; the upstream summaries do not list the #320/#321 split packet or its #321-1 commit, so no status claim changes. Phase B updates them when the fix is applied to the series.",
+        "attribution": "Claude Code 2.1.285 (t3-opus-med subagent), model claude-opus-5-5, medium reasoning effort; session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk"
       }
     },
     {
@@ -488,6 +491,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
+          "docs/defects/mos-native-width-pressure-sets.json": "5849b2c8c6594bc311967ea34953d4265492e8d953686d31c3055b052820cd1f",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -521,9 +525,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-30T00:21:06.348036+00:00",
-        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-09-30T02:24:32.751478+00:00",
+        "note": "New confirmed record mos-native-width-pressure-sets (Phase A candidate only). TODO already tracks it as the wip T3 native-width pressure item; the upstream summaries do not list the #320/#321 split packet or its #321-1 commit, so no status claim changes. Phase B updates them when the fix is applied to the series.",
+        "attribution": "Claude Code 2.1.285 (t3-opus-med subagent), model claude-opus-5-5, medium reasoning effort; session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk"
       }
     },
     {

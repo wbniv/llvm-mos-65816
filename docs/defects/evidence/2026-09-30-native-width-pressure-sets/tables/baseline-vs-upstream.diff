@@ -1,0 +1,37 @@
+2c2
+<     "MOSAsmParamRegClass",
+---
+>     "Ac16",
+3a4,5
+>     "Xc16",
+>     "Yc16",
+4a7,9
+>     "GPR_LSB_with_Ac16",
+>     "GPR_LSB_with_Xc16",
+>     "GPR_LSB_with_Yc16",
+6a12,14
+>     "Anyi1_with_Ac16",
+>     "Anyi1_with_Xc16",
+>     "Anyi1_with_Yc16",
+10c18
+<     3,  	// 0: MOSAsmParamRegClass
+---
+>     2,  	// 0: Ac16
+12,15c20,31
+<     6,  	// 2: GPR_LSB
+<     7,  	// 3: GPR_LSB_with_Pc
+<     262,  	// 4: Anyi1
+<     263,  	// 5: Anyi1_with_Pc
+---
+>     4,  	// 2: Xc16
+>     4,  	// 3: Yc16
+>     6,  	// 4: GPR_LSB
+>     6,  	// 5: GPR_LSB_with_Ac16
+>     6,  	// 6: GPR_LSB_with_Xc16
+>     6,  	// 7: GPR_LSB_with_Yc16
+>     7,  	// 8: GPR_LSB_with_Pc
+>     262,  	// 9: Anyi1
+>     262,  	// 10: Anyi1_with_Ac16
+>     262,  	// 11: Anyi1_with_Xc16
+>     262,  	// 12: Anyi1_with_Yc16
+>     263,  	// 13: Anyi1_with_Pc

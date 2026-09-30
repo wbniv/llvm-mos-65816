@@ -1,6 +1,6 @@
 # Keep the native-width registers out of default-mode register pressure
 
-Status: planned. The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
+Status: Phase A done, with one escalation (see [Phase A results](#phase-a-results)). Canonical record: [`mos-native-width-pressure-sets`](../defects/mos-native-width-pressure-sets.json). The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
 
 Attribution: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
 
@@ -27,6 +27,18 @@ The commit ("[MOS] Model 65816 native-width registers and feature gates", split 
     - Apply the change to #321 commit 1 of the split series, and recheck the later packet patches and the per-commit suites.
     - Apply it downstream in `vendor/llvm-mos`, regenerate `0002`, rebuild, and run the project differential.
     - Close the record with a same-input red/green.
+
+## Phase A results
+
+**2026‑09‑30, isolated experiment.** Claude Code 2.1.285, model Claude Opus 5.5 (`claude-opus-5-5`), medium reasoning effort (t3-opus-med subagent). Evidence: [`docs/defects/evidence/2026-09-30-native-width-pressure-sets/`](../defects/evidence/2026-09-30-native-width-pressure-sets/README.md).
+
+- **Baseline (red).** `tools/default-identity.sh` compares upstream `06bc967d2668` with unchanged `a359c6b1d73c`. It exits 1 with `RESULT: DIFFER (51 input/mode results changed)`: mos6502 has 18 of 90 inputs with asm differences and mosw65816 has 33 of 90. The rebuilt `a359c6b1d73c` llc is bit-identical to the split's deleted 321‑1 llc.
+- **Change.** `let GeneratePressureSet = 0 in { … }` around `Ac16`, `Xc16` and `Yc16`, with no other edits.
+- **Pressure tables.** `PressureNameTable` and `PressureLimitTable` equal upstream's at `a359c6b1d73c` and at series head `c33eb63d65a3`. The remaining full-section differences are the three new classes and the three new units (`B`, `XH`, `YH`), which are appended to existing set lists.
+- **Default mode (green).** The change at `a359c6b1d73c` gives exit 0 and `RESULT: IDENTICAL`: 90 of 90 inputs are identical in both modes, in asm and object.
+- **Native mode at #321‑1.** `+mos-a16` and `+mos-a16,+mos-xy16` output equals upstream plain mosw65816 output on 90 of 90 inputs, a change of −3,202 B against unchanged `a359c6b1d73c`.
+- **Series head `c33eb63d65a3`.** Default-mode code shrinks by 3,515 B on mos6502 and 3,379 B on mosw65816 compared with unchanged head. Native code grows by 539 B for `+mos-a16` (80 inputs: 21 larger, 13 smaller) and by 217 B for `+mos-a16,+mos-xy16` (79 inputs: 21 larger, 10 smaller). No compile status changes. **The growth is not yet explained. Verification step 4 is escalated to T4** as a design question: whether native mode needs its own pressure modeling.
+- **Lit.** MOS CodeGen+MC pass: 132 pass and 1 unsupported at `a359c6b1d73c` with and without the change, and 143 pass and 1 unsupported at head with the change.
 
 ## Verification
 

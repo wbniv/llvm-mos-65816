@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "528d2e521e4258192341b097c0244c837e03c52ab1cfb74f752044c6829461dc",
+  "sourceHash": "6021667ce20e98a76a598695130d3ec5a1dfe74a964be19e0ab539c3f0b4c007",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -252,6 +252,22 @@
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/README.md"
       ],
       "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-native-width-pressure-sets",
+      "kind": "defect",
+      "title": "Opt-in native-width register classes change default-mode register pressure sets and code",
+      "summary": "Split #321-1 (a359c6b1d73c) adds the single-member classes Ac16, Xc16 and Yc16 for the opt-in 65816 native widths. TableGen derives pressure sets from them: the MOS pressure tables grow from 6 sets to 14 and lose MOSAsmParamRegClass. MachineLICM, MachineSink and the scheduler read those tables in every mode, so default-mode code changes. Against upstream 06bc967d2668 on the split's fixed 90-input set, 18 of 90 mos6502 and 33 of 90 plain mosw65816 results differ, adding +3,478 bytes on mos6502 and +3,202 bytes on mosw65816. Candidate (Phase A, not yet applied to the series or downstream): let GeneratePressureSet = 0 on Ac16/Xc16/Yc16 restores upstream's PressureNameTable/PressureLimitTable exactly and makes default output byte-identical to upstream on all 90 inputs in both modes, in asm and object. At #321-1, +mos-a16 and +mos-a16,+mos-xy16 output also becomes identical to upstream plain mosw65816 (-3,202 bytes). At series head c33eb63d65a3 the change removes 3,515 bytes (mos6502) and 3,379 bytes (mosw65816) of default-mode code, but native output grows by 539 bytes (+mos-a16: 21 inputs larger, 13 smaller) and by 217 bytes (+mos-a16,+mos-xy16: 21 larger, 10 smaller). That growth is unexplained and escalated.",
+      "localStatus": "qualified",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-native-width-pressure-sets.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
       "demoUrls": []
     },
     {
