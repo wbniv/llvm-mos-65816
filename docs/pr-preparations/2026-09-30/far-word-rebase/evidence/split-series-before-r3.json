@@ -1,0 +1,349 @@
+{
+ "destination": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+ "head": "c275e191de52361a8c36a726630f3fa16e809bb6",
+ "final_tree": "3ca03f1da90c6b89a47190d22581707d3b28f7c7",
+ "all_intermediate_trees_match": true,
+ "original_candidate": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8",
+ "tree_delta_vs_original_candidate": [
+  "M\tllvm/lib/Target/MOS/MOSAsmPrinter.cpp",
+  "M\tllvm/lib/Target/MOS/MOSCallingConv.cpp",
+  "M\tllvm/lib/Target/MOS/MOSCallingConv.td",
+  "M\tllvm/lib/Target/MOS/MOSCopyOpt.cpp",
+  "M\tllvm/lib/Target/MOS/MOSInstrInfo.cpp",
+  "M\tllvm/lib/Target/MOS/MOSInstrInfo.h",
+  "M\tllvm/lib/Target/MOS/MOSInstrLogical.td",
+  "M\tllvm/lib/Target/MOS/MOSInstructionSelector.cpp",
+  "M\tllvm/lib/Target/MOS/MOSLegalizerInfo.cpp",
+  "M\tllvm/lib/Target/MOS/MOSLegalizerInfo.h",
+  "M\tllvm/lib/Target/MOS/MOSMCInstLower.cpp",
+  "M\tllvm/lib/Target/MOS/MOSRegisterInfo.cpp",
+  "M\tllvm/lib/Target/MOS/MOSRegisterInfo.h",
+  "M\tllvm/lib/Target/MOS/MOSRegisterInfo.td",
+  "M\tllvm/lib/Target/MOS/MOSSubtarget.cpp",
+  "M\tllvm/lib/Target/MOS/MOSSubtarget.h",
+  "M\tllvm/lib/Target/MOS/MOSZeroPageAlloc.cpp",
+  "M\tllvm/lib/TargetParser/TargetDataLayout.cpp",
+  "A\tllvm/test/CodeGen/MOS/a16-accumulator-forms.mir",
+  "A\tllvm/test/CodeGen/MOS/a16-load-store.ll",
+  "A\tllvm/test/CodeGen/MOS/a16-small-add.ll",
+  "A\tllvm/test/CodeGen/MOS/asm-printer-45gs02.mir",
+  "A\tllvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir",
+  "M\tllvm/test/CodeGen/MOS/copy-phys-reg.mir",
+  "A\tllvm/test/CodeGen/MOS/far-access-non-65816.ll",
+  "M\tllvm/test/CodeGen/MOS/far-addressing.ll",
+  "A\tllvm/test/CodeGen/MOS/far-fold-debug.ll",
+  "A\tllvm/test/CodeGen/MOS/far-index-fold-debug.ll",
+  "M\tllvm/test/CodeGen/MOS/far-indir-indexed.ll",
+  "A\tllvm/test/CodeGen/MOS/far-memop-length.ll",
+  "A\tllvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll",
+  "A\tllvm/test/CodeGen/MOS/far-ptr-trunc.ll",
+  "A\tllvm/test/CodeGen/MOS/far-quad-spill-call.ll",
+  "A\tllvm/test/CodeGen/MOS/imag32-allocation-gate.mir",
+  "A\tllvm/test/CodeGen/MOS/imag32-copy.mir",
+  "A\tllvm/test/CodeGen/MOS/imag32-registers.mir",
+  "A\tllvm/test/CodeGen/MOS/imag32-reserved-pairs.ll",
+  "A\tllvm/test/CodeGen/MOS/imag32-zp-alloc.mir",
+  "M\tllvm/test/CodeGen/MOS/inline-asm-zp-csr.ll",
+  "A\tllvm/test/CodeGen/MOS/native-spill-copy.mir",
+  "A\tllvm/test/CodeGen/MOS/native-width-default-pressure.ll",
+  "A\tllvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll",
+  "A\tllvm/test/CodeGen/MOS/native-width-registers.mir",
+  "A\tllvm/test/CodeGen/MOS/near-index-nowrap.ll",
+  "A\tllvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
+  "A\tllvm/test/CodeGen/MOS/xy16-index-forms.mir",
+  "A\tllvm/test/CodeGen/MOS/zp-alloc-composite-benefit.mir",
+  "A\tllvm/test/MC/MOS/index-width-mapping-65816.s"
+ ],
+ "mos_suites": "PASS=187 UNSUPPORTED=1",
+ "llc_sha256": "c90f96487d2fe6d3fa49a8cfc01f9485affdbd4857e4594ee8b87f7bfefcbbcb",
+ "series": [
+  {
+   "patch": "patches-split/0001-MOS-Model-65816-native-width-registers-and-feature-g.patch",
+   "commit": "45bc97d89c6a603008894622970ee2524fef68e7",
+   "subject": "[MOS] Model 65816 native-width registers and feature gates",
+   "tree": "02a2de002570380ea33a356473d14d2ee296abc7",
+   "matches_commit_tree": true,
+   "sha256": "5b52be9c3208be87f119bb9b571b254aa4f2f191d3335282d2e866167459a956"
+  },
+  {
+   "patch": "patches-split/0002-MOS-Define-16-bit-accumulator-instruction-forms.patch",
+   "commit": "793da9041cd3366b7b55a40af04144847c868f97",
+   "subject": "[MOS] Define 16-bit accumulator instruction forms",
+   "tree": "068a8d67a5f1d882a43bdaf3e86c82f9c0fce0e6",
+   "matches_commit_tree": true,
+   "sha256": "a79efb173d865c92e92d90780f41e9884a611891d715667298a3ac8603d1f88e"
+  },
+  {
+   "patch": "patches-split/0003-MOS-Define-16-bit-index-instruction-forms-and-X-widt.patch",
+   "commit": "2d64d3c841ff42ebf814f78f86da767aaec279b1",
+   "subject": "[MOS] Define 16-bit index instruction forms and X-width requirements",
+   "tree": "8182e78bb689991f7c1f5272eb50e84e2b1c6770",
+   "matches_commit_tree": true,
+   "sha256": "82f4892133058bf5193703a1db872d733316904062a3fee2df780cf45239e60f"
+  },
+  {
+   "patch": "patches-split/0004-MOS-Insert-REP-SEP-from-M-X-width-requirements.patch",
+   "commit": "c5dfebbfbf55e974d067d7af148eb5da83a3bcd1",
+   "subject": "[MOS] Insert REP/SEP from M/X width requirements",
+   "tree": "90455428fe7298e68a16d07e8610dfca98006c5f",
+   "matches_commit_tree": true,
+   "sha256": "f911125666a54fa20105a7d106b9e42ce408aeff68b6e2d1333a2ed399e1d04d"
+  },
+  {
+   "patch": "patches-split/0005-MOS-Preserve-status-flags-across-register-scavenging.patch",
+   "commit": "8eb8a6534bdf5fe93d9eedd0dd4ff2aacc28c493",
+   "subject": "[MOS] Preserve status flags across register scavenging",
+   "tree": "c5023867fd40bee49d65b6de10e5d7e14e0edd0e",
+   "matches_commit_tree": true,
+   "sha256": "3222181baa4ef30dc4032e79369253bec824f498e7ed45e467c5fa6d156d2475"
+  },
+  {
+   "patch": "patches-split/0006-MOS-Spill-and-copy-native-width-registers.patch",
+   "commit": "b86abf199cbb437fe0d463a64585fef2626f0b33",
+   "subject": "[MOS] Spill and copy native-width registers",
+   "tree": "720fbb0f69f0ddeed6ddc7dc5ee1201f2c193945",
+   "matches_commit_tree": true,
+   "sha256": "c0f78cdc191016563667e7ebcda425431aaed4a230818ff7c57d0c5eb2602a7e"
+  },
+  {
+   "patch": "patches-split/0007-MOS-Keep-call-clobbered-imaginary-copies-out-of-Imag.patch",
+   "commit": "ba6887cac12db842a3e47e3fd6ee9bee78c725c1",
+   "subject": "[MOS] Keep call-clobbered imaginary copies out of Imag16 pairs",
+   "tree": "679ae1edb1a81e47c7f3bb43042cd352682084a1",
+   "matches_commit_tree": true,
+   "sha256": "532cfd1567eea5e3aef037c67fcbc258c2e129649b986ea5b5dd4c8ceb32a827"
+  },
+  {
+   "patch": "patches-split/0008-MOS-Legalize-and-select-native-16-bit-loads-and-stor.patch",
+   "commit": "c6337b5af8783d19e2365314ab8b65e2320a2de4",
+   "subject": "[MOS] Legalize and select native 16-bit loads and stores",
+   "tree": "d609a7bbf1512b17858eed3f37a6849cd0086bc7",
+   "matches_commit_tree": true,
+   "sha256": "824c8dbf1a8dd0971e2ff3057675dd3c394acf3ccdc25321e12eb6024ecf722e"
+  },
+  {
+   "patch": "patches-split/0009-MOS-Legalize-native-s32-s64-lanes-and-wide-any-exten.patch",
+   "commit": "56e6c7f91e9e0a9254b1f0e682684e046d6893e1",
+   "subject": "[MOS] Legalize native s32/s64 lanes and wide any-extensions",
+   "tree": "a24cc7d7fdb59fdba660080b000d65a6d028616d",
+   "matches_commit_tree": true,
+   "sha256": "c6b43858edadb2ce2bc5230fa7c9e58b761cce376f60877ff620544543018957"
+  },
+  {
+   "patch": "patches-split/0010-MOS-Select-native-16-bit-arithmetic-logic-and-consta.patch",
+   "commit": "a520448a2c7f3193f7d523c1e8dba53eae888011",
+   "subject": "[MOS] Select native 16-bit arithmetic, logic and constant shifts",
+   "tree": "487772f3a7d216008f09a271aeca7dd7b2e552a4",
+   "matches_commit_tree": true,
+   "sha256": "784fcdc15b3f6cec4e96ddc2718bace3c74fef27e707fb4a2bca976199dfcf65"
+  },
+  {
+   "patch": "patches-split/0011-MOS-Select-native-16-bit-compares-and-fused-branches.patch",
+   "commit": "9b471aa8df068e251307d1632e3dec30969eb9fe",
+   "subject": "[MOS] Select native 16-bit compares and fused branches",
+   "tree": "2abe9a13ca0aa96a2b0ce4ba9e9dc19bfcd64fe4",
+   "matches_commit_tree": true,
+   "sha256": "e193c738b22a72c74d7d6f679a45c5d30436089d84e83a8ab22594b2c8952a67"
+  },
+  {
+   "patch": "patches-split/0012-MOS-Keep-byte-indexes-byte-wide-in-absolute-indexed-.patch",
+   "commit": "497db27604400f5961676dace699fefc5d1225bb",
+   "subject": "[MOS] Keep byte indexes byte-wide in absolute indexed addressing",
+   "tree": "84debe54c9a8dd3f1589ce8f958b5ebe87f8c59e",
+   "matches_commit_tree": true,
+   "sha256": "a40e5b1be2404e03a356eb80651f385823ef2c75e003c718487f8f77c66b4b11"
+  },
+  {
+   "patch": "patches-split/0013-MOS-Require-a-no-wrap-proof-before-folding-near-inde.patch",
+   "commit": "ef1fdd877206a81fa961da92b8cad45877a93be4",
+   "subject": "[MOS] Require a no-wrap proof before folding near indexes on the 65816",
+   "tree": "5d385b950627efd7dfc6120b0b1379c39d998f82",
+   "matches_commit_tree": true,
+   "sha256": "64f79471924d11ee591099265b2462f096cc132b21f3a614ae370ba07ad21178"
+  },
+  {
+   "patch": "patches-split/0014-MOS-Select-16-bit-index-registers-under-mos-xy16.patch",
+   "commit": "a6718b6f6560a7070d518015443e188a5a65530a",
+   "subject": "[MOS] Select 16-bit index registers under +mos-xy16",
+   "tree": "15a3c8f6977335e7c8803678ee2ccb5f7e9f744d",
+   "matches_commit_tree": true,
+   "sha256": "d52a3e2051cdc691813455eee1987874a4f82c0104c52eda242ac31ba94c7c3e"
+  },
+  {
+   "patch": "patches-split/0015-MOS-Keep-small-8-bit-adds-relocatable-under-mos-a16.patch",
+   "commit": "8db2e8118a70bae7913cf959498f8210802703d8",
+   "subject": "[MOS] Keep small 8-bit adds relocatable under +mos-a16",
+   "tree": "cc770fd1d7986a21e0e526288452d5b3cc5a1b13",
+   "matches_commit_tree": true,
+   "sha256": "6db844d1a4f77febf4bed197b73d7cbea7e2c86f045779aa6a18c40703da0e15"
+  },
+  {
+   "patch": "patches-split/0016-MOS-Preserve-interrupted-M-X-state-in-65816-interrup.patch",
+   "commit": "aa868b9525705f8612cd316a3e5c86d500b2bcc1",
+   "subject": "[MOS] Preserve interrupted M/X state in 65816 interrupt handlers",
+   "tree": "d6b87f6d2aa674b13cdb4eacccb8b9dbecd56bfe",
+   "matches_commit_tree": true,
+   "sha256": "8caa7b414d7abde58642a01be7d6f440eede9d6fa198d1c181fa86021ec6aff4"
+  },
+  {
+   "patch": "patches-split/0017-Honor-explicit-address-widths-for-constant-operands.patch",
+   "commit": "3721ab9a5c0e98e912f7055bf9dfe3ad8ba2e359",
+   "subject": "Honor explicit address widths for constant operands",
+   "tree": "773e3eecaa921fc89e54824514bbb88f5a883354",
+   "matches_commit_tree": true,
+   "sha256": "013a7de74038f3d4753d59e88cb77d678c9451b923afa80eb6e1e7751aee25e4"
+  },
+  {
+   "patch": "patches-split/0018-Preserve-long-address-widths-in-printed-assembly.patch",
+   "commit": "25c40909b44aa7b9c908e844612d2eb4b6e36596",
+   "subject": "Preserve long address widths in printed assembly",
+   "tree": "a3dd878ca83dd071cab9a72c8e5712d401f6e06b",
+   "matches_commit_tree": true,
+   "sha256": "ffbbd0f4fa5df85bc1636b3209354554d99bef59bcace8cee5fb4dbe5e774401"
+  },
+  {
+   "patch": "patches-split/0019-MOS-Avoid-newlines-in-inline-asm-operands.patch",
+   "commit": "ad7b2f4239a23d5fa4d399fad41ebd3866920fb4",
+   "subject": "[MOS] Avoid newlines in inline asm operands",
+   "tree": "e07d2e363d19f6ab6e7a8c9e16cda873aae0e916",
+   "matches_commit_tree": true,
+   "sha256": "2610e147b81321b4542c8558c57058c2f895b8dfbe809eba8f2721fc219a160a"
+  },
+  {
+   "patch": "patches-split/0020-MOS-Accumulate-composite-zero-page-CSR-benefit.patch",
+   "commit": "f8a569b204c1d76325343436ab6958cbe5e710b6",
+   "subject": "[MOS] Accumulate composite zero-page CSR benefit",
+   "tree": "5dca45df66ca870edb160eb03b3c2712aec1304a",
+   "matches_commit_tree": true,
+   "sha256": "aef2f5c746aae28ab513077176c52391dae8df1a439a8c649d6358c1bde5bb3f"
+  },
+  {
+   "patch": "patches-split/0021-MOS-Add-nonallocatable-32-bit-imaginary-registers.patch",
+   "commit": "fcb88211d861634b121e089a1bfc18380cf1b306",
+   "subject": "[MOS] Add nonallocatable 32-bit imaginary registers",
+   "tree": "60f12ac75927a8003474a178f9704f7b8d4d4891",
+   "matches_commit_tree": true,
+   "sha256": "3b0578763fc9bcc0e4d2ee2bf087d2a8badab9c2c7a41151e6e7c1a2be5a894b"
+  },
+  {
+   "patch": "patches-split/0022-MOS-Reserve-Imag32-quads-that-overlap-reserved-pairs.patch",
+   "commit": "733b59e025ee80a1742f5c3258da6b70b14b39cc",
+   "subject": "[MOS] Reserve Imag32 quads that overlap reserved pairs",
+   "tree": "f4ea09e9146e59fdaf8adbab9a03bb22ff606370",
+   "matches_commit_tree": true,
+   "sha256": "cfe8b7229fb9b9b9494e1f31b994ff5ccde67e6cd53ab26ffbfc6d1ff01164bb"
+  },
+  {
+   "patch": "patches-split/0023-MOS-Add-the-far-address-space-and-allocate-Imag32-qu.patch",
+   "commit": "dcb9d3227be9feb5504e3582c2c805c45265af54",
+   "subject": "[MOS] Add the far address space and allocate Imag32 quads on the 65816",
+   "tree": "332f129e85a22dd8dbafe2447562395ab69fad27",
+   "matches_commit_tree": true,
+   "sha256": "6e32398c6aff96eb5c6ea1a7e90890da11be9dd6bdc81b1c10ccec750211ca7d"
+  },
+  {
+   "patch": "patches-split/0024-MOS-Spill-and-reload-Imag32-quads-as-four-bytes.patch",
+   "commit": "cbbe9c70f520c9437520387688bd882cd5afca65",
+   "subject": "[MOS] Spill and reload Imag32 quads as four bytes",
+   "tree": "1672906e2dbda4254c3c439dc8edc75283b4588f",
+   "matches_commit_tree": true,
+   "sha256": "4746f067ef8ae4e9674edd9f9119eb29473b02b4621d15a24e806bf520ab6b79"
+  },
+  {
+   "patch": "patches-split/0025-MOS-Legalize-and-select-far-pointer-values-and-memor.patch",
+   "commit": "3046c5754503f93d80d735d19b598ef86793389a",
+   "subject": "[MOS] Legalize and select far pointer values and memory accesses",
+   "tree": "811c932c6a78af5d2951bf242a641195216edbd8",
+   "matches_commit_tree": true,
+   "sha256": "db9330c19e270209190ea428e25477edcda227ad71f128e1685baef419e789a2"
+  },
+  {
+   "patch": "patches-split/0026-MOS-Route-far-memory-intrinsics-to-the-far-runtime.patch",
+   "commit": "8d9c0382db7cd5f5dc62cd6c89d771355adf73fa",
+   "subject": "[MOS] Route far memory intrinsics to the far runtime",
+   "tree": "56996cfc180652285aa51ce61cc4acd242c42297",
+   "matches_commit_tree": true,
+   "sha256": "f381dde451cb89db916e0e4e226643a133f3021bfb142c1de987932a6045895b"
+  },
+  {
+   "patch": "patches-split/0027-MOS-Select-bounded-runtime-dp-Y-indexing-for-far-byt.patch",
+   "commit": "d19b7155d3c60bfe2e647907aa42288169fa7ce7",
+   "subject": "[MOS] Select bounded runtime [dp],Y indexing for far byte accesses",
+   "tree": "11f4fcadc11a23a13f04379b35de767628387909",
+   "matches_commit_tree": true,
+   "sha256": "708c96a8d69564f45c3fc262d3532f57e981344f3af4d98ab4d3d9f5325d4edc"
+  },
+  {
+   "patch": "patches-split/0028-Cost-native-index-copies-to-imaginary-register-pairs.patch",
+   "commit": "8802a1b438df5d785f94851f9202a3ed847094bb",
+   "subject": "Cost native index copies to imaginary register pairs",
+   "tree": "5e82ce0cccb24e22190793fceec608711a4bcc8c",
+   "matches_commit_tree": true,
+   "sha256": "6e52a2e727258e761b9f876c8d24e24c20bcfcb66a6af6cbc13419771ba4e274"
+  },
+  {
+   "patch": "patches-split/0029-Select-far-absolute-indexed-byte-accesses.patch",
+   "commit": "a252fae7ee3f58e2761ad428ad475b3c6f429ee7",
+   "subject": "Select far absolute indexed byte accesses",
+   "tree": "f515ccec3d70f7531545f739abd24de668ae9c8e",
+   "matches_commit_tree": true,
+   "sha256": "773ff9d648ee710113d6e36a3b5809d0d042ecd2dce0e4d9ffa97da5c84463f6"
+  },
+  {
+   "patch": "patches-split/0030-Select-native-accumulator-far-word-accesses.patch",
+   "commit": "e6b070e3f8dc0960df8718ed02c8d8b5211633b3",
+   "subject": "Select native accumulator far word accesses",
+   "tree": "cccbd5c6b443d9d98df18a2693e1bcd122cffc0a",
+   "matches_commit_tree": true,
+   "sha256": "d8ebb559bb8785c256cca3464e579431c9cbb026f9ccfe7ca65baf95d87562db"
+  },
+  {
+   "patch": "patches-split/0031-Select-far-extending-load-addresses-within-the-legal.patch",
+   "commit": "022959bb0841ab70337387eccce470a26f6ec74f",
+   "subject": "Select far extending-load addresses within the legalizer worklist",
+   "tree": "5533a4b197f97969822fb3c89f5d4428b1e97d75",
+   "matches_commit_tree": true,
+   "sha256": "3de42430ef6e6aa7f538e910e224efca0b7cbf59218a1c6c06505ce9e8ff03db"
+  },
+  {
+   "patch": "patches-split/0032-Prove-bounded-byte-loop-ranges-for-far-runtime-index.patch",
+   "commit": "8b2046d20bebb4ed5702fce5fd5f5159fcec68cc",
+   "subject": "Prove bounded byte-loop ranges for far runtime indexing",
+   "tree": "daf29cf7e6779ab6dff5a21bff5eb35e4e1d45d7",
+   "matches_commit_tree": true,
+   "sha256": "cb790890081091c9903a07d42018604240371e9b8a1a0451a6408a42dbebd29f"
+  },
+  {
+   "patch": "patches-split/0033-Preserve-undefined-lane-definitions-in-identity-copi.patch",
+   "commit": "f3a9620d4559764295b78768933b2791326973fe",
+   "subject": "Preserve undefined lane definitions in identity copies",
+   "tree": "b1743c6a60281ce34cf27079ca2f63191bef4a43",
+   "matches_commit_tree": true,
+   "sha256": "c9a2607038d33df66bbf4efd1bd786690b0f4b8ed5bd719bd89d27d6d627ace2"
+  },
+  {
+   "patch": "patches-split/0034-Fold-bounded-native-far-word-loads-in-speed-optimize.patch",
+   "commit": "5a8bdff0172e4a2a346cadcfa4a7bbf001c7b1c6",
+   "subject": "Fold bounded native far word loads in speed-optimized functions",
+   "tree": "c14ee6f6576acd6edd188546ea78ce5d5377e9d9",
+   "matches_commit_tree": true,
+   "sha256": "6e03e225641a27f3a9f697d8d4cb7d1e6226d9136b69f1e0b3334d6e431f361e"
+  },
+  {
+   "patch": "patches-split/0035-Check-far-word-boundaries-operands-and-loop-proof-li.patch",
+   "commit": "19d982788eb25f08332a535372afaa935c87038e",
+   "subject": "Check far-word boundaries, operands, and loop-proof limits",
+   "tree": "1a7bb8266ffeacf25843e83fadfbe7faf8597bbb",
+   "matches_commit_tree": true,
+   "sha256": "dfbd207f1a0feaafb08098450730af36b13cce41cdf91d34e895e3b19b4e34d9"
+  },
+  {
+   "patch": "patches-split/0036-Assert-shared-base-and-index-for-mixed-far-loads.patch",
+   "commit": "c275e191de52361a8c36a726630f3fa16e809bb6",
+   "subject": "Assert shared base and index for mixed far loads",
+   "tree": "3ca03f1da90c6b89a47190d22581707d3b28f7c7",
+   "matches_commit_tree": true,
+   "sha256": "aa809dfbe8a38310e51d263649b178548ef961f7609652fa18127326b2c8c64c"
+  }
+ ]
+}

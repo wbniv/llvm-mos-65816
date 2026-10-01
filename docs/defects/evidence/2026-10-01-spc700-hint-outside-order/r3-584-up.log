@@ -1,0 +1,33 @@
+$ build/split-320-321/llc/r3-584-up -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+# llc sha256 c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03
+r3-584-up: /work/build/register-exhaustion-src/llvm/lib/CodeGen/AllocationOrder.cpp:49: static AllocationOrder llvm::AllocationOrder::create(Register, const VirtRegMap &, const RegisterClassInfo &, const LiveRegMatrix *): Assertion `all_of(Hints, [&](MCPhysReg Hint) { return is_contained(Order, Hint); }) && "Target hint is outside allocation order."' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/r3-584-up -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll'.
+2.	Running pass 'Greedy Register Allocator' on function '@main'
+ #0 0x000063ac585fba0b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/r3-584-up+0x452ea0b)
+ #1 0x000063ac585f8891 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/r3-584-up+0x452b891)
+ #2 0x000063ac585fc81b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007539fc1f3cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007539fc2541ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007539fc1f3b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007539fc1d68ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x00007539fc1d7979 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x29979)
+ #8 0x00007539fc1e9f75 __assert_fail (/usr/lib/x86_64-linux-gnu/libc.so.6+0x3bf75)
+ #9 0x000063ac574b2291 llvm::AllocationOrder::create(llvm::Register, llvm::VirtRegMap const&, llvm::RegisterClassInfo const&, llvm::LiveRegMatrix const*) AllocationOrder.cpp:0:0
+#10 0x000063ac574e3da6 llvm::RAGreedy::selectOrSplitImpl(llvm::LiveInterval const&, llvm::SmallVectorImpl<llvm::Register>&, llvm::SmallSet<llvm::Register, 16u, std::less<llvm::Register>>&, llvm::SmallVector<std::pair<llvm::LiveInterval const*, llvm::MCRegister>, 8u>&, unsigned int) RegAllocGreedy.cpp:0:0
+#11 0x000063ac574e4637 llvm::RAGreedy::selectOrSplit(llvm::LiveInterval const&, llvm::SmallVectorImpl<llvm::Register>&) RegAllocGreedy.cpp:0:0
+#12 0x000063ac574ada8a llvm::RegAllocBase::allocatePhysRegs() (build/split-320-321/llc/r3-584-up+0x33e0a8a)
+#13 0x000063ac574d62b7 llvm::RAGreedy::run(llvm::MachineFunction&) RegAllocGreedy.cpp:0:0
+#14 0x000063ac574e9359 (anonymous namespace)::RAGreedyLegacy::runOnMachineFunction(llvm::MachineFunction&) RegAllocGreedy.cpp:0:0
+#15 0x000063ac572963f9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/r3-584-up+0x31c93f9)
+#16 0x000063ac578287d0 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/r3-584-up+0x375b7d0)
+#17 0x000063ac578308d2 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/r3-584-up+0x37638d2)
+#18 0x000063ac57829594 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/r3-584-up+0x375c594)
+#19 0x000063ac561f9acb compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#20 0x000063ac561f6d93 main (build/split-320-321/llc/r3-584-up+0x2129d93)
+#21 0x00007539fc1d8601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#22 0x00007539fc1d8718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#23 0x000063ac561f5fa5 _start (build/split-320-321/llc/r3-584-up+0x2128fa5)
+exit_code=134

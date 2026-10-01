@@ -1,0 +1,3 @@
+$ build/split-320-321/llc/r3-320-2 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gfield.ll -o /dev/null
+# llc build/split-320-321/llc/r3-320-2 sha256 e49291d6da0fd4513c00a8eda919a5fd398d1a65fb1289e35acb1e07e3cfe9d9
+exit_code=0

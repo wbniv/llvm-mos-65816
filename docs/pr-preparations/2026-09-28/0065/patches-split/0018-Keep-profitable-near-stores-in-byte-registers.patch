@@ -1,4 +1,4 @@
-From eb677769483641104c1010466aef3fbdb7710990 Mon Sep 17 00:00:00 2001
+From db92a67164bbb3bdb9c91efbaa572784fdcca0db Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:14:01 +0700
 Subject: [PATCH 18/18] Keep profitable near stores in byte registers
@@ -7,20 +7,20 @@ Extract completed downstream 0065: support canonical unit decrement, byte-return
 
 Extraction and validation assistance: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Independent review and boundary tests: same tool/version, model and effort; verified session 01a0e79c-b9af-7ed3-acf5-19074d8d761a. Earlier implementation credits are retained in the downstream completion and canonical records.
 ---
- llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 136 +++++++++++--
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 150 +++++++++++---
  .../MOS/a16-near-store-profit-boundaries.ll   |  61 ++++++
  .../CodeGen/MOS/a16-near-store-profit-sub.mir |  81 ++++++++
  .../test/CodeGen/MOS/a16-near-store-profit.ll | 187 ++++++++++++++++++
- 4 files changed, 444 insertions(+), 21 deletions(-)
+ 4 files changed, 449 insertions(+), 30 deletions(-)
  create mode 100644 llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll
  create mode 100644 llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir
  create mode 100644 llvm/test/CodeGen/MOS/a16-near-store-profit.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 659e0cf9d443..e86a02836c46 100644
+index f2970bfb65cb..d3da9c09312a 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -869,12 +869,13 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -893,12 +893,13 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
    const LLT Ty = MRI.getType(Dst);
    if (STI.hasAccum16() && Ty == LLT::scalar(16)) {
@@ -38,7 +38,7 @@ index 659e0cf9d443..e86a02836c46 100644
                          Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
                          Def->getParent() == MI.getParent() &&
                          MRI.getType(Def->getOperand(1).getReg()) == S8;
-@@ -888,6 +889,7 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -912,6 +913,7 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
                       isABIByte(Def->getOperand(2).getReg(), MOS::X);
      }
      unsigned Stores = 0;
@@ -46,7 +46,7 @@ index 659e0cf9d443..e86a02836c46 100644
      if (ByteSequence) {
        for (MachineInstr &Use : MRI.use_nodbg_instructions(Src)) {
          if (&Use == &MI || Use.getOpcode() == TargetOpcode::G_UNMERGE_VALUES)
-@@ -899,22 +901,66 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -923,22 +925,66 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
            break;
          }
          const auto &Store = cast<GStore>(Use);
@@ -116,7 +116,7 @@ index 659e0cf9d443..e86a02836c46 100644
    }
  
    auto RHSConst =
-@@ -2153,7 +2199,7 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
+@@ -2192,7 +2238,7 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
            return false;
          auto Step = getIConstantVRegValWithLookThrough(
              Use.getOperand(2).getReg(), MRI);
@@ -125,14 +125,15 @@ index 659e0cf9d443..e86a02836c46 100644
        }
        case MOS::G_STORE16_ABS:
          return none_of(Use.memoperands(), [](const MachineMemOperand *MMO) {
-@@ -2170,10 +2216,11 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
+@@ -2209,11 +2255,11 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
      });
    };
  
 -  // A single plain indirect store can consume an A:X value directly. Imaginary
 -  // argument pairs and values shared with other stores can favor one wide load.
--  // Allow only copies and byte splits between the merge and its consumers: other
--  // work can clobber A:X or establish a native-width context with cheaper stores.
+-  // Allow only copies and byte splits between the merge and its consumers:
+-  // other work can clobber A:X or establish a native-width context with cheaper
+-  // stores.
 +  // One plain indirect store can consume A:X or a zero-extended byte directly.
 +  // A unit increment may share the byte pair when its result is split into bytes.
 +  // Other work can clobber A:X or establish a cheaper native-width context, so
@@ -141,7 +142,7 @@ index 659e0cf9d443..e86a02836c46 100644
    auto isByteIndirectStore = [&]() {
      // Atomic stores must remain a single memory operation.
      if (IsLoad || MI.isAtomic())
-@@ -2184,24 +2231,71 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
+@@ -2224,30 +2270,74 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
        return false;
      Register Value = cast<GStore>(MI).getValueReg();
      const MachineInstr *Def = MRI.getVRegDef(Value);
@@ -175,21 +176,29 @@ index 659e0cf9d443..e86a02836c46 100644
 +      return false;
 +    }
 +    if (Begin->getParent() != Def->getParent())
-+      return false;
+       return false;
+-    return all_of(MRI.use_nodbg_instructions(Value),
+-                  [&](const MachineInstr &Use) {
+-                    if (Use.getParent() != Def->getParent() ||
+-                        (&Use != &MI &&
+-                         Use.getOpcode() != TargetOpcode::G_UNMERGE_VALUES))
+-                      return false;
+-                    for (auto I = std::next(Def->getIterator());
+-                         I != Use.getIterator(); ++I)
+-                      if (&*I != &MI && !I->isCopy() && !I->isDebugInstr() &&
+-                          I->getOpcode() != TargetOpcode::G_UNMERGE_VALUES)
+-                        return false;
+-                    return true;
+-                  });
 +    if (count_if(MRI.use_nodbg_instructions(Value),
 +                 [](const MachineInstr &Use) {
 +                   return Use.getOpcode() == TargetOpcode::G_ADD ||
 +                          Use.getOpcode() == TargetOpcode::G_SUB;
 +                 }) > 1)
-       return false;
-     return all_of(MRI.use_nodbg_instructions(Value), [&](const MachineInstr &Use) {
--      if (Use.getParent() != Def->getParent() ||
--          (&Use != &MI && Use.getOpcode() != TargetOpcode::G_UNMERGE_VALUES))
++      return false;
++    return all_of(MRI.use_nodbg_instructions(Value), [&](const MachineInstr &Use) {
 +      if (Use.getParent() != Def->getParent())
-         return false;
--      for (auto I = std::next(Def->getIterator()); I != Use.getIterator(); ++I)
--        if (&*I != &MI && !I->isCopy() && !I->isDebugInstr() &&
--            I->getOpcode() != TargetOpcode::G_UNMERGE_VALUES)
++        return false;
 +      if (&Use != &MI && Use.getOpcode() != TargetOpcode::G_UNMERGE_VALUES) {
 +        if (Def->getOpcode() != TargetOpcode::G_MERGE_VALUES ||
 +            (Use.getOpcode() != TargetOpcode::G_ADD &&
@@ -219,9 +228,12 @@ index 659e0cf9d443..e86a02836c46 100644
 +              getIConstantVRegValWithLookThrough(I->getOperand(0).getReg(), MRI)) &&
 +            !(I->getOpcode() == MOS::ADJCALLSTACKUP &&
 +              I->getOperand(0).getImm() == 0))
-           return false;
-       return true;
-     });
++          return false;
++      return true;
++    });
+   };
+ 
+   // Don't take a constant-valued store native: materializing the constant into
 diff --git a/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll b/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll
 new file mode 100644
 index 000000000000..bda4527ebc84

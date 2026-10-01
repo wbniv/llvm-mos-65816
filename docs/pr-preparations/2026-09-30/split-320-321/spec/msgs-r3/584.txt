@@ -1,0 +1,27 @@
+[MOS] Fix non-GPR immediate loads in mos-late-opt
+
+On SPC700, LDImm accepts imaginary-register destinations to represent
+`mov dp, #imm`. `combineLdImm` tracks only A/X/Y; processing an
+imaginary destination through that path dereferences a null tracking
+pointer.
+
+Restrict immediate-load folding to GPR destinations in the existing
+filtering condition. Other instructions use the existing
+register-invalidation path. The sibling TA handler keeps its original
+behavior.
+
+The SPC700 MIR regression covers an imaginary-register immediate load
+and confirms that it does not interfere with folding an adjacent GPR
+load to TAX.
+
+On 06bc967d2668, 13 of the 38 CodeGen/MOS .ll tests crash in "MOS Late
+Optimizations" at -mcpu=mosspc700 -O2 (for example fcmp.ll, zp-alloc.ll
+and light-spill.ll); with this change all of them compile.
+
+Carry note: this is the net diff of llvm-mos PR #584
+(wbniv:mos-late-opt-nongpr-ldimm @ 7f4c37de6219), squashed as upstream
+merges, with the PR's title and description. Squashed for the #320/#321
+series by Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5
+(claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>

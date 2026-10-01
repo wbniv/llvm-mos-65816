@@ -1,0 +1,30 @@
+{
+ "p-321-00": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00",
+  "build_dir": "/home/will/llvm-mos-65816/build/split-320-321/build (frozen hard link)",
+  "source_commit": "06bc967d2668",
+  "what": "upstream llvm-mos main, assertions",
+  "sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7"
+ },
+ "r3-584-up": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-584-up",
+  "build_dir": "/home/will/llvm-mos-65816/build/split-320-321/build (frozen hard link)",
+  "source_commit": "95e066056667",
+  "what": "06bc967d2668 + #584 net diff",
+  "sha256": "c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03"
+ },
+ "r3-mc-2": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-mc-2",
+  "build_dir": "/home/will/llvm-mos-65816/build/split-320-321/build (frozen hard link)",
+  "source_commit": "ed90d3aabae7",
+  "what": "series MC top, before the #584 commit",
+  "sha256": "be44489018362b4ecb808c9bfbc17cc1a99f081c9683b50c24f43faa20f8c7ae"
+ },
+ "r3-584": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-584",
+  "build_dir": "/home/will/llvm-mos-65816/build/split-320-321/build (frozen hard link)",
+  "source_commit": "5f5d76c59fa9",
+  "what": "series #584 commit",
+  "sha256": "158fa57ee9a4988646906a779660e57f5dc6f6c0290c4d8771774cd3194b1d09"
+ }
+}

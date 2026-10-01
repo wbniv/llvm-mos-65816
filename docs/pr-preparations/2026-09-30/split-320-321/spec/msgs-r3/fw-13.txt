@@ -1,0 +1,34 @@
+Check far-word boundaries, operands, and loop-proof limits
+
+Add direct 254/255 word endpoint controls, preserved base/index/MMO
+checks, atomic/escape/call rejection, and a compact live-consumer IR case
+whose known-bits bound does not depend on the loop matcher. Check the
+feature-disabled byte lowering on that supported bounded input.
+
+Cover reversed PHI operands, multiple external predecessors, a valid
+narrow shift and the expression-recursion boundary. Terminate every
+positive word-policy opcode explicitly, following the same contract as
+the existing byte-range checks.
+
+The broader no-A16 fallback probe reaches the already documented missing
+s32/byte far-pointer bridge. Its diagnostic is retained as a prerequisite
+scope limit; this test does not claim general A8 far-pointer support.
+
+Review N8 additions: far-word-index-boundaries.mir checks that a word
+store sharing the address rejects the whole group while a byte store folds
+with the word load, and far-word-rep-sep.mir checks that REP/SEP insertion
+sets X=1 before the folded word load after a 16-bit index instruction under
++mos-xy16. The mixed-order functions of far-word-policy.mir now pin the byte
+sibling's opcode too, which the extended sensitivity runner found unchecked.
+The boundary tests' OFF runs are gone with -mos-far-loop-range (review N5).
+
+Validation: assertions-enabled exact-upstream extraction, 160 MOS
+CodeGen/MC files pass and one pre-existing unconditional unsupported test.
+Preparation and validation: OpenAI Codex CLI 0.157.1 (session source
+vscode), model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+
+Review N5 and N8 test changes: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F

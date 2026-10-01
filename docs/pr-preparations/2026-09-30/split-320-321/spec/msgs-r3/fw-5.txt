@@ -1,0 +1,23 @@
+Select far absolute indexed byte accesses
+
+Rebase downstream 0061 onto the extracted far-data prerequisite.
+Retain the existing unsigned index and explicit long-address contracts.
+Original implementation and validation credits remain in the 0061 patch
+and its investigation at wbniv/llvm-mos-65816 c3a53aecbc48.
+
+The fold drops the debug locations of the address adds it makes dead
+(dropDeadFarAddressDebugUses); far-fold-debug.ll gains a -g far global
+indexed by a zero-extended byte.
+
+Rebase preparation: OpenAI Codex CLI 0.157.1 (session source vscode),
+model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+
+Debug-location fix and test added while carrying the second review's
+fixes: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5
+(claude-opus-5-5), high reasoning effort.
+
+The commit's own C++ lines are clang-format clean (review N3): Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F

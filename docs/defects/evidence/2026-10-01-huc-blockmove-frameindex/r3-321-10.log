@@ -1,0 +1,4 @@
+$ python3 build/split-320-321/spec/run-test-with.py build/split-320-321/llc/r3-321-10 docs/defects/evidence/2026-10-01-huc-blockmove-frameindex/blockmove-stack.ll
+# llc build/split-320-321/llc/r3-321-10 sha256 9289bc9768f283590042b909155446c5799cf2722793693fd37ef01c4c6bff2e
+FAIL RUN 1: error: CHECK: expected string not found in input
+exit_code=1

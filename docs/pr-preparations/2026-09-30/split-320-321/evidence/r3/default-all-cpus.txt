@@ -1,0 +1,132 @@
+# All 14 MOS CPUs (llc -mcpu=help), 90 inputs, -O2, assembly and object hashes (default-hashes-cpus.sh). Each row: commit vs its parent (first row vs upstream 06bc967d2668).
+r3-321-01: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-02: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-03: total        same=1124 fail->pass=0 pass->fail=0 output=136 error=0
+r3-321-04: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-05: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-06: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-07: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-08: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-09: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-10: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-11: total        same=1258 fail->pass=0 pass->fail=0 output=2 error=0
+r3-321-12: total        same=1061 fail->pass=0 pass->fail=0 output=199 error=0
+r3-321-13: total        same=1232 fail->pass=1 pass->fail=0 output=27 error=0
+r3-321-14: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-15: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-321-16: total        same=1257 fail->pass=0 pass->fail=0 output=3 error=0
+r3-mc-1: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-mc-2: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-584: total        same=1229 fail->pass=31 pass->fail=0 output=0 error=0
+r3-320-1a1: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-320-1a2: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-320-1a3: total        same=1204 fail->pass=0 pass->fail=21 output=0 error=35
+r3-320-1b: total        same=1204 fail->pass=21 pass->fail=0 output=0 error=35
+r3-320-1c: total        same=1242 fail->pass=0 pass->fail=0 output=0 error=18
+r3-320-1d: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-320-2: total        same=1191 fail->pass=0 pass->fail=0 output=0 error=69
+r3-320-3: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-320-4: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-fw-9: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-fw-5: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-fw-6: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-fw-7: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-fw-8: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-fw-11: total        same=1246 fail->pass=0 pass->fail=0 output=14 error=0
+r3-fw-12: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-fw-13: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r3-fw-14: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+
+# References
+p-321-16 (pre-round #321 top) vs r3-321-16: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r2-fw-14 (second-round top) vs r3-fw-14: total        same=1234 fail->pass=0 pass->fail=0 output=0 error=26
+r2-fw-11 vs r3-fw-11: total        same=1234 fail->pass=0 pass->fail=0 output=0 error=26
+r2-fw-8 vs r2-fw-11 (old patch 11): total        same=1246 fail->pass=0 pass->fail=0 output=14 error=0
+upstream 06bc967d2668 vs + #584 (r3-584-up): total        same=1229 fail->pass=31 pass->fail=0 output=0 error=0
+
+# Per-CPU detail of every non-identical step
+r3-321-03
+  mos65el02    same= 22 fail->pass=0 pass->fail=0 output=68 error=0
+  mosw65816    same= 22 fail->pass=0 pass->fail=0 output=68 error=0
+r3-321-11
+  moshuc6280   same= 88 fail->pass=0 pass->fail=0 output=2 error=0
+r3-321-12
+  mos4510      same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mos45gs02    same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mos6502      same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mos6502x     same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mos65c02     same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mos65ce02    same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mos65dtv02   same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mos65el02    same= 72 fail->pass=0 pass->fail=0 output=18 error=0
+  moshuc6280   same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mosr65c02    same= 74 fail->pass=0 pass->fail=0 output=16 error=0
+  mossweet16   same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mosw65816    same= 72 fail->pass=0 pass->fail=0 output=18 error=0
+  mosw65c02    same= 72 fail->pass=0 pass->fail=0 output=18 error=0
+r3-321-13
+  mosw65816    same= 62 fail->pass=1 pass->fail=0 output=27 error=0
+r3-321-16
+  mosw65816    same= 87 fail->pass=0 pass->fail=0 output=3 error=0
+r3-584
+  mosspc700    same= 59 fail->pass=31 pass->fail=0 output=0 error=0
+r3-320-1a3
+  mos4510      same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mos45gs02    same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mos6502      same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mos6502x     same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mos65c02     same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mos65ce02    same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mos65dtv02   same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mos65el02    same= 86 fail->pass=0 pass->fail=3 output=0 error=1
+  moshuc6280   same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mosr65c02    same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+  mosspc700    same= 86 fail->pass=0 pass->fail=2 output=0 error=2
+  mossweet16   same= 86 fail->pass=0 pass->fail=0 output=0 error=4
+  mosw65816    same= 86 fail->pass=0 pass->fail=4 output=0 error=0
+  mosw65c02    same= 86 fail->pass=0 pass->fail=3 output=0 error=1
+r3-320-1b
+  mos4510      same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mos45gs02    same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mos6502      same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mos6502x     same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mos65c02     same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mos65ce02    same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mos65dtv02   same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mos65el02    same= 86 fail->pass=3 pass->fail=0 output=0 error=1
+  moshuc6280   same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mosr65c02    same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+  mosspc700    same= 86 fail->pass=2 pass->fail=0 output=0 error=2
+  mossweet16   same= 86 fail->pass=0 pass->fail=0 output=0 error=4
+  mosw65816    same= 86 fail->pass=4 pass->fail=0 output=0 error=0
+  mosw65c02    same= 86 fail->pass=3 pass->fail=0 output=0 error=1
+r3-320-1c
+  mosspc700    same= 72 fail->pass=0 pass->fail=0 output=0 error=18
+r3-320-2
+  mos4510      same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mos45gs02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mos6502      same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mos6502x     same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mos65c02     same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mos65ce02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mos65dtv02   same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mos65el02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  moshuc6280   same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mosr65c02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mosspc700    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mossweet16   same= 86 fail->pass=0 pass->fail=0 output=0 error=4
+  mosw65816    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+  mosw65c02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+r3-fw-11
+  mos4510      same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mos45gs02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mos6502      same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mos6502x     same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mos65c02     same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mos65ce02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mos65dtv02   same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mos65el02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  moshuc6280   same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mosr65c02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+  mosw65816    same= 87 fail->pass=0 pass->fail=0 output=3 error=0
+  mosw65c02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0

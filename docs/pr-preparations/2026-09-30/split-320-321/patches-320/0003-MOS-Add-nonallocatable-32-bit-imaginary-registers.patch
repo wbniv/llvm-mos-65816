@@ -1,4 +1,4 @@
-From fcb88211d861634b121e089a1bfc18380cf1b306 Mon Sep 17 00:00:00 2001
+From 03cd24fdcb9f6bd8e29f96fbd2218399f0ace889 Mon Sep 17 00:00:00 2001
 From: mlund <mlund@localhost>
 Date: Mon, 10 Aug 2026 16:43:58 +0200
 Subject: [PATCH 3/9] [MOS] Add nonallocatable 32-bit imaginary registers
@@ -60,7 +60,7 @@ index 50432465870e..ca1700b448fb 100644
            TRI.copyCost(Dst, Src, STI).value(CostMode) <= LdImmCostVal)
          continue;
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index ef09d4e8bae6..3c43dd923b09 100644
+index 517e9e640478..d095ecc695d6 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -694,6 +694,12 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
@@ -91,7 +91,7 @@ index 75fc2ea7bded..8d6969cc65f0 100644
            Ctx.getOrCreateSymbol(TRI.getImag8SymbolName(Reg)), Ctx);
        MCOp = MCOperand::createExpr(Expr);
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index ca45b5d5878e..a78a81c23e34 100644
+index 6028863a6afc..02a342dd35bb 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -69,6 +69,8 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
@@ -103,7 +103,7 @@ index ca45b5d5878e..a78a81c23e34 100644
      if (MOS::Imag16RegClass.contains(R))
        R = getSubReg(R, MOS::sublo);
      if (!MOS::Imag8RegClass.contains(R))
-@@ -1456,6 +1458,9 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+@@ -1465,6 +1467,9 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
    if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
      return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
    }

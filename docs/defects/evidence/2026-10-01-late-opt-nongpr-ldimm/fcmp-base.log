@@ -1,0 +1,22 @@
+$ build/split-320-321/llc/p-321-00 -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp.ll -o /dev/null
+# llc build/split-320-321/llc/p-321-00 sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/p-321-00 -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp.ll'.
+2.	Running pass 'MOS Late Optimizations' on function '@one_f32'
+ #0 0x00005c17c463898b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/p-321-00+0x452e98b)
+ #1 0x00005c17c4635811 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/p-321-00+0x452b811)
+ #2 0x00005c17c463979b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007a22affc6cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00005c17c2c3eb0d (anonymous namespace)::MOSLateOptimization::runOnMachineFunction(llvm::MachineFunction&) MOSLateOptimization.cpp:0:0
+ #5 0x00005c17c32d3379 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/p-321-00+0x31c9379)
+ #6 0x00005c17c3865750 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/p-321-00+0x375b750)
+ #7 0x00005c17c386d852 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/p-321-00+0x3763852)
+ #8 0x00005c17c3866514 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/p-321-00+0x375c514)
+ #9 0x00005c17c2236a8b compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#10 0x00005c17c2233d53 main (build/split-320-321/llc/p-321-00+0x2129d53)
+#11 0x00007a22affab601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#12 0x00007a22affab718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#13 0x00005c17c2232f65 _start (build/split-320-321/llc/p-321-00+0x2128f65)
+exit_code=139

@@ -1,0 +1,198 @@
+{
+ "schema": 1,
+ "id": "mos-spc700-hint-outside-order",
+ "title": "SPC700 greedy allocation asserts on a copy hint outside the allocation order",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/plans/2026-10-01-far-prerequisite-split-carry.md",
+ "summary": "On upstream main 06bc967d2668 with assertions, -mcpu=mosspc700 -O2 aborts in the Greedy Register Allocator with \"Target hint is outside allocation order\" on 18 of the 52 corpus IRs of the series' default-mode set (boids, bf-vm, cardioid, mvscrl, ...). MOSRegisterInfo::getRegAllocationHints offers a strong copy hint that the SPC700 allocation order of the class does not contain. Upstream plus #584 still aborts the same way. The #320 split's 1c commit filters a strong hint that is not in the order (added for the empty Imag32 order on non-65816 CPUs); on SPC700 that turns this assertion into \"ran out of registers during register allocation\" followed by an abort in the Virtual Register Rewriter, so the inputs still fail. Not fixed; root cause in the SPC700 orders not traced.",
+ "attribution": [
+  "Found by the third-round all-CPU default-mode gate of the #320/#321 split; evidence and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
+ ],
+ "unknowns": [
+  "Not reduced; which register class and hint trigger it is not traced.",
+  "Release builds were not examined; without the assertion the allocator may proceed with an out-of-order hint."
+ ],
+ "prior_work": {
+  "disposition": "new_defect",
+  "search_terms": [
+   "Target hint is outside allocation order",
+   "getRegAllocationHints",
+   "spc700"
+  ],
+  "related_records": [],
+  "related_reports": [
+   "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review-3.md"
+  ],
+  "related_changes": [
+   "split series #320-1c 1a49ff6be74c (strong-hint filter)"
+  ],
+  "source_assessment": "Upstream getRegAllocationHints returns a strong hint without checking that it is in Order; 1c adds `is_contained(Order, *StrongHint)`.",
+  "binary_assessment": "p-321-00 and r3-584-up abort with the signature; r3-320-1b too; r3-320-1c and the series top fail with an out-of-registers error and a rewriter abort instead.",
+  "decision": "New defect, upstream; distinct from the late-opt crash (different pass, still present after #584).",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/prior-work.json",
+   "sha256": "829beec4d379f15a17a28282194faab2d8eabdbdcd5cca8547a52b58ea92a30a"
+  }
+ },
+ "baseline": {
+  "command": "build/split-320-321/llc/p-321-00 -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null",
+  "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+  "configuration": {
+   "cpu": "mosspc700",
+   "features": [],
+   "optimization": "O2",
+   "lto": false,
+   "verifier": false,
+   "expected": "compiles"
+  },
+  "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00 (06bc967d2668 (upstream main)); identity in docs/defects/evidence/2026-10-01-spc700-hint-outside-order/identity.json",
+  "toolchain_sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+  "input": {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+   "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/p-321-00.log",
+   "sha256": "c236d04cc0eb2860be46ad7390627d9384b057867979a4a609ca9db22ae18f08"
+  },
+  "exit_code": 134,
+  "failure_signature": "Target hint is outside allocation order"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+   "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/identity.json",
+   "sha256": "511bac8dcaec0b79b40eaf32adefbb89974b50272bbdd31b1f4e778be453b157"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/p-321-00.log",
+   "sha256": "c236d04cc0eb2860be46ad7390627d9384b057867979a4a609ca9db22ae18f08"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/prior-work.json",
+   "sha256": "829beec4d379f15a17a28282194faab2d8eabdbdcd5cca8547a52b58ea92a30a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-320-1b.log",
+   "sha256": "fd88720a0765046c6a9236cbec3e44ad94ab1142300ac8245c1896b50d0916cf"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-320-1c.log",
+   "sha256": "c3f51342e2a863c5106f07784d70e93fd24f0863439320ac00a78ba5c51d43e6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-584-up.log",
+   "sha256": "a3b80606d8fbb9542cf9bf028bc0cf50d2f800a91e2a676809459a9e9704f0a9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-fw-14.log",
+   "sha256": "0d5471d1378d4d7fb3fef206469c488fa64ccc0cc026690bebcd991479039236"
+  }
+ ],
+ "additional_runs": [
+  {
+   "command": "build/split-320-321/llc/r3-584-up -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": false,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-584-up (95e066056667 (upstream + #584)); identity in docs/defects/evidence/2026-10-01-spc700-hint-outside-order/identity.json",
+   "toolchain_sha256": "c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+    "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-584-up.log",
+    "sha256": "a3b80606d8fbb9542cf9bf028bc0cf50d2f800a91e2a676809459a9e9704f0a9"
+   },
+   "exit_code": 134,
+   "label": "upstream + #584",
+   "observed": "fails with the signature"
+  },
+  {
+   "command": "build/split-320-321/llc/r3-320-1b -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": false,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-320-1b (47e53302ee3f (#320-1b)); identity in docs/defects/evidence/2026-10-01-spc700-hint-outside-order/identity.json",
+   "toolchain_sha256": "00d1c26b26e1cb4a5236c04796653f75a49b4c13c5b7db07c2fc9480bc8f98b7",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+    "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-320-1b.log",
+    "sha256": "fd88720a0765046c6a9236cbec3e44ad94ab1142300ac8245c1896b50d0916cf"
+   },
+   "exit_code": 134,
+   "label": "#320-1b",
+   "observed": "fails with the signature"
+  },
+  {
+   "command": "build/split-320-321/llc/r3-320-1c -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": false,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-320-1c (1a49ff6be74c (#320-1c, strong-hint filter)); identity in docs/defects/evidence/2026-10-01-spc700-hint-outside-order/identity.json",
+   "toolchain_sha256": "9fb1460ef4d1c9e4f61ff83a398861704220295eeac927ec4a1489057e34432f",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+    "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-320-1c.log",
+    "sha256": "c3f51342e2a863c5106f07784d70e93fd24f0863439320ac00a78ba5c51d43e6"
+   },
+   "exit_code": 134,
+   "label": "#320-1c (strong-hint filter)",
+   "observed": "fails differently: ran out of registers, then an abort in the Virtual Register Rewriter"
+  },
+  {
+   "command": "build/split-320-321/llc/r3-fw-14 -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": false,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-fw-14 (f299b753f0d5 (series top)); identity in docs/defects/evidence/2026-10-01-spc700-hint-outside-order/identity.json",
+   "toolchain_sha256": "48a0c0891b4847466fd80d1dc47d678b6b8de8f981ae9eb3da3702a92e279f71",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+    "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-fw-14.log",
+    "sha256": "0d5471d1378d4d7fb3fef206469c488fa64ccc0cc026690bebcd991479039236"
+   },
+   "exit_code": 134,
+   "label": "series top",
+   "observed": "fails as at #320-1c"
+  }
+ ]
+}

@@ -1,0 +1,1192 @@
+From e801be3ce227156ecc3cef5214f426d54f7d729a Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 28 Sep 2026 18:47:56 +0700
+Subject: [PATCH 33/37] Prove bounded byte-loop ranges for far runtime indexing
+
+Rebase downstream 0069 onto the pinned native/far compiler series.
+Original implementation, validation and review credits remain in the
+source patch and investigation at wbniv/llvm-mos-65816 c3a53aecbc48.
+
+The loop proof is always on. It only narrows the known-bits bound, so it
+has no size or speed trade-off, and the hidden -mos-far-loop-range switch
+of the downstream patch is gone (independent review N5); the parent commit
+shows the same shapes without the proof.
+
+Rebase preparation: OpenAI Codex CLI 0.157.1 (session source vscode),
+model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+
+Option removal (review N5): Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+---
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp |  109 ++-
+ llvm/test/CodeGen/MOS/far-loop-range.mir | 1013 ++++++++++++++++++++++
+ 2 files changed, 1118 insertions(+), 4 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/far-loop-range.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index ccdea3923351..02757fd3b45a 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -55,6 +55,7 @@
+ #include "llvm/IR/Instructions.h"
+ #include "llvm/IR/Intrinsics.h"
+ #include "llvm/IR/RuntimeLibcalls.h"
++#include "llvm/Support/CommandLine.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/MathExtras.h"
+ 
+@@ -3086,6 +3087,107 @@ static bool noCallBetween(const MachineInstr &VDef, const MachineInstr &U,
+          Clean(UB->begin(), U.getIterator());
+ }
+ 
++// A single-block counting loop starts at a constant and returns to its header
++// only while the next value differs from a larger constant. With a unit step,
++// every header value lies in [Start, End); the recurrence cannot wrap.
++// Match the byte comparison after branch legalization as an SBC zero flag.
++static std::optional<uint64_t> getFarLoopMax(Register Reg,
++                                             const MachineRegisterInfo &MRI,
++                                             const MachineBasicBlock &Loop) {
++  const MachineInstr *Phi = MRI.getVRegDef(Reg);
++  if (!Phi || Phi->getOpcode() != G_PHI || Phi->getParent() != &Loop ||
++      Phi->getNumOperands() != 5 || Loop.pred_size() != 2 ||
++      Loop.succ_size() != 2 || !Loop.isSuccessor(&Loop))
++    return std::nullopt;
++  unsigned Back = Phi->getOperand(2).getMBB() == &Loop ? 1 : 3;
++  unsigned Entry = Back == 1 ? 3 : 1;
++  if (Phi->getOperand(Back + 1).getMBB() != &Loop ||
++      Phi->getOperand(Entry + 1).getMBB() == &Loop)
++    return std::nullopt;
++  auto Start =
++      getIConstantVRegValWithLookThrough(Phi->getOperand(Entry).getReg(), MRI);
++  Register Next = Phi->getOperand(Back).getReg();
++  const MachineInstr *Inc = getOpcodeDef(G_ADD, Next, MRI);
++  if (!Start || !Inc || Inc->getParent() != &Loop ||
++      Inc->getOperand(1).getReg() != Reg)
++    return std::nullopt;
++  auto Step =
++      getIConstantVRegValWithLookThrough(Inc->getOperand(2).getReg(), MRI);
++  if (!Step || !Step->Value.isOne())
++    return std::nullopt;
++  auto Term = Loop.getFirstTerminator();
++  if (Term == Loop.end() || Term->getOpcode() != MOS::G_BRCOND_IMM ||
++      MRI.getType(Reg) != LLT::scalar(8))
++    return std::nullopt;
++  const bool BranchToLoop = Term->getOperand(1).getMBB() == &Loop;
++  // SBC with carry set computes Next-Bound. Its zero output is false
++  // exactly when the operands differ, including unsigned values above 127.
++  if (Term->getOperand(2).getImm() != (BranchToLoop ? 0 : 1))
++    return std::nullopt;
++  Register Flag = Term->getOperand(0).getReg();
++  if (!Flag.isVirtual())
++    return std::nullopt;
++  const MachineInstr *Def = MRI.getVRegDef(Flag);
++  for (unsigned N = 0; Def && Def->isCopy() && N < 4; ++N) {
++    Flag = Def->getOperand(1).getReg();
++    if (!Flag.isVirtual())
++      return std::nullopt;
++    Def = MRI.getVRegDef(Flag);
++  }
++  if (!Def || Def->getOpcode() != MOS::G_SBC || Def->getParent() != &Loop ||
++      Def->getOperand(4).getReg() != Flag ||
++      Def->getOperand(5).getReg() != Next)
++    return std::nullopt;
++  auto Carry =
++      getIConstantVRegValWithLookThrough(Def->getOperand(7).getReg(), MRI);
++  if (!Carry || !Carry->Value.isOne())
++    return std::nullopt;
++  Register Bound = Def->getOperand(6).getReg();
++  auto End = getIConstantVRegValWithLookThrough(Bound, MRI);
++  if (!End || End->Value.getActiveBits() > 16 || !Start->Value.ult(End->Value))
++    return std::nullopt;
++  ++Term;
++  if (Term == Loop.end() || Term->getOpcode() != G_BR ||
++      (Term->getOperand(0).getMBB() == &Loop) == BranchToLoop ||
++      ++Term != Loop.end())
++    return std::nullopt;
++  return End->Value.getZExtValue() - 1;
++}
++
++// Refine an unsigned known-bits bound through zero extension and a constant
++// scale only when the maximum does not overflow the operation's own width.
++// The offset expression itself is retained, including its integer wrapping.
++static uint64_t getFarOffsetMax(Register Reg, const MachineRegisterInfo &MRI,
++                                GISelValueTracking &VT,
++                                const MachineBasicBlock &Loop,
++                                unsigned Depth = 0) {
++  APInt Bits = VT.getKnownBits(Reg).getMaxValue();
++  uint64_t Max = Bits.getLimitedValue();
++  if (Depth > 5)
++    return Max;
++  if (auto Bound = getFarLoopMax(Reg, MRI, Loop))
++    return std::min(Max, *Bound);
++  const MachineInstr *Def = MRI.getVRegDef(Reg);
++  if (!Def)
++    return Max;
++  if (Def->getOpcode() == G_ZEXT)
++    return std::min(Max, getFarOffsetMax(Def->getOperand(1).getReg(), MRI, VT,
++                                         Loop, Depth + 1));
++  if (Def->getOpcode() == G_SHL) {
++    auto Shift =
++        getIConstantVRegValWithLookThrough(Def->getOperand(2).getReg(), MRI);
++    if (Shift && Shift->Value.ult(16)) {
++      uint64_t Input = getFarOffsetMax(Def->getOperand(1).getReg(), MRI, VT,
++                                       Loop, Depth + 1);
++      unsigned Amount = Shift->Value.getZExtValue();
++      unsigned Width = MRI.getType(Reg).getScalarSizeInBits();
++      if (Width <= 64 && Amount < Width &&
++          Input <= (APInt::getMaxValue(Width).getZExtValue() >> Amount))
++        Max = std::min(Max, Input << Amount);
++    }
++  }
++  return Max;
++}
+ // The pointer add disappears only when every use is a non-atomic access, or
+ // a constant non-negative displacement leading exclusively to such accesses.
+ // MaxEnd includes each access's final byte. Escapes and selected fallbacks keep
+@@ -3138,7 +3240,7 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
+   return true;
+ }
+ 
+-// Fold a runtime byte offset only when its known-bits maximum plus the last
++// Fold a runtime byte offset only when its proven maximum plus the last
+ // accessed byte fits Y (8 bits, or 16 bits under +mos-xy16). Use the computed
+ // offset value directly, preserving narrow integer wrapping and bank carries.
+ // All uses must fold so the 32-bit pointer add disappears. Absolute bases are
+@@ -3175,10 +3277,9 @@ tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+ 
+   // (b) range proof on the offset itself, before the (costlier) user walk.
+   const uint64_t Limit = STI.hasIndex16() ? 0xFFFF : 0xFF;
+-  const APInt MaxOffAP = VT->getKnownBits(Off).getMaxValue();
+-  if (MaxOffAP.ugt(Limit))
++  const uint64_t MaxOff = getFarOffsetMax(Off, MRI, *VT, *MI.getParent());
++  if (MaxOff > Limit)
+     return false;
+-  const uint64_t MaxOff = MaxOffAP.getZExtValue();
+ 
+   // (c) every user of V folds, and the furthest byte any of them reads/writes
+   // still satisfies (b).
+diff --git a/llvm/test/CodeGen/MOS/far-loop-range.mir b/llvm/test/CodeGen/MOS/far-loop-range.mir
+new file mode 100644
+index 000000000000..8d3b830b718e
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-loop-range.mir
+@@ -0,0 +1,1013 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=A16
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=XY16
++#
++# A byte induction value is bounded only when a unit increment reaches a larger
++# constant before wrapping. Both exit orientations use the SBC zero result with
++# carry set. Other flags, steps, wrapping recurrences and control-flow shapes
++# retain their known-bits bounds. Constant displacement and scaling must fit Y.
++# Generic comparisons exercise branch legalization before the memory fold.
++
++# A16-LABEL: name: ne_backedge
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: ne_backedge
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: ne_backedge
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: eq_exit
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: eq_exit
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: eq_exit
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.2, 1
++    G_BR %bb.1
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: nonzero_start
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: nonzero_start
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: nonzero_start
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 17
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: unsigned_end
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: unsigned_end
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: unsigned_end
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 248
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: offset_256
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: offset_256
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: offset_256
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 249
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: wrapped_induction
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: wrapped_induction
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: wrapped_induction
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 250
++    %end:_(s8) = G_CONSTANT i8 6
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: full_cycle
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: full_cycle
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: full_cycle
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 0
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: equal_start_end
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: equal_start_end
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: equal_start_end
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 48
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: step_two
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: step_two
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: step_two
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 2
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: eq_backedge
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: eq_backedge
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: eq_backedge
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 1
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: ne_exit
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: ne_exit
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: ne_exit
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.2, 0
++    G_BR %bb.1
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: compare_phi
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: compare_phi
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: compare_phi
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %iv, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: borrow_input
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: borrow_input
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: borrow_input
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 0
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: carry_flag
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: carry_flag
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: carry_flag
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %carryout(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: negative_flag
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: negative_flag
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: negative_flag
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %negative(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: overflow_flag
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: overflow_flag
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: overflow_flag
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %overflow(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: zero_copy
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: zero_copy
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: zero_copy
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    %copy0:_(s1) = COPY %zero(s1)
++    G_BRCOND_IMM %copy0(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: four_copies
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: four_copies
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: four_copies
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    %copy0:_(s1) = COPY %zero(s1)
++    %copy1:_(s1) = COPY %copy0(s1)
++    %copy2:_(s1) = COPY %copy1(s1)
++    %copy3:_(s1) = COPY %copy2(s1)
++    G_BRCOND_IMM %copy3(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: five_copies
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: five_copies
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: five_copies
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    %copy0:_(s1) = COPY %zero(s1)
++    %copy1:_(s1) = COPY %copy0(s1)
++    %copy2:_(s1) = COPY %copy1(s1)
++    %copy3:_(s1) = COPY %copy2(s1)
++    %copy4:_(s1) = COPY %copy3(s1)
++    G_BRCOND_IMM %copy4(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: scale_fits
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: scale_fits
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: scale_fits
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 124
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: scale_overflows_y
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: scale_overflows_y
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: scale_overflows_y
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 129
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: narrow_scale_wraps
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: narrow_scale_wraps
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: narrow_scale_wraps
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 140
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %small:_(s8) = G_SHL %iv, %step
++    %off:_(s32) = G_ZEXT %small(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: narrow_add_wraps
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: narrow_add_wraps
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: narrow_add_wraps
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %small:_(s8) = G_ADD %iv, %wrapadd
++    %off:_(s32) = G_ZEXT %small(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: multiple_blocks
++# A16: = G_LOAD_FAR_INDIR{{ }}
++# XY16-LABEL: name: multiple_blocks
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
++---
++name: multiple_blocks
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.3, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.3
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.3, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++  bb.3:
++    successors: %bb.1
++    G_BR %bb.1
++...
++
++# A16-LABEL: name: generic_ne
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: generic_ne
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: generic_ne
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %cond:_(s1) = G_ICMP intpred(ne), %next(s8), %end
++    G_BRCOND %cond(s1), %bb.1
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# A16-LABEL: name: generic_eq
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
++# XY16-LABEL: name: generic_eq
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: generic_eq
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %cond:_(s1) = G_ICMP intpred(eq), %next(s8), %end
++    G_BRCOND %cond(s1), %bb.2
++    G_BR %bb.1
++  bb.2:
++    RTS
++...
+-- 
+2.53.0
+

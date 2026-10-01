@@ -1,4 +1,4 @@
-From 793da9041cd3366b7b55a40af04144847c868f97 Mon Sep 17 00:00:00 2001
+From faece415166573738bb006fe4a931efa252085ab Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 02/16] [MOS] Define 16-bit accumulator instruction forms
@@ -133,7 +133,7 @@ index ca75d5524124..2716e7a36359 100644
  
  /// An 8-bit pc-relative reference, for branch instructions.
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index 6b8158ca0cac..a4c1528978f9 100644
+index 6b8158ca0cac..23227194a85b 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
@@ -335,7 +335,7 @@ index 6b8158ca0cac..a4c1528978f9 100644
 +  dag InOperandList = (ins Ac16:$src);
 +}
 +
-+// #321 native s16 indirect memory: LDA (zp) / STA (zp) in 16-bit-accumulator mode —
++// Native s16 indirect memory: LDA (zp) / STA (zp) in 16-bit-accumulator mode —
 +// load/store a 16-bit value through a runtime pointer held in a zero-page Imag16
 +// pair. Mirror the 8-bit LDIndir/STIndir (LDA_Indirect=$B2 / STA_Indirect=$92,
 +// 65C02+; the w65816 has them) with MLow=1 so MOSInsertREPSEP brackets the access.
@@ -353,7 +353,7 @@ index 6b8158ca0cac..a4c1528978f9 100644
 +  dag InOperandList = (ins Ac16:$src, Imag16:$addr);
 +}
 +
-+// #321 native 16-bit compares: A16 - operand, discard the result, keep the flags
++// Native 16-bit compares: A16 - operand, discard the result, keep the flags
 +// (Cc = carry; N/Z set implicitly). MLow=1 so MOSInsertREPSEP brackets `lda; cmp`
 +// in one rep/sep run; SEP doesn't touch C/Z/N, so a following branch reads them.
 +// Used by selectSbc16 for the unsigned-ordering (C-flag) s16 comparisons. There is
@@ -403,7 +403,7 @@ index 6b8158ca0cac..a4c1528978f9 100644
 +def ASLAcc16 : MOSShiftAcc16<ASL_Accumulator> { let Defs = [C]; }
 +def LSRAcc16 : MOSShiftAcc16<LSR_Accumulator> { let Defs = [C]; }
 +
-+// #321 native s16 inc/dec: in 16-bit-accumulator mode one `inc a` / `dec a` steps all
++// Native s16 inc/dec: in 16-bit-accumulator mode one `inc a` / `dec a` steps all
 +// 16 bits, so a 16-bit `x + 1` / `x - 1` selects to a single accumulator inc/dec
 +// (1 byte, no carry-init) instead of `(clc;) adc #$0001` — and far better than the
 +// 8-bit byte inc/dec-with-carry chain the default path emits. Same accumulator-RMW
@@ -416,7 +416,7 @@ index 6b8158ca0cac..a4c1528978f9 100644
 +// Native unit arithmetic uses accumulator INC/DEC between the selected
 +// load and store, preserving the addressing mode and memory operands.
 +
-+// #321 native s16 arithmetic right shift (signed `>>`): the 65816 has no native
++// Native s16 arithmetic right shift (signed `>>`): the 65816 has no native
 +// ASR, but in 16-bit mode `cmp #$8000` sets carry = the sign bit (A >= 0x8000) and
 +// `ror a` rotates that carry back into bit 15 while shifting right — so the sign
 +// replicates. selectShift16Native emits `cmp #$8000; ror a` per bit. Unlike ASL/LSR

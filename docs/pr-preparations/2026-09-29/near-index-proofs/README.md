@@ -4,6 +4,8 @@ Prepared September 29, 2026. This packet extracts the completed downstream near-
 
 ## Split series (current)
 
+**Third round (2026‑10‑01).** The #321 commits were rebuilt for the review's N3/N4 findings (clang-format and history tags; comments and whitespace only, plus one sorted `#include`). The recovery patch was replayed onto them without conflicts (`pkt-r3-near-index` `7d6560bd0254`). With comments stripped, every file equals the previous candidate's except that include. [`patches-split/`](patches-split/) and [the round-trip record](evidence/split-series.json) are regenerated: 17 patches, every intermediate tree matches, final tree `0537ca4478fb`, MOS CodeGen+MC 157 pass, 1 unsupported. The previous record is [`split-series-before-r3.json`](evidence/split-series-before-r3.json). The table below describes the earlier split.
+
 The #321 prerequisite (patch 1 below) is now the 16-commit [split series](../../2026-09-30/split-320-321/README.md). [`patches-split/`](patches-split/) holds those 16 commits followed by this packet's near-index recovery patch, applied unchanged with `git am -3`. On 2026‑09‑30 the split was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application) (#321‑1 and #321‑8), and this section records the rerun on the regenerated commits.
 
 | Check | Result |

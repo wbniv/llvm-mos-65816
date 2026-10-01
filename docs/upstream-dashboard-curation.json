@@ -310,7 +310,7 @@
         "docs/plans/2026-09-30-split-320-321-series.md"
       ],
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/320",
-      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. #320/#321 are now split into reviewable commit series (docs/pr-preparations/2026-09-30/split-320-321); repair those findings on that series, then re-review."
+      "nextStep": "Split into reviewable #321 and #320 series (docs/pr-preparations/2026-09-30/split-320-321) built on mlund's #594. Three independent reviews' findings are fixed through the October 1 third round; filing waits on mlund's answers on #594 (RL DWARF numbering, the reservation fix) and a final check."
     },
     {
       "id": "platform:321",
@@ -327,7 +327,7 @@
         "docs/plans/2026-09-30-split-320-321-series.md"
       ],
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/321",
-      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. #320/#321 are now split into reviewable commit series (docs/pr-preparations/2026-09-30/split-320-321); repair those findings on that series, then re-review."
+      "nextStep": "Split into reviewable #321 and #320 series (docs/pr-preparations/2026-09-30/split-320-321) built on mlund's #594. Three independent reviews' findings are fixed through the October 1 third round; filing waits on mlund's answers on #594 (RL DWARF numbering, the reservation fix) and a final check."
     },
     {
       "id": "platform:snes415",

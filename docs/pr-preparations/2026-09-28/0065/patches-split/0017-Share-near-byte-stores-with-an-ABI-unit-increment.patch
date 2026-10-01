@@ -1,4 +1,4 @@
-From 717c95e8c36a41648c0962af89807782fdd39195 Mon Sep 17 00:00:00 2001
+From 022db5850955174f455f8559512044a64b2ee372 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:13:36 +0700
 Subject: [PATCH 17/18] Share near byte stores with an ABI unit increment
@@ -12,10 +12,10 @@ Extraction assistance: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, 
  2 files changed, 67 insertions(+), 5 deletions(-)
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 877e6a91147b..659e0cf9d443 100644
+index 49f8c46cbe2e..f2970bfb65cb 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -868,8 +868,54 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -892,8 +892,54 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    assert(MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB);
    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
    const LLT Ty = MRI.getType(Dst);
@@ -72,7 +72,7 @@ index 877e6a91147b..659e0cf9d443 100644
  
    auto RHSConst =
        getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
-@@ -2093,6 +2139,22 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
+@@ -2132,6 +2178,22 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
        switch (Use.getOpcode()) {
        case TargetOpcode::G_UNMERGE_VALUES:
          return true;

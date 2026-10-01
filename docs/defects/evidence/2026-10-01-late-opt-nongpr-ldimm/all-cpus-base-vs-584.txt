@@ -1,0 +1,49 @@
+# default-hashes-cpus.sh: 90 inputs (38 CodeGen/MOS .ll tests at 06bc967d2668 + 52 corpus IRs) x 14 MOS CPUs at -O2, assembly and object
+# old = upstream 06bc967d2668 (llc p-321-00), new = 06bc967d2668 + #584 (llc r3-584-up, commit 95e066056667)
+mos4510      same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mos45gs02    same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mos6502      same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mos6502x     same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mos65c02     same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mos65ce02    same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mos65dtv02   same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mos65el02    same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+moshuc6280   same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mosr65c02    same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mosspc700    same= 59 fail->pass=31 pass->fail=0 output=0 error=0
+mossweet16   same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mosw65816    same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+mosw65c02    same= 90 fail->pass=0 pass->fail=0 output=0 error=0
+total        same=1229 fail->pass=31 pass->fail=0 output=0 error=0
+fail->pass O2 corpus/examples_65816_a16scavnz.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '2275f990824b29ed', '0', '303a0b8a83a10c2e')
+fail->pass O2 corpus/examples_65816_k_bits.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'f391c2e277c0e188', '0', 'ab7c56d28ca487af')
+fail->pass O2 corpus/examples_65816_mixedwidth-probe.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'f76c1700f84d7541', '0', '5e718d78ebe169d5')
+fail->pass O2 corpus/examples_snes_corpus_avalanche_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'f38262f0dc56c749', '0', '9f1e3e0a7d57b68f')
+fail->pass O2 corpus/examples_snes_corpus_boids_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '97fe46eea72e299d', '0', '6457e9ee7061f4cf')
+fail->pass O2 corpus/examples_snes_corpus_cgrade_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'eb6f5d849b7d0f54', '0', '9837f40abc3ac56c')
+fail->pass O2 corpus/examples_snes_corpus_critters_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '3a282cd474df4f50', '0', '56eedb0beb46a31f')
+fail->pass O2 corpus/examples_snes_corpus_fenwick_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '0d53f5ea1562992f', '0', 'ad713e45f3978b4b')
+fail->pass O2 corpus/examples_snes_corpus_grid3d_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '8a86a9c2ffec2056', '0', 'd1e50e756a892d08')
+fail->pass O2 corpus/examples_snes_corpus_jt256_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '5df95ae57583e1e7', '0', 'bd8642e78b65337a')
+fail->pass O2 corpus/examples_snes_corpus_lzdec_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '31f32d72e4312f3d', '0', '99b4962113f007ec')
+fail->pass O2 corpus/examples_snes_corpus_montorbit_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '4511e368e45bcd1f', '0', '54ca65b15d5c4328')
+fail->pass O2 corpus/examples_snes_corpus_nmitally_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'fc7c4e369276009f', '0', '9350260095ebec6a')
+fail->pass O2 corpus/examples_snes_corpus_perlin_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '47580d40bc88c3c4', '0', '6d8fb1a9effd3cb4')
+fail->pass O2 corpus/examples_snes_corpus_rangecode_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '5e041536563bfeee', '0', 'd52a5a0a8ea126d9')
+fail->pass O2 corpus/examples_snes_corpus_sodo_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '5b02e06add35ce24', '0', '49de6623df7ec649')
+fail->pass O2 corpus/examples_snes_corpus_tea_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '9efffb58f402842c', '0', 'f83d6d97046c905a')
+fail->pass O2 corpus/examples_snes_corpus_ulam_sim.c.default.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '5f634dbd3066ec5a', '0', '971399b1b21200be')
+fail->pass O2 tests/callee-saved-regs.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'ec11a0802396430a', '0', '02c957d7f119b5eb')
+fail->pass O2 tests/char-stats-norecurse.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '63bf26bee98cdc3f', '0', '345c089ea0c1e78c')
+fail->pass O2 tests/char-stats.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '53999960688dfb36', '0', '4f95f02ec98ef4a6')
+fail->pass O2 tests/fcmp.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '5bf98902aab42276', '0', 'ca744d33670e19e9')
+fail->pass O2 tests/getchar-regression.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'b184afe2cbeeaf0c', '0', 'ea7092af99ebeeae')
+fail->pass O2 tests/immediate-remat.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'eb4632a58bfbdd85', '0', 'f1027df28c09b746')
+fail->pass O2 tests/indvar-simplify-20230930.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'bd87cad119368200', '0', '88f611ea4bd1e6ce')
+fail->pass O2 tests/light-spill.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '6f803fe8f304e486', '0', 'f74c480e98702734')
+fail->pass O2 tests/scmp-ucmp.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '425c17ed0b2ac430', '0', 'ca800a8f55a9f0af')
+fail->pass O2 tests/shift-rotate.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '7a3e401b4c8c3cec', '0', 'b0be13794b9d01f4')
+fail->pass O2 tests/vector-scalarize.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '7ee5910229523f23', '0', 'ca52bb07389fc287')
+fail->pass O2 tests/whole-program-zp.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', '6b122c720b04bd39', '0', '9e548d9b1059b3e6')
+fail->pass O2 tests/zp-alloc.ll mosspc700 ('139', 'err:3dff6dfc75e0', '139', '-') -> ('0', 'e13a6dc2d46aa8e6', '0', '12893036f2779d42')
+# table sha256: 085a25113fb61b8b6a4cb417e31705c5579936f23d23e1f3539263335be80d68 old, 06fefa2c1a9f0d79c8429fd14b23defa9af2bd52cd53222eee161b17c82cce88 new

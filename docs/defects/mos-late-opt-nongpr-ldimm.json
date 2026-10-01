@@ -1,0 +1,244 @@
+{
+ "schema": 1,
+ "id": "mos-late-opt-nongpr-ldimm",
+ "title": "mos-late-opt dereferences a null tracker on an SPC700 LDImm into an imaginary register",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/upstream-late-opt-nongpr-ldimm-pr.md",
+ "summary": "MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On current upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The fix is our own open upstream PR #584 (restrict the immediate-load folding to GPR destinations), carried downstream as patch 0003 and, since the third round, as its own commit in the #320/#321 split series ahead of #320. Upstream is not fixed until #584 merges, so the status stays confirmed.",
+ "attribution": [
+  "Found in the 138 LZSS far-decode investigation and fixed in PR #584 / patch 0003 (2026-07-31): credits as recorded in the PR commits (Will Norris, co-authored by Claude Opus 4.8 (1M context); agent/tool version and reasoning effort unknown).",
+  "Rediscovered as finding N17 by the third independent review of the #320 series: Claude Code 2.1.285, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d.",
+  "Prior-work reconciliation, upstream measurement, evidence and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
+ ],
+ "unknowns": [
+  "The original July baseline toolchain (the downstream fork at that time) is not preserved here; the 138 plan describes it. This record's baseline is a fresh capture on upstream 06bc967d2668.",
+  "Release builds were not examined; the null store is undefined behavior there."
+ ],
+ "prior_work": {
+  "disposition": "historical_migration",
+  "search_terms": [
+   "combineLdImm",
+   "late-opt-spc700",
+   "non-GPR LDImm",
+   "MOS Late Optimizations",
+   "mosspc700 segfault"
+  ],
+  "related_records": [],
+  "related_reports": [
+   "docs/upstream-late-opt-nongpr-ldimm-pr.md",
+   "docs/plans/2026-07-27-138-lzss-far-decode-mos-late-optimization-crash.md",
+   "docs/upstream-contribution-status.md",
+   "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review-3.md"
+  ],
+  "related_changes": [
+   "llvm-mos PR #584 (wbniv:mos-late-opt-nongpr-ldimm @ 7f4c37de6219)",
+   "patches/llvm-mos/0003-late-opt-nongpr-ldimm-dest.patch",
+   "split series commit \"[MOS] Fix non-GPR immediate loads in mos-late-opt\" (#584 squash)"
+  ],
+  "source_assessment": "Upstream 06bc967d2668 MOSLateOptimization.cpp combineLdImm has no destination-class filter; #584's net diff adds `!MOS::GPRRegClass.contains(MI.getOperand(0).getReg())` to the existing filtering condition. The #320-2 hunk the review found is the same guard without #584's comment change.",
+  "binary_assessment": "Upstream llc p-321-00 segfaults on #584's own MIR test and on fcmp.ll at mosspc700 -O2; upstream + #584 (r3-584-up) and the series #584 commit pass both. Across 90 inputs x 14 CPUs at -O2, #584 turns exactly the 31 mosspc700 crashes into compiles and changes nothing else.",
+  "decision": "Historical migration: the defect, its fix and its upstream PR exist; only the canonical record was missing. No duplicate upstream submission; the PR gets a prepared follow-up comment with the new measurement.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/prior-work.json",
+   "sha256": "f1cd6e26b86f9a142c1a0a08f7adec96faf7689ece4e2f9c160faf018fccc536"
+  }
+ },
+ "baseline": {
+  "command": "build/split-320-321/llc/p-321-00 -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir -o /dev/null",
+  "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+  "configuration": {
+   "cpu": "mosspc700",
+   "features": [],
+   "pass": "-run-pass=mos-late-opt",
+   "lto": false,
+   "verifier": true,
+   "expected": "the pass leaves the imaginary-register LDImm and folds the adjacent GPR load to TAX"
+  },
+  "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00 (upstream llvm-mos main, assertions, source 06bc967d2668); identity in docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/identity.json",
+  "toolchain_sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+  "input": {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir",
+   "sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/baseline.log",
+   "sha256": "6ae1610aa22a45e491cc49e61524fc68d53dbd30cd2586f4f8d87fb4c7f7011d"
+  },
+  "exit_code": 139,
+  "failure_signature": "Running pass 'MOS Late Optimizations'"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/all-cpus-base-vs-584.txt",
+   "sha256": "202ef564c0e2aba21f00ec391481733f4eb52a2abe0f65d98d49dcf5ce3a4e76"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/baseline.log",
+   "sha256": "6ae1610aa22a45e491cc49e61524fc68d53dbd30cd2586f4f8d87fb4c7f7011d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/candidate-series.log",
+   "sha256": "1be67b628877fb4fc2fb0c1b84c139c51e37d7bd886caeb4bc6f5bcadbae0e86"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/candidate.log",
+   "sha256": "a4d066ea492870750057454cc57f05f52d60a61396e78770e09db45ba82f162b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp-base.log",
+   "sha256": "84134888fe819da83b9577d42f1871484e45615a9f02a5248e822fa3a6bfeb1d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp-candidate.log",
+   "sha256": "bfada404a87180150fba22de42b86af549955511b5f14758ca7b071ed950bd63"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp.ll",
+   "sha256": "737babec84c64f51e8f60626d65b9247533fe79c396e4c4fce4f2be31f6a5919"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/identity.json",
+   "sha256": "f6897bbdfbe95789851883cf5a5f8e45a48e0c85fe5bcd4b74e3c3cee5e02899"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir",
+   "sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/prior-work.json",
+   "sha256": "f1cd6e26b86f9a142c1a0a08f7adec96faf7689ece4e2f9c160faf018fccc536"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/series-mc-top.log",
+   "sha256": "df5e2f5dd1aed0f4f9529d66fdab16811dc106a11da480cf10a9f04f21f611a0"
+  }
+ ],
+ "additional_runs": [
+  {
+   "label": "Upstream 06bc967d2668 + #584 alone: same input and configuration",
+   "command": "build/split-320-321/llc/r3-584-up -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "pass": "-run-pass=mos-late-opt",
+    "lto": false,
+    "verifier": true,
+    "expected": "the pass leaves the imaginary-register LDImm and folds the adjacent GPR load to TAX"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-584-up (06bc967d2668 + #584 net diff, source 95e066056667); identity in docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/identity.json",
+   "toolchain_sha256": "c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir",
+    "sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/candidate.log",
+    "sha256": "a4d066ea492870750057454cc57f05f52d60a61396e78770e09db45ba82f162b"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Split series #584 commit: same input and configuration",
+   "command": "build/split-320-321/llc/r3-584 -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "pass": "-run-pass=mos-late-opt",
+    "lto": false,
+    "verifier": true,
+    "expected": "the pass leaves the imaginary-register LDImm and folds the adjacent GPR load to TAX"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-584 (series #584 commit, source 1f46524f126a); identity in docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/identity.json",
+   "toolchain_sha256": "158fa57ee9a4988646906a779660e57f5dc6f6c0290c4d8771774cd3194b1d09",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir",
+    "sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/candidate-series.log",
+    "sha256": "1be67b628877fb4fc2fb0c1b84c139c51e37d7bd886caeb4bc6f5bcadbae0e86"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Split series MC top (parent of the #584 commit): same input and configuration",
+   "command": "build/split-320-321/llc/r3-mc-2 -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "pass": "-run-pass=mos-late-opt",
+    "lto": false,
+    "verifier": true,
+    "expected": "the pass leaves the imaginary-register LDImm and folds the adjacent GPR load to TAX"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-mc-2 (series MC top, before the #584 commit, source caea4546ceff); identity in docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/identity.json",
+   "toolchain_sha256": "be44489018362b4ecb808c9bfbc17cc1a99f081c9683b50c24f43faa20f8c7ae",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir",
+    "sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/series-mc-top.log",
+    "sha256": "df5e2f5dd1aed0f4f9529d66fdab16811dc106a11da480cf10a9f04f21f611a0"
+   },
+   "exit_code": 139,
+   "observed": "fails with the signature"
+  },
+  {
+   "label": "Upstream 06bc967d2668: in-tree fcmp.ll at mosspc700 -O2",
+   "command": "build/split-320-321/llc/p-321-00 -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": false,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00 (upstream llvm-mos main, assertions, source 06bc967d2668); identity in docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/identity.json",
+   "toolchain_sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp.ll",
+    "sha256": "737babec84c64f51e8f60626d65b9247533fe79c396e4c4fce4f2be31f6a5919"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp-base.log",
+    "sha256": "84134888fe819da83b9577d42f1871484e45615a9f02a5248e822fa3a6bfeb1d"
+   },
+   "exit_code": 139,
+   "observed": "fails with the signature"
+  },
+  {
+   "label": "Upstream 06bc967d2668 + #584: fcmp.ll at mosspc700 -O2",
+   "command": "build/split-320-321/llc/r3-584-up -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": false,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-584-up (06bc967d2668 + #584 net diff, source 95e066056667); identity in docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/identity.json",
+   "toolchain_sha256": "c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp.ll",
+    "sha256": "737babec84c64f51e8f60626d65b9247533fe79c396e4c4fce4f2be31f6a5919"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/fcmp-candidate.log",
+    "sha256": "bfada404a87180150fba22de42b86af549955511b5f14758ca7b071ed950bd63"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  }
+ ]
+}

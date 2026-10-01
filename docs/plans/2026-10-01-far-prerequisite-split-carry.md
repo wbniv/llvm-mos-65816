@@ -1,6 +1,6 @@
 # Carry the far-prerequisite repairs into the #320 split commits
 
-Status: first carry implemented (2026‑10‑01; verification below). Second round implemented 2026‑10‑01 (verification below): #594 option 1, B8, B9 and N10–N16 from the [second independent review](../pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md); see [Second round](#second-round-594-option-1-b8-b9-n10n16). This plan carries the downstream B1–B4 repairs ([far-prerequisite plan](2026-09-30-far-prerequisite-defects.md), commit `664b877a`), the B6 extraction gap, and the independent review's N3/N4 cleanups into the #320 commits of the [#320/#321 split](2026-09-30-split-320-321-series.md). It then re-verifies the split and the far-word 0069/0070 packet for a second independent review. It belongs to the two TODO items "Prepare native-word speed policy 0070 for upstream review" and "Prepare the bounded Farblit range proof for upstream review", whose shared blocker is these defects. The user approved the work on 2026‑09‑30 ("go ahead on 0069 and 0070 when it doesn't conflict with work in-flight"); the conflicting pressure-set change landed on origin as `b145a581`.
+Status: first carry implemented (2026‑10‑01; verification below). Third round implemented 2026‑10‑01 ([Third round](#third-round-n17n22-and-the-older-open-items); verification at the end). Second round implemented 2026‑10‑01 (verification below): #594 option 1, B8, B9 and N10–N16 from the [second independent review](../pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md); see [Second round](#second-round-594-option-1-b8-b9-n10n16). This plan carries the downstream B1–B4 repairs ([far-prerequisite plan](2026-09-30-far-prerequisite-defects.md), commit `664b877a`), the B6 extraction gap, and the independent review's N3/N4 cleanups into the #320 commits of the [#320/#321 split](2026-09-30-split-320-321-series.md). It then re-verifies the split and the far-word 0069/0070 packet for a second independent review. It belongs to the two TODO items "Prepare native-word speed policy 0070 for upstream review" and "Prepare the bounded Farblit range proof for upstream review", whose shared blocker is these defects. The user approved the work on 2026‑09‑30 ("go ahead on 0069 and 0070 when it doesn't conflict with work in-flight"); the conflicting pressure-set change landed on origin as `b145a581`.
 
 Attribution: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F).
 
@@ -309,3 +309,131 @@ with a different error message.
 ```
 
 The whole #320 group, #594 included, changes no default-mode code at any level. For far code, the second-round changes are debug-location drops (B8) and error paths (N12, N13, the allocation gate). The 58 far-word replay objects (Os, Oz, O2, O3) are byte-identical to the reviewed packet's. No repair in this round changes code for an input that compiled before, so no level gate is needed. [Levels](../pr-preparations/2026-09-30/split-320-321/evidence/r2/levels.txt).
+
+## Third round: N17–N22 and the older open items
+
+Added 2026‑10‑01 after the [third independent review](../pr-preparations/2026-09-30/far-word-rebase/independent-review-3.md) (origin `74e24d94`). The second-round series stays on `split-320-321-r2` and `pkt-r2-far-word` as the reference. The third-round series goes on `split-320-321-r3` (whole split, from `06bc967d2668`) and `pkt-r3-far-word`.
+
+### Prior-work reconciliation for N17
+
+N17 is not a new defect. It is the project's own open upstream PR [#584](https://github.com/llvm-mos/llvm-mos/pull/584) ("[MOS] Fix non-GPR immediate loads in mos-late-opt", `wbniv:mos-late-opt-nongpr-ldimm` @ `7f4c37de6219`, posted 2026‑07‑31, two review rounds), carried downstream as `patches/llvm-mos/0003-late-opt-nongpr-ldimm-dest.patch` and first found in the [138 LZSS far-decode investigation](2026-07-27-138-lzss-far-decode-mos-late-optimization-crash.md). The #320‑2 hunk is #584's guard without its comment change. Upstream `main` is still `06bc967d2668` (fetched 2026‑10‑01), so the defect is live upstream. No `docs/defects/*.json` record exists for it.
+
+Consequences:
+
+- The series carries #584's net diff as its own commit, unchanged (#584's squash, the way upstream merges), with #584's `late-opt-spc700.mir` as the regression test. It goes directly after the MC commits, before #320‑1a, and #320‑2 loses the hunk. The same commit applies to `06bc967d2668` alone, which is how #584 lands.
+- The upstream entry is #584's existing row in `docs/upstream-contribution-status.md`, not a new one: a second PR would duplicate a posted fix. The row gains the new evidence (15 of 51 in-tree inputs crash at `mosspc700 -O2` on current `main`) and a prepared, unposted comment for #584 that reports it.
+- A new canonical record, `mos-late-opt-nongpr-ldimm-null-tracker.json`, against `06bc967d2668`, with the `prior_work` audit pointing at #584, `0003` and the 138 plan. Its original attribution is the 2026‑07‑31 discovery. It stays `confirmed` until #584 merges.
+
+### Where each item lands
+
+| Item | Fix | Commit |
+|---|---|---|
+| N17 | #584 as its own commit; hunk removed from #320‑2; default-mode identity over all 14 MOS CPUs | new commit after MC, #320‑2 |
+| N19 | 1b message and test comment name both signatures: the reduced test's `Use not jointly dominated by defs.` and `variadic-call.ll`'s `Invalid global physical register` | #320‑1b |
+| N20 | on CPUs without the 65816, a far pointer value (stored, passed, returned, converted, compared, selected) stops with a purpose-written error naming the function, before the generic `G_UNMERGE_VALUES` failure; far accesses keep the per-access diagnostic. 1c's message states that `addrspace(2)` changes meaning on every MOS CPU (32-bit `p2`; upstream treated it as a 16-bit pointer). | #320‑2, #320‑1c message |
+| N21 | see the soundness check below; salvage only where sound | #320‑2 helper |
+| N22 | close `mos-far-fold-dangling-dbg-sites` as fixed with the same-input red and green runs | record |
+| N1 | explicit error instead of `llvm_unreachable` for the unlowered X16↔Y16 and A16 copy edges | far-word patch 9 |
+| N2 | patch 11 reduced to computing the flag in place and passing it to `handleIdentityCopy`; the X86 characterization test is labelled as such in its header | far-word patch 11 |
+| N3 | clang-format of packet patches 5 and 6; of all 16 #321 commits (their own lines) | patches 5, 6; #321 1–16 |
+| N4 | history tags removed from #321 lib and test comments, and the broken `(Native widths: )` fixed | #321 1–16 |
+| N5 | `-mos-far-loop-range` removed (its `OFF` runs go; the parent-red runs show the same contrast); `-mos-far-word-index=all` honours `optnone` | far-word patches 8, 12, 13 |
+| N7 | PR/README list of loud unsupported far shapes: far `null` compare, far `select` at O0, `vector-scalarize.ll` under `+mos-a16` at O2/O3, far `atomicrmw`/`cmpxchg`, far values on plain mosw65816 (A8) that reach memory | docs |
+| N8 | sensitivity runner extended to the two boundary tests; tests for a word-store sibling rejecting a group and for XY16 X8 forcing around the word pseudo | far-word patch 13, `check-sensitivity.py` |
+| N9 | fetch #593, #601 and #585 read-only, apply each onto the new far-word top, report conflicts, build, run the MOS suites | evidence |
+| N18 | not touched (mlund; the comment body is the orchestrator's) | — |
+
+#321 N3/N4 are comment and whitespace changes only. Each #321 commit is rebuilt as its old tree plus tag rewrites plus clang-format over the cumulative `06bc967d2668` diff, so no later commit has to re-resolve a reformatted line by hand. The near-index and 0065 packets are regenerated on the new #321 and gated; their compiled output must be identical.
+
+### N21 soundness check (done)
+
+The concern was the DWARF address size: if it were 2 bytes, `DW_OP_bregN k` or `DW_OP_deref; DW_OP_plus_uconst k` would read a far pointer as a 2-byte generic value and drop the bank byte. Measured instead of assumed: a `-g` object from `r2-320-4` has a compile unit with `addr_size = 0x04`, and a far pointer argument described as `DBG_VALUE %p, DW_OP_plus_uconst 1` is emitted as `DW_OP_bregx RL1+1`. The generic stack is 4 bytes, so the addition covers all 32 bits and keeps a carry into the bank byte. Salvage is sound and is implemented. It stays `$noreg` in three shapes, each for a stated reason: an address below a runtime offset (it would need a variadic `DBG_VALUE_LIST`), a tree that starts at a folded global or constant (no register holds the address after the fold), and indirect or list `DBG_VALUE`s.
+
+### Gates (as in round two, widened)
+
+Per-commit build with assertions and MOS CodeGen+MC; red on parent and green on own and later commits for every added test; patch round trips from `06bc967d2668`; packet regeneration; default-mode identity per commit at O2 over all 14 MOS CPUs, and at O0–O3/Os/Oz on the endpoints; per-level measurement for any codegen change on previously compiling inputs; the far-word replay objects compared, with the emulator replay only if they change.
+
+### What changed while implementing (third round)
+
+1. **N17 is #584.** See the reconciliation above. The commit is #584's squash with its title and description, a carry note and its original co-author line; `late-opt-spc700.mir` is its test. On upstream `06bc967d2668` plus #584 alone, the 31 `mosspc700` inputs of the 90-input set that crash at `-O2` compile, and nothing else changes on any of the 14 MOS CPUs.
+2. **N21 lands in #320‑4, not #320‑2.** At #320‑2 every fold that erases adds starts from a global or constant base, so nothing is salvageable there; #320‑4 adds the first folds with a live base. The `offset-field` case of `far-fold-debug.ll` turned out salvageable too: the displacement window keeps the runtime add live, so `q = (base + n) + 1` becomes that add plus 1.
+3. **N20 stops with a fatal usage error.** A far pointer value on a CPU without the 65816 has no representation the legalizer could substitute, so "diagnose and continue" is not possible without erasing whole use chains. The error names the function and replaces the generic `unable to legalize … G_UNMERGE_VALUES`; far accesses keep their per-access diagnostic, and a far pointer that only addresses diagnosed accesses is erased with them, so `far-access-non-65816.ll`'s access cases are unchanged. The rules cover every generic opcode that can carry a `p2` operand (constants, globals, casts, compares, selects, pointer adds and masks, PHIs, freezes, and loads and stores of a far value through a near pointer).
+4. **N1 is a fatal error with crash diagnostics.** An unlowered native copy is an internal invariant violation, not a user error, so `report_fatal_error` keeps the backtrace; the test uses `not --crash`. It lands in far-word patch 9, which owns the native-index copy edges, so #321 stays a comment and whitespace change.
+5. **N8 found an unchecked opcode.** Extending the sensitivity runner to every far access opcode in every function (not only the one word load) showed that `far-word-policy.mir`'s four mixed-order functions never pinned the byte sibling's opcode. Patch 13 now pins it. The runner covers the two boundary tests as well.
+6. **N3/N4 in #321.** Every #321 commit was rebuilt from its old tree with the tag rewrites and clang-format over the cumulative `06bc967d2668` diff, so no later commit had to be re-resolved by hand. A comment-stripping token comparison shows each rebuilt commit differs from the old one only in comments and whitespace, plus one sorted `#include` in `MOSTargetMachine.cpp`. The leading "Native widths:" topic labels that an earlier mechanical relabel left were kept where they read as a label; the four places where it broke a sentence were fixed.
+7. **Packets on #321.** The near-index recovery patch replays without conflicts; 0065's second patch conflicts with reformatted context in `MOSLegalizerInfo.cpp` and was resolved to the patch's own text. Token comparisons without comments show both packets' trees equal their previous ones except the sorted include.
+8. **Two more upstream defects from the all-CPU gate.** #321‑11's opcode-keyed frame-index displacement also fixes an upstream HuC6280 miscompile: `HuCMemcpy`'s destination frame index is followed by the block length, which upstream adds as the destination offset ([record](../defects/mos-huc-blockmove-frameindex-offset.json)). Upstream SPC700 also aborts in the greedy allocator ("Target hint is outside allocation order") on 18 corpus inputs; 1c's strong-hint filter changes that failure but does not fix it ([record](../defects/mos-spc700-hint-outside-order.json)). The #321‑3, #321‑11, #321‑12, 1b, 1c, #320‑2 and far-word patch 11 messages now state their effects on every CPU. **ESCALATE:** whether the HuC6280 part of #321‑11 should be split out and offered upstream on its own, as #584 is, is a series-shape decision for the user.
+9. **Patch 11's default-mode cost predates this round.** On the all-CPU set it changes three corpus inputs (+8 bytes in examples_snes_bf-vm on 12 CPUs), identically to the reviewed patch 11; the minimal form changes nothing.
+
+### Third-round verification
+
+1. Every commit builds with assertions and passes MOS CodeGen+MC with no new MOS warnings.
+
+    ```text
+    evidence/r3-stages.tsv: 38 rows (37 series commits + #584 alone on 06bc967d2668), gate_rc=0, hash_rc=0 for all
+    PASS counts: 584-up 133; #321 134 135 137 139 140 141 142 144 146 148 149 151 152 153 154 155; MC 158 160; #584 161;
+    #320 161 162 167 168 169 169 175 177 179; far-word 181 182 183 184 185 185 186 190 190 (1 unsupported each)
+    ```
+
+    PASS.
+
+2. Default mode on all 14 MOS CPUs (`llc -mcpu=help`), each commit against its parent at O2.
+
+    ```text
+    identical: #321-1,2,4..10,14,15; MC x2; 1a-i, 1a-ii, 1d, #320-3, #320-4; far-word 9,5,6,7,8,12,13,14
+    #321-3: 68 object-only (mos65el02, mosw65816)    #321-11: 2 (moshuc6280)    #321-12: 199 (13 CPUs)
+    #321-13: 28 (mosw65816)    #321-16: 3 (mosw65816)    #584: 31 fail->pass (mosspc700)
+    1a-iii: 21 pass->fail + 35 error changes; 1b: the exact reverse (1a-ii == 1b on all 1,260)
+    1c: 18 error changes (mosspc700)    #320-2: 69 error changes (5 far inputs x 13 CPUs, 4 on mossweet16)
+    far-word 11: 14 output changes (bf-vm x12, metaball, sodo), as the reviewed patch 11
+    p-321-16 vs r3-321-16: same=1260; r2-fw-14 vs r3-fw-14: outputs identical, 26 error changes (N20)
+    ```
+
+    PASS. Each effect is stated in its commit message ([table](../pr-preparations/2026-09-30/split-320-321/evidence/r3/default-all-cpus.txt)).
+
+3. Red/green for every added or changed test.
+
+    ```text
+         15 green char PASS
+        215 green reg PASS
+          7 red char PASS
+         35 red reg FAIL
+    unexpected: (none)
+    ```
+
+    PASS ([table](../pr-preparations/2026-09-30/split-320-321/evidence/r3/red-green.tsv)).
+
+4. Round trips and packet regeneration.
+
+    ```text
+    split: patches=28 matching=28 mismatching=0 final_tree=b3afcaba1e4a top=36d569637f6a
+    r3-near-index: 17 patches, trees match: True, final 0537ca4478fb, PASS=157 UNSUPPORTED=1
+    r3-0065: 18 patches, trees match: True, final 04a530515ead, PASS=158 UNSUPPORTED=1
+    r3-far-word: 37 patches, trees match: True, final 5d6924925790, PASS=190 UNSUPPORTED=1
+    ```
+
+    PASS.
+
+5. Replay objects, sensitivity, N9.
+
+    ```text
+    58 configurations: 58 identical to the recorded objects, 0 different, 0 failed
+    {'positive_passes': 8, 'functions': 111, 'functions_without_far_opcode': 0, 'mutations': 262, 'rejected': 262}
+    n9-601 rc=1 FAIL=2 PASS=189 UNSUPPORTED=1   (a16-byte-store.ll, a16-indirect-byte-store.ll: .cfi_startproc after the label)
+    n9-585 rc=0 PASS=191 UNSUPPORTED=1
+    n9-593 rc=0 PASS=191 UNSUPPORTED=1
+    ```
+
+    PASS, with #601's two test updates noted for whichever lands second.
+
+6. Records.
+
+    ```text
+    $ python3 dev/check-defect-evidence.py --worktree
+    Defect evidence: PASS (39 records, worktree)
+    ```
+
+    PASS. New: mos-late-opt-nongpr-ldimm (confirmed upstream, fix is #584), mos-huc-blockmove-frameindex-offset (confirmed upstream), mos-spc700-hint-outside-order (confirmed upstream). Closed as fixed: mos-far-fold-dangling-dbg-sites.
+
+Levels (lesson 4): no third-round change alters the output of an input that compiled before. The third-round tops produce the same assembly and objects as the second-round tops on every CPU, so the second round's per-level table still applies.
+

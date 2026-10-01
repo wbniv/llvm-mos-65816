@@ -1,0 +1,7 @@
+# N21: DWARF address size and the location emitted for a far pointer plus a constant (llc r3-320-4, mosw65816 +mos-a16)
+-O0 rc=0
+0x00000000: Compile Unit: length = 0x00000041, format = DWARF32, version = 0x0005, unit_type = DW_UT_compile, abbr_offset = 0x0000, addr_size = 0x04 (next unit at 0x00000045)
+            DW_LLE_offset_pair     (0x00000000, 0x00000003): DW_OP_bregx RL1+1
+-O2 rc=0
+0x00000000: Compile Unit: length = 0x00000041, format = DWARF32, version = 0x0005, unit_type = DW_UT_compile, abbr_offset = 0x0000, addr_size = 0x04 (next unit at 0x00000045)
+            DW_LLE_offset_pair     (0x00000000, 0x00000003): DW_OP_bregx RL1+1

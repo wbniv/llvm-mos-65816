@@ -1,0 +1,266 @@
+From 863ec640a7600f0058d16d2fb39b9805522623eb Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 28 Sep 2026 19:20:41 +0700
+Subject: [PATCH 34/37] Preserve undefined lane definitions in identity copies
+
+Reuse the prepared 0028 extraction as a compiler prerequisite. The
+far-word boundary workload reaches its existing identity-copy lane
+contract in word_pressure. The missing-patch compiler and pre-rewriter
+MIR are retained; this is reconciliation of an existing root repair.
+
+Pristine destination still removes the allocated identity copy without
+remembering its undef-lane definition. Preserve the current
+readsUndefSubreg(MI, MO) interface and the prepared generic X86 regression.
+
+The change is kept minimal (independent review N2): copyHasUndefLanes()
+decides, before an instruction's operands are rewritten, whether a COPY's
+source has lanes that are not live there, and handleIdentityCopy() keeps
+such an identity copy as a KILL. The rewrite loop is otherwise unchanged.
+virtregrewriter-x86-undef-high-byte-result.mir is the regression test;
+virtregrewriter-x86-copy-contracts.mir characterizes the existing
+identity-copy contracts and passes without this change, as its header says.
+This generic VirtRegMap.cpp change needs its own llvm-project path or an
+explicit llvm-mos carry decision.
+
+Default-mode effect: unchanged from the reviewed patch. On the fixed input
+set, examples_snes_bf-vm changes on every MOS CPU except mosspc700 and
+mossweet16 (+8 bytes of .text on mos6502, mos65c02 and mosw65816: a kept
+lane definition becomes a register copy before two pair spills), and
+examples_snes_metaball (+1 byte) and examples_snes_sodo (+8 bytes) change
+on mosw65816.
+
+Prior extraction: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra,
+xhigh reasoning effort; session 01a0db16-f6a0-7e32-ada6-0c8098813933.
+Prior independent review: OpenAI Codex CLI 0.157.1, model gpt-6-astra,
+xhigh reasoning effort; session 01a0db96-a6cd-7800-82a5-6b871eb7e177.
+Reapplication and validation: OpenAI Codex CLI 0.157.1 (session source
+vscode), model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84. Earlier implementation credits
+remain in the canonical mos-coalescing-rc-undef record.
+
+Minimal form and test labels (review N2): Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+---
+ llvm/lib/CodeGen/VirtRegMap.cpp               | 38 ++++++-
+ .../virtregrewriter-x86-copy-contracts.mir    | 99 +++++++++++++++++++
+ ...regrewriter-x86-undef-high-byte-result.mir | 23 +++++
+ 3 files changed, 155 insertions(+), 5 deletions(-)
+ create mode 100644 llvm/test/CodeGen/X86/virtregrewriter-x86-copy-contracts.mir
+ create mode 100644 llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir
+
+diff --git a/llvm/lib/CodeGen/VirtRegMap.cpp b/llvm/lib/CodeGen/VirtRegMap.cpp
+index 92a5996c733e..c524bf5fcfcf 100644
+--- a/llvm/lib/CodeGen/VirtRegMap.cpp
++++ b/llvm/lib/CodeGen/VirtRegMap.cpp
+@@ -228,7 +228,8 @@ class VirtRegRewriter {
+   void addMBBLiveIns();
+   bool readsUndefSubreg(const MachineInstr &MI, const MachineOperand &MO) const;
+   void addLiveInsForSubRanges(const LiveInterval &LI, MCRegister PhysReg) const;
+-  void handleIdentityCopy(MachineInstr &MI);
++  bool copyHasUndefLanes(const MachineInstr &MI) const;
++  void handleIdentityCopy(MachineInstr &MI, bool CopyHasUndefLanes);
+   void expandCopyBundle(MachineInstr &MI) const;
+   bool subRegLiveThrough(const MachineInstr &MI, MCRegister SuperPhysReg) const;
+   LaneBitmask liveOutUndefPhiLanesForUndefSubregDef(
+@@ -489,7 +490,30 @@ bool VirtRegRewriter::readsUndefSubreg(const MachineInstr &MI,
+   return true;
+ }
+ 
+-void VirtRegRewriter::handleIdentityCopy(MachineInstr &MI) {
++/// A full COPY defines its destination even where the source has no live
++/// lane. Returns true if, before rewriting, MI copies a virtual register with
++/// subranges and some lane of the copied (sub)register is not live at MI.
++bool VirtRegRewriter::copyHasUndefLanes(const MachineInstr &MI) const {
++  if (!MI.isCopy() || !LIS)
++    return false;
++  const MachineOperand &Src = MI.getOperand(1);
++  if (!Src.getReg().isVirtual() || !LIS->hasInterval(Src.getReg()))
++    return false;
++  const LiveInterval &LI = LIS->getInterval(Src.getReg());
++  if (!LI.hasSubRanges())
++    return false;
++  LaneBitmask UndefLanes = Src.getSubReg()
++                               ? TRI->getSubRegIndexLaneMask(Src.getSubReg())
++                               : MRI->getMaxLaneMaskForVReg(Src.getReg());
++  SlotIndex Idx = LIS->getInstructionIndex(MI);
++  for (const LiveInterval::SubRange &SR : LI.subranges())
++    if (SR.liveAt(Idx))
++      UndefLanes &= ~SR.LaneMask;
++  return UndefLanes.any();
++}
++
++void VirtRegRewriter::handleIdentityCopy(MachineInstr &MI,
++                                         bool CopyHasUndefLanes) {
+   if (!MI.isIdentityCopy())
+     return;
+   LLVM_DEBUG(dbgs() << "Identity copy: " << MI);
+@@ -509,8 +533,10 @@ void VirtRegRewriter::handleIdentityCopy(MachineInstr &MI) {
+   //    %al = COPY %al, implicit-def %eax
+   // give us additional liveness information: The target (super-)register
+   // must not be valid before this point. Replace the COPY with a KILL
+-  // instruction to maintain this information.
+-  if (MI.getOperand(1).isUndef() || MI.getNumOperands() > 2) {
++  // instruction to maintain this information. The same holds for a copy whose
++  // source had undefined lanes: the COPY was their only definition.
++  if (CopyHasUndefLanes || MI.getOperand(1).isUndef() ||
++      MI.getNumOperands() > 2) {
+     MI.setDesc(TII->get(TargetOpcode::KILL));
+     LLVM_DEBUG(dbgs() << "  replace by: " << MI);
+     return;
+@@ -661,6 +687,8 @@ void VirtRegRewriter::rewrite() {
+        MBBI != MBBE; ++MBBI) {
+     LLVM_DEBUG(MBBI->print(dbgs(), Indexes));
+     for (MachineInstr &MI : llvm::make_early_inc_range(MBBI->instrs())) {
++      // Decided before the operands below become physical registers.
++      const bool CopyHasUndefLanes = copyHasUndefLanes(MI);
+       for (MachineOperand &MO : MI.operands()) {
+         // Make sure MRI knows about registers clobbered by regmasks.
+         if (MO.isRegMask())
+@@ -770,7 +798,7 @@ void VirtRegRewriter::rewrite() {
+       expandCopyBundle(MI);
+ 
+       // We can remove identity copies right now.
+-      handleIdentityCopy(MI);
++      handleIdentityCopy(MI, CopyHasUndefLanes);
+     }
+   }
+ 
+diff --git a/llvm/test/CodeGen/X86/virtregrewriter-x86-copy-contracts.mir b/llvm/test/CodeGen/X86/virtregrewriter-x86-copy-contracts.mir
+new file mode 100644
+index 000000000000..a7be1a27d033
+--- /dev/null
++++ b/llvm/test/CodeGen/X86/virtregrewriter-x86-copy-contracts.mir
+@@ -0,0 +1,99 @@
++# RUN: llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
++
++# Characterization, not a regression test: these identity-copy contracts hold
++# with or without the undefined-lane KILL in VirtRegRewriter. The regression
++# test for that change is virtregrewriter-x86-undef-high-byte-result.mir.
++
++---
++# A defined physical identity copy contributes no new lane definition.
++name: defined_identity
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $al
++    ; CHECK-LABEL: name: defined_identity
++    ; CHECK: liveins: $al
++    ; CHECK-NOT: COPY
++    ; CHECK-NOT: KILL
++    ; CHECK: RET64 implicit $al
++    $al = COPY $al
++    RET64 implicit $al
++...
++---
++# An explicitly undef source still defines its destination for later uses.
++name: explicitly_undef_identity
++tracksRegLiveness: true
++body: |
++  bb.0:
++    ; CHECK-LABEL: name: explicitly_undef_identity
++    ; CHECK: $ah = KILL undef $ah
++    ; CHECK-NEXT: RET64 implicit $ah
++    $ah = COPY undef $ah
++    RET64 implicit $ah
++...
++---
++# An implicit super-register definition must survive identity-copy cleanup.
++name: implicit_definition_identity
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $al
++    ; CHECK-LABEL: name: implicit_definition_identity
++    ; CHECK: $al = KILL $al, implicit-def $ax
++    ; CHECK-NEXT: RET64 implicit $ah
++    $al = COPY $al, implicit-def $ax
++    RET64 implicit $ah
++...
++---
++# A parallel copy must consume the incoming RAX before overwriting it.
++name: ordered_copy_bundle
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rax, $rcx
++    ; CHECK-LABEL: name: ordered_copy_bundle
++    ; CHECK: $rdx = COPY $rax
++    ; CHECK-NEXT: $rax = COPY $rcx
++    ; CHECK-NEXT: RET64 implicit $rdx, implicit $rax
++    $rax = COPY $rcx {
++      $rdx = COPY $rax
++    }
++    RET64 implicit $rdx, implicit $rax
++...
++---
++# Only the defined low byte is copied; its undef sibling is not an operand.
++name: defined_source_subregister
++tracksRegLiveness: true
++body: |
++  bb.0:
++    ; CHECK-LABEL: name: defined_source_subregister
++    ; CHECK: renamable $al = MOV8ri 1
++    ; CHECK-NOT: COPY
++    ; CHECK-NOT: KILL
++    ; CHECK: RET64 implicit $al
++    %0:gr8_abcd_l = MOV8ri 1
++    undef %1.sub_8bit:gr16_abcd = COPY %0
++    %2:gr8_abcd_l = COPY %1.sub_8bit
++    $al = COPY %2
++    RET64 implicit $al
++...
++---
++# The source remains live across CX's clobber, requiring a non-identity copy.
++name: nonidentity_partial_undef
++tracksRegLiveness: true
++body: |
++  bb.0:
++    ; CHECK-LABEL: name: nonidentity_partial_undef
++    ; CHECK: $cx = COPY renamable $dx
++    ; CHECK-NEXT: $eax = MOVZX32rr8 $ch
++    ; CHECK-NEXT: $cx = IMPLICIT_DEF
++    ; CHECK-NEXT: RET64 implicit $eax, implicit $dl
++    %0:gr8_abcd_l = MOV8ri 1
++    undef %1.sub_8bit:gr16_abcd = COPY %0
++    $cx = COPY %1
++    $eax = MOVZX32rr8 $ch
++    $cx = IMPLICIT_DEF
++    %2:gr8_abcd_l = COPY %1.sub_8bit
++    $dl = COPY %2
++    RET64 implicit $eax, implicit $dl
++...
+diff --git a/llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir b/llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir
+new file mode 100644
+index 000000000000..7c22f7abd85d
+--- /dev/null
++++ b/llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir
+@@ -0,0 +1,23 @@
++# RUN: llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
++
++# The full virtual copy defines both byte lanes even though only its source's
++# low byte is live. An allocated identity copy must retain the high-byte
++# definition consumed by MOVZX32rr8.
++---
++name: undef_high_byte_identity_copy
++tracksRegLiveness: true
++body: |
++  bb.0:
++    ; CHECK-LABEL: name: undef_high_byte_identity_copy
++    ; CHECK: renamable $al = MOV8ri 1
++    ; CHECK-NEXT: renamable $ax = KILL renamable $ax
++    ; CHECK-NEXT: renamable $eax = MOVZX32rr8 killed renamable $ah
++    ; CHECK-NEXT: RET64 implicit $eax
++    %0:gr8_abcd_l = MOV8ri 1
++    undef %1.sub_8bit:gr16_abcd = COPY %0
++    %2:gr16_abcd = COPY %1
++    %3:gr8_abcd_h = COPY %2.sub_8bit_hi
++    %4:gr32 = MOVZX32rr8 %3
++    $eax = COPY %4
++    RET64 implicit $eax
++...
+-- 
+2.53.0
+

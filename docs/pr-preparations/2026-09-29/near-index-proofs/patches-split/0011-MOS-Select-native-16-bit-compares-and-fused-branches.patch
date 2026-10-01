@@ -1,4 +1,4 @@
-From 9b471aa8df068e251307d1632e3dec30969eb9fe Mon Sep 17 00:00:00 2001
+From 939f9f5fdd0d974aae4999e8d49a1d626398d7a7 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 11/17] [MOS] Select native 16-bit compares and fused branches
@@ -7,7 +7,7 @@ Under +mos-a16, s16 unsigned ordering (UGE, and ULT through it) becomes one 16-b
 
 Supporting changes: analyzeBranch accepts compare-branches with two memory operands and treats any volatile one as a barrier; eliminateFrameIndex decides where a frame-index displacement lives by opcode, because the operand after CmpBrAbsImm16's address is its compare immediate, not a displacement. A 16-bit arithmetic shift right by whole bytes fills the sign byte with a byte shift instead of a signed compare, so it does not request another native comparison.
 
-Default-mode effect: none (fixed input set identical).
+Default-mode effect: on moshuc6280 only. The frame-index change also applies to the HuC6280 HuCMemcpy pseudo, whose destination frame index is followed by the block length: upstream used that length as the destination offset, so a block move into a stack object wrote to the wrong place (for example both halves of a 32-byte copy to offset 16; record mos-huc-blockmove-frameindex-offset). The destination now uses its own operand offset. In the fixed input set two moshuc6280 inputs change (examples_snes_cardioid and examples_snes_mvscrl); the other 13 MOS CPUs are identical.
 
 Tests: a16-immediate-width.ll checks `adc #mos16(66)`, `eor #mos16(255)`, the unmarked `adc #43981`, and `cmp #mos16(5)` followed by genuine 8-bit immediates after `sep #32`.
 
@@ -18,18 +18,18 @@ Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
 ---
- llvm/lib/Target/MOS/MOSInstrInfo.cpp          |  77 +++++-
+ llvm/lib/Target/MOS/MOSInstrInfo.cpp          |  79 ++++-
  llvm/lib/Target/MOS/MOSInstrInfo.h            |   1 +
  llvm/lib/Target/MOS/MOSInstrPseudos.td        |  41 +++
- .../lib/Target/MOS/MOSInstructionSelector.cpp | 256 ++++++++++++++++++
- llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 163 ++++++++++-
- llvm/lib/Target/MOS/MOSRegisterInfo.cpp       |  20 +-
+ .../lib/Target/MOS/MOSInstructionSelector.cpp | 271 ++++++++++++++++++
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 177 +++++++++++-
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp       |  21 +-
  llvm/test/CodeGen/MOS/a16-immediate-width.ll  |  65 +++++
- 7 files changed, 608 insertions(+), 15 deletions(-)
+ 7 files changed, 638 insertions(+), 17 deletions(-)
  create mode 100644 llvm/test/CodeGen/MOS/a16-immediate-width.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 336e016b6aad..ef09d4e8bae6 100644
+index 6258c557ff93..517e9e640478 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -357,6 +357,11 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
@@ -50,7 +50,7 @@ index 336e016b6aad..ef09d4e8bae6 100644
      if (!FirstBR->memoperands_empty()) {
 -      assert(FirstBR->hasOneMemOperand() &&
 -             "CmpBr should have at most one mem operand");
-+      // Most CmpBr forms have one mem operand; the Native widths: 16-bit abs-fold
++      // Most CmpBr forms have one mem operand; the 16-bit abs-fold
 +      // CmpBrAbsAbs16 carries two (the folded `lda abs` + `cmp abs` globals).
        // Don't futz with volatile compare and branches; the compare part has to
        // happen, and we can't lose the MMO that says the compare is volatile.
@@ -75,17 +75,18 @@ index 336e016b6aad..ef09d4e8bae6 100644
  
    // Control flow
    case MOS::GBR:
-@@ -1405,6 +1419,63 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
+@@ -1405,6 +1419,65 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
    MI.eraseFromParent();
  }
  
-+// #321 native s16 equality: expand a fused 16-bit compare-branch to
++// Native s16 equality: expand a fused 16-bit compare-branch to
 +// `LDA{Imag16,bs16} $l; CMP{Imag16,Abs16,Imm16} $r; BR`. The LDA/CMP are MLow=1
 +// logical pseudos, so the late REP/SEP pass brackets them with rep/sep; the cmp
-+// sets Z (modeled as an implicit def), and the inserted `sep` doesn't touch Z, so
-+// the BR reads it correctly. Operands: (0)=tgt (1)=Flag=Z (2)=flag_val (3)=$l
-+// (4)=$r. The LHS ($l) is Imag16 (CmpBrImag16/Imm16) or a near-abs GLOBAL read by
-+// `lda abs` (CmpBrAbsAbs16); the RHS ($r) is Imag16, an abs global
++// sets Z (modeled as an implicit def), and the inserted `sep` doesn't touch Z,
++// so the BR reads it correctly. Operands: (0)=tgt (1)=Flag=Z (2)=flag_val
++// (3)=$l (4)=$r. The LHS ($l) is Imag16 (CmpBrImag16/Imm16) or a near-abs
++// GLOBAL read by `lda abs` (CmpBrAbsAbs16); the RHS ($r) is Imag16, an abs
++// global
 +// (`cmp abs`), or a 16-bit immediate. The two folded loads' memrefs ride on the
 +// pseudo and are cloned onto the abs lda/cmp.
 +void MOSInstrInfo::expandCmpBr16(MachineIRBuilder &Builder) const {
@@ -103,7 +104,8 @@ index 336e016b6aad..ef09d4e8bae6 100644
 +  case MOS::CmpBrAbsAbs16:
 +    CmpOpc = MOS::CMPAbs16;
 +    break;
-+  case MOS::CmpBrImagAbs16: // LHS is Imag16 (LhsAbs=false -> LDAImag16); RHS is abs global
++  case MOS::CmpBrImagAbs16: // LHS is Imag16 (LhsAbs=false -> LDAImag16); RHS is
++                            // abs global
 +    CmpOpc = MOS::CMPAbs16;
 +    break;
 +  default: // CmpBrImag16
@@ -152,14 +154,14 @@ index a19b69cd054f..5dcd2b5063b8 100644
    bool shouldRematPhysRegCopy() const override { return false; }
  };
 diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-index 21910cfeab37..820f09f6f564 100644
+index 21910cfeab37..be003600c498 100644
 --- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
 +++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
 @@ -359,4 +359,45 @@ let mayLoad = true in {
    def CmpBrIndirIdx : MOSCmpBr {
      dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, Ac:$l, Imag16:$addr, Yc:$idx);
    }
-+  // #321 native s16 equality (== / !=): a fused 16-bit compare-and-branch. The LHS
++  // Native s16 equality (== / !=): a fused 16-bit compare-and-branch. The LHS
 +  // is an Imag16 pair (loaded into A16 at expansion, unlike the 8-bit forms whose
 +  // LHS is already in a GPR); the RHS is an Imag16 pair or a 16-bit immediate.
 +  // expandCmpBr lowers these to `LDAImag16; CMPImag16/CMPImm16` (both MLow=1, so the
@@ -191,7 +193,7 @@ index 21910cfeab37..820f09f6f564 100644
 +    let Defs = [C, A16, NZ];
 +    dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, addr16:$l, i16imm:$r);
 +  }
-+  // Native widths: computed-vs-global: Imag16-resident LHS (computed/indirect value in zp) vs near-abs
++  // Computed-vs-global: Imag16-resident LHS (computed/indirect value in zp) vs near-abs
 +  // GLOBAL RHS — `lda zp_l` (LDAImag16, LhsAbs=false) + `cmp abs_r` (CMPAbs16). The global's
 +  // memref rides on this pseudo and is cloned to the CMP by expandCmpBr16. Fills the mixed gap
 +  // between CmpBrImag16 (both-Imag16) and CmpBrAbsAbs16 (both-global).
@@ -202,24 +204,24 @@ index 21910cfeab37..820f09f6f564 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index a78146b542a4..5ed8f45719b1 100644
+index 64a4e97f8a37..ec5518077e0a 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
    // Post-tablegen selection functions. If these return false, it is an error.
    bool selectBrCondImm(MachineInstr &MI);
    bool selectSbc(MachineInstr &MI);
-+  // #321 native 16-bit compares: select an s16 G_SBC (compare form) to one
++  // Native 16-bit compares: select an s16 G_SBC (compare form) to one
 +  // rep/lda/cmp/sep producing the carry flag, for unsigned-ordering branches.
 +  bool selectSbc16(MachineInstr &MI);
    bool selectFrameIndex(MachineInstr &MI);
    std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
    bool selectAddr(MachineInstr &MI);
-@@ -870,6 +873,11 @@ struct CmpNZ_match {
+@@ -872,6 +875,11 @@ struct CmpNZ_match {
      CondMI = DefSrcReg->MI;
      if (CondMI->getOpcode() != MOS::G_SBC)
        return false;
-+    // #321 native s16: a 16-bit G_SBC is the native equality form (handled by the
++    // Native s16: a 16-bit G_SBC is the native equality form (handled by the
 +    // s16 matchers + selectBrCondImm's CmpBrImag16/Imm16). Keep the 8-bit CmpNZ
 +    // matchers from ever folding a 16-bit G_SBC into an 8-bit compare-branch.
 +    if (MRI.getType(CondMI->getOperand(0).getReg()) != LLT::scalar(8))
@@ -227,13 +229,14 @@ index a78146b542a4..5ed8f45719b1 100644
  
      auto CInConst =
          getIConstantVRegValWithLookThrough(CondMI->getOperand(7).getReg(), MRI);
-@@ -882,6 +890,70 @@ struct CmpNZ_match {
+@@ -884,6 +892,75 @@ struct CmpNZ_match {
    }
  };
  
-+// #321 native s16 equality: match a 16-bit G_SBC whose live flag is Z (the ==/!=
-+// form left un-narrowed by legalizeICmp when the result feeds a branch). LHS/RHS are
-+// the s16 operands (5/6); selectBrCondImm emits a CmpBrImag16/Imm16 fused branch.
++// Native s16 equality: match a 16-bit G_SBC whose live flag is Z (the ==/!=
++// form left un-narrowed by legalizeICmp when the result feeds a branch).
++// LHS/RHS are the s16 operands (5/6); selectBrCondImm emits a CmpBrImag16/Imm16
++// fused branch.
 +struct CmpNZ16_match {
 +  Register &LHS;
 +  Register &Flag;
@@ -254,7 +257,8 @@ index a78146b542a4..5ed8f45719b1 100644
 +      return false;
 +    LHS = CondMI->getOperand(5).getReg();
 +    Flag = getSbcFlagForRegister(*CondMI, DefSrcReg->Reg);
-+    return Flag == MOS::Z; // only equality (Z); native s16 ordering uses C, not NZ
++    return Flag ==
++           MOS::Z; // only equality (Z); native s16 ordering uses C, not NZ
 +  }
 +};
 +
@@ -265,9 +269,11 @@ index a78146b542a4..5ed8f45719b1 100644
 +  bool match(const MachineRegisterInfo &MRI, Register CondReg) {
 +    if (!CmpNZ16_match::match(MRI, CondReg))
 +      return false;
-+    // Recover the constant even when legalization byte-split it into G_MERGE_VALUES
-+    // (a G_CONSTANT i16 is illegal under +mos-a16) — without this `g == 0x1234` and
-+    // `*p == 0x1234` fall to CmpBrImag16 and materialize the constant into Imag16.
++    // Recover the constant even when legalization byte-split it into
++    // G_MERGE_VALUES (a G_CONSTANT i16 is illegal under +mos-a16) — without
++    // this `g == 0x1234` and
++    // `*p == 0x1234` fall to CmpBrImag16 and materialize the constant into
++    // Imag16.
 +    auto RHSConst = getI16Const(CondMI->getOperand(6).getReg(), MRI);
 +    if (!RHSConst)
 +      return false;
@@ -275,7 +281,8 @@ index a78146b542a4..5ed8f45719b1 100644
 +    return true;
 +  }
 +};
-+inline CmpNZImm16_match m_CmpNZImm16(Register &LHS, int64_t &RHS, Register &Flag) {
++inline CmpNZImm16_match m_CmpNZImm16(Register &LHS, int64_t &RHS,
++                                     Register &Flag) {
 +  return {LHS, RHS, Flag};
 +}
 +
@@ -298,12 +305,12 @@ index a78146b542a4..5ed8f45719b1 100644
  struct CmpNZZero_match : public CmpNZ_match {
    CmpNZZero_match(Register &LHS, Register &Flag) : CmpNZ_match(LHS, Flag) {}
  
-@@ -1061,6 +1133,12 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
+@@ -1063,6 +1140,12 @@ inline CmpNZIndirIdx_match m_CmpNZIndirIdx(Register &LHS, Register &Addr,
    return {LHS, Addr, Idx, Flag, Load, AA};
  }
  
-+// Defined later (beside selectSbc16): the defining single-use near-abs G_LOAD16_ABS
-+// of R in User's block, else null — the Native widths: EQ abs-fold operand.
++// Defined later (beside selectSbc16): the defining single-use near-abs
++// G_LOAD16_ABS of R in User's block, else null — the EQ abs-fold operand.
 +static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
 +                                       const MachineRegisterInfo &MRI,
 +                                       AAResults *AA);
@@ -311,21 +318,21 @@ index a78146b542a4..5ed8f45719b1 100644
  bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
  
-@@ -1084,6 +1162,86 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1086,6 +1169,87 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
      MI.eraseFromParent();
      return true;
    }
-+  // #321 native s16 equality: a 16-bit G_SBC (Z) feeding this branch -> a fused
-+  // 16-bit compare-branch. Matched first (type-discriminated) so the 8-bit CmpNZ
-+  // cases below never see a 16-bit G_SBC. expandCmpBr lowers these to
++  // Native s16 equality: a 16-bit G_SBC (Z) feeding this branch -> a fused
++  // 16-bit compare-branch. Matched first (type-discriminated) so the 8-bit
++  // CmpNZ cases below never see a 16-bit G_SBC. expandCmpBr lowers these to
 +  // LDAImag16; CMPImag16/CMPImm16 (MLow=1 -> rep/sep bracket) + BR reading Z.
 +  Register RHS16;
 +  int64_t RHS16Const;
 +  if (mi_match(CondReg, MRI, m_CmpNZImm16(LHS, RHS16Const, Flag))) {
-+    // #321 `g == 0x1234`: fold a single-use near-abs GLOBAL LHS into `lda abs`
-+    // (CmpBrAbsImm16) instead of materializing it into an Imag16 pair. Same 1-to-1
-+    // volatile-safe fold as CmpBrAbsAbs16; the dead 16-bit G_SBC + COPY are cleaned by
-+    // InstructionSelect's isTriviallyDead.
++    // For `g == 0x1234`, fold a single-use near-abs GLOBAL LHS into `lda abs`
++    // (CmpBrAbsImm16) instead of materializing it into an Imag16 pair. Same
++    // 1-to-1 volatile-safe fold as CmpBrAbsAbs16; the dead 16-bit G_SBC + COPY
++    // are cleaned by InstructionSelect's isTriviallyDead.
 +    if (MachineInstr *LdL = foldableAbsLoad16(LHS, MI, MRI, AA)) {
 +      auto Branch = Builder.buildInstr(MOS::CmpBrAbsImm16)
 +                        .addMBB(Tgt)
@@ -369,9 +376,10 @@ index a78146b542a4..5ed8f45719b1 100644
 +      MI.eraseFromParent();
 +      return true;
 +    }
-+    // Native widths: computed-vs-global: the legalizer swap ensured the Imag16-resident value is on
-+    // LHS and the single-use foldable abs global is on RHS16. Fold the global into `cmp abs`
-+    // (CmpBrImagAbs16: LDAImag16 $l + CMPAbs16 $r) instead of materializing it into Imag16.
++    // Computed-vs-global: the legalizer swap ensured the Imag16-resident value
++    // is on LHS and the single-use foldable abs global is on RHS16. Fold the
++    // global into `cmp abs` (CmpBrImagAbs16: LDAImag16 $l + CMPAbs16 $r)
++    // instead of materializing it into Imag16.
 +    if (LdR) {
 +      auto Branch = Builder.buildInstr(MOS::CmpBrImagAbs16)
 +                        .addMBB(Tgt)
@@ -398,7 +406,7 @@ index a78146b542a4..5ed8f45719b1 100644
    if (mi_match(CondReg, MRI, m_CmpNZZero(LHS, Flag))) {
      auto Branch = Builder.buildInstr(MOS::CmpBrZero)
                        .addMBB(Tgt)
-@@ -1184,6 +1342,10 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+@@ -1186,6 +1350,10 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
    return true;
  }
  
@@ -406,19 +414,20 @@ index a78146b542a4..5ed8f45719b1 100644
 +static std::optional<int64_t> getImm16Operand(Register R,
 +                                              MachineRegisterInfo &MRI);
 +
- // #321 native s16 compare-operand fold: returns the defining G_LOAD16_ABS iff `R`
- // is a single-use 16-bit near-abs global load in `User`'s block — the operand the
- // absolute compare/load forms (cmp abs / lda abs) can read directly instead of
-@@ -1225,12 +1387,106 @@ static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
+ // Native s16 compare-operand fold: returns the defining G_LOAD16_ABS iff `R`
+ // is a single-use 16-bit near-abs global load in `User`'s block — the operand
+ // the absolute compare/load forms (cmp abs / lda abs) can read directly instead
+@@ -1229,12 +1397,115 @@ static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
    return nullptr;
  }
  
-+// #321 RHS-indexed compare fold: a single-use, same-BB 16-bit *indirect* load
++// RHS-indexed compare fold: a single-use, same-BB 16-bit *indirect* load
 +// (G_LOAD16_INDIR — the `lda (zp)` form that arr[i]/p[i] legalize to, via a
-+// computed pointer) whose pointer `cmp (zp)` (CMPIndir16) can read directly, instead
-+// of staging the loaded value through an Imag16 temp. Mirror of foldableAbsLoad16;
-+// operand 1 is the zp pointer pair. No isXc16Reg guard: an indirect-load result is
-+// never Xc16-constrained (only the abs G_LOAD16_ABS arm constrains for selectXY16).
++// computed pointer) whose pointer `cmp (zp)` (CMPIndir16) can read directly,
++// instead of staging the loaded value through an Imag16 temp. Mirror of
++// foldableAbsLoad16; operand 1 is the zp pointer pair. No isXc16Reg guard: an
++// indirect-load result is never Xc16-constrained (only the abs G_LOAD16_ABS arm
++// constrains for selectXY16).
 +static MachineInstr *foldableIndirLoad16(Register R, const MachineInstr &User,
 +                                         const MachineRegisterInfo &MRI,
 +                                         AAResults *AA) {
@@ -430,27 +439,29 @@ index a78146b542a4..5ed8f45719b1 100644
 +  return nullptr;
 +}
 +
-+// #321 native 16-bit compares: select an s16 G_SBC that the legalizer left
++// Native 16-bit compares: select an s16 G_SBC that the legalizer left
 +// un-narrowed for an unsigned-ordering compare (NativeS16/UGE path). Only the
 +// carry-out flag (operand 1) is used; the s16 result and N/V/Z are dead and the
-+// carry-in is set. Emits `lda lhs; cmp rhs` (both MLow=1 -> one rep/sep bracket)
-+// producing C, which the following branch tests (bcc/bcs). A near-abs global
-+// operand is read directly via lda abs / cmp abs (foldableAbsLoad16) instead of
-+// being materialized into an Imag16 pair; otherwise the accumulator is
-+// entered only via LDAImag16 -> never an Ac16<->8-bit COPY (the native invariant).
++// carry-in is set. Emits `lda lhs; cmp rhs` (both MLow=1 -> one rep/sep
++// bracket) producing C, which the following branch tests (bcc/bcs). A near-abs
++// global operand is read directly via lda abs / cmp abs (foldableAbsLoad16)
++// instead of being materialized into an Imag16 pair; otherwise the accumulator
++// is entered only via LDAImag16 -> never an Ac16<->8-bit COPY (the native
++// invariant).
 +bool MOSInstructionSelector::selectSbc16(MachineInstr &MI) {
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
 +
 +  Register CarryOut = MI.getOperand(1).getReg(); // C — the only used flag (UGE)
-+  Register L = MI.getOperand(5).getReg();        // LHS (s16, in Imag16 or abs load)
-+  Register R = MI.getOperand(6).getReg();        // RHS (s16, in Imag16 or abs load)
++  Register L = MI.getOperand(5).getReg(); // LHS (s16, in Imag16 or abs load)
++  Register R = MI.getOperand(6).getReg(); // RHS (s16, in Imag16 or abs load)
 +
 +  SmallVector<MachineInstrBuilder, 2> New;
 +  SmallVector<MachineInstr *, 2> Folded; // near-abs loads consumed by the fold
 +
-+  // lda lhs (16-bit) -> A16. A single-use near-abs global LHS reads via `lda abs`
-+  // directly, dropping the `lda abs; sta tmp` round-trip; otherwise from its Imag16.
++  // lda lhs (16-bit) -> A16. A single-use near-abs global LHS reads via `lda
++  // abs` directly, dropping the `lda abs; sta tmp` round-trip; otherwise from
++  // its Imag16.
 +  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
 +  if (MachineInstr *LdL = foldableAbsLoad16(L, MI, MRI, AA)) {
 +    New.push_back(Builder.buildInstr(MOS::LDAbs16)
@@ -462,12 +473,15 @@ index a78146b542a4..5ed8f45719b1 100644
 +    New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(L));
 +  }
 +
-+  // cmp rhs (16-bit): A16 - rhs, discard result, set C/N/Z. A constant RHS folds to
-+  // `cmp #imm16` (common loop bounds); a single-use near-abs global RHS to `cmp abs`
-+  // (reading the global directly); otherwise compare the Imag16 operand.
++  // cmp rhs (16-bit): A16 - rhs, discard result, set C/N/Z. A constant RHS
++  // folds to `cmp #imm16` (common loop bounds); a single-use near-abs global
++  // RHS to `cmp abs` (reading the global directly); otherwise compare the
++  // Imag16 operand.
 +  if (auto Imm = getImm16Operand(R, MRI)) {
-+    New.push_back(
-+        Builder.buildInstr(MOS::CMPImm16).addDef(CarryOut).addUse(Lo).addImm(*Imm));
++    New.push_back(Builder.buildInstr(MOS::CMPImm16)
++                      .addDef(CarryOut)
++                      .addUse(Lo)
++                      .addImm(*Imm));
 +  } else if (MachineInstr *LdR = foldableAbsLoad16(R, MI, MRI, AA)) {
 +    New.push_back(Builder.buildInstr(MOS::CMPAbs16)
 +                      .addDef(CarryOut)
@@ -476,9 +490,10 @@ index a78146b542a4..5ed8f45719b1 100644
 +                      .cloneMemRefs(*LdR));
 +    Folded.push_back(LdR);
 +  } else if (MachineInstr *LdR = foldableIndirLoad16(R, MI, MRI, AA)) {
-+    // arr[i]/p[i] on the RHS: read the value directly via `cmp (zp)` (CMPIndir16)
-+    // instead of staging it through an Imag16 temp. The pointer (operand 1) use is
-+    // transferred to the cmp; the single-use indirect load is erased below.
++    // arr[i]/p[i] on the RHS: read the value directly via `cmp (zp)`
++    // (CMPIndir16) instead of staging it through an Imag16 temp. The pointer
++    // (operand 1) use is transferred to the cmp; the single-use indirect load
++    // is erased below.
 +    New.push_back(Builder.buildInstr(MOS::CMPIndir16)
 +                      .addDef(CarryOut)
 +                      .addUse(Lo)
@@ -486,8 +501,10 @@ index a78146b542a4..5ed8f45719b1 100644
 +                      .cloneMemRefs(*LdR));
 +    Folded.push_back(LdR);
 +  } else {
-+    New.push_back(
-+        Builder.buildInstr(MOS::CMPImag16).addDef(CarryOut).addUse(Lo).addUse(R));
++    New.push_back(Builder.buildInstr(MOS::CMPImag16)
++                      .addDef(CarryOut)
++                      .addUse(Lo)
++                      .addUse(R));
 +  }
 +
 +  for (MachineInstrBuilder &B : New)
@@ -508,7 +525,7 @@ index a78146b542a4..5ed8f45719b1 100644
    MachineIRBuilder Builder(MI);
    const auto &MRI = *Builder.getMRI();
  
-+  // #321 native 16-bit compare: an s16-result G_SBC is the unsigned-ordering
++  // Native 16-bit compare: an s16-result G_SBC is the unsigned-ordering
 +  // compare form (selectSbc16). The 8-bit body below assumes 8-bit operands.
 +  if (MRI.getType(MI.getOperand(0).getReg()) == LLT::scalar(16))
 +    return selectSbc16(MI);
@@ -517,10 +534,10 @@ index a78146b542a4..5ed8f45719b1 100644
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index e963285fe981..eda3c1950fa1 100644
+index df4de13b0b56..d67348b11c6a 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -1098,11 +1098,18 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -1122,11 +1122,19 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      case MOS::G_ROTR:
        break;
      case MOS::G_ASHR: {
@@ -532,8 +549,9 @@ index e963285fe981..eda3c1950fa1 100644
 +      // Broadcast the high byte's sign bit using byte arithmetic so sign fill
 +      // does not recursively request another native signed comparison.
 +      if (Builder.getMF().getSubtarget<MOSSubtarget>().hasAccum16()) {
-+        Fill = Builder.buildAShr(S8, DstBytes.back(), Builder.buildConstant(S8, 7))
-+                   .getReg(0);
++        Fill =
++            Builder.buildAShr(S8, DstBytes.back(), Builder.buildConstant(S8, 7))
++                .getReg(0);
 +      } else {
 +        Register Sign = Builder
 +                            .buildICmp(ICmpInst::ICMP_SLT, S1, Src,
@@ -544,16 +562,17 @@ index e963285fe981..eda3c1950fa1 100644
        break;
      }
      case MOS::G_LSHR:
-@@ -1472,6 +1479,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1496,6 +1504,29 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
  
    LLT Type = MRI.getType(LHS);
  
-+  // #321 native s16 signed ordering: signed order equals unsigned order after
-+  // flipping the sign bit, a <ₛ b ⟺ (a ^ 0x8000) <ᵤ (b ^ 0x8000). Under +mos-a16
-+  // rewrite the canonical signed primitive (SLT) to an unsigned ULT on the
-+  // sign-flipped operands, reusing the already-native 16-bit EOR (the XORs) and the
-+  // native unsigned UGE carry path (ULT re-legalizes to !UGE). No new flag handling.
-+  // A constant RHS stays constant (b ^ 0x8000) and folds into cmp #imm.
++  // Native s16 signed ordering: signed order equals unsigned order after
++  // flipping the sign bit, a <ₛ b ⟺ (a ^ 0x8000) <ᵤ (b ^ 0x8000). Under
++  // +mos-a16 rewrite the canonical signed primitive (SLT) to an unsigned ULT on
++  // the sign-flipped operands, reusing the already-native 16-bit EOR (the XORs)
++  // and the native unsigned UGE carry path (ULT re-legalizes to !UGE). No new
++  // flag handling. A constant RHS stays constant (b ^ 0x8000) and folds into
++  // cmp #imm.
 +  {
 +    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
 +    if (STI.hasAccum16() && Type == LLT::scalar(16) &&
@@ -573,7 +592,7 @@ index e963285fe981..eda3c1950fa1 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1490,7 +1519,114 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1514,7 +1545,119 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
  
@@ -592,11 +611,14 @@ index e963285fe981..eda3c1950fa1 100644
 +      return false;
 +    if (MRI.getType(Def->getOperand(0).getReg()) != LLT::scalar(16))
 +      return false;
-+    // Non-absolute pointer => indirect load => value is in Imag16 (native wins).
-+    return !matchAbsoluteAddressing(MRI, Def->getOperand(1).getReg()).has_value();
++    // Non-absolute pointer => indirect load => value is in Imag16 (native
++    // wins).
++    return !matchAbsoluteAddressing(MRI, Def->getOperand(1).getReg())
++                .has_value();
 +  };
 +  // A single-use absolute s16 load can fold directly into the comparison.
-+  // The single-use condition keeps the native gate consistent with the selector.
++  // The single-use condition keeps the native gate consistent with the
++  // selector.
 +  auto isFoldableAbsS16Load = [&](Register Reg) -> bool {
 +    MachineInstr *Def = getDefIgnoringCopies(Reg, MRI);
 +    if (!Def || (Def->getOpcode() != TargetOpcode::G_LOAD &&
@@ -610,7 +632,8 @@ index e963285fe981..eda3c1950fa1 100644
 +    // absolute iff its pointer matches the absolute-addressing pattern.
 +    if (Def->getOpcode() == MOS::G_LOAD16_ABS)
 +      return true;
-+    return matchAbsoluteAddressing(MRI, Def->getOperand(1).getReg()).has_value();
++    return matchAbsoluteAddressing(MRI, Def->getOperand(1).getReg())
++        .has_value();
 +  };
 +  // Both-global equality and a global compared with a nonzero constant can
 +  // fold their operands directly. Mixed register/global operands and zero
@@ -659,28 +682,29 @@ index e963285fe981..eda3c1950fa1 100644
 +  const bool NativeS16Eq =
 +      STI.hasAccum16() && Type == LLT::scalar(16) && Pred == CmpInst::ICMP_EQ &&
 +      !RHSIsZero &&
-+      (isIndirectS16Load(LHS) || isIndirectS16Load(RHS) || // Indirect-load operand.
-+       BothGlobal || GlobalVsImm ||                        // Foldable globals.
-+       ComputedEq || ComputedVsGlobal ||                   // Resident or mixed operands.
++      (isIndirectS16Load(LHS) ||
++       isIndirectS16Load(RHS) ||         // Indirect-load operand.
++       BothGlobal || GlobalVsImm ||      // Foldable globals.
++       ComputedEq || ComputedVsGlobal || // Resident or mixed operands.
 +       all_of(MRI.use_instructions(Dst), [](const MachineInstr &U) {
 +         return U.getOpcode() == MOS::G_BRCOND_IMM;
 +       }));
-+  const bool NativeS16 =
-+      STI.hasAccum16() && Type == LLT::scalar(16) &&
-+      (Pred == CmpInst::ICMP_UGE || NativeS16Eq);
++  const bool NativeS16 = STI.hasAccum16() && Type == LLT::scalar(16) &&
++                         (Pred == CmpInst::ICMP_UGE || NativeS16Eq);
 +
-+  // #321 canonicalization: EQ's Z is symmetric (a-b==0 iff b-a==0); swaps below are safe.
-+  // For ComputedVsGlobal, put the Imag16-resident value on LHS (for `lda zp` via
-+  // LDAImag16) and the global on RHS (for `cmp abs` via CMPAbs16), so foldableAbsLoad16(RHS16)
-+  // fires in selectBrCondImm. Covers both `(a+b)==g` (LHS is already computed — swap is no-op
-+  // since isFoldableAbsS16Load(LHS) is false) and `g==(a+b)` (global on LHS — swaps them).
++  // Canonicalization: EQ's Z is symmetric (a-b==0 iff b-a==0); swaps below are
++  // safe. For ComputedVsGlobal, put the Imag16-resident value on LHS (for `lda
++  // zp` via LDAImag16) and the global on RHS (for `cmp abs` via CMPAbs16), so
++  // foldableAbsLoad16(RHS16) fires in selectBrCondImm. Covers both `(a+b)==g`
++  // (LHS is already computed — swap is no-op since isFoldableAbsS16Load(LHS) is
++  // false) and `g==(a+b)` (global on LHS — swaps them).
 +  if (NativeS16Eq && ComputedVsGlobal && isFoldableAbsS16Load(LHS) &&
 +      isImag16Resident(RHS))
 +    std::swap(LHS, RHS);
-+  // GlobalVsImm: put a lone foldable-abs global on LHS (read by `lda abs`) and any constant on
-+  // RHS (`cmp #imm`), so CmpBrAbsImm16 fires for `0x1234 == g` too. Guard !isImag16Resident(LHS)
-+  // so ComputedVsGlobal cases (computed LHS + global RHS, after the swap above) are not
-+  // accidentally re-swapped back.
++  // GlobalVsImm: put a lone foldable-abs global on LHS (read by `lda abs`) and
++  // any constant on RHS (`cmp #imm`), so CmpBrAbsImm16 fires for `0x1234 == g`
++  // too. Guard !isImag16Resident(LHS) so ComputedVsGlobal cases (computed LHS +
++  // global RHS, after the swap above) are not accidentally re-swapped back.
 +  if (NativeS16Eq && isFoldableAbsS16Load(RHS) && !isFoldableAbsS16Load(LHS) &&
 +      !isImag16Resident(LHS))
 +    std::swap(LHS, RHS);
@@ -689,7 +713,7 @@ index e963285fe981..eda3c1950fa1 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1561,16 +1697,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1585,16 +1728,24 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
  
@@ -701,37 +725,42 @@ index e963285fe981..eda3c1950fa1 100644
    // www.6502.org/tutorials/compare_beyond.html.
    switch (Pred) {
    case CmpInst::ICMP_EQ: {
-+    // #321 native s16 equality (branch-fused): one 16-bit G_SBC -> selectBrCondImm
-+    // emits rep/lda/cmp/sep/beq. Z (getReg(4)) is the live flag; the branch reads it.
-+    LLT CmpTy = NativeS16 ? LLT::scalar(16) : S8;
-     auto Sbc =
+-    auto Sbc =
 -        Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1}, {LHS, RHS, CIn});
-+        Builder.buildInstr(MOS::G_SBC, {CmpTy, S1, S1, S1, S1}, {LHS, RHS, CIn});
++    // Native s16 equality (branch-fused): one 16-bit G_SBC -> selectBrCondImm
++    // emits rep/lda/cmp/sep/beq. Z (getReg(4)) is the live flag; the branch
++    // reads it.
++    LLT CmpTy = NativeS16 ? LLT::scalar(16) : S8;
++    auto Sbc = Builder.buildInstr(MOS::G_SBC, {CmpTy, S1, S1, S1, S1},
++                                  {LHS, RHS, CIn});
      Register Z = Sbc.getReg(4);
-+    // Value use of a native 16-bit Z: wrap it in a select so MOSLowerSelect turns it into
-+    // a G_BRCOND_IMM that selectBrCondImm fuses into CmpBrImag16 (the materialization
-+    // diamond loads 0/1). For a branch use isNZUseLegal is true, so this is skipped.
++    // Value use of a native 16-bit Z: wrap it in a select so MOSLowerSelect
++    // turns it into a G_BRCOND_IMM that selectBrCondImm fuses into CmpBrImag16
++    // (the materialization diamond loads 0/1). For a branch use isNZUseLegal is
++    // true, so this is skipped.
      if (!isNZUseLegal(Dst, MRI))
        Z = buildNZSelect(Z, Builder);
      Builder.buildCopy(Dst, Z);
-@@ -1578,8 +1720,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1602,8 +1753,12 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {
-+    // Native 16-bit under +mos-a16 (NativeS16), else 8-bit. The 16-bit G_SBC is
-+    // selected to one rep/lda/cmp/sep producing C; its result + N/V/Z are unused.
-+    LLT CmpTy = NativeS16 ? LLT::scalar(16) : S8;
-     auto Sbc =
+-    auto Sbc =
 -        Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1}, {LHS, RHS, CIn});
-+        Builder.buildInstr(MOS::G_SBC, {CmpTy, S1, S1, S1, S1}, {LHS, RHS, CIn});
++    // Native 16-bit under +mos-a16 (NativeS16), else 8-bit. The 16-bit G_SBC is
++    // selected to one rep/lda/cmp/sep producing C; its result + N/V/Z are
++    // unused.
++    LLT CmpTy = NativeS16 ? LLT::scalar(16) : S8;
++    auto Sbc = Builder.buildInstr(MOS::G_SBC, {CmpTy, S1, S1, S1, S1},
++                                  {LHS, RHS, CIn});
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index efda8fdb4078..ca45b5d5878e 100644
+index 6e7193df907d..6028863a6afc 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -526,11 +526,25 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
+@@ -526,11 +526,26 @@ bool MOSRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator MI,
  
    int Idx = MI->getOperand(FIOperandNum).getIndex();
    int64_t Offset = MFI.getObjectOffset(Idx);
@@ -740,14 +769,15 @@ index efda8fdb4078..ca45b5d5878e 100644
 +  // Where the frame-index displacement lives depends on the instruction format,
 +  // so key off the opcode rather than guessing "the operand after the frame
 +  // index is its displacement immediate". That guess misfires for CmpBrAbsImm16
-+  // (#321), whose operand after the frame-index address is the COMPARE immediate
++  // whose operand after the frame-index address is the COMPARE immediate
 +  // (not a displacement) — adding it would corrupt the resolved stack address.
 +  switch (MI->getOpcode()) {
 +  case MOS::AddrLostk:
 +  case MOS::AddrHistk:
 +  case MOS::LDStk:
 +  case MOS::STStk:
-+    // These carry the displacement in a separate immediate operand after the FI.
++    // These carry the displacement in a separate immediate operand after the
++    // FI.
      Offset += MI->getOperand(FIOperandNum + 1).getImm();
 -  else
 +    break;

@@ -1,0 +1,437 @@
+From 03cd24fdcb9f6bd8e29f96fbd2218399f0ace889 Mon Sep 17 00:00:00 2001
+From: mlund <mlund@localhost>
+Date: Mon, 10 Aug 2026 16:43:58 +0200
+Subject: [PATCH 22/37] [MOS] Add nonallocatable 32-bit imaginary registers
+
+Model each RL as two RS subregisters and support physical copies and
+symbol lowering. Group RL aliases during zero-page CSR allocation.
+
+Keep Imag32 nonallocatable because linker scripts may place adjacent RS
+registers apart.
+
+[Rebased onto llvm-mos 06bc967d2668 for the #320 series: from llvm-mos/llvm-mos#594 head 7b80f7e18768. MOSImagReg32 takes a bits<32> number, matching the 32-bit MOSReg numbering introduced by #571; every other changed line is as posted.]
+---
+ llvm/lib/Target/MOS/MOSAsmPrinter.cpp        |  3 +-
+ llvm/lib/Target/MOS/MOSCopyOpt.cpp           |  3 +-
+ llvm/lib/Target/MOS/MOSInstrInfo.cpp         |  6 +++
+ llvm/lib/Target/MOS/MOSMCInstLower.cpp       |  3 +-
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp      |  5 ++
+ llvm/lib/Target/MOS/MOSRegisterInfo.td       | 32 +++++++++++-
+ llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp     | 55 ++++++++++++++++----
+ llvm/test/CodeGen/MOS/asm-printer-45gs02.mir | 16 ++++++
+ llvm/test/CodeGen/MOS/copy-phys-reg.mir      | 19 +++++++
+ llvm/test/CodeGen/MOS/imag32-copy.mir        | 14 +++++
+ llvm/test/CodeGen/MOS/imag32-nonalloc.mir    | 17 ++++++
+ llvm/test/CodeGen/MOS/imag32-registers.mir   | 27 ++++++++++
+ llvm/test/CodeGen/MOS/imag32-zp-alloc.mir    | 26 +++++++++
+ 13 files changed, 212 insertions(+), 14 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/asm-printer-45gs02.mir
+ create mode 100644 llvm/test/CodeGen/MOS/imag32-copy.mir
+ create mode 100644 llvm/test/CodeGen/MOS/imag32-nonalloc.mir
+ create mode 100644 llvm/test/CodeGen/MOS/imag32-registers.mir
+ create mode 100644 llvm/test/CodeGen/MOS/imag32-zp-alloc.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+index 79dcbf042fcf..199b5970a605 100644
+--- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
++++ b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+@@ -206,7 +206,8 @@ bool MOSAsmPrinter::PrintAsmOperand(const MachineInstr *MI, unsigned OpNo,
+       break;
+     }
+ 
+-    if (MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg))
++    if (MOS::Imag32RegClass.contains(Reg) ||
++        MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg))
+       OS << TRI.getImag8SymbolName(Reg);
+     else
+       OS << TRI.getRegAsmName(Reg);
+diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
+index 50432465870e..ca1700b448fb 100644
+--- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp
++++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
+@@ -229,7 +229,8 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &MF) {
+       auto [Dst, Src] = MI.getFirst2Regs();
+       auto LdImmCostVal = MOSInstrCost(2, 2).value(CostMode);
+ 
+-      if (!MOS::Imag16RegClass.contains(Dst) && Dst != MOS::C &&
++      if (!MOS::Imag32RegClass.contains(Dst) &&
++          !MOS::Imag16RegClass.contains(Dst) && Dst != MOS::C &&
+           Dst != MOS::V &&
+           TRI.copyCost(Dst, Src, STI).value(CostMode) <= LdImmCostVal)
+         continue;
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index 517e9e640478..d095ecc695d6 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+@@ -694,6 +694,12 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
+   } else if (AreClasses(MOS::Imag16RegClass, MOS::Yc16RegClass)) {
+     // Native indices: Imag16 ZP pair ← Y16: sty zp
+     Builder.buildInstr(MOS::STYImag16).addDef(DestReg).addUse(SrcReg);
++  } else if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
++    assert(SrcReg.isPhysical() && DestReg.isPhysical());
++    copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::sublo16),
++                    TRI.getSubReg(SrcReg, MOS::sublo16));
++    copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::subhi16),
++                    TRI.getSubReg(SrcReg, MOS::subhi16));
+   } else if (AreClasses(MOS::Anyi1RegClass, MOS::Anyi1RegClass)) {
+     assert(SrcReg.isPhysical() && DestReg.isPhysical());
+     Register SrcReg8 =
+diff --git a/llvm/lib/Target/MOS/MOSMCInstLower.cpp b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+index 75fc2ea7bded..8d6969cc65f0 100644
+--- a/llvm/lib/Target/MOS/MOSMCInstLower.cpp
++++ b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+@@ -862,7 +862,8 @@ bool MOSMCInstLower::lowerOperand(const MachineOperand &MO, MCOperand &MCOp) {
+       break;
+     }
+ 
+-    if (MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg)) {
++    if (MOS::Imag32RegClass.contains(Reg) ||
++        MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg)) {
+       const MCExpr *Expr = MCSymbolRefExpr::create(
+           Ctx.getOrCreateSymbol(TRI.getImag8SymbolName(Reg)), Ctx);
+       MCOp = MCOperand::createExpr(Expr);
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index 6028863a6afc..02a342dd35bb 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -69,6 +69,8 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
+     // Pointers are referred to by their low byte in the addressing modes that
+     // use them.
+     unsigned R = Reg;
++    if (MOS::Imag32RegClass.contains(R))
++      R = getSubReg(R, MOS::sublo16);
+     if (MOS::Imag16RegClass.contains(R))
+       R = getSubReg(R, MOS::sublo);
+     if (!MOS::Imag8RegClass.contains(R))
+@@ -1465,6 +1467,9 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+   if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
+     return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
+   }
++  if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
++    return copyCost(MOS::RC0, MOS::RC1, STI) * 4;
++  }
+   if (AreClasses(MOS::Anyi1RegClass, MOS::Anyi1RegClass)) {
+     Register SrcReg8 =
+         getMatchingSuperReg(SrcReg, MOS::sublsb, &MOS::Anyi8RegClass);
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+index 52d4cbc453be..b2905b948aa3 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+@@ -27,6 +27,10 @@ def sublo : MOSSubRegIndex<8>;
+ // High byte of a 16-bit imaginary pointer register.
+ def subhi : MOSSubRegIndex<8, 8>;
+ 
++// Low and high words of a 32-bit imaginary register.
++def sublo16 : MOSSubRegIndex<16>;
++def subhi16 : MOSSubRegIndex<16, 16>;
++
+ // Carry bit of the 8-bit processor status register.
+ def subcarry : MOSSubRegIndex<1>;
+ 
+@@ -186,14 +190,25 @@ class MOSImagReg16<bits<32> num, string name, list<Register> subregs>
+   let CoveredBySubRegs = 1;
+ }
+ 
++// 32-bit imaginary registers composed of pairs of 16-bit registers.
++class MOSImagReg32<bits<32> num, string name, list<Register> subregs>
++    : MOSReg<num, name> {
++  let SubRegs = subregs;
++  let SubRegIndices = [sublo16, subhi16];
++  let CoveredBySubRegs = 1;
++}
++
++defvar MaxImag32Regs = !sra(MaxImag16Regs, 1);
++defvar Imag32RegsOffset = !add(Imag16RegsOffset, MaxImag16Regs);
++
+ // Now we enumerate the imaginary registers.
+-// Imaginary 8-bit registers, starting with the prefix rc
++// Imaginary 8-bit registers, starting with the prefix rc (c = "char")
+ foreach I = 0...!add(MaxImag8Regs, -1) in {
+   // There exist MaxImag8Regs rcXX registers...
+   defm RC#I: MOSImagReg8<I, "rc"#!cast<string>(I)>;
+ }
+ 
+-// Imaginary 16-bit registers, starting with the prefix rs
++// Imaginary 16-bit registers, starting with the prefix rs (s = "short")
+ foreach I = 0...!add(MaxImag16Regs, -1) in {
+   // There exist MaxImag16Regs rsXX registers...
+   def RS#I: MOSImagReg16<I, "rs"#!cast<string>(I),
+@@ -201,6 +216,14 @@ foreach I = 0...!add(MaxImag16Regs, -1) in {
+        !cast<Register>("RC"#!add(!shl(I,1),1))]>;
+ }
+ 
++// Imaginary 32-bit registers, starting with the prefix rl (l = "long")
++foreach I = 0...!add(MaxImag32Regs, -1) in {
++  // There exist MaxImag32Regs rlXX registers...
++  def RL#I: MOSImagReg32<!add(I, Imag32RegsOffset), "rl"#!cast<string>(I),
++      [!cast<Register>("RS"#!shl(I, 1)),
++       !cast<Register>("RS"#!add(!shl(I,1),1))]>;
++}
++
+ //===----------------------------------------------------------------------===//
+ //  Register classes
+ //===----------------------------------------------------------------------===//
+@@ -214,6 +237,7 @@ class MOSReg1Class<dag RegList>: MOSRegClass<[i1], 8, RegList> {
+ }
+ class MOSReg8Class<dag RegList>: MOSRegClass<[i8], 8, RegList>;
+ class MOSReg16Class<dag RegList>: MOSRegClass<[i16], 8, RegList>;
++class MOSReg32Class<dag RegList>: MOSRegClass<[i32], 8, RegList>;
+ 
+ // Single register classes.
+ let isPressureFineGrained = true in {
+@@ -233,6 +257,10 @@ let isPressureFineGrained = true in {
+ }
+ def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
+ def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
++// Linker scripts may place adjacent RS registers apart, so RL cannot be
++// allocated safely.
++let isAllocatable = false in
++def Imag32 : MOSReg32Class<(sequence "RL%u", 0, !add(MaxImag32Regs, -1))>;
+ 
+ // The native-width classes below are opt-in and must not create register
+ // pressure sets: MachineLICM, MachineSink and the scheduler read the pressure
+diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+index 5dcca9e38612..cab216e32d9b 100644
+--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
++++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+@@ -387,10 +387,20 @@ bool MOSZeroPageAlloc::runOnModule(Module &M) {
+         DenseMap<Register, size_t> &CSRZPOffsets =
+             MF.getInfo<MOSFunctionInfo>()->CSRZPOffsets;
+         const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
+-        if (MOS::Imag16RegClass.contains(Cand->CSR)) {
+-          CSRZPOffsets[Cand->CSR] =
+-              CSRZPOffsets[TRI.getSubReg(Cand->CSR, MOS::sublo)] = Offset++;
+-          CSRZPOffsets[TRI.getSubReg(Cand->CSR, MOS::subhi)] = Offset++;
++        // Later stages may refer to any alias of an assigned composite CSR.
++        auto AssignImag16 = [&](Register Reg) {
++          CSRZPOffsets[Reg] =
++              CSRZPOffsets[TRI.getSubReg(Reg, MOS::sublo)] = Offset++;
++          CSRZPOffsets[TRI.getSubReg(Reg, MOS::subhi)] = Offset++;
++        };
++        if (MOS::Imag32RegClass.contains(Cand->CSR)) {
++          Register Lo = TRI.getSubReg(Cand->CSR, MOS::sublo16);
++          Register Hi = TRI.getSubReg(Cand->CSR, MOS::subhi16);
++          CSRZPOffsets[Cand->CSR] = Offset;
++          AssignImag16(Lo);
++          AssignImag16(Hi);
++        } else if (MOS::Imag16RegClass.contains(Cand->CSR)) {
++          AssignImag16(Cand->CSR);
+         } else {
+           CSRZPOffsets[Cand->CSR] = Offset++;
+         }
+@@ -563,6 +573,8 @@ void MOSZeroPageAlloc::collectCandidates(
+   TFL.determineCalleeSaves(MF, SavedRegs, /*RS=*/nullptr);
+   unsigned Idx = 0;
+   DenseSet<Register> Imag16Regs;
++  DenseSet<Register> Imag32Regs;
++  const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
+   for (Register Reg : SavedRegs.set_bits()) {
+     if (!MOS::Imag8RegClass.contains(Reg))
+       continue;
+@@ -583,13 +595,38 @@ void MOSZeroPageAlloc::collectCandidates(
+       Benefit += 12 * RestoreFreq; // LDA ABS,STA ZP
+     }
+ 
+-    // If the CSR is used as a 16-bit pointer, then the two halves cannot be
+-    // assigned independently. Thus, instead of two size-1 candidates, one
+-    // size-2 candidate is used.
++    // Composite imaginary registers must be assigned as one candidate.
++    // RC has both RS and RL super-registers, so select each layer explicitly.
+     Register Imag16 =
+-        *MF.getSubtarget().getRegisterInfo()->superregs(Reg).begin();
++        TRI.getMatchingSuperReg(Reg, MOS::sublo, &MOS::Imag16RegClass);
++    if (!Imag16)
++      Imag16 =
++          TRI.getMatchingSuperReg(Reg, MOS::subhi, &MOS::Imag16RegClass);
+     assert(MOS::Imag16RegClass.contains(Imag16));
+-    if (!MF.getRegInfo().reg_nodbg_empty(Imag16)) {
++    Register Imag32 =
++        TRI.getMatchingSuperReg(Imag16, MOS::sublo16, &MOS::Imag32RegClass);
++    if (!Imag32)
++      Imag32 = TRI.getMatchingSuperReg(Imag16, MOS::subhi16,
++                                       &MOS::Imag32RegClass);
++    if (Imag32 && !MF.getRegInfo().reg_nodbg_empty(Imag32)) {
++      if (Imag32Regs.contains(Imag32))
++        continue;
++
++      Reg = Imag32;
++      Imag32Regs.insert(Reg);
++
++      for (unsigned I = 1; I != 4; ++I) {
++        if (Idx++ < 4) {
++          Benefit += 9 * SaveFreq;
++          Benefit += 10 * RestoreFreq;
++        } else {
++          Benefit += 12 * SaveFreq;
++          Benefit += 12 * RestoreFreq;
++        }
++        ++Size;
++      }
++      Benefit /= Size;
++    } else if (!MF.getRegInfo().reg_nodbg_empty(Imag16)) {
+       // Don't create the Imag16 candidate twice.
+       if (Imag16Regs.contains(Imag16))
+         continue;
+diff --git a/llvm/test/CodeGen/MOS/asm-printer-45gs02.mir b/llvm/test/CodeGen/MOS/asm-printer-45gs02.mir
+new file mode 100644
+index 000000000000..eae9fb4285ed
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/asm-printer-45gs02.mir
+@@ -0,0 +1,16 @@
++# RUN: llc -mtriple=mos -mcpu=mos45gs02 -start-after=machine-opt-remark-emitter \
++# RUN:   -verify-machineinstrs -o - %s | FileCheck %s
++
++# Physical RL operands are currently reachable only from MIR.
++
++---
++name: imag32_memory_operand
++body: |
++  bb.0.entry:
++    INLINEASM &"lda [$0],z", 9 /* sideeffect mayload attdialect */, 196622 /* mem:m */, $rl1
++    INLINEASM &"lda [$0],z", 9 /* sideeffect mayload attdialect */, 196622 /* mem:m */, $rl7
++    ; CHECK-LABEL: imag32_memory_operand
++    ; CHECK: lda [__rc4],z
++    ; CHECK: lda [__rc28],z
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/copy-phys-reg.mir b/llvm/test/CodeGen/MOS/copy-phys-reg.mir
+index 9de851df125c..b3621e6dd8e2 100644
+--- a/llvm/test/CodeGen/MOS/copy-phys-reg.mir
++++ b/llvm/test/CodeGen/MOS/copy-phys-reg.mir
+@@ -192,6 +192,25 @@ body: |
+     $rs1 = COPY $rs0
+ ...
+ ---
++name: imag32_to_imag32
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $rl1
++    ; CHECK-LABEL: name: imag32_to_imag32
++    ; CHECK: liveins: $rl1
++    ; CHECK-NEXT: {{  $}}
++    ; CHECK-NEXT: [[LD0:%[0-9]+]]:gpr = LDImag8 $rc4
++    ; CHECK-NEXT: $rc8 = STImag8 [[LD0]]
++    ; CHECK-NEXT: [[LD1:%[0-9]+]]:gpr = LDImag8 $rc5
++    ; CHECK-NEXT: $rc9 = STImag8 [[LD1]]
++    ; CHECK-NEXT: [[LD2:%[0-9]+]]:gpr = LDImag8 $rc6
++    ; CHECK-NEXT: $rc10 = STImag8 [[LD2]]
++    ; CHECK-NEXT: [[LD3:%[0-9]+]]:gpr = LDImag8 $rc7
++    ; CHECK-NEXT: $rc11 = STImag8 [[LD3]]
++    $rl2 = COPY $rl1
++...
++---
+ name: lsb_to_lsb
+ tracksRegLiveness: true
+ body: |
+diff --git a/llvm/test/CodeGen/MOS/imag32-copy.mir b/llvm/test/CodeGen/MOS/imag32-copy.mir
+new file mode 100644
+index 000000000000..38243d70dd6c
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-copy.mir
+@@ -0,0 +1,14 @@
++# RUN: llc -mtriple=mos -O2 -start-before=mos-copy-opt -verify-machineinstrs \
++# RUN:   -o - %s | FileCheck %s
++
++---
++name: imag32_copy
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $rl1
++    ; CHECK-LABEL: imag32_copy:
++    ; CHECK: rts
++    $rl2 = COPY $rl1
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/imag32-nonalloc.mir b/llvm/test/CodeGen/MOS/imag32-nonalloc.mir
+new file mode 100644
+index 000000000000..06a8783a3842
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-nonalloc.mir
+@@ -0,0 +1,17 @@
++# RUN: not llc -mtriple=mos -run-pass=none -verify-machineinstrs -o - %s \
++# RUN:   2>&1 | FileCheck %s
++
++# The MIR parser rejects virtual registers from nonallocatable classes.
++# CHECK: Cannot use non-allocatable class 'Imag32'
++
++---
++name: imag32_not_allocatable
++legalized: true
++regBankSelected: true
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    %0:imag32 = IMPLICIT_DEF
++    KILL %0
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/imag32-registers.mir b/llvm/test/CodeGen/MOS/imag32-registers.mir
+new file mode 100644
+index 000000000000..7aa34d48ca59
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-registers.mir
+@@ -0,0 +1,27 @@
++# RUN: llc -mtriple=mos -run-pass=none -verify-machineinstrs -o - %s | FileCheck %s
++
++---
++name: imag32_register
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $rl1
++    ; CHECK-LABEL: name: imag32_register
++    ; CHECK: liveins: $rl1
++    ; CHECK: $rl1 = IMPLICIT_DEF
++    $rl1 = IMPLICIT_DEF
++    RTS
++...
++---
++name: imag32_word_subregisters
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $rl1
++    ; CHECK-LABEL: name: imag32_word_subregisters
++    ; CHECK: $rs4 = EXTRACT_SUBREG $rl1, %subreg.sublo16
++    ; CHECK: $rs5 = EXTRACT_SUBREG $rl1, %subreg.subhi16
++    $rs4 = EXTRACT_SUBREG $rl1, %subreg.sublo16
++    $rs5 = EXTRACT_SUBREG $rl1, %subreg.subhi16
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/imag32-zp-alloc.mir b/llvm/test/CodeGen/MOS/imag32-zp-alloc.mir
+new file mode 100644
+index 000000000000..141fb1add8c1
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-zp-alloc.mir
+@@ -0,0 +1,26 @@
++# RUN: llc -mtriple=mos -mcpu=mos45gs02 -O2 -zp-avail=224 \
++# RUN:   -start-before=mos-zero-page-alloc -verify-machineinstrs -o - %s \
++# RUN:   | FileCheck %s
++
++--- |
++  target triple = "mos"
++
++  define void @imag32_zp() #0 {
++  entry:
++    ret void
++  }
++
++  attributes #0 = { "nonreentrant" }
++...
++---
++name: imag32_zp
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    $rl5 = IMPLICIT_DEF
++    INLINEASM &"lda [$0],z", 9 /* sideeffect mayload attdialect */, 196622 /* mem:m */, $rl5
++    ; CHECK-LABEL: imag32_zp:
++    ; CHECK: lda [mos8(.Limag32_zp_zp_stk)],z
++    ; CHECK: .size .Limag32_zp_zp_stk, 4
++    RTS
++...
+-- 
+2.53.0
+

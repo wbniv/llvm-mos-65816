@@ -1,0 +1,20 @@
+[MOS] Route far memory intrinsics to the far runtime
+
+A G_MEMSET, G_MEMCPY or G_MEMMOVE with any address-space-2 pointer operand that is not expanded inline now calls the far runtime. Near and direct-page pointer arguments are cast to far (bank $00 under the DBR=0 contract), so both pointers use the far-pointer ABI.
+
+The length selects the entry. A length that provably fits 16 bits (a constant up to 65535, or known bits that clear bits 16 and above) calls __memset_far, __memcpy_far or __memmove_far with a 16-bit size_t length. Any other length, such as a constant above 65535 or the loop idiom's zext(n) * 2, calls __memset_far32, __memcpy_far32 or __memmove_far32 with a uint32_t length. A length wider than 32 bits is narrowed to 32, because no far object can exceed INT32_MAX bytes (LangRef, "Allocated objects"). When every pointer operand is far, no length is truncated. With a near or direct-page operand, the IRTranslator has already narrowed the length to that pointer's index width (16 or 8 bits) before legalization. That is sound by the same LangRef rule, which bounds a near object by 32767 bytes and a direct-page object by 127, so a longer length is undefined behaviour. The runtime must provide all six entries; memmove chooses its copy direction from the full addresses.
+
+This replaces the previous commit's legalization failure for far memory intrinsics that are not expanded inline; the generic memory libcall would pass the far pointer to the near runtime and drop the bank byte. A single 16-bit entry would silently truncate a longer length: 70000 would become 4464 and 65537 would become 1.
+
+Default-mode effect: none for the fixed input set (assembly and objects identical in mos6502 and mosw65816); only calls with far pointer operands change.
+
+Tests: far-memset.ll checks a far constant fill over the inline limit and a variable-length far fill calling __memset_far, and a near variable fill still calling __memset. far-memop-length.ll checks constant lengths 65535, 65536, 65537 and 70000, unbounded runtime i32 lengths and the loop idiom's scaled length (the 32-bit entries), and provably bounded runtime lengths (the 16-bit entries), in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16. Its mixed-space cases pin the IRTranslator narrowing: a memcpy from a near source keeps a 40000-byte length and narrows 70000 to 4464.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/far-memset.ll llvm/test/CodeGen/MOS/far-memop-length.ll`.
+
+Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort. Repairs, review follow-ups and the second review's fixes carried into this commit: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+

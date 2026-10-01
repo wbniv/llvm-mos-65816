@@ -1,0 +1,17 @@
+[MOS] Keep byte indexes byte-wide in absolute indexed addressing
+
+In absolute indexed addressing, an index that is already s8 (a zero-page pointer offset) is used directly. An s16 index known to fit in 8 bits is truncated for the access, and its other users are rewritten to an explicit G_MERGE_VALUES of the low byte and a zero byte, inserted after the definition (after the PHIs for a PHI), with the legalizer observer notified around each rewrite so GISel CSE stays consistent.
+
+Both lanes of the shared s16 offset stay explicitly defined: under native widths that value can reach a word spill or a word consumer, which reads both bytes.
+
+Default-mode effect: yes, on 13 of the 14 MOS CPUs (16 of 90 inputs change on each 6502-family CPU, 18 on mosw65816, mosw65c02 and mos65el02, 1 on mossweet16; mosspc700 is identical, with 57 of its inputs still crashing in the late optimizer at this point of the series). legalizer.mir drops a COPY of the s8 index in two zero-page tests, and the high byte of a shared offset becomes a known zero. In the fixed input set 16 of 54 compiling mos6502 inputs and 18 of 78 mosw65816 inputs produce different assembly; code size changes by +243 bytes on mos6502 (12 inputs larger, 3 smaller) and -102 bytes on mosw65816 (17 smaller).
+
+Tests: zp-byte-index.ll checks zero-page indexed loads and stores in mos6502, +mos-a16 and +mos-a16,+mos-xy16 modes; legalizer-indexed-offset-observer.mir checks the rewritten operands and the CSE observer contract (assertions builds); legalizer.mir is updated.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/zp-byte-index.ll llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir llvm/test/CodeGen/MOS/legalizer.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+

@@ -1,4 +1,4 @@
-From 497db27604400f5961676dace699fefc5d1225bb Mon Sep 17 00:00:00 2001
+From fc7a64f9d59e43c59bbf4fd13fc09af85569d2f2 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 12/16] [MOS] Keep byte indexes byte-wide in absolute indexed
@@ -8,7 +8,7 @@ In absolute indexed addressing, an index that is already s8 (a zero-page pointer
 
 Both lanes of the shared s16 offset stay explicitly defined: under native widths that value can reach a word spill or a word consumer, which reads both bytes.
 
-Default-mode effect: yes, in every mode. legalizer.mir drops a COPY of the s8 index in two zero-page tests, and the high byte of a shared offset becomes a known zero. In the fixed input set 16 of 54 compiling mos6502 inputs and 18 of 78 mosw65816 inputs produce different assembly; code size changes by +243 bytes on mos6502 (12 inputs larger, 3 smaller) and -102 bytes on mosw65816 (17 smaller).
+Default-mode effect: yes, on 13 of the 14 MOS CPUs (16 of 90 inputs change on each 6502-family CPU, 18 on mosw65816, mosw65c02 and mos65el02, 1 on mossweet16; mosspc700 is identical, with 57 of its inputs still crashing in the late optimizer at this point of the series). legalizer.mir drops a COPY of the s8 index in two zero-page tests, and the high byte of a shared offset becomes a known zero. In the fixed input set 16 of 54 compiling mos6502 inputs and 18 of 78 mosw65816 inputs produce different assembly; code size changes by +243 bytes on mos6502 (12 inputs larger, 3 smaller) and -102 bytes on mosw65816 (17 smaller).
 
 Tests: zp-byte-index.ll checks zero-page indexed loads and stores in mos6502, +mos-a16 and +mos-a16,+mos-xy16 modes; legalizer-indexed-offset-observer.mir checks the rewritten operands and the CSE observer contract (assertions builds); legalizer.mir is updated.
 
@@ -19,19 +19,19 @@ Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
 ---
- llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 42 ++++++++++++++++++-
- .../MOS/legalizer-indexed-offset-observer.mir | 28 +++++++++++++
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 44 ++++++++++++++++++-
+ .../MOS/legalizer-indexed-offset-observer.mir | 28 ++++++++++++
  llvm/test/CodeGen/MOS/legalizer.mir           |  4 +-
  llvm/test/CodeGen/MOS/zp-byte-index.ll        | 23 ++++++++++
- 4 files changed, 93 insertions(+), 4 deletions(-)
+ 4 files changed, 95 insertions(+), 4 deletions(-)
  create mode 100644 llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
  create mode 100644 llvm/test/CodeGen/MOS/zp-byte-index.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index eda3c1950fa1..1080b80e0b38 100644
+index d67348b11c6a..21496cc85f00 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -2501,7 +2501,47 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -2546,7 +2546,49 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                .countMaxActiveBits() <= 8) {
          if (Index)
            return false;
@@ -44,7 +44,8 @@ index eda3c1950fa1..1080b80e0b38 100644
 +        }
 +
 +        // Use a byte index and reconstruct an explicit zero high byte for other
-+        // consumers of the s16 offset. This keeps both lanes defined for spills.
++        // consumers of the s16 offset. This keeps both lanes defined for
++        // spills.
 +        LLT S16 = LLT::scalar(16);
 +        auto &SavedMBB = Builder.getMBB();
 +        auto SavedInsertPt = Builder.getInsertPt();
@@ -63,7 +64,8 @@ index eda3c1950fa1..1080b80e0b38 100644
 +            Builder.buildMergeLikeInstr(S16, {Lo, ZeroHi}).getReg(0);
 +
 +        // Notify the legalizer observer around every use rewrite. GISel CSE
-+        // keys depend on operands, so the index must track each new operand profile.
++        // keys depend on operands, so the index must track each new operand
++        // profile.
 +        MachineInstr *TruncMI = MRI.getVRegDef(Lo);
 +        for (MachineOperand &MO :
 +             llvm::make_early_inc_range(MRI.use_operands(NewOffset))) {

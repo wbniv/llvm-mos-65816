@@ -1,4 +1,4 @@
-From 2d64d3c841ff42ebf814f78f86da767aaec279b1 Mon Sep 17 00:00:00 2001
+From 5364ac03a4fce124abf51d04941403fc581e1443 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 03/18] [MOS] Define 16-bit index instruction forms and X-width
@@ -8,7 +8,7 @@ Define the index-width pseudos, gated on HasIndex16: A loads and stores through 
 
 The existing 8-bit LDX, STX, LDY, STY, CPX and CPY zero-page and absolute forms are marked XHigh: they require 8-bit index registers. A REP/SEP pass needs this to narrow X before them, because with X clear they would read or write two bytes.
 
-Default-mode effect: assembly is unchanged. MOSMCELFStreamer emits $xh mapping symbols from the XHigh flag on W65816 objects, so mosw65816 objects gain $xh symbols before these instructions: 68 of 90 mosw65816 objects in the fixed input set differ, with identical section bytes and relocations (for example 667 to 1,121 $xh symbols in examples_snes_boids). mos6502 objects are identical.
+Default-mode effect: assembly is unchanged. MOSMCELFStreamer emits $xh mapping symbols from the XHigh flag on W65816 objects, so mosw65816 objects gain $xh symbols before these instructions: 68 of 90 mosw65816 objects in the fixed input set differ, with identical section bytes and relocations (for example 667 to 1,121 $xh symbols in examples_snes_boids). mos65el02 objects, which share the 65816 opcode set, differ the same way (68 of 90). Every other MOS CPU is identical.
 
 Tests: index-width-mapping-65816.s assembles each XHigh form after a 16-bit `ldx` and checks that each opens its own $xh mapping region. xy16-index-forms.mir emits the index pseudos from MIR and checks the expanded instructions and the three-byte index immediates in the object.
 
@@ -143,7 +143,7 @@ index b0fcd25377e8..f18089ddb47d 100644
  /// The conditional branch instructions all have the form xxy10000. The flag
  /// indicated by xx is compared with y, and the branch is taken if they are
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index a4c1528978f9..dd598e1dd1b6 100644
+index 23227194a85b..9e3f4439c099 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -73,6 +73,15 @@ class MOSLogicalInstr : Instruction {

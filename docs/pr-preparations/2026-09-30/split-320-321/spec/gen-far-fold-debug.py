@@ -7,8 +7,10 @@ usage: gen-far-fold-debug.py STAGE > far-fold-debug.ll
 Each section is a -g function whose far access is folded into an addressing
 mode that erases the G_PTR_ADD a DBG_VALUE refers to. Every section compiles
 verifier-clean in +mos-a16 and +mos-a16,+mos-xy16 (and plain mosw65816 unless
-it needs a zero-extended runtime offset) at O0 and O2, and at O0 its dead
-address's DBG_VALUE is $noreg after the legalizer.
+it needs a zero-extended runtime offset) at O0 and O2. At O0, after the
+legalizer, a dead address that is a live base plus a constant is salvaged to
+that base with DW_OP_plus_uconst (320-4 on, where the base stays live), and
+every other dead address's DBG_VALUE is $noreg.
 """
 import sys
 
@@ -58,7 +60,7 @@ define i8 @walk() !dbg !10 {
   ret void, !dbg !20
 }
 '''),
-    ('320-4', 'offset-field', 'a runtime offset plus 1 from a runtime far pointer (runtime fold or window)', '''define i8 @walk(ptr addrspace(2) %base, i8 %n) !dbg !10 {
+    ('320-4', 'offset-field', 'a runtime offset plus 1 from a runtime far pointer; the window keeps the runtime add live, so the location is salvaged off it', '''define i8 @walk(ptr addrspace(2) %base, i8 %n) !dbg !10 {
   %off = zext i8 %n to i32
   %p = getelementptr i8, ptr addrspace(2) %base, i32 %off
   %q = getelementptr i8, ptr addrspace(2) %p, i32 1
@@ -85,17 +87,24 @@ out = ['; RUN: split-file %s %t']
 # A zero-extended runtime offset needs +mos-a16 lanes (plain mosw65816 cannot
 # legalize the s32 merge), so those sections skip the plain runs.
 NATIVE_ONLY = {'offset-field', 'global-index'}
+# Sections whose address is a live runtime base plus a constant are salvaged:
+# field and store-field off the incoming pointer; offset-field off the live
+# runtime add (base + offset) that the displacement window keeps.
+SALVAGE = {'field': 1, 'store-field': 3, 'offset-field': 1}
 for name, *_ in [(s[1],) for s in active]:
-    out.append(f'; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs -stop-after=legalizer %t/{name}.ll -o - | FileCheck %s --check-prefix=DROP')
+    prefix = f'SALV{SALVAGE[name]}' if name in SALVAGE else 'DROP'
+    out.append(f'; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs -stop-after=legalizer %t/{name}.ll -o - | FileCheck %s --check-prefix={prefix}')
     for attrs in (('',) if name not in NATIVE_ONLY else ()) + (' -mattr=+mos-a16', ' -mattr=+mos-a16,+mos-xy16'):
         for opt in ('O0', 'O2'):
             out.append(f'; RUN: llc -mtriple=mos -mcpu=mosw65816{attrs} -{opt} -verify-machineinstrs %t/{name}.ll -o /dev/null')
 out.append('''
 ; A far addressing-mode fold replaces an access's pointer with a base and an
 ; offset the new instruction encodes, so the G_PTR_ADDs that computed the
-; pointer die. salvageDebugInfo cannot express a G_PTR_ADD, so the fold drops
-; the location of each remaining DBG_VALUE of those adds ($noreg) instead of
-; leaving it on an erased register, which the verifier rejects under -g.
+; pointer die. salvageDebugInfo cannot express a G_PTR_ADD, so the fold
+; rewrites each remaining DBG_VALUE of those adds instead of leaving it on an
+; erased register, which the verifier rejects under -g: to the live base plus
+; the constant offset where there is one (SALV), otherwise to $noreg (DROP,
+; for a folded global base or an address with a runtime offset).
 ; Sections:''')
 for _, name, desc, _ in active:
     out.append(f';   {name}: {desc}.')
@@ -103,6 +112,11 @@ out.append('''
 ; DROP-LABEL: name: walk
 ; DROP: DBG_VALUE $noreg, $noreg, !{{[0-9]+}}, !DIExpression()
 ; DROP-NOT: G_PTR_ADD''')
+for off in sorted({v for k, v in SALVAGE.items() if k in [s[1] for s in active]}):
+    out.append(f'''
+; SALV{off}-LABEL: name: walk
+; SALV{off}: DBG_VALUE %{{{{[0-9]+}}}}(p2), $noreg, !{{{{[0-9]+}}}}, !DIExpression(DW_OP_plus_uconst, {off}, DW_OP_stack_value)
+; SALV{off}-NOT: G_PTR_ADD''')
 for _, name, _, ir in active:
     out.append(f'\n;--- {name}.ll')
     out.append(ir.rstrip('\n') + '\n' + META.rstrip('\n'))

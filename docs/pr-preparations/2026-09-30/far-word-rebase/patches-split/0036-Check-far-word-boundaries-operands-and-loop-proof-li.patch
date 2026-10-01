@@ -1,0 +1,608 @@
+From a984735f73146ed068fac99c8ee5fb25efe9bb65 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 28 Sep 2026 19:15:17 +0700
+Subject: [PATCH 36/37] Check far-word boundaries, operands, and loop-proof
+ limits
+
+Add direct 254/255 word endpoint controls, preserved base/index/MMO
+checks, atomic/escape/call rejection, and a compact live-consumer IR case
+whose known-bits bound does not depend on the loop matcher. Check the
+feature-disabled byte lowering on that supported bounded input.
+
+Cover reversed PHI operands, multiple external predecessors, a valid
+narrow shift and the expression-recursion boundary. Terminate every
+positive word-policy opcode explicitly, following the same contract as
+the existing byte-range checks.
+
+The broader no-A16 fallback probe reaches the already documented missing
+s32/byte far-pointer bridge. Its diagnostic is retained as a prerequisite
+scope limit; this test does not claim general A8 far-pointer support.
+
+Review N8 additions: far-word-index-boundaries.mir checks that a word
+store sharing the address rejects the whole group while a byte store folds
+with the word load, and far-word-rep-sep.mir checks that REP/SEP insertion
+sets X=1 before the folded word load after a 16-bit index instruction under
++mos-xy16. The mixed-order functions of far-word-policy.mir now pin the byte
+sibling's opcode too, which the extended sensitivity runner found unchecked.
+The boundary tests' OFF runs are gone with -mos-far-loop-range (review N5).
+
+Validation: assertions-enabled exact-upstream extraction, 160 MOS
+CodeGen/MC files pass and one pre-existing unconditional unsupported test.
+Preparation and validation: OpenAI Codex CLI 0.157.1 (session source
+vscode), model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+
+Review N5 and N8 test changes: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+---
+ .../CodeGen/MOS/far-loop-range-boundaries.mir | 201 ++++++++++++++++++
+ .../CodeGen/MOS/far-word-index-boundaries.mir | 168 +++++++++++++++
+ .../CodeGen/MOS/far-word-index-integration.ll |  29 +++
+ llvm/test/CodeGen/MOS/far-word-policy.mir     |  44 ++--
+ llvm/test/CodeGen/MOS/far-word-rep-sep.mir    |  27 +++
+ 5 files changed, 453 insertions(+), 16 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/far-loop-range-boundaries.mir
+ create mode 100644 llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
+ create mode 100644 llvm/test/CodeGen/MOS/far-word-index-integration.ll
+ create mode 100644 llvm/test/CodeGen/MOS/far-word-rep-sep.mir
+
+diff --git a/llvm/test/CodeGen/MOS/far-loop-range-boundaries.mir b/llvm/test/CodeGen/MOS/far-loop-range-boundaries.mir
+new file mode 100644
+index 000000000000..de0cf0f76133
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-loop-range-boundaries.mir
+@@ -0,0 +1,201 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s
++#
++# PHI operand order does not change the recurrence. A narrow scale must preserve
++# its own width, and range recursion and multiple entries conservatively bound
++# the analysis.
++
++# CHECK-LABEL: name: reverse_phi
++# CHECK: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: reverse_phi
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %next(s8), %bb.1, %start(s8), %bb.0
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# CHECK-LABEL: name: narrow_scale
++# CHECK: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: narrow_scale
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %sh:_(s8) = G_CONSTANT i8 1
++    %scaled:_(s8) = G_SHL %iv, %sh
++    %off:_(s32) = G_ZEXT %scaled(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# CHECK-LABEL: name: two_entries
++# CHECK: = G_LOAD_FAR_INDIR{{ }}
++---
++name: two_entries
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1, %bb.3
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 48
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    %cond:_(s1) = G_CONSTANT i1 0
++    G_BRCOND %cond(s1), %bb.3
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1, %start(s8), %bb.3
++    %off:_(s32) = G_ZEXT %iv(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++  bb.3:
++    successors: %bb.1
++    G_BR %bb.1
++...
++
++# CHECK-LABEL: name: depth_five
++# CHECK: = G_LOAD_FAR_INDIR_IDX{{ }}
++---
++name: depth_five
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 2
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %scaled0:_(s32) = G_SHL %wide, %shift
++    %scaled1:_(s32) = G_SHL %scaled0, %shift
++    %scaled2:_(s32) = G_SHL %scaled1, %shift
++    %off:_(s32) = G_SHL %scaled2, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# CHECK-LABEL: name: depth_six
++# CHECK: = G_LOAD_FAR_INDIR{{ }}
++---
++name: depth_six
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 2
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 8
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %scaled0:_(s32) = G_SHL %wide, %shift
++    %scaled1:_(s32) = G_SHL %scaled0, %shift
++    %scaled2:_(s32) = G_SHL %scaled1, %shift
++    %scaled3:_(s32) = G_SHL %scaled2, %shift
++    %off:_(s32) = G_SHL %scaled3, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s8) = G_LOAD %addr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir b/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
+new file mode 100644
+index 000000000000..c1c5ee3efa68
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
+@@ -0,0 +1,168 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s
++#
++# The group's last byte must fit Y8, and the indexed word keeps its original
++# base, narrowed offset, and volatile memory operand. The offset's maximum is
++# provided by known bits, independently of the loop-range matcher.
++--- |
++  declare void @callee()
++  define void @end254() { ret void }
++  define void @end255() { ret void }
++  define void @atomic() { ret void }
++  define void @escape() { ret void }
++  define void @call_between() { ret void }
++  define void @word_store_sibling() { ret void }
++  define void @byte_store_sibling() { ret void }
++...
++
++# CHECK-LABEL: name: end254
++# CHECK: %[[BASE:[a-zA-Z0-9_]+]]:_(p2) = COPY $rl1
++# CHECK: %[[OFFSET:[a-zA-Z0-9_]+]]:_(s8) = G_AND
++# CHECK-NOT: G_PTR_ADD
++# CHECK: = G_LOAD16_FAR_INDIR_IDX{{ }}%[[BASE]](p2), %[[OFFSET]] :: (volatile load (s16), align 1, addrspace 2)
++# CHECK-NOT: G_PTR_ADD
++---
++name: end254
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %mask:_(s8) = G_CONSTANT i8 254
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    %value:_(s16) = G_LOAD %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
++    RTS
++...
++
++# CHECK-LABEL: name: end255
++# CHECK-NOT: G_LOAD16_FAR_INDIR_IDX
++# CHECK: = G_LOAD16_FAR_INDIR{{ }}
++# CHECK-NOT: G_LOAD16_FAR_INDIR_IDX
++---
++name: end255
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %mask:_(s8) = G_CONSTANT i8 255
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    %value:_(s16) = G_LOAD %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
++    RTS
++...
++
++# CHECK-LABEL: name: atomic
++# CHECK-NOT: G_LOAD16_FAR_INDIR_IDX
++# CHECK-NOT: G_LOAD16_FAR_INDIR_IDX
++---
++name: atomic
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %mask:_(s8) = G_CONSTANT i8 254
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    %value:_(s16) = G_LOAD %ptr(p2) :: (load monotonic (s16), align 2, addrspace 2)
++    RTS
++...
++
++# CHECK-LABEL: name: escape
++# CHECK-NOT: G_LOAD16_FAR_INDIR_IDX
++# CHECK: = G_LOAD16_FAR_INDIR{{ }}
++# CHECK-NOT: G_LOAD16_FAR_INDIR_IDX
++---
++name: escape
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %mask:_(s8) = G_CONSTANT i8 254
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    %out:_(p0) = G_CONSTANT i16 512
++    %escaped:_(s32) = G_PTRTOINT %ptr(p2)
++    G_STORE %escaped(s32), %out(p0) :: (volatile store (s32))
++    %value:_(s16) = G_LOAD %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
++    RTS
++...
++
++# CHECK-LABEL: name: call_between
++# CHECK-NOT: G_LOAD16_FAR_INDIR_IDX
++# CHECK: = G_LOAD16_FAR_INDIR{{ }}
++# CHECK-NOT: G_LOAD16_FAR_INDIR_IDX
++---
++name: call_between
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %mask:_(s8) = G_CONSTANT i8 254
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    JSR @callee, mos_csr
++    %value:_(s16) = G_LOAD %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
++    RTS
++...
++
++# A word store is never folded, so a word store sharing the address rejects the
++# whole group: the word load keeps its explicit pointer too.
++# CHECK-LABEL: name: word_store_sibling
++# CHECK-NOT: _IDX
++# CHECK: = G_LOAD16_FAR_INDIR{{ }}%ptr(p2)
++# CHECK-NEXT: G_STORE16_FAR_INDIR{{ }}%v(s16), %ptr(p2)
++# CHECK-NOT: _IDX
++---
++name: word_store_sibling
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a, $rs2
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %v:_(s16) = COPY $rs2
++    %mask:_(s8) = G_CONSTANT i8 127
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    %value:_(s16) = G_LOAD %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
++    G_STORE %v(s16), %ptr(p2) :: (volatile store (s16), align 1, addrspace 2)
++    RTS
++...
++
++# The same group with a byte store folds both accesses on the shared base.
++# CHECK-LABEL: name: byte_store_sibling
++# CHECK: = G_LOAD16_FAR_INDIR_IDX{{ }}%base(p2), %bound
++# CHECK-NEXT: G_STORE_FAR_INDIR_IDX{{ }}%byte(s8), %base(p2), %bound
++# CHECK-NOT: G_PTR_ADD
++---
++name: byte_store_sibling
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %mask:_(s8) = G_CONSTANT i8 127
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    %value:_(s16) = G_LOAD %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
++    G_STORE %byte(s8), %ptr(p2) :: (volatile store (s8), addrspace 2)
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/far-word-index-integration.ll b/llvm/test/CodeGen/MOS/far-word-index-integration.ll
+new file mode 100644
+index 000000000000..4ea34f438809
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-word-index-integration.ll
+@@ -0,0 +1,29 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -stop-after=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=BYTE
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -stop-after=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=MIR
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=ASM
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=ASM
++
++; Known bits bounds the starting offset by 254 without a loop proof. The live
++; arithmetic result and volatile store keep the native word consumer observable.
++@result = external global i16
++
++define void @bounded_word(ptr addrspace(2) %base, i8 %index) {
++; BYTE-LABEL: name: bounded_word
++; BYTE-NOT: G_LOAD16_FAR_INDIR
++; BYTE: = G_LOAD_FAR_INDIR_IDX{{ }}
++; BYTE-NOT: G_LOAD16_FAR_INDIR
++; MIR-LABEL: name: bounded_word
++; MIR: = G_LOAD16_FAR_INDIR_IDX{{ }}
++; ASM-LABEL: bounded_word:
++; ASM: rep #32
++; ASM: lda [__rc{{[0-9]+}}],y
++; ASM: sta result
++; ASM: sep #32
++  %bounded = and i8 %index, -2
++  %offset = zext i8 %bounded to i32
++  %address = getelementptr i8, ptr addrspace(2) %base, i32 %offset
++  %value = load volatile i16, ptr addrspace(2) %address, align 1
++  %sum = add i16 %value, 1234
++  store volatile i16 %sum, ptr @result
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/far-word-policy.mir b/llvm/test/CodeGen/MOS/far-word-policy.mir
+index ee603dc90b6e..171ebd93e170 100644
+--- a/llvm/test/CodeGen/MOS/far-word-policy.mir
++++ b/llvm/test/CodeGen/MOS/far-word-policy.mir
+@@ -28,9 +28,9 @@
+   define void @mixed_2_0()  { ret void }
+ ...
+ # SPEED-LABEL: name: word_speed
+-# SPEED: = G_LOAD16_FAR_INDIR_IDX
++# SPEED: = G_LOAD16_FAR_INDIR_IDX{{ }}
+ # ALL-LABEL: name: word_speed
+-# ALL: = G_LOAD16_FAR_INDIR_IDX
++# ALL: = G_LOAD16_FAR_INDIR_IDX{{ }}
+ # OFF-LABEL: name: word_speed
+ # OFF: = G_LOAD16_FAR_INDIR{{ }}
+ ---
+@@ -71,7 +71,7 @@ body: |
+ # SPEED-LABEL: name: word_size
+ # SPEED: = G_LOAD16_FAR_INDIR{{ }}
+ # ALL-LABEL: name: word_size
+-# ALL: = G_LOAD16_FAR_INDIR_IDX
++# ALL: = G_LOAD16_FAR_INDIR_IDX{{ }}
+ # OFF-LABEL: name: word_size
+ # OFF: = G_LOAD16_FAR_INDIR{{ }}
+ ---
+@@ -112,7 +112,7 @@ body: |
+ # SPEED-LABEL: name: word_minsize
+ # SPEED: = G_LOAD16_FAR_INDIR{{ }}
+ # ALL-LABEL: name: word_minsize
+-# ALL: = G_LOAD16_FAR_INDIR_IDX
++# ALL: = G_LOAD16_FAR_INDIR_IDX{{ }}
+ # OFF-LABEL: name: word_minsize
+ # OFF: = G_LOAD16_FAR_INDIR{{ }}
+ ---
+@@ -356,11 +356,14 @@ body: |
+ ...
+ 
+ # SPEED-LABEL: name: mixed_1_1
+-# SPEED: = G_LOAD16_FAR_INDIR_IDX
++# SPEED: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
++# SPEED: %value:_(s16) = G_LOAD16_FAR_INDIR_IDX{{ }}
+ # ALL-LABEL: name: mixed_1_1
+-# ALL: = G_LOAD16_FAR_INDIR_IDX
++# ALL: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
++# ALL: %value:_(s16) = G_LOAD16_FAR_INDIR_IDX{{ }}
+ # OFF-LABEL: name: mixed_1_1
+-# OFF: = G_LOAD16_FAR_INDIR{{ }}
++# OFF: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
++# OFF: %value:_(s16) = G_LOAD16_FAR_INDIR{{ }}
+ ---
+ name: mixed_1_1
+ tracksRegLiveness: true
+@@ -400,11 +403,14 @@ body: |
+ ...
+ 
+ # SPEED-LABEL: name: mixed_1_0
+-# SPEED: = G_LOAD16_FAR_INDIR_IDX
++# SPEED: %value:_(s16) = G_LOAD16_FAR_INDIR_IDX{{ }}
++# SPEED: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
+ # ALL-LABEL: name: mixed_1_0
+-# ALL: = G_LOAD16_FAR_INDIR_IDX
++# ALL: %value:_(s16) = G_LOAD16_FAR_INDIR_IDX{{ }}
++# ALL: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
+ # OFF-LABEL: name: mixed_1_0
+-# OFF: = G_LOAD16_FAR_INDIR{{ }}
++# OFF: %value:_(s16) = G_LOAD16_FAR_INDIR{{ }}
++# OFF: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
+ ---
+ name: mixed_1_0
+ tracksRegLiveness: true
+@@ -444,11 +450,14 @@ body: |
+ ...
+ 
+ # SPEED-LABEL: name: mixed_2_1
+-# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# SPEED: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
++# SPEED: %value:_(s16) = G_LOAD16_FAR_INDIR{{ }}
+ # ALL-LABEL: name: mixed_2_1
+-# ALL: = G_LOAD16_FAR_INDIR{{ }}
++# ALL: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
++# ALL: %value:_(s16) = G_LOAD16_FAR_INDIR{{ }}
+ # OFF-LABEL: name: mixed_2_1
+-# OFF: = G_LOAD16_FAR_INDIR{{ }}
++# OFF: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
++# OFF: %value:_(s16) = G_LOAD16_FAR_INDIR{{ }}
+ ---
+ name: mixed_2_1
+ tracksRegLiveness: true
+@@ -488,11 +497,14 @@ body: |
+ ...
+ 
+ # SPEED-LABEL: name: mixed_2_0
+-# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# SPEED: %value:_(s16) = G_LOAD16_FAR_INDIR{{ }}
++# SPEED: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
+ # ALL-LABEL: name: mixed_2_0
+-# ALL: = G_LOAD16_FAR_INDIR{{ }}
++# ALL: %value:_(s16) = G_LOAD16_FAR_INDIR{{ }}
++# ALL: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
+ # OFF-LABEL: name: mixed_2_0
+-# OFF: = G_LOAD16_FAR_INDIR{{ }}
++# OFF: %value:_(s16) = G_LOAD16_FAR_INDIR{{ }}
++# OFF: %byte:_(s8) = G_LOAD_FAR_INDIR_IDX{{ }}
+ ---
+ name: mixed_2_0
+ tracksRegLiveness: true
+diff --git a/llvm/test/CodeGen/MOS/far-word-rep-sep.mir b/llvm/test/CodeGen/MOS/far-word-rep-sep.mir
+new file mode 100644
+index 000000000000..fa6caf34c8ae
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-word-rep-sep.mir
+@@ -0,0 +1,27 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs %s -o - | FileCheck %s
++
++# The folded far word load reads `lda [dp],y` with an 8-bit Y. Under
++# +mos-xy16 a preceding 16-bit index instruction leaves X=0, so REP/SEP
++# insertion must set X=1 (sep #$10) together with M=0 before the load.
++---
++name: x16_then_word
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $y
++    ; CHECK-LABEL: name: x16_then_word
++    ; CHECK: REP_Immediate 16
++    ; CHECK-NEXT: $x16 = LDXImm16 1000
++    ; CHECK-NEXT: STXAbs16 killed $x16, 4864
++    ; CHECK-NEXT: REP_Immediate 32
++    ; CHECK-NEXT: SEP_Immediate 16
++    ; CHECK-NEXT: $a16 = LDIndirLongIdx16 $rl1, killed $y
++    ; CHECK-NEXT: STAbs16 killed $a16, 4866
++    ; CHECK-NEXT: SEP_Immediate 32
++    ; CHECK-NEXT: RTS
++    $x16 = LDXImm16 1000
++    STXAbs16 killed $x16, 4864
++    $a16 = LDIndirLongIdx16 $rl1, killed $y
++    STAbs16 killed $a16, 4866
++    RTS
++...
+-- 
+2.53.0
+

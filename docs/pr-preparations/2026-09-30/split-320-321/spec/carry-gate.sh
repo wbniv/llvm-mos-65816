@@ -38,7 +38,7 @@ fi
 if [ "$WHAT" != build ]; then
   set +e
   dev/container.sh "${MOUNTS[@]}" -v "$EV":/work/ev -- \
-    sh -c 'ulimit -c 0; ulimit -v 2000000; exec timeout 3000 /work/build/0029-cross-target-build/bin/llvm-lit -j4 -v -o /work/ev/lit.json /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS /work/build/register-exhaustion-src/llvm/test/MC/MOS' \
+    sh -c 'ulimit -c 0; ulimit -v 2000000; exec timeout 3000 /work/build/0029-cross-target-build/bin/llvm-lit -j3 -v -o /work/ev/lit.json /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS /work/build/register-exhaustion-src/llvm/test/MC/MOS' \
     > "$EV/lit.log" 2>&1 </dev/null
   lrc=$?
   set -e

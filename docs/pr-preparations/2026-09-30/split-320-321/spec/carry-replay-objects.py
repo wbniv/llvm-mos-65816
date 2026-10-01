@@ -8,7 +8,7 @@ usage: carry-replay-objects.py PRE0070_LLC CANDIDATE_LLC RESULTS_JSON OUT_DIR
   OUT_DIR        objects, logs and objects.json land here
 Uses exactly the llc arguments of the packet's runtime.py and compares each
 object's sha256 with the recorded one. Run inside the dev container. Each llc
-runs with ulimit -c 0, ulimit -v 2000000 and a 180 s timeout, four at a time.
+runs with ulimit -c 0, ulimit -v 2000000 and a 180 s timeout, three at a time.
 """
 import concurrent.futures as cf, hashlib, json, os, subprocess, sys
 
@@ -40,7 +40,7 @@ def job(r):
                 identical=h == r['object_sha256'])
 
 
-with cf.ThreadPoolExecutor(4) as ex:
+with cf.ThreadPoolExecutor(3) as ex:
     rows = list(ex.map(job, rec))
 json.dump(dict(pre0070_llc=pre, candidate_llc=cand,
                pre0070_sha256=hashlib.sha256(open(pre, 'rb').read()).hexdigest(),

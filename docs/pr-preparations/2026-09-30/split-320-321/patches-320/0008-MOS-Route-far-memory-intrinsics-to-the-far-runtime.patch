@@ -1,4 +1,4 @@
-From 8d9c0382db7cd5f5dc62cd6c89d771355adf73fa Mon Sep 17 00:00:00 2001
+From 7a5050aaeea30b9271c169adbb154dd08ceffab3 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 8/9] [MOS] Route far memory intrinsics to the far runtime
@@ -29,7 +29,7 @@ Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
  create mode 100644 llvm/test/CodeGen/MOS/far-memset.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index b91d42ff5d5b..1b45d411651b 100644
+index d02a5f5004f3..0d5ba4073c97 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -48,6 +48,7 @@
@@ -40,7 +40,7 @@ index b91d42ff5d5b..1b45d411651b 100644
  #include "llvm/IR/DiagnosticInfo.h"
  #include "llvm/IR/InstrTypes.h"
  #include "llvm/IR/Instructions.h"
-@@ -2989,6 +2990,101 @@ static bool anyFarPointerOperand(const MachineRegisterInfo &MRI,
+@@ -3096,6 +3097,101 @@ static bool anyFarPointerOperand(const MachineRegisterInfo &MRI,
    return false;
  }
  
@@ -142,7 +142,7 @@ index b91d42ff5d5b..1b45d411651b 100644
  bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
                                       MachineRegisterInfo &MRI, MachineInstr &MI,
                                       LostDebugLocObserver &LocObserver) const {
-@@ -3039,11 +3135,11 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+@@ -3146,11 +3242,11 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
      return true;
    }
  

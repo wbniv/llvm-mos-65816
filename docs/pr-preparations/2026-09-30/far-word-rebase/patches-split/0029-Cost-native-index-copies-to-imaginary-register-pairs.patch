@@ -1,0 +1,218 @@
+From 9c364c9637e4c7d8eb13060b01f44966c53c99d3 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 28 Sep 2026 19:04:27 +0700
+Subject: [PATCH 29/37] Cost native index copies to imaginary register pairs
+
+Model the four legal X16/Y16 <-> Imag16 copy edges that physical-copy
+lowering already supports. Each uses a two-byte direct-page instruction
+and four cycles; mode-switch placement is context dependent.
+
+An assertions-enabled build of the extracted far/native prerequisites
+aborted in copyCost on load_byte_wide_index and far_scaled_word. The
+preserved failing compiler is 35a1afd96ad2af273aabbcbc98b3be2beb028babcdb86ff959a679f8c535659e.
+Both unchanged IR inputs and the focused allocation MIR fail there and
+pass with this change. MOS CodeGen/MC: 156 pass, 1 unsupported.
+
+This defect requires downstream native classes; pristine upstream does
+not have the entry points. Earlier Imag32-cost and width-mismatch-hint
+repairs are present and address different copy edges.
+
+The other native 16-bit copy edges (X16<->Y16 and any A16 copy) have no
+lowering or cost. Allocation never forms them, because each native 16-bit
+class has one register, but copyPhysRegImpl and copyCost now stop with a
+fatal error that names the copy instead of reaching llvm_unreachable, which
+is undefined behavior in a release build (independent review N1).
+native-copy-unlowered.mir checks both errors.
+
+Implementation and validation: OpenAI Codex CLI 0.157.1 (session source
+vscode), model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+
+Explicit copy errors (review N1): Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+---
+ llvm/lib/Target/MOS/MOSInstrInfo.cpp          | 10 +++
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp       | 16 +++++
+ .../CodeGen/MOS/native-copy-unlowered.mir     | 33 +++++++++
+ .../CodeGen/MOS/native-index-copy-cost.mir    | 72 +++++++++++++++++++
+ 4 files changed, 131 insertions(+)
+ create mode 100644 llvm/test/CodeGen/MOS/native-copy-unlowered.mir
+ create mode 100644 llvm/test/CodeGen/MOS/native-index-copy-cost.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index 8c4c3b4c1336..e2656d63531b 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+@@ -772,6 +772,16 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
+                            {SrcReg, INT64_C(-1), INT64_C(0)});
+       }
+     }
++  } else if (IsClass(DestReg, MOS::Ac16RegClass) ||
++             IsClass(SrcReg, MOS::Ac16RegClass) ||
++             AreClasses(MOS::Xc16RegClass, MOS::Yc16RegClass) ||
++             AreClasses(MOS::Yc16RegClass, MOS::Xc16RegClass)) {
++    // A16 copies and X16<->Y16 copies have no lowering. Allocation never
++    // forms them: every 16-bit native class is a single register and only
++    // the Imag16 edges above are costed. Name the copy if one appears.
++    report_fatal_error(
++        Twine("MOS: no lowering for a native 16-bit copy from ") +
++        TRI.getName(SrcReg) + " to " + TRI.getName(DestReg));
+   } else
+     llvm_unreachable("Unexpected physical register copy.");
+ }
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index a1e3b05cc397..d02eedd7ef04 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -1525,6 +1525,15 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+   if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
+     return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
+   }
++  if (AreClasses(MOS::Xc16RegClass, MOS::Imag16RegClass) ||
++      AreClasses(MOS::Imag16RegClass, MOS::Xc16RegClass) ||
++      AreClasses(MOS::Yc16RegClass, MOS::Imag16RegClass) ||
++      AreClasses(MOS::Imag16RegClass, MOS::Yc16RegClass)) {
++    // LDX/LDY/STX/STY dp with a 16-bit index transfers two bytes in four
++    // cycles. REP/SEP placement depends on surrounding instructions and is
++    // not part of the individual copy cost.
++    return MOSInstrCost(2, 4);
++  }
+   if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
+     return copyCost(MOS::RC0, MOS::RC1, STI) * 4;
+   }
+@@ -1588,6 +1597,13 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+     // BIT setv; BR; CLV;
+     return BitCost + BranchCost + ClvCost;
+   }
++  // copyPhysRegImpl has no lowering for these; see the error there.
++  if (MOS::Ac16RegClass.contains(DestReg) ||
++      MOS::Ac16RegClass.contains(SrcReg) ||
++      AreClasses(MOS::Xc16RegClass, MOS::Yc16RegClass) ||
++      AreClasses(MOS::Yc16RegClass, MOS::Xc16RegClass))
++    report_fatal_error(Twine("MOS: no cost for a native 16-bit copy from ") +
++                       getName(SrcReg) + " to " + getName(DestReg));
+ 
+   llvm_unreachable("Unexpected physical register copy.");
+ }
+diff --git a/llvm/test/CodeGen/MOS/native-copy-unlowered.mir b/llvm/test/CodeGen/MOS/native-copy-unlowered.mir
+new file mode 100644
+index 000000000000..8113d9d951f2
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-copy-unlowered.mir
+@@ -0,0 +1,33 @@
++# RUN: split-file %s %t
++# RUN: not --crash llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=postrapseudos %t/xy.mir -o /dev/null 2>&1 | FileCheck %s --check-prefix=XY
++# RUN: not --crash llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=postrapseudos %t/a16.mir -o /dev/null 2>&1 | FileCheck %s --check-prefix=A16
++
++# Native 16-bit copies are lowered only between X16 or Y16 and an Imag16 pair.
++# Allocation never forms another one, because each native 16-bit class has a
++# single register. If one appears, it is named in an error instead of reaching
++# llvm_unreachable, which is undefined behavior in a release build.
++
++# XY: LLVM ERROR: MOS: no lowering for a native 16-bit copy from X16 to Y16
++# A16: LLVM ERROR: MOS: no lowering for a native 16-bit copy from RS1 to A16
++
++#--- xy.mir
++---
++name: x_to_y
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $x16
++    $y16 = COPY $x16
++    RTS implicit $y16
++...
++
++#--- a16.mir
++---
++name: pair_to_a
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1
++    $a16 = COPY $rs1
++    RTS implicit $a16
++...
+diff --git a/llvm/test/CodeGen/MOS/native-index-copy-cost.mir b/llvm/test/CodeGen/MOS/native-index-copy-cost.mir
+new file mode 100644
+index 000000000000..9b2bb80ce6d1
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-index-copy-cost.mir
+@@ -0,0 +1,72 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
++
++# Native index registers and imaginary pairs support equal-width copies in both
++# directions. Allocation must cost each of these legal copy edges.
++
++---
++name: x_from_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1
++    ; CHECK-LABEL: name: x_from_pair
++    ; CHECK: $x16 = COPY{{( killed)?( renamable)?}} $rs
++    %0:imag16 = COPY $rs1
++    %1:xc16 = COPY %0
++    $x16 = COPY %1
++    RTS implicit $x16
++...
++
++---
++name: x_to_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $x16
++    ; CHECK-LABEL: name: x_to_pair
++    ; CHECK: $rs{{[0-9]+}} = COPY{{( killed)?( renamable)?}} $x16
++    %0:xc16 = COPY $x16
++    %1:imag16 = COPY %0
++    $rs1 = COPY %1
++    RTS implicit $rs1
++...
++
++---
++name: y_from_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1
++    ; CHECK-LABEL: name: y_from_pair
++    ; CHECK: $y16 = COPY{{( killed)?( renamable)?}} $rs
++    %0:imag16 = COPY $rs1
++    %1:yc16 = COPY %0
++    $y16 = COPY %1
++    RTS implicit $y16
++...
++
++---
++name: y_to_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $y16
++    ; CHECK-LABEL: name: y_to_pair
++    ; CHECK: $rs{{[0-9]+}} = COPY{{( killed)?( renamable)?}} $y16
++    %0:yc16 = COPY $y16
++    %1:imag16 = COPY %0
++    $rs1 = COPY %1
++    RTS implicit $rs1
++...
+-- 
+2.53.0
+

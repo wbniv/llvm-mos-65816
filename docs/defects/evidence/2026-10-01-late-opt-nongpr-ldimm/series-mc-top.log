@@ -1,0 +1,22 @@
+$ build/split-320-321/llc/r3-mc-2 -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir -o /dev/null
+# llc build/split-320-321/llc/r3-mc-2 sha256 be44489018362b4ecb808c9bfbc17cc1a99f081c9683b50c24f43faa20f8c7ae
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/r3-mc-2 -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir'.
+2.	Running pass 'MOS Late Optimizations' on function '@ldimm_imag8_only'
+ #0 0x00005dd7ea5d76bb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/r3-mc-2+0x45486bb)
+ #1 0x00005dd7ea5d4541 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/r3-mc-2+0x4545541)
+ #2 0x00005dd7ea5d84cb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007f9eae631cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00005dd7e8bd4ffc (anonymous namespace)::MOSLateOptimization::runOnMachineFunction(llvm::MachineFunction&) MOSLateOptimization.cpp:0:0
+ #5 0x00005dd7e92721a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/r3-mc-2+0x31e31a9)
+ #6 0x00005dd7e98044e0 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/r3-mc-2+0x37754e0)
+ #7 0x00005dd7e980c5e2 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/r3-mc-2+0x377d5e2)
+ #8 0x00005dd7e98052a4 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/r3-mc-2+0x37762a4)
+ #9 0x00005dd7e81bfe0b compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#10 0x00005dd7e81bd0d3 main (build/split-320-321/llc/r3-mc-2+0x212e0d3)
+#11 0x00007f9eae616601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#12 0x00007f9eae616718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#13 0x00005dd7e81bc2e5 _start (build/split-320-321/llc/r3-mc-2+0x212d2e5)
+exit_code=139

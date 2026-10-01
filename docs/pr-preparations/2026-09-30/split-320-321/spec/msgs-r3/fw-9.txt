@@ -1,0 +1,31 @@
+Cost native index copies to imaginary register pairs
+
+Model the four legal X16/Y16 <-> Imag16 copy edges that physical-copy
+lowering already supports. Each uses a two-byte direct-page instruction
+and four cycles; mode-switch placement is context dependent.
+
+An assertions-enabled build of the extracted far/native prerequisites
+aborted in copyCost on load_byte_wide_index and far_scaled_word. The
+preserved failing compiler is 35a1afd96ad2af273aabbcbc98b3be2beb028babcdb86ff959a679f8c535659e.
+Both unchanged IR inputs and the focused allocation MIR fail there and
+pass with this change. MOS CodeGen/MC: 156 pass, 1 unsupported.
+
+This defect requires downstream native classes; pristine upstream does
+not have the entry points. Earlier Imag32-cost and width-mismatch-hint
+repairs are present and address different copy edges.
+
+The other native 16-bit copy edges (X16<->Y16 and any A16 copy) have no
+lowering or cost. Allocation never forms them, because each native 16-bit
+class has one register, but copyPhysRegImpl and copyCost now stop with a
+fatal error that names the copy instead of reaching llvm_unreachable, which
+is undefined behavior in a release build (independent review N1).
+native-copy-unlowered.mir checks both errors.
+
+Implementation and validation: OpenAI Codex CLI 0.157.1 (session source
+vscode), model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+
+Explicit copy errors (review N1): Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F

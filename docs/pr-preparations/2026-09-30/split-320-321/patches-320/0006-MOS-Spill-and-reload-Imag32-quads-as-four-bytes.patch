@@ -1,4 +1,4 @@
-From cbbe9c70f520c9437520387688bd882cd5afca65 Mon Sep 17 00:00:00 2001
+From f9072c2b93f36e51d37240ee0d277b0ba9b69d3e Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:12:12 +0700
 Subject: [PATCH 6/9] [MOS] Spill and reload Imag32 quads as four bytes
@@ -16,13 +16,13 @@ Original implementation attribution: agent/tool, version, model and reasoning ef
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
 ---
- llvm/lib/Target/MOS/MOSInstrInfo.cpp    | 60 +++++++++++++++++++++++--
- llvm/lib/Target/MOS/MOSRegisterInfo.cpp | 32 +++++++++++++
- llvm/test/CodeGen/MOS/prologepilog.mir  | 26 +++++++++++
- 3 files changed, 114 insertions(+), 4 deletions(-)
+ llvm/lib/Target/MOS/MOSInstrInfo.cpp    | 56 ++++++++++++++++++++++++-
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp | 32 ++++++++++++++
+ llvm/test/CodeGen/MOS/prologepilog.mir  | 26 ++++++++++++
+ 3 files changed, 112 insertions(+), 2 deletions(-)
 
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 3c43dd923b09..daf2187bad16 100644
+index d095ecc695d6..8c4c3b4c1336 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -958,9 +958,61 @@ void MOSInstrInfo::loadStoreRegStackSlot(
@@ -89,22 +89,11 @@ index 3c43dd923b09..daf2187bad16 100644
        // Spill the accumulator with a word load/store. Byte GPR copies cannot
        // represent A16. Ac16 is available only under HasAccum16, and the mode
        // insertion pass supplies the M=0 state required by these instructions.
-@@ -969,8 +1021,8 @@ void MOSInstrInfo::loadStoreRegStackSlot(
-           .addFrameIndex(FrameIndex)
-           .addMemOperand(MMO);
-     } else if ((Reg.isPhysical() && MOS::Imag16RegClass.contains(Reg)) ||
--        (Reg.isVirtual() &&
--         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
-+               (Reg.isVirtual() &&
-+                MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
-       MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
-       MachineOperand Hi = Lo;
-       Register Tmp = Reg;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 74ae5cbbc53c..46057c8e4ba5 100644
+index 6c1e9a8eb3d5..612d7192ba7a 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -883,6 +883,38 @@ void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
+@@ -889,6 +889,38 @@ void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
      return;
    }
  

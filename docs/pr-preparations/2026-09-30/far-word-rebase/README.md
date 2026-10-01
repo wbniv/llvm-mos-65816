@@ -4,6 +4,40 @@ Prepared September 30, 2026. This packet rebases the [September 28 extracted ser
 
 ## Split series (current)
 
+Status (2026‑10‑01, third round): **ready for a final check, not for filing.** The [third independent review](independent-review-3.md) found no blocker. Its nonblocking N17–N22 and the older N1, N2, N3 (patches 5 and 6), N5, N7, N8 and N9 are addressed below and in the [#320 map](../split-320-321/REVIEWER-MAP-320.md#where-the-reviews-findings-land). Filing still waits on mlund's answers on #594 (B5 numbering, B7 alignment including the 1b reservation fix, N18). [Plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#third-round-n17n22-and-the-older-open-items).
+
+The series is #321 in 16 commits (rebuilt for N3/N4), the two MC commits, llvm-mos#584 (our open SPC700 late-opt fix, formerly hidden in #320‑2), #320 in nine commits, then this packet's patches 9, 5–8 and 11–14 (top `f299b753f0d5`, branch `pkt-r3-far-word`). [`patches-split/`](patches-split/) holds all 37 patches in that order.
+
+| Patch | Third-round change |
+| --- | --- |
+| 9 | N1: `copyPhysRegImpl` and `copyCost` stop with a fatal error naming an unlowered X16↔Y16 or A16 copy instead of reaching `llvm_unreachable`; native-copy-unlowered.mir |
+| 5, 6 | N3: their own C++ lines are clang-format clean |
+| 8 | N5: `-mos-far-loop-range` removed; the loop proof only narrows the known-bits bound, so it is always on |
+| 11 | N2: reduced to `copyHasUndefLanes()` plus a parameter to `handleIdentityCopy` (38 changed lines instead of 299); the X86 characterization test says so. Its output equals the old patch 11's on every CPU |
+| 12 | N5: `-mos-far-word-index=all` no longer folds in `optnone` functions |
+| 13 | N8: word-store sibling rejection and X8 forcing tests; byte siblings pinned in far-word-policy.mir; the boundary tests' OFF runs removed with the option |
+
+| Check | Result |
+| --- | --- |
+| Round trip | Each of the 37 patches applied in order to `06bc967d2668` reproduces its commit's tree; final tree `5d6924925790` ([record](evidence/split-series.json); the second round's is [`split-series-before-r3.json`](evidence/split-series-before-r3.json)) |
+| Per commit | Every commit built with assertions and passed MOS CodeGen+MC with no MOS warnings: patches 9, 5, 6, 7, 8, 11, 12, 13, 14 give 181, 182, 183, 184, 185, 185, 186, 190, 190 pass, 1 unsupported each ([stages](../split-320-321/evidence/r3/stages.tsv)) |
+| Red/green | 35 red runs fail and 230 green runs pass; seven characterization runs pass on their parents by design, all of them in patches 11, 13 and 14 ([table](../split-320-321/evidence/r3/red-green.tsv)) |
+| X86 (patch 11) | virtregrewriter-x86-undef-high-byte-result.mir fails on patch 8 ("Found 1 machine code errors") and passes from patch 11 on; virtregrewriter-x86-copy-contracts.mir passes on both, as its header now says |
+| Sensitivity (N8) | 111 function/configuration pairs over four test files, 262 of 262 opcode substitutions rejected ([results](evidence/sensitivity-r3.json)) |
+| Default mode, all 14 CPUs | Patches 9, 5–8 and 12–14 are identical to their parents. Patch 11 changes three corpus inputs (examples_snes_bf-vm on 12 CPUs, +8 bytes; metaball +1 and sodo +8 on mosw65816), exactly as the reviewed patch 11 did; its message now states it ([sizes](../split-320-321/evidence/r3/patch11-default-size.txt)) |
+| Against the second round | The top produces the same assembly and objects as the second-round top for every input on every CPU; only the N20 far-value errors differ ([table](../split-320-321/evidence/r3/default-all-cpus.txt)) |
+| Replay objects | The 58 frozen configurations give objects byte-identical to the reviewed carried packet's, which passed MAME and bsnes ([comparison](evidence/split-r3-replay.json)); the emulators were not rerun |
+
+N9, rebase check against the other open PRs (heads read on 2026‑10‑01, applied read-only onto the series top):
+
+| PR | Head | Result |
+| --- | --- | --- |
+| #593 (mlund, split ZP-stack counters) | `06aad6b5c745` | Its first commit is already in upstream `main`. The second conflicts with #594 and #320 in `MOSMCInstLower.cpp` (the Imag32 operand case) and `MOSZeroPageAlloc.cpp` (#594's composite candidates). Resolved by keeping both: #593's assertion and `PairRequired` around #594's quad branch. Builds; MOS CodeGen+MC 191 pass, including `zp-alloc-65ce02.ll` and every CSR and far test |
+| #601 (johnwbyrd, DWARF CFI) | `76e6266607b8` | Merges without conflicts and builds. Two #321 tests (`a16-byte-store.ll`, `a16-indirect-byte-store.ll`) fail: their `CHECK-NEXT` after the function label meets the new `.cfi_startproc`. Whichever lands second updates those two tests; no code conflict |
+| #585 (mlund, 65CE02 arithmetic shifts) | `c2fd5d7e32c9` | Merges without conflicts; builds; 191 pass |
+
+## Split series, second round (reviewed by the third independent review)
+
 Status (2026‑10‑01): **ready for a focused third independent review, not for filing.** The [second independent review](independent-review-2.md) upheld the first carry (B1–B3, B6, N3/N4, patch 12) and found two blockers, B8 and B9, and nonblocking N10–N16. All are addressed. The user's #594 decision (option 1) is implemented. Two items stay open:
 
 - the RL DWARF numbering (B5), escalated because the chosen formula lands inside the RS range of the MOS DWARF specification;
@@ -137,7 +171,9 @@ All but N6 apply to the patch text itself, so they belong to the split series be
   - ~~Repair B1–B4 downstream with same-input red/green regressions, and carry the repairs into the #320 series.~~ Done: downstream in `664b877a`, split carry on 2026‑10‑01.
   - ~~Restore the omitted trunc pattern (B6).~~ Done in #320‑2.
   - Decide the far-quad DWARF representation (B5); escalated with B7.
-  - ~~Apply N3 and N4 to the #320 commits.~~ Done. N3/N4 in the #321 commits and far-word patches 5, 6 and 10, and N1, N2, N5 and N7–N9, remain.
+  - ~~Apply N3 and N4 to the #320 commits.~~ Done. ~~N3/N4 in the #321 commits and far-word patches 5 and 6, and N1, N2, N5 and N7–N9.~~ Done in the third round (patch 10 is #320‑1d, which is clean).
+  - ~~Third review's N17–N22.~~ Done in the third round, except N18, which is mlund's to answer.
+  - Decide whether the HuC6280 block-move fix inside #321‑11 should also go upstream on its own, like #584 ([record](../../../defects/mos-huc-blockmove-frameindex-offset.json)).
   - ~~Rerun this packet's checks and the runtime replay.~~ Done on the carried split. Then have the series independently reviewed again.
 - **Reconcile with #594 (B7).** Settle this with its author and the maintainers before filing a competing register definition.
 - **Settle the #320/#321 scope.** This rebased series does not certify either feature issue. Compiler overhead and independent-application profitability remain unmeasured.
@@ -145,4 +181,4 @@ All but N6 apply to the patch text itself, so they belong to the split series be
 
 ## Attribution
 
-Rebase, validation, reconciliation and packet preparation: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. The September 28 extraction, copy-cost repair and measurements: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The independent review names its own attribution. Second round (after the second independent review): Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Carry of the far-prerequisite repairs into the split, the packet rebuild and the 2026‑10‑01 replay: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Downstream replay of the review findings and the four defect records: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
+Rebase, validation, reconciliation and packet preparation: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. The September 28 extraction, copy-cost repair and measurements: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The independent review names its own attribution. Second and third rounds (after the second and third independent reviews): Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Carry of the far-prerequisite repairs into the split, the packet rebuild and the 2026‑10‑01 replay: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Downstream replay of the review findings and the four defect records: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.

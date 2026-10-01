@@ -1,4 +1,4 @@
-From ef1fdd877206a81fa961da92b8cad45877a93be4 Mon Sep 17 00:00:00 2001
+From c65a498d87d9e4d90f811699780ec5f461c40b64 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 13/18] [MOS] Require a no-wrap proof before folding near
@@ -23,7 +23,7 @@ Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
  create mode 100644 llvm/test/CodeGen/MOS/near-index-nowrap.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 1080b80e0b38..6819d49cec5f 100644
+index 21496cc85f00..e8a346d4b17a 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -27,6 +27,7 @@
@@ -34,7 +34,7 @@ index 1080b80e0b38..6819d49cec5f 100644
  #include "llvm/CodeGen/GlobalISel/LegalizerHelper.h"
  #include "llvm/CodeGen/GlobalISel/LegalizerInfo.h"
  #include "llvm/CodeGen/GlobalISel/LostDebugLocObserver.h"
-@@ -2202,6 +2203,23 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+@@ -2246,6 +2247,23 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
    return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
  }
  
@@ -58,7 +58,7 @@ index 1080b80e0b38..6819d49cec5f 100644
  bool MOSLegalizerInfo::tryIndexedAddressing16(LegalizerHelper &Helper,
                                                MachineRegisterInfo &MRI,
                                                GLoadStore &MI) const {
-@@ -2268,6 +2286,8 @@ bool MOSLegalizerInfo::tryIndexedAddressing16(LegalizerHelper &Helper,
+@@ -2312,6 +2330,8 @@ bool MOSLegalizerInfo::tryIndexedAddressing16(LegalizerHelper &Helper,
      // becomes VarIndex (first one wins; a second means we can't fold both).
      if (const auto *PtrAdd =
              cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
@@ -67,7 +67,7 @@ index 1080b80e0b38..6819d49cec5f 100644
        Addr = PtrAdd->getBaseReg();
        Register Off = PtrAdd->getOffsetReg();
        if (auto C = getIConstantVRegValWithLookThrough(Off, MRI)) {
-@@ -2475,6 +2495,8 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -2520,6 +2540,8 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
      }
      if (const auto *PtrAddAddr =
              cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
@@ -76,7 +76,7 @@ index 1080b80e0b38..6819d49cec5f 100644
        Addr = PtrAddAddr->getBaseReg();
        Register NewOffset = PtrAddAddr->getOffsetReg();
        if (auto ConstOffset =
-@@ -2600,7 +2622,8 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -2647,7 +2669,8 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
        isa<GLoad>(MI) ? MOS::G_LOAD_INDIR_IDX : MOS::G_STORE_INDIR_IDX;
  
    if (const auto *PtrAddAddr =

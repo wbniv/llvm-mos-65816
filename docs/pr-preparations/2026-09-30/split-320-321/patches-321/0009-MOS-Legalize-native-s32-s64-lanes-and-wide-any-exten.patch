@@ -1,4 +1,4 @@
-From 56e6c7f91e9e0a9254b1f0e682684e046d6893e1 Mon Sep 17 00:00:00 2001
+From 9cf29583ac1b15423b79e6043661deab75aff261 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 09/16] [MOS] Legalize native s32/s64 lanes and wide
@@ -19,19 +19,19 @@ Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
 ---
- llvm/lib/Target/MOS/MOSLegalizerInfo.cpp    | 169 ++++++++++++++++++--
- llvm/lib/Target/MOS/MOSLegalizerInfo.h      |  12 ++
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp    | 184 ++++++++++++++++++--
+ llvm/lib/Target/MOS/MOSLegalizerInfo.h      |  20 +++
  llvm/test/CodeGen/MOS/anyext-masked-byte.ll |  13 ++
  llvm/test/CodeGen/MOS/anyext-wide.mir       |  79 +++++++++
- 4 files changed, 258 insertions(+), 15 deletions(-)
+ 4 files changed, 281 insertions(+), 15 deletions(-)
  create mode 100644 llvm/test/CodeGen/MOS/anyext-masked-byte.ll
  create mode 100644 llvm/test/CodeGen/MOS/anyext-wide.mir
 
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index eb56ca2608ad..522d5cea6bbb 100644
+index 9279a8bb513e..8cccac99a892 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -95,15 +95,27 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -95,15 +95,28 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
  
    // Integer Extension and Truncation
  
@@ -47,7 +47,8 @@ index eb56ca2608ad..522d5cea6bbb 100644
 +  // Native s32 values use two s16 lanes. Keep the extension and merge rules
 +  // consistent with that representation; zero extensions lower through bytes.
 +  {
-+    auto &B = getActionDefinitionsBuilder(G_ANYEXT).scalarize(0).legalFor({{S16, S8}});
++    auto &B = getActionDefinitionsBuilder(G_ANYEXT).scalarize(0).legalFor(
++        {{S16, S8}});
 +    if (STI.hasAccum16())
 +      B.legalFor({{S32, S16}, {S32, S8}})
 +          .customFor({{S64, S8}, {S64, S16}, {S64, S32}});
@@ -59,8 +60,8 @@ index eb56ca2608ad..522d5cea6bbb 100644
 +     }).unsupported();
 +  }
 +  {
-+    auto &B = getActionDefinitionsBuilder(G_TRUNC)
-+                  .legalFor({{S1, S8}, {S1, S16}, {S8, S16}});
++    auto &B = getActionDefinitionsBuilder(G_TRUNC).legalFor(
++        {{S1, S8}, {S1, S16}, {S8, S16}});
 +    if (STI.hasAccum16())
 +      B.legalFor({{S16, S32}});
 +    B.scalarize(0).unsupported();
@@ -68,7 +69,7 @@ index eb56ca2608ad..522d5cea6bbb 100644
  
    getActionDefinitionsBuilder(G_SEXT).scalarize(0).custom();
  
-@@ -151,12 +163,36 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -151,12 +164,40 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
    // inserts with constant indices, which the rule above then lowers further.
    getActionDefinitionsBuilder(G_SHUFFLE_VECTOR).lower();
  
@@ -78,19 +79,21 @@ index eb56ca2608ad..522d5cea6bbb 100644
 -  getActionDefinitionsBuilder(G_UNMERGE_VALUES)
 -      .legalForCartesianProduct({S8, PZ}, {S16, P})
 -      .unsupported();
-+  // Native accumulator: s32<->2x s16 (un)merge is the glue for the 2x s16 representation of s32
-+  // (see the ext/trunc note above), mirroring the default s16<->s8 (un)merge.
++  // Native accumulator: s32<->2x s16 (un)merge is the glue for the 2x s16
++  // representation of s32 (see the ext/trunc note above), mirroring the default
++  // s16<->s8 (un)merge.
 +  {
 +    auto &B = getActionDefinitionsBuilder(G_MERGE_VALUES)
 +                  .legalForCartesianProduct({S16, P}, {S8, PZ});
 +    if (STI.hasAccum16())
-+      // {S32,S16} 2x s16->s32 is the direct legal form; {S32,S8} is a 4x s8->s32
-+      // merge (e.g. an i8->i32 sext the artifact combiner couldn't fold) that the
-+      // 2-source selectMergeValues can't take — custom-rewrite it into the legal
-+      // 2-level form (see legalizeMergeS32FromBytes).
-+      // {S64,S32} 2x s32->s64 is the direct legal form; {S64,S16} is a 4x s16->s64
-+      // merge that the 2-source selector can't take — custom-rewrite to the 2-level
-+      // form (see legalizeMergeS64FromWords). Mirror of the s32 case, one level up.
++      // {S32,S16} 2x s16->s32 is the direct legal form; {S32,S8} is a 4x
++      // s8->s32 merge (e.g. an i8->i32 sext the artifact combiner couldn't
++      // fold) that the 2-source selectMergeValues can't take — custom-rewrite
++      // it into the legal 2-level form (see legalizeMergeS32FromBytes).
++      // {S64,S32} 2x s32->s64 is the direct legal form; {S64,S16} is a 4x
++      // s16->s64 merge that the 2-source selector can't take — custom-rewrite
++      // to the 2-level form (see legalizeMergeS64FromWords). Mirror of the s32
++      // case, one level up.
 +      B.legalFor({{S32, S16}, {S64, S32}}).customFor({{S32, S8}, {S64, S16}});
 +    B.unsupported();
 +  }
@@ -98,30 +101,34 @@ index eb56ca2608ad..522d5cea6bbb 100644
 +    auto &B = getActionDefinitionsBuilder(G_UNMERGE_VALUES)
 +                  .legalForCartesianProduct({S8, PZ}, {S16, P});
 +    if (STI.hasAccum16())
-+      // {S16,S32} 2x s16<-s32 is the direct legal form; {S8,S32} is a 4x s8<-s32
-+      // unmerge (e.g. the byte split inside an s32 ±1 add or an s32 shift>=8) that
-+      // the 2-dest selectUnmergeValues can't take — custom-rewrite it into the legal
-+      // 2-level form (see legalizeUnmergeS32ToBytes). Mirror of the G_MERGE_VALUES rule.
-+      // {S32,S64} 2x s32<-s64 is the direct legal form; {S16,S64} is a 4x s16<-s64
-+      // unmerge (e.g. splitting a 64-bit value into 16-bit lanes) — custom-rewrite to
-+      // the 2-level form (see legalizeUnmergeS64ToWords). Mirror of the s32 case.
++      // {S16,S32} 2x s16<-s32 is the direct legal form; {S8,S32} is a 4x
++      // s8<-s32 unmerge (e.g. the byte split inside an s32 ±1 add or an s32
++      // shift>=8) that the 2-dest selectUnmergeValues can't take —
++      // custom-rewrite it into the legal 2-level form (see
++      // legalizeUnmergeS32ToBytes). Mirror of the G_MERGE_VALUES rule.
++      // {S32,S64} 2x s32<-s64 is the direct legal form; {S16,S64} is a 4x
++      // s16<-s64 unmerge (e.g. splitting a 64-bit value into 16-bit lanes) —
++      // custom-rewrite to the 2-level form (see legalizeUnmergeS64ToWords).
++      // Mirror of the s32 case.
 +      B.legalFor({{S16, S32}, {S32, S64}}).customFor({{S8, S32}, {S16, S64}});
 +    B.unsupported();
 +  }
  
    getActionDefinitionsBuilder(G_BSWAP)
        .customFor({S8})
-@@ -542,6 +578,18 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+@@ -545,6 +586,20 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
    case G_FREEZE:
      return legalizeToCopy(Helper, MRI, MI);
  
 +  case G_MERGE_VALUES:
-+    // customFor {S32,S8} (4x s8->s32) and {S64,S16} (4x s16->s64); pick by dest width.
++    // customFor {S32,S8} (4x s8->s32) and {S64,S16} (4x s16->s64); pick by dest
++    // width.
 +    if (MRI.getType(MI.getOperand(0).getReg()).getSizeInBits() == 64)
 +      return legalizeMergeS64FromWords(Helper, MRI, MI);
 +    return legalizeMergeS32FromBytes(Helper, MRI, MI);
 +  case G_UNMERGE_VALUES:
-+    // customFor {S8,S32} (4x s8<-s32) and {S16,S64} (4x s16<-s64); pick by source width.
++    // customFor {S8,S32} (4x s8<-s32) and {S16,S64} (4x s16<-s64); pick by
++    // source width.
 +    if (MRI.getType(MI.getOperand(MI.getNumOperands() - 1).getReg())
 +            .getSizeInBits() == 64)
 +      return legalizeUnmergeS64ToWords(Helper, MRI, MI);
@@ -130,15 +137,16 @@ index eb56ca2608ad..522d5cea6bbb 100644
    // Integer Operations
    case G_ADD:
    case G_SUB:
-@@ -638,6 +686,97 @@ static auto unmergeDefsSplitHigh(MachineInstr *MI) {
+@@ -641,6 +696,105 @@ static auto unmergeDefsSplitHigh(MachineInstr *MI) {
                       MI->getOperand(MI->getNumOperands() - 2)};
  }
  
-+// Native accumulator: a direct 4x s8 -> s32 G_MERGE_VALUES (only reached via customFor({S32,S8})
-+// under +mos-a16) — rewrite into the legal 2-level form so it routes through the
-+// s32-as-2x-s16 representation: merge(a,b)->s16, merge(c,d)->s16, then those ->s32.
-+// Both halves are legal (legalForCartesianProduct {S16,S8}; legalFor {S32,S16}) and the
-+// artifact combiner folds them against feeding unmerges. selectMergeValues only takes a
++// Native accumulator: a direct 4x s8 -> s32 G_MERGE_VALUES (only reached via
++// customFor({S32,S8}) under +mos-a16) — rewrite into the legal 2-level form so
++// it routes through the s32-as-2x-s16 representation: merge(a,b)->s16,
++// merge(c,d)->s16, then those ->s32. Both halves are legal
++// (legalForCartesianProduct {S16,S8}; legalFor {S32,S16}) and the artifact
++// combiner folds them against feeding unmerges. selectMergeValues only takes a
 +// 2-source merge, so the 4-source form must be split here, not selected.
 +bool MOSLegalizerInfo::legalizeMergeS32FromBytes(LegalizerHelper &Helper,
 +                                                 MachineRegisterInfo &MRI,
@@ -157,13 +165,15 @@ index eb56ca2608ad..522d5cea6bbb 100644
 +  return true;
 +}
 +
-+// Native accumulator: a direct 4x s8 <- s32 G_UNMERGE_VALUES (only reached via customFor({S8,S32})
-+// under +mos-a16) — the symmetric inverse of legalizeMergeS32FromBytes. Rewrite it into
-+// the legal 2-level form so it routes through the s32-as-2x-s16 representation: unmerge
-+// the s32 into two s16 words (legal {S16,S32}), then unmerge each word into two s8 bytes
-+// (legal {S8,S16}), reusing the four original byte def regs. selectUnmergeValues only
-+// takes a 2-dest unmerge, so the 4-dest form must be split here, not selected. Building
-+// only unmerges (no new merge) cannot create a merge<->unmerge artifact-combine loop.
++// Native accumulator: a direct 4x s8 <- s32 G_UNMERGE_VALUES (only reached via
++// customFor({S8,S32}) under +mos-a16) — the symmetric inverse of
++// legalizeMergeS32FromBytes. Rewrite it into the legal 2-level form so it
++// routes through the s32-as-2x-s16 representation: unmerge the s32 into two s16
++// words (legal {S16,S32}), then unmerge each word into two s8 bytes (legal
++// {S8,S16}), reusing the four original byte def regs. selectUnmergeValues only
++// takes a 2-dest unmerge, so the 4-dest form must be split here, not selected.
++// Building only unmerges (no new merge) cannot create a merge<->unmerge
++// artifact-combine loop.
 +bool MOSLegalizerInfo::legalizeUnmergeS32ToBytes(LegalizerHelper &Helper,
 +                                                 MachineRegisterInfo &MRI,
 +                                                 MachineInstr &MI) const {
@@ -173,7 +183,8 @@ index eb56ca2608ad..522d5cea6bbb 100644
 +  Register D1 = MI.getOperand(1).getReg();
 +  Register D2 = MI.getOperand(2).getReg();
 +  Register D3 = MI.getOperand(3).getReg();
-+  Register Src = MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
++  Register Src =
++      MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
 +  auto Words = Builder.buildUnmerge(S16, Src);     // s32 -> Lo:s16, Hi:s16
 +  Builder.buildUnmerge({D0, D1}, Words.getReg(0)); // Lo -> D0, D1
 +  Builder.buildUnmerge({D2, D3}, Words.getReg(1)); // Hi -> D2, D3
@@ -181,11 +192,12 @@ index eb56ca2608ad..522d5cea6bbb 100644
 +  return true;
 +}
 +
-+// Native accumulator: a direct 4x s16 -> s64 G_MERGE_VALUES (only reached via customFor({S64,S16})
-+// under +mos-a16) — the s64 analogue of legalizeMergeS32FromBytes, one level up: merge each
-+// pair of s16 words into an s32 (legal {S32,S16}), then merge the two s32 halves into the s64
-+// (legal {S64,S32}). selectMergeValues only takes a 2-source merge, so the 4-source form must be
-+// split here, not selected.
++// Native accumulator: a direct 4x s16 -> s64 G_MERGE_VALUES (only reached via
++// customFor({S64,S16}) under +mos-a16) — the s64 analogue of
++// legalizeMergeS32FromBytes, one level up: merge each pair of s16 words into an
++// s32 (legal {S32,S16}), then merge the two s32 halves into the s64 (legal
++// {S64,S32}). selectMergeValues only takes a 2-source merge, so the 4-source
++// form must be split here, not selected.
 +bool MOSLegalizerInfo::legalizeMergeS64FromWords(LegalizerHelper &Helper,
 +                                                 MachineRegisterInfo &MRI,
 +                                                 MachineInstr &MI) const {
@@ -203,11 +215,13 @@ index eb56ca2608ad..522d5cea6bbb 100644
 +  return true;
 +}
 +
-+// Native accumulator: a direct 4x s16 <- s64 G_UNMERGE_VALUES (only reached via customFor({S16,S64})
-+// under +mos-a16) — the symmetric inverse of legalizeMergeS64FromWords, and the s64 analogue of
-+// legalizeUnmergeS32ToBytes: unmerge the s64 into two s32 halves (legal {S32,S64}), then unmerge
-+// each half into two s16 words (legal {S16,S32}), reusing the four original word def regs.
-+// selectUnmergeValues only takes a 2-dest unmerge, so the 4-dest form must be split here.
++// Native accumulator: a direct 4x s16 <- s64 G_UNMERGE_VALUES (only reached via
++// customFor({S16,S64}) under +mos-a16) — the symmetric inverse of
++// legalizeMergeS64FromWords, and the s64 analogue of legalizeUnmergeS32ToBytes:
++// unmerge the s64 into two s32 halves (legal {S32,S64}), then unmerge each half
++// into two s16 words (legal {S16,S32}), reusing the four original word def
++// regs. selectUnmergeValues only takes a 2-dest unmerge, so the 4-dest form
++// must be split here.
 +bool MOSLegalizerInfo::legalizeUnmergeS64ToWords(LegalizerHelper &Helper,
 +                                                 MachineRegisterInfo &MRI,
 +                                                 MachineInstr &MI) const {
@@ -217,7 +231,8 @@ index eb56ca2608ad..522d5cea6bbb 100644
 +  Register D1 = MI.getOperand(1).getReg();
 +  Register D2 = MI.getOperand(2).getReg();
 +  Register D3 = MI.getOperand(3).getReg();
-+  Register Src = MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
++  Register Src =
++      MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
 +  auto Halves = Builder.buildUnmerge(S32, Src);     // s64 -> Lo:s32, Hi:s32
 +  Builder.buildUnmerge({D0, D1}, Halves.getReg(0)); // Lo -> D0, D1
 +  Builder.buildUnmerge({D2, D3}, Halves.getReg(1)); // Hi -> D2, D3
@@ -229,24 +244,32 @@ index eb56ca2608ad..522d5cea6bbb 100644
                                        MachineRegisterInfo &MRI,
                                        MachineInstr &MI) const {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-index b979eea6c2b4..9c308482a1e2 100644
+index 12f36c429637..0df1a74b6fac 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-@@ -38,6 +38,18 @@ public:
+@@ -38,6 +38,26 @@ public:
                           MachineInstr &MI) const;
  
  private:
-+  // Native accumulator: 4x s8 -> s32 G_MERGE_VALUES -> legal 2-level (2x s16) form.
-+  bool legalizeMergeS32FromBytes(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++  // Native accumulator: 4x s8 -> s32 G_MERGE_VALUES -> legal 2-level (2x s16)
++  // form.
++  bool legalizeMergeS32FromBytes(LegalizerHelper &Helper,
++                                 MachineRegisterInfo &MRI,
 +                                 MachineInstr &MI) const;
-+  // Native accumulator: 4x s8 <- s32 G_UNMERGE_VALUES -> legal 2-level (2x s16) form (mirror).
-+  bool legalizeUnmergeS32ToBytes(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++  // Native accumulator: 4x s8 <- s32 G_UNMERGE_VALUES -> legal 2-level (2x s16)
++  // form (mirror).
++  bool legalizeUnmergeS32ToBytes(LegalizerHelper &Helper,
++                                 MachineRegisterInfo &MRI,
 +                                 MachineInstr &MI) const;
-+  // Native accumulator: 4x s16 -> s64 G_MERGE_VALUES -> legal 2-level (2x s32) form (one level up).
-+  bool legalizeMergeS64FromWords(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++  // Native accumulator: 4x s16 -> s64 G_MERGE_VALUES -> legal 2-level (2x s32)
++  // form (one level up).
++  bool legalizeMergeS64FromWords(LegalizerHelper &Helper,
++                                 MachineRegisterInfo &MRI,
 +                                 MachineInstr &MI) const;
-+  // Native accumulator: 4x s16 <- s64 G_UNMERGE_VALUES -> legal 2-level (2x s32) form (mirror).
-+  bool legalizeUnmergeS64ToWords(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++  // Native accumulator: 4x s16 <- s64 G_UNMERGE_VALUES -> legal 2-level (2x
++  // s32) form (mirror).
++  bool legalizeUnmergeS64ToWords(LegalizerHelper &Helper,
++                                 MachineRegisterInfo &MRI,
 +                                 MachineInstr &MI) const;
    // Integer Extension and Truncation
    bool legalizeAnyExt(LegalizerHelper &Helper, MachineRegisterInfo &MRI,

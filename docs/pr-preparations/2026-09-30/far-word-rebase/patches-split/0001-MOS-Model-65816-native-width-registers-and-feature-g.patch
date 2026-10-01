@@ -1,7 +1,7 @@
-From 45bc97d89c6a603008894622970ee2524fef68e7 Mon Sep 17 00:00:00 2001
+From e8441515e0092dbc39a96be81c3aea120704c8a1 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 01/36] [MOS] Model 65816 native-width registers and feature
+Subject: [PATCH 01/37] [MOS] Model 65816 native-width registers and feature
  gates
 
 Add two opt-in subtarget features for the WDC 65816: mos-a16 selects 16-bit accumulator codegen, and mos-xy16 selects 16-bit index registers and implies mos-a16. No CPU implies either feature.
@@ -23,10 +23,10 @@ Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
  llvm/lib/Target/MOS/MOSFeatures.td            |  16 +++
  llvm/lib/Target/MOS/MOSRegisterBanks.td       |   5 +-
  llvm/lib/Target/MOS/MOSRegisterInfo.td        |  38 ++++++
- llvm/lib/Target/MOS/MOSSubtarget.h            |   8 ++
+ llvm/lib/Target/MOS/MOSSubtarget.h            |  10 ++
  .../MOS/native-width-default-pressure.ll      | 124 ++++++++++++++++++
  .../CodeGen/MOS/native-width-registers.mir    |  28 ++++
- 6 files changed, 218 insertions(+), 1 deletion(-)
+ 6 files changed, 220 insertions(+), 1 deletion(-)
  create mode 100644 llvm/test/CodeGen/MOS/native-width-default-pressure.ll
  create mode 100644 llvm/test/CodeGen/MOS/native-width-registers.mir
 
@@ -124,23 +124,25 @@ index 5d4b239d1f3d..52d4cbc453be 100644
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
  let isPressureFineGrained = true in {
 diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
-index 6d303255c67f..5cb39f7dfefe 100644
+index 6d303255c67f..aaac0ceb50bb 100644
 --- a/llvm/lib/Target/MOS/MOSSubtarget.h
 +++ b/llvm/lib/Target/MOS/MOSSubtarget.h
-@@ -115,6 +115,12 @@ public:
+@@ -115,6 +115,14 @@ public:
    bool hasJMPIdxIndir() const { return has65C02() || hasSPC700(); }
    bool staticStack() const { return StaticStack; }
  
-+  // Native widths: opt-in 16-bit accumulator mode (REP/SEP-bracketed 16-bit-A codegen).
++  // Native widths: opt-in 16-bit accumulator mode (REP/SEP-bracketed 16-bit-A
++  // codegen).
 +  bool hasAccum16() const { return HasAccum16; }
 +
-+  // Native indices: opt-in 16-bit index register mode (REP/SEP-bracketed 16-bit-X/Y).
++  // Native indices: opt-in 16-bit index register mode (REP/SEP-bracketed
++  // 16-bit-X/Y).
 +  bool hasIndex16() const { return HasIndex16; }
 +
    bool hasW65816Or65EL02() const { return HasW65816Insns || Has65EL02Insns; }
  
  private:
-@@ -140,6 +146,8 @@ private:
+@@ -140,6 +148,8 @@ private:
  
    bool LongRegisterNames = false;
    bool StaticStack = false;

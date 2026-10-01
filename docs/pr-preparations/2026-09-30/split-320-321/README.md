@@ -1,6 +1,6 @@
 # #320/#321 split into reviewable commit series
 
-Status: split landed on branch `split-320-321` in `build/split-320-321/source` (a worktree of `.scratch/carry-clang-upstream/source`), head `1a616f08ea67`. Nothing is posted. On 2026‑09‑30 the series was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application): `GeneratePressureSet = 0` in #321‑1 and the pressure hooks with the `-O3` gate in #321‑8. Every commit hash changed, and every gate below was rerun on the new commits. On 2026‑10‑01 the far-prerequisite repairs (B1–B4, the B6 trunc pattern) and the N3/N4 cleanups were carried into the four #320 commits ([carry](#far-prerequisite-carry-2026-10-01)); the #321 and MC commits are unchanged. Contract: [the split plan](../../../plans/2026-09-30-split-320-321-series.md) and [the carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md). **Current #320 (2026‑10‑01, second round):** branch `split-320-321-r2`, nine commits on #594; see [Second round](#second-round-2026-10-01).
+Status: split landed on branch `split-320-321` in `build/split-320-321/source` (a worktree of `.scratch/carry-clang-upstream/source`), head `1a616f08ea67`. Nothing is posted. On 2026‑09‑30 the series was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application): `GeneratePressureSet = 0` in #321‑1 and the pressure hooks with the `-O3` gate in #321‑8. Every commit hash changed, and every gate below was rerun on the new commits. On 2026‑10‑01 the far-prerequisite repairs (B1–B4, the B6 trunc pattern) and the N3/N4 cleanups were carried into the four #320 commits ([carry](#far-prerequisite-carry-2026-10-01)); the #321 and MC commits are unchanged. Contract: [the split plan](../../../plans/2026-09-30-split-320-321-series.md) and [the carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md). **Current series (2026‑10‑01, third round):** branch `split-320-321-r3`, with every #321 commit rebuilt for N3/N4, llvm-mos#584 as its own commit after MC, and nine #320 commits on #594; see [Third round](#third-round-2026-10-01). The second-round #320 stays on `split-320-321-r2`.
 
 Attribution: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. Far-prerequisite carry: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Pressure-set regeneration: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F).
 
@@ -10,11 +10,14 @@ Attribution: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`c
 | [REVIEWER-MAP-320.md](REVIEWER-MAP-320.md) | 4 #320 commits, the #594 reconciliation point, and where the independent review's B1–B7/N3/N4 findings land |
 | [patches-321/](patches-321/) | `git format-patch` of the #321 series on `06bc967d2668` |
 | [patches-mc/](patches-mc/) | the two MC address-width commits, unchanged apart from their parent |
-| [patches-320/](patches-320/) | the #320 series, applied after `patches-mc/` |
+| [patches-584/](patches-584/) | llvm-mos#584 (our open upstream SPC700 late-opt fix), applied after `patches-mc/` |
+| [patches-320/](patches-320/) | the #320 series, applied after `patches-584/` |
 | [spec/](spec/) | everything needed to rebuild the series and its evidence (see [Reproducing](#reproducing)) |
 | [evidence/](evidence/) | per-commit suite summaries, default-mode comparisons, red/green proofs, invariant lists, and sha256 of the large logs |
 
 ## Chain
+
+Current (third round): `06bc967d2668` → #321 1–16 (`e8441515e009`..`2140dc93cb73`) → MC `6d8547b02580`, `ed90d3aabae7` → #584 `5f5d76c59fa9` → #320: #594 ×3 (`dec9150f0d0b`..`03cd24fdcb9f`) → `47e53302ee3f`..`36d569637f6a` (branch `split-320-321-r3`). The far-word packet continues to `f299b753f0d5` (branch `pkt-r3-far-word`). Earlier states:
 
 `06bc967d2668` → #321 1–16 (`45bc97d89c6a`..`aa868b952570`) → MC `3721ab9a5c0e` "Honor explicit address widths for constant operands" → MC `25c40909b44a` "Preserve long address widths in printed assembly" → #320 1–4 (`abfb29168fca`..`59d98c37ab77`, branch `split-320-321-carry`; before the carry `42785c3bef21`..`1a616f08ea67`, branch `split-320-321`). Current #320: #594 ×3 (`ad7b2f4239a2`..`fcb88211d861`) → `733b59e025ee`..`d19b7155d3c6` (branch `split-320-321-r2`); the reviewed carry `abfb29168fca`..`59d98c37ab77` stays on `split-320-321-carry`.
 
@@ -70,6 +73,27 @@ After the [second independent review](../far-word-rebase/independent-review-2.md
 | B8/B9 probes (second review) | no far probe fails the verifier on the new #320‑4 or packet; the spill assertion is gone; the near upstream shapes still fail, as recorded ([sweep](evidence/r2/b8-sweep.tsv)) |
 | Replay | the 58 far-word configurations give objects identical to the reviewed packet's ([comparison](../far-word-rebase/evidence/split-r2-replay.json)) |
 | N3/N4 | 0 clang-format lines in each of our commits; #594's register commit (unchanged) has 5; no history tags |
+
+## Third round (2026-10-01)
+
+After the [third independent review](../far-word-rebase/independent-review-3.md) ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#third-round-n17n22-and-the-older-open-items), [#320 map](REVIEWER-MAP-320.md), [#321 map](REVIEWER-MAP-321.md)):
+
+- **N17:** the SPC700 fix hidden in #320‑2 is our own open upstream PR [#584](https://github.com/llvm-mos/llvm-mos/pull/584). It is now its own commit, before #320, with #584's test ([record](../../../defects/mos-late-opt-nongpr-ldimm.json)). Every default-mode check now runs on all 14 MOS CPUs.
+- **N3/N4 in #321:** all 16 commits rebuilt; each differs from the one it replaces only in comments and whitespace plus one sorted `#include` ([check](evidence/r3/321-token-equal.txt)). Their output is identical to the old ones on all CPUs.
+- **N19–N22** in #320 ([findings table](REVIEWER-MAP-320.md#where-the-reviews-findings-land)); N1, N2, N3 (far-word 5 and 6), N5 and N8 in the far-word packet ([README](../far-word-rebase/README.md)).
+- **New, from the all-CPU check:** an upstream HuC6280 block-move miscompile that #321‑11 fixes as a side effect ([record](../../../defects/mos-huc-blockmove-frameindex-offset.json)), and an upstream SPC700 allocator assertion in 18 corpus inputs, still failing ([record](../../../defects/mos-spc700-hint-outside-order.json)). The #321‑3, #321‑11 and #321‑12 messages now state their effects on the other CPUs.
+
+| Gate | Result |
+|---|---|
+| Per commit: build, MOS CodeGen+MC, MOS warnings | All 37 commits and #584 alone on upstream pass; #321: 134 → 155, MC 158, 160, #584 161, #320: 161, 162, 167, 168, 169, 169, 175, 177, 179, far-word 181 → 190 (1 unsupported each); 0 MOS warnings ([stages](evidence/r3/stages.tsv)) |
+| Default mode, all 14 CPUs, each commit vs parent (O2) | Only the documented effects ([table](evidence/r3/default-all-cpus.txt)) |
+| #321 output | new #321 top vs the previous one: identical on all 1,260 input/CPU pairs |
+| Against the second round | far-word top: identical output everywhere; only the N20 errors differ (2 inputs × 13 CPUs). No level gate needed |
+| Round trip | 28 patches (`patches-321/`, `patches-mc/`, `patches-584/`, `patches-320/`) on `06bc967d2668` reproduce every commit tree; final tree `b3afcaba1e4a` ([log](evidence/r3/roundtrip.txt)) |
+| #594 carry | changed lines identical to the second round's (`bits<32>` the only adaptation) |
+| Red/green | see [table](evidence/r3/red-green.tsv) |
+| Near-index and 0065 packets on the new #321 | replayed (0065 with one conflict resolved to the patch's text); comment-stripped trees equal the previous ones except the sorted include; suites 157 and 158 pass |
+| Messages | final messages applied with `git commit-tree`; trees unchanged ([mapping](evidence/r3/final-map.tsv)) |
 
 ## Tests the split adds
 
@@ -157,7 +181,7 @@ Each was needed for a build or test gate, or to keep one concept per commit.
 - **Resolved: #321‑1 no longer changes default codegen** (pressure-set change, deviation 13; record [`mos-native-width-pressure-sets`](../../../defects/mos-native-width-pressure-sets.json)).
 - **Downstream `0002` does not carry the pressure-set change yet.** Applied downstream, the change grows default-mode code by 13,427 B (+0.58%) and native code by about 3 KB over 262 SNES sources at `-Os`, because the downstream carry scheduling (0064/0067, not in this series) relies on the Ac16/Xc16/Yc16-derived pressure sets. With carry scheduling off, the same change shrinks default code by 25,290 B. That is escalated for a user decision ([plan](../../../plans/2026-09-30-native-register-pressure-sets.md#application)).
 - **#594 (B7): decided and implemented** (option 1, second round). **B5: the RL numbering is escalated** again: the chosen formula gives `0x30080 + K`, inside the RS type range of the DWARF specification ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#594-carry-one-mechanical-adaptation-one-escalation)). The #594 coordination draft has suggested additions ([594-comment.md](../../2026-10-01/594-comment.md)).
-- **Review findings:** B1–B4, B6 and the #320 parts of N3 and N4 are fixed in the #320 commits ([status](REVIEWER-MAP-320.md#where-the-independent-reviews-findings-land)). N3 and N4 in the #321 commits (including the broken "(Native widths: )" in #321‑8) are not changed, so the near-index and 0065 packets keep their commits.
+- **Review findings:** B1–B4, B6 and the #320 parts of N3 and N4 are fixed in the #320 commits ([status](REVIEWER-MAP-320.md#where-the-independent-reviews-findings-land)). N3 and N4 in the #321 commits were fixed in the third round; the near-index and 0065 packets were replayed onto the rebuilt #321.
 - **0065 measurements** (replay, runtime, loaded pointer) were taken on its `26d7c2c1eebf` series and were not repeated on the split.
 - **Commits 5, 7 and 16 independence** from the rest of the series is by code inspection; they were built only in series order.
 

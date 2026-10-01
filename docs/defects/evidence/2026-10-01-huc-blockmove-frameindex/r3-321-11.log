@@ -1,0 +1,4 @@
+$ python3 build/split-320-321/spec/run-test-with.py build/split-320-321/llc/r3-321-11 docs/defects/evidence/2026-10-01-huc-blockmove-frameindex/blockmove-stack.ll
+# llc build/split-320-321/llc/r3-321-11 sha256 eb4183faa87e8e8d009f10dbb051cec4f695a3e43bf6a600062a05d8ee78a5d4
+PASS 
+exit_code=0

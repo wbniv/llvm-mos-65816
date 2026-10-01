@@ -1,0 +1,5 @@
+mos6502 bf-vm text 14024 -> 14032 (8)
+mosw65816 bf-vm text 13165 -> 13173 (8)
+mosw65816 metaball text 10946 -> 10947 (1)
+mosw65816 sodo text 10224 -> 10232 (8)
+mos65c02 bf-vm text 12989 -> 12997 (8)

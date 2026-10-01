@@ -1,0 +1,22 @@
+# r3-token-equal.py: each rebuilt #321 commit vs the commit it replaces (comments and whitespace stripped)
+#321-01 45bc97d89c6a -> e8441515e009: 1 files, 0 with code changes
+#321-02 793da9041cd3 -> faece4151665: 2 files, 0 with code changes
+#321-03 2d64d3c841ff -> a82001031ef0: 2 files, 0 with code changes
+#321-04 c5dfebbfbf55 -> c35f85eb80c3: 5 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-05 8eb8a6534bdf -> 947d14a8f5d1: 6 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-06 b86abf199cbb -> 91c59a2ac0f9: 8 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-07 ba6887cac12d -> 55b1f7dc043f: 8 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-08 c6337b5af878 -> 1441f6c69f0c: 12 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-09 56e6c7f91e9e -> 346ab9e781ae: 12 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-10 a520448a2c7f -> 975e7de69ed2: 13 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-11 9b471aa8df06 -> f88cf001c9d4: 14 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-12 497db2760440 -> 875c0217a7d6: 14 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-13 ef1fdd877206 -> c7819aef2575: 14 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-14 a6718b6f6560 -> 361c8dff9a18: 14 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-15 8db2e8118a70 -> 7404013e6546: 14 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+#321-16 aa868b952570 -> f5ffdf0d81ca: 15 files, 1 with code changes [ llvm/lib/Target/MOS/MOSTargetMachine.cpp ]
+
+# per-commit clang-format-diff lines (format-count.sh) and history-tag lines on the rebuilt commits
+321-01 0 321-02 0 321-03 0 321-04 0 321-05 0 321-06 0 321-07 0 321-08 0 321-09 0 321-10 0 321-11 0 321-12 0 321-13 0 321-14 0 321-15 0 321-16 0 
+(the only code-token difference, from #321-04 on, is the sorted #include "MOSInsertREPSEP.h" before "MOSInternalize.h" in MOSTargetMachine.cpp)
+history-tag lines added per rebuilt commit (regex #3NN|Increment N|Phase N|BN:|seed N|our new|(Native widths: )|the Native widths): 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 

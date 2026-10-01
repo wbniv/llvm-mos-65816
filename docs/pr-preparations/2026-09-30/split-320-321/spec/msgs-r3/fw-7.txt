@@ -1,0 +1,11 @@
+Select far extending-load addresses within the legalizer worklist
+
+Rebase downstream 0066 onto the pinned native/far compiler series.
+Original implementation, validation and review credits remain in the
+source patch and investigation at wbniv/llvm-mos-65816 c3a53aecbc48.
+
+Rebase preparation: OpenAI Codex CLI 0.157.1 (session source vscode),
+model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+
+

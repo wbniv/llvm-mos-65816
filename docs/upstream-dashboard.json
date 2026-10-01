@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "fbc220b2fbbb96b138b1c7ae5cbdd823ea25f880422c98f481ac4db0b10b531d",
+  "sourceHash": "4e3d18100e0d76010c9a0ecf27fe33195e78c368510deaa622d6ec180c2ebbc6",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -149,7 +149,7 @@
       "kind": "defect",
       "title": "Far addressing folds other than the runtime-index fold leave dangling DBG_VALUEs",
       "summary": "Three far addressing-mode folds erase or rewrite an access and leave the G_PTR_ADDs that computed its pointer with only debug uses: the absolute-long fold (tryFarAbsoluteAddressing, #320-2), the [dp],Y displacement window in tryFarIndirectIndexedAddressing (#320-4), and the absolute-long indexed fold (tryFarAbsoluteIndexedAddressing, far-word patch 5 / downstream 0061). The legalizer erases the dead adds; salvageDebugInfoForDbgValue cannot express a G_PTR_ADD and leaves the DBG_VALUE on the erased register, which DetectDeadLanes marks undef, so -g with -verify-machineinstrs fails (\"Generic virtual register use cannot be undef\"). The simplest -g far field access (base + 1) fails at O0 and O2 on the reviewed split and on the downstream release toolchain. Emitted code is unaffected. This is the mechanism of mos-far-index-fold-dangling-dbg (B4) at the fold sites its repair did not cover.",
-      "localStatus": "qualified",
+      "localStatus": "fixed",
       "publicationStatus": "unknown",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-fold-dangling-dbg-sites.json"
@@ -269,6 +269,22 @@
       "demoUrls": []
     },
     {
+      "id": "defect:mos-huc-blockmove-frameindex-offset",
+      "kind": "defect",
+      "title": "HuC6280 block moves into a stack object get the block length as their destination offset",
+      "summary": "Upstream MOSRegisterInfo::eliminateFrameIndex adds the immediate operand that follows a frame index as its displacement. The HuC6280 HuCMemcpy pseudo (src, dst, length, descending) has its length right after the destination frame index, so a block move into a stack object gets length instead of the operand's own offset: a 32-byte constant copied into a local array becomes `tii line,sstk+16,#16; tii line+16,sstk+16,#16`, which writes the first half over the second and leaves bytes 0-15 unset. Silent wrong code on moshuc6280 at -O2 on upstream main 06bc967d2668 (two corpus inputs of the default-mode set change, cardioid and mvscrl). The #321 split commit 'Select native 16-bit compares and fused branches' (#321-11) replaces the heuristic with a per-opcode rule for its own CmpBrAbsImm16 pseudo and fixes this as a side effect; that commit's plan claimed no default-mode effect. Upstream is not fixed.",
+      "localStatus": "qualified",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-huc-blockmove-frameindex-offset.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
+      "demoUrls": []
+    },
+    {
       "id": "defect:mos-imag32-reserved-pair-units",
       "kind": "defect",
       "title": "Unreserved Imag32 quads over reserved pairs make calls with stack arguments abort",
@@ -277,6 +293,22 @@
       "publicationStatus": "unknown",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-imag32-reserved-pair-units.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-late-opt-nongpr-ldimm",
+      "kind": "defect",
+      "title": "mos-late-opt dereferences a null tracker on an SPC700 LDImm into an imaginary register",
+      "summary": "MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On current upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The fix is our own open upstream PR #584 (restrict the immediate-load folding to GPR destinations), carried downstream as patch 0003 and, since the third round, as its own commit in the #320/#321 split series ahead of #320. Upstream is not fixed until #584 merges, so the status stays confirmed.",
+      "localStatus": "qualified",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-late-opt-nongpr-ldimm.json"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -439,6 +471,22 @@
       "evidenceNote": "",
       "dependsOn": [],
       "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-spc700-hint-outside-order",
+      "kind": "defect",
+      "title": "SPC700 greedy allocation asserts on a copy hint outside the allocation order",
+      "summary": "On upstream main 06bc967d2668 with assertions, -mcpu=mosspc700 -O2 aborts in the Greedy Register Allocator with \"Target hint is outside allocation order\" on 18 of the 52 corpus IRs of the series' default-mode set (boids, bf-vm, cardioid, mvscrl, ...). MOSRegisterInfo::getRegAllocationHints offers a strong copy hint that the SPC700 allocation order of the class does not contain. Upstream plus #584 still aborts the same way. The #320 split's 1c commit filters a strong hint that is not in the order (added for the empty Imag32 order on non-65816 CPUs); on SPC700 that turns this assertion into \"ran out of registers during register allocation\" followed by an abort in the Virtual Register Rewriter, so the inputs still fail. Not fixed; root cause in the SPC700 orders not traced.",
+      "localStatus": "qualified",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-spc700-hint-outside-order.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -670,7 +718,7 @@
       "localStatus": "in-progress",
       "publicationStatus": "unposted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/320",
-      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. #320/#321 are now split into reviewable commit series (docs/pr-preparations/2026-09-30/split-320-321); repair those findings on that series, then re-review.",
+      "nextStep": "Split into reviewable #321 and #320 series (docs/pr-preparations/2026-09-30/split-320-321) built on mlund's #594. Three independent reviews' findings are fixed through the October 1 third round; filing waits on mlund's answers on #594 (RL DWARF numbering, the reservation fix) and a final check.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/320-upstream-far-pointer-note.md",
@@ -690,7 +738,7 @@
       "localStatus": "in-progress",
       "publicationStatus": "unposted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/321",
-      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. #320/#321 are now split into reviewable commit series (docs/pr-preparations/2026-09-30/split-320-321); repair those findings on that series, then re-review.",
+      "nextStep": "Split into reviewable #321 and #320 series (docs/pr-preparations/2026-09-30/split-320-321) built on mlund's #594. Three independent reviews' findings are fixed through the October 1 third round; filing waits on mlund's answers on #594 (RL DWARF numbering, the reservation fix) and a final check.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/321-upstream-native-width-pr.md",

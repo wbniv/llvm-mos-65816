@@ -1,4 +1,4 @@
-From aa868b9525705f8612cd316a3e5c86d500b2bcc1 Mon Sep 17 00:00:00 2001
+From 2140dc93cb73cd97491143d30caa0ca39733b7d4 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 16/16] [MOS] Preserve interrupted M/X state in 65816 interrupt
@@ -17,16 +17,16 @@ Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
 ---
- llvm/lib/Target/MOS/MOSFrameLowering.cpp      | 44 +++++++++++++++++++
- .../test/CodeGen/MOS/interrupt-width-65816.ll | 34 ++++++++++++++
- 2 files changed, 78 insertions(+)
+ llvm/lib/Target/MOS/MOSFrameLowering.cpp      | 42 +++++++++++++++++++
+ .../test/CodeGen/MOS/interrupt-width-65816.ll | 34 +++++++++++++++
+ 2 files changed, 76 insertions(+)
  create mode 100644 llvm/test/CodeGen/MOS/interrupt-width-65816.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSFrameLowering.cpp b/llvm/lib/Target/MOS/MOSFrameLowering.cpp
-index cd0d8fae27c1..204cb37d5623 100644
+index cd0d8fae27c1..a915d7646dce 100644
 --- a/llvm/lib/Target/MOS/MOSFrameLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSFrameLowering.cpp
-@@ -285,6 +285,38 @@ void MOSFrameLowering::emitPrologue(MachineFunction &MF,
+@@ -285,6 +285,36 @@ void MOSFrameLowering::emitPrologue(MachineFunction &MF,
    const TargetRegisterInfo &TRI = *MF.getRegInfo().getTargetRegisterInfo();
    MachineIRBuilder Builder(MBB, MBB.begin());
  
@@ -47,8 +47,7 @@ index cd0d8fae27c1..204cb37d5623 100644
 +  if (isISR(MF) && MF.getSubtarget<MOSSubtarget>().hasW65816()) {
 +    const TargetInstrInfo &TII = *MF.getSubtarget().getInstrInfo();
 +    auto Entry = MBB.begin();
-+    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::REP_Immediate))
-+        .addImm(0x30);
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::REP_Immediate)).addImm(0x30);
 +    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHA_Implied));
 +    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHX_Implied));
 +    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHY_Implied));
@@ -58,14 +57,13 @@ index cd0d8fae27c1..204cb37d5623 100644
 +    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PLD_Implied));
 +    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHK_Implied));
 +    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PLB_Implied));
-+    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::SEP_Immediate))
-+        .addImm(0x30);
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::SEP_Immediate)).addImm(0x30);
 +  }
 +
    // Stack pointer adjustments need to occur after the CLD in an interrupt
    // handler or the sum might be incorrect.
    for (MachineInstr &MI : MBB)
-@@ -346,6 +378,18 @@ void MOSFrameLowering::emitEpilogue(MachineFunction &MF,
+@@ -346,6 +376,18 @@ void MOSFrameLowering::emitEpilogue(MachineFunction &MF,
    // If soft stack is used, increase the soft stack pointer SP.
    if (StackSize)
      offsetSP(Builder, StackSize);

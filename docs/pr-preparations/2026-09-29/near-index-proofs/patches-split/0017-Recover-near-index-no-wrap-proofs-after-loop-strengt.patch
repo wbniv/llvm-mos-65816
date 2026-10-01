@@ -1,4 +1,4 @@
-From 5ce81a01e46512750440a191bcd65b01dfd54f28 Mon Sep 17 00:00:00 2001
+From 7d6560bd0254d81113517e8b8bacb27bb2801c7f Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Tue, 29 Sep 2026 19:44:55 +0700
 Subject: [PATCH 17/17] Recover near-index no-wrap proofs after loop strength
@@ -191,7 +191,7 @@ index 000000000000..d709887f39e9
 +
 +#endif // not LLVM_LIB_TARGET_MOS_MOSRECOVERNEARNOWRAP_H
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index bdee4974c55f..6f38d9c25831 100644
+index b52eff729a2c..effbefe0d172 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 +++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 @@ -30,6 +30,7 @@

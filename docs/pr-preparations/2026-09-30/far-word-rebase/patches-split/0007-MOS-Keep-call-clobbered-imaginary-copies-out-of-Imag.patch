@@ -1,7 +1,7 @@
-From ba6887cac12db842a3e47e3fd6ee9bee78c725c1 Mon Sep 17 00:00:00 2001
+From 25e5dba45c103520b0f2ed209f8a84b6f2993854 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 07/36] [MOS] Keep call-clobbered imaginary copies out of
+Subject: [PATCH 07/37] [MOS] Keep call-clobbered imaginary copies out of
  Imag16 pairs
 
 Refuse to coalesce a sub-register copy into an Imag16 pair when one side is a virtual register whose only definition is `COPY $rcN` and that register is live across a call whose regmask clobbers $rcN. The pair would inherit the $rcN allocation hint and could be re-bound to $rcN across the clobbering call, leaving a use with no reaching definition that the machine verifier rejects. Keeping the COPY gives the value its own spillable register.
@@ -19,13 +19,13 @@ Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
 ---
- llvm/lib/Target/MOS/MOSRegisterInfo.cpp       | 51 +++++++++++++++++
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp       | 54 ++++++++++++++++++
  .../MOS/coalesce-call-clobbered-imag.mir      | 57 +++++++++++++++++++
- 2 files changed, 108 insertions(+)
+ 2 files changed, 111 insertions(+)
  create mode 100644 llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir
 
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 8abc01658afa..d02c88c15874 100644
+index c08c9e4340b6..85703af737af 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -20,8 +20,10 @@
@@ -39,23 +39,24 @@ index 8abc01658afa..d02c88c15874 100644
  #include "llvm/CodeGen/LivePhysRegs.h"
  #include "llvm/CodeGen/MachineBasicBlock.h"
  #include "llvm/CodeGen/MachineFrameInfo.h"
-@@ -906,12 +908,61 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
+@@ -911,12 +913,64 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
    return true;
  }
  
-+// True if the virtual register Reg's unique definition is a COPY *directly* out of a
-+// physical imaginary register ($rcN) — `Reg = COPY $rcN` — and Reg is live across a
-+// call that clobbers that same $rcN.
++// True if the virtual register Reg's unique definition is a COPY *directly* out
++// of a physical imaginary register ($rcN) — `Reg = COPY $rcN` — and Reg is live
++// across a call that clobbers that same $rcN.
 +//
-+// $rcN are the calling convention's imaginary (zero-page) argument/return scratch: a
-+// libcall passes and returns values in them and clobbers them (via the call's
-+// regmask). A `Reg = COPY $rcN` reading such a return value hints Reg back to $rcN.
-+// If Reg is then folded into an imaginary-register *pair* (a sub-register copy
-+// building an Imag16) that outlives a libcall re-clobbering $rcN, the pair inherits
-+// the $rcN hint and the allocator re-binds it to $rcN across the clobber — leaving a
-+// use of $rcN with no reaching definition on that path. The value survives in $rcN at
-+// runtime so the code is correct, but the IR is ill-formed and the MachineVerifier
-+// rejects it ("Using an undefined physical register") — a latent miscompile hazard.
++// $rcN are the calling convention's imaginary (zero-page) argument/return
++// scratch: a libcall passes and returns values in them and clobbers them (via
++// the call's regmask). A `Reg = COPY $rcN` reading such a return value hints
++// Reg back to $rcN. If Reg is then folded into an imaginary-register *pair* (a
++// sub-register copy building an Imag16) that outlives a libcall re-clobbering
++// $rcN, the pair inherits the $rcN hint and the allocator re-binds it to $rcN
++// across the clobber — leaving a use of $rcN with no reaching definition on
++// that path. The value survives in $rcN at runtime so the code is correct, but
++// the IR is ill-formed and the MachineVerifier rejects it ("Using an undefined
++// physical register") — a latent miscompile hazard.
 +static bool copiedFromClobberedPhysImag(Register Reg,
 +                                        const MachineRegisterInfo &MRI,
 +                                        LiveIntervals &LIS) {
@@ -79,19 +80,21 @@ index 8abc01658afa..d02c88c15874 100644
    const auto &MRI = MI->getMF()->getRegInfo();
  
 +  // Don't fold a value read straight out of a call-clobbered imaginary register
-+  // ($rcN, via `vreg = COPY $rcN`) into an imaginary-register *pair* (a sub-register
-+  // copy that builds an Imag16) when that value outlives the clobbering call. The
-+  // pair inherits the physical-$rcN allocation hint and the allocator re-binds it to
-+  // $rcN across the clobber, producing a disconnected def->use the MachineVerifier
-+  // rejects ("Using an undefined physical register") — a latent miscompile hazard.
-+  // Refusing keeps the COPY so the value gets its own spillable vreg.
++  // ($rcN, via `vreg = COPY $rcN`) into an imaginary-register *pair* (a
++  // sub-register copy that builds an Imag16) when that value outlives the
++  // clobbering call. The pair inherits the physical-$rcN allocation hint and
++  // the allocator re-binds it to $rcN across the clobber, producing a
++  // disconnected def->use the MachineVerifier rejects ("Using an undefined
++  // physical register") — a latent miscompile hazard. Refusing keeps the COPY
++  // so the value gets its own spillable vreg.
 +  //
 +  // Narrowly gated to stay inert on the common case: it requires (1) a *direct*
-+  // `vreg = COPY $rcN` read (unique def), (2) that vreg genuinely live across a call
-+  // clobbering $rcN, and (3) a sub-register copy into an Imag16 pair — the exact shape
-+  // that re-creates the re-bindable hint. It only ever keeps an extra COPY, never
-+  // changing correctness. Pure virtual values without a physical-register COPY
-+  // do not satisfy this guard; their call-clobber constraints belong to allocation.
++  // `vreg = COPY $rcN` read (unique def), (2) that vreg genuinely live across a
++  // call clobbering $rcN, and (3) a sub-register copy into an Imag16 pair — the
++  // exact shape that re-creates the re-bindable hint. It only ever keeps an
++  // extra COPY, never changing correctness. Pure virtual values without a
++  // physical-register COPY do not satisfy this guard; their call-clobber
++  // constraints belong to allocation.
 +  if (NewRC == &MOS::Imag16RegClass && (DstSubReg || SubReg)) {
 +    if (copiedFromClobberedPhysImag(MI->getOperand(0).getReg(), MRI, LIS) ||
 +        copiedFromClobberedPhysImag(MI->getOperand(1).getReg(), MRI, LIS))

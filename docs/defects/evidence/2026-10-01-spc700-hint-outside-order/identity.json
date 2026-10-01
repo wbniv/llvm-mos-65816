@@ -1,0 +1,27 @@
+{
+ "p-321-00": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00",
+  "source_commit": "06bc967d2668 (upstream main)",
+  "sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7"
+ },
+ "r3-584-up": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-584-up",
+  "source_commit": "95e066056667 (upstream + #584)",
+  "sha256": "c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03"
+ },
+ "r3-320-1b": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-320-1b",
+  "source_commit": "47e53302ee3f (#320-1b)",
+  "sha256": "00d1c26b26e1cb4a5236c04796653f75a49b4c13c5b7db07c2fc9480bc8f98b7"
+ },
+ "r3-320-1c": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-320-1c",
+  "source_commit": "1a49ff6be74c (#320-1c, strong-hint filter)",
+  "sha256": "9fb1460ef4d1c9e4f61ff83a398861704220295eeac927ec4a1489057e34432f"
+ },
+ "r3-fw-14": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-fw-14",
+  "source_commit": "f299b753f0d5 (series top)",
+  "sha256": "48a0c0891b4847466fd80d1dc47d678b6b8de8f981ae9eb3da3702a92e279f71"
+ }
+}

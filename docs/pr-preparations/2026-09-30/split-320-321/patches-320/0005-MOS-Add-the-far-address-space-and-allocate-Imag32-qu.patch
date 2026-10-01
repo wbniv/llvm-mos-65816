@@ -1,4 +1,4 @@
-From dcb9d3227be9feb5504e3582c2c805c45265af54 Mon Sep 17 00:00:00 2001
+From 1a49ff6be74cc4e9954d062575f0c97576de16b2 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 5/9] [MOS] Add the far address space and allocate Imag32 quads
@@ -10,7 +10,9 @@ A runtime far pointer lives in an Imag32 quad, the RL register family of the pre
 
 Calls: where quads are allocatable, a far pointer argument is assigned to RL1-RL3; a far pointer that finds no free quad, and every far pointer on other CPUs, goes to a 4-byte stack slot. It never falls through to the generic pointer rule, whose 16-bit RS pair cannot hold it. The calling-convention type of a far pointer is i32, and incoming 32-bit values are accepted.
 
-Default-mode effect: the data layout string gains p2:32:8 for every MOS CPU. Generated code for the fixed input set is identical in mos6502 and mosw65816 (assembly and objects).
+Address space 2 changes meaning on every MOS CPU. Upstream has no p2 entry in the data layout, so an addrspace(2) pointer there is a 16-bit pointer like any other. With this commit it is a 32-bit far pointer on every MOS CPU, not only the 65816: IR that used addrspace(2) for some other purpose now gets 32-bit pointers, and on CPUs without the 65816 the next commit rejects far accesses and far pointer values with far-specific errors.
+
+Default-mode effect: the data layout string gains p2:32:8 for every MOS CPU. Generated code for the fixed input set is identical on all 14 MOS CPUs (assembly and objects). On mosspc700, 18 corpus inputs that already abort upstream in the greedy allocator ("Target hint is outside allocation order", record mos-spc700-hint-outside-order) fail differently: the strong-hint filter turns the assertion into "ran out of registers during register allocation" followed by an abort in the virtual register rewriter.
 
 Tests: imag32-allocation-gate.mir checks that the 65816 allocates a quad and that mos6502 reports that no register is available, with no hint from a quad outside the order; it replaces #594's imag32-nonalloc.mir, whose non-allocatable class this commit changes. far-ptr-arg-exhaustion.ll checks call lowering for a fourth far pointer and for near/far interleavings in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16, and that mos6502 passes every far pointer on the stack. Nothing produces address space 2 values until the next commits.
 
@@ -141,10 +143,10 @@ index d7e981ef61dc..eeea52ad87a5 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 09d3c79821df..74ae5cbbc53c 100644
+index b0e5b0cf1b95..6c1e9a8eb3d5 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -1173,7 +1173,10 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+@@ -1182,7 +1182,10 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
  
    if (std::optional<Register> StrongHint =
            getStrongCopyHint(VirtReg, MF, VRM)) {
@@ -184,7 +186,7 @@ index b2905b948aa3..892dcb2f6ff2 100644
  // The native-width classes below are opt-in and must not create register
  // pressure sets: MachineLICM, MachineSink and the scheduler read the pressure
 diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
-index 5cb39f7dfefe..1eff61e60b42 100644
+index aaac0ceb50bb..7d817866b9d4 100644
 --- a/llvm/lib/Target/MOS/MOSSubtarget.h
 +++ b/llvm/lib/Target/MOS/MOSSubtarget.h
 @@ -102,6 +102,13 @@ public:
@@ -202,7 +204,7 @@ index 5cb39f7dfefe..1eff61e60b42 100644
    bool has65CE02() const { return Has65CE02Insns; }
    bool hasHUC6280() const { return HasHUC6280Insns; }
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index bdee4974c55f..73e853b1de48 100644
+index b52eff729a2c..7e1559cb5b9d 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 +++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 @@ -87,7 +87,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {

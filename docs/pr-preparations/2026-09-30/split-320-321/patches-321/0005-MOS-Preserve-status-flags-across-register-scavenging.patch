@@ -1,4 +1,4 @@
-From 8eb8a6534bdf5fe93d9eedd0dd4ff2aacc28c493 Mon Sep 17 00:00:00 2001
+From ff8b09f53b78bbb2060c9c8f9e1a1f617abcc52f Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 05/16] [MOS] Preserve status flags across register scavenging
@@ -24,7 +24,7 @@ Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
  create mode 100644 llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index baf6de604cb7..91fc9e132cc3 100644
+index baf6de604cb7..694c31459cdb 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -141,23 +141,92 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
@@ -181,9 +181,9 @@ index baf6de604cb7..91fc9e132cc3 100644
 +    // The processor-status flags can be live across a scavenge point under
 +    // 16-bit-accumulator codegen: a 16-bit compare/ALU keeps N (or Z) live
 +    // across a frame-index materialization whose carry the scavenger must place
-+    // in $c (a sub-register of $p), forcing the whole $p to be preserved. Unlike
-+    // A/Y (restored via LD/PL, which only transiently set N/Z), the P restore
-+    // must reproduce *all* of P exactly.
++    // in $c (a sub-register of $p), forcing the whole $p to be preserved.
++    // Unlike A/Y (restored via LD/PL, which only transiently set N/Z), the P
++    // restore must reproduce *all* of P exactly.
 +    //
 +    // The scavenger borrows $c (a sub-register of $p) for a frame-index carry,
 +    // which forces the whole $p to be preserved even where $p carries no live

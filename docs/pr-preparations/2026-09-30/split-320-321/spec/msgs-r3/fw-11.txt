@@ -1,0 +1,41 @@
+Preserve undefined lane definitions in identity copies
+
+Reuse the prepared 0028 extraction as a compiler prerequisite. The
+far-word boundary workload reaches its existing identity-copy lane
+contract in word_pressure. The missing-patch compiler and pre-rewriter
+MIR are retained; this is reconciliation of an existing root repair.
+
+Pristine destination still removes the allocated identity copy without
+remembering its undef-lane definition. Preserve the current
+readsUndefSubreg(MI, MO) interface and the prepared generic X86 regression.
+
+The change is kept minimal (independent review N2): copyHasUndefLanes()
+decides, before an instruction's operands are rewritten, whether a COPY's
+source has lanes that are not live there, and handleIdentityCopy() keeps
+such an identity copy as a KILL. The rewrite loop is otherwise unchanged.
+virtregrewriter-x86-undef-high-byte-result.mir is the regression test;
+virtregrewriter-x86-copy-contracts.mir characterizes the existing
+identity-copy contracts and passes without this change, as its header says.
+This generic VirtRegMap.cpp change needs its own llvm-project path or an
+explicit llvm-mos carry decision.
+
+Default-mode effect: unchanged from the reviewed patch. On the fixed input
+set, examples_snes_bf-vm changes on every MOS CPU except mosspc700 and
+mossweet16 (+8 bytes of .text on mos6502, mos65c02 and mosw65816: a kept
+lane definition becomes a register copy before two pair spills), and
+examples_snes_metaball (+1 byte) and examples_snes_sodo (+8 bytes) change
+on mosw65816.
+
+Prior extraction: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra,
+xhigh reasoning effort; session 01a0db16-f6a0-7e32-ada6-0c8098813933.
+Prior independent review: OpenAI Codex CLI 0.157.1, model gpt-6-astra,
+xhigh reasoning effort; session 01a0db96-a6cd-7800-82a5-6b871eb7e177.
+Reapplication and validation: OpenAI Codex CLI 0.157.1 (session source
+vscode), model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84. Earlier implementation credits
+remain in the canonical mos-coalescing-rc-undef record.
+
+Minimal form and test labels (review N2): Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F

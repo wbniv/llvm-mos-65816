@@ -1,0 +1,17 @@
+{
+ "r3-320-2": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-320-2",
+  "source_commit": "97a8af8303cc",
+  "sha256": "e49291d6da0fd4513c00a8eda919a5fd398d1a65fb1289e35acb1e07e3cfe9d9"
+ },
+ "r3-320-4": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-320-4",
+  "source_commit": "36d569637f6a",
+  "sha256": "841e20697a447c3e6bb31d4a256d21ec684c70216a8b39276a86ce69d2587598"
+ },
+ "r3-fw-14": {
+  "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/r3-fw-14",
+  "source_commit": "f299b753f0d5",
+  "sha256": "48a0c0891b4847466fd80d1dc47d678b6b8de8f981ae9eb3da3702a92e279f71"
+ }
+}

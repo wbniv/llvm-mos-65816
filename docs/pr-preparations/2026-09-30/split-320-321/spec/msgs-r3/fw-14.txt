@@ -1,0 +1,12 @@
+Assert shared base and index for mixed far loads
+
+Check both byte-first and word-first traversal orders. Each access must
+retain the same runtime base and narrowed offset, its volatile memory
+operand, and its width; the explicit wide pointer addition disappears.
+
+Preparation and validation: OpenAI Codex CLI 0.157.1 (session source
+vscode), model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+
+
+

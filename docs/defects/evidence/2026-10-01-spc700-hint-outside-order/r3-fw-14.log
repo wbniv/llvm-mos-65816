@@ -1,0 +1,31 @@
+$ build/split-320-321/llc/r3-fw-14 -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+# llc sha256 48a0c0891b4847466fd80d1dc47d678b6b8de8f981ae9eb3da3702a92e279f71
+error: <unknown>:0:0: ran out of registers during register allocation in function 'main'
+Remaining virtual register %2480...
+...in instruction: dead early-clobber %2480:imag16 = STStk killed renamable $rs2, %stack.0, 0 :: (store (s16) into %stack.0, align 1)
+
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/r3-fw-14 -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll'.
+2.	Running pass 'Virtual Register Rewriter' on function '@_title_emit'
+ #0 0x00005d2cdb55b9bb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/r3-fw-14+0x45569bb)
+ #1 0x00005d2cdb558841 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/r3-fw-14+0x4553841)
+ #2 0x00005d2cdb55c7cb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x000077400352acb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x000077400358b1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x000077400352ab7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x000077400350d8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x00005d2cda2ae6ad llvm::MachineRegisterInfo::clearVirtRegs() (build/split-320-321/llc/r3-fw-14+0x32a96ad)
+ #8 0x00005d2cda57b1a5 (anonymous namespace)::VirtRegRewriter::run(llvm::MachineFunction&) VirtRegMap.cpp:0:0
+ #9 0x00005d2cda57e91e (anonymous namespace)::VirtRegRewriterLegacy::runOnMachineFunction(llvm::MachineFunction&) VirtRegMap.cpp:0:0
+#10 0x00005d2cda1f61d9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/r3-fw-14+0x31f11d9)
+#11 0x00005d2cda7887e0 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/r3-fw-14+0x37837e0)
+#12 0x00005d2cda7908e2 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/r3-fw-14+0x378b8e2)
+#13 0x00005d2cda7895a4 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/r3-fw-14+0x37845a4)
+#14 0x00005d2cd913a14b compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#15 0x00005d2cd9137413 main (build/split-320-321/llc/r3-fw-14+0x2132413)
+#16 0x000077400350f601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#17 0x000077400350f718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#18 0x00005d2cd9136625 _start (build/split-320-321/llc/r3-fw-14+0x2131625)
+exit_code=134

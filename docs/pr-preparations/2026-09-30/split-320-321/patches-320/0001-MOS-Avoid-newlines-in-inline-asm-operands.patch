@@ -1,4 +1,4 @@
-From ad7b2f4239a23d5fa4d399fad41ebd3866920fb4 Mon Sep 17 00:00:00 2001
+From dec9150f0d0b6aff7d8e2f33e0c57e1c5466989e Mon Sep 17 00:00:00 2001
 From: mlund <mlund@localhost>
 Date: Mon, 10 Aug 2026 16:42:13 +0200
 Subject: [PATCH 1/9] [MOS] Avoid newlines in inline asm operands

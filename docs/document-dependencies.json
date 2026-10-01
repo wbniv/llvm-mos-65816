@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "efa9f2f53e85dcfc2bf28f86590eb8d1c95686b1160634057980bf61398e4701",
+          "docs/upstream-dashboard-curation.json": "40e7e37feae60009078c121bbe1a4fc87920a849ef19c8ac58975ed4887a5de8",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -86,14 +86,16 @@
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
           "docs/defects/mos-far-access-non-65816.json": "552b6483adfedf17890efc86ef069432227360cc96ee1188e8abda15206d0b3f",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "07f335500f42673c0eca96ed83e4fd40db8e5cd500971efcb72fbf6bc74a2087",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "c7d293e267c5b9ebb52c89da9ed0f19fae05d6bde6c731221f886f0ccfd0ee09",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "4255ba97cc699409c19d7c2c1815884bc42be04e4c42a3b29967584084be5094",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "2723962e3606e07e617c4ebcfde823d3505d9168d4d87cf397d1b9e2a9439cd8",
           "docs/defects/mos-far-memop-length-truncation.json": "91f4fe1cc38b07aae2f03652fd45de84fd39bd23a2a90a80fd902c2949ade72d",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "bc62029675d6c745522a7f2dd823787379dd57877591b659d93f2dfb83695669",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "569b74d4b20abf78e29ae640bb8766d29e9bd8ac61e029238a51f9141700d78b",
           "docs/defects/mos-imag32-reserved-pair-units.json": "77c4e9eae0f1b77813cc9be6ac34a5e9a8ea290f0a7c4b3e9c1495f25c178ab4",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "e91ac981bc70f769eac9aa99bca8daacea3c2e0de90e07b607a99ef62c4ef1a3",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "80663f5d8e17cf3203aba58c8dfa8e86a98cc3f45c4f1e6caee514ed44b8853a",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
           "docs/defects/mos-native-width-pressure-sets.json": "dcb44c4de5caf03bf4791f32c30d41c3fdeb5d7643117d030ee96be8118de119",
@@ -102,6 +104,7 @@
           "docs/defects/mos-near-nowrap-option-clash.json": "f02673b6a5a6895a2ec4edd8d312ad02cb8813c4e42a411719b353c858ce33b1",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
+          "docs/defects/mos-spc700-hint-outside-order.json": "230a9fc7bfebdcfd2a82e51a456bac310e382fd89ab2b3642a3b0c01735ff19d",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
@@ -117,7 +120,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "faa2e951c39e260529e29c40975cf8e66af134f309eaa342ba6c6a406292a0eb"
+          "docs/upstream-dashboard.json": "9b431aeae3701a6cec7508dc6843927330d3ab41d8d464637257b86f13e6ad03"
         }
       }
     },
@@ -138,13 +141,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "88010a7fca6babe47b84767690e8f9efba1d045d1d725d2809eae9a59b406bde",
+          "docs/upstream-pending-work.md": "d493a0d785f8f83a271616813cc61c87a025650d89c9f2598bc76cd22f9bc09c",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "faa2e951c39e260529e29c40975cf8e66af134f309eaa342ba6c6a406292a0eb",
+          "docs/upstream-dashboard.json": "9b431aeae3701a6cec7508dc6843927330d3ab41d8d464637257b86f13e6ad03",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "47e0d09ab754851b5f29d5f107acf8a8cbff2cefe2be349acbadaeadd4189b65"
+          "docs/upstream-dashboard-graph.json": "e3cbf47c8ec4023386e9f699ada035f577d6350a90df1dd1833fefbef4f32821"
         }
       }
     },
@@ -312,14 +315,16 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "3d0b1991a4250a4eeb873eda2fa7e6cc0290d098a6ed5082ce1586e57aed7aee",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "d9f6f8527a6ebb1b637717e312a3508b682a6bed71fa0f3efa2779705d19f5ea",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "94994efbdd4fdc15363ae99dabe6a033ff2c6f40231332852a243ab58283df31",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "355cd9c239f52525d52b3bee1d69fdbf2de23661c41a5e025dba2b0434f6f95d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -328,6 +333,7 @@
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
+          "docs/defects/mos-spc700-hint-outside-order.json": "0f402d6d0d46359556941e8a02d65753a29d5ff4ab91043d018198f41ea3f35c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -363,11 +369,11 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T04:18:48.209323+00:00",
-        "note": "Reviewed against the 0071 landing (0ec78ab1): the carry item now records the landed pressure contract and keeps only the profitability comparison; the agent's placeholder receipt is superseded.",
-        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-10-01T07:34:09.136064+00:00",
+        "note": "NOT reviewed or edited by this agent: the coordinator maintains TODO.md and asked agents to leave it alone. Its sources changed through four defect records (mos-late-opt-nongpr-ldimm, mos-huc-blockmove-frameindex-offset and mos-spc700-hint-outside-order are new and confirmed; mos-far-fold-dangling-dbg-sites is now fixed) and the 0065 README; the coordinator should triage them into TODO.md.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -410,14 +416,16 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "3d0b1991a4250a4eeb873eda2fa7e6cc0290d098a6ed5082ce1586e57aed7aee",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "d9f6f8527a6ebb1b637717e312a3508b682a6bed71fa0f3efa2779705d19f5ea",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "94994efbdd4fdc15363ae99dabe6a033ff2c6f40231332852a243ab58283df31",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "355cd9c239f52525d52b3bee1d69fdbf2de23661c41a5e025dba2b0434f6f95d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -426,6 +434,7 @@
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
+          "docs/defects/mos-spc700-hint-outside-order.json": "0f402d6d0d46359556941e8a02d65753a29d5ff4ab91043d018198f41ea3f35c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -453,11 +462,11 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T03:59:30.574117+00:00",
-        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-01T07:29:19.675416+00:00",
+        "note": "Reviewed against the third-round records (late-opt #584, HuC6280 block move, SPC700 hint, far-fold closure) and the 0065 replay onto the rebuilt #321; pending-work and contribution status gained a third-round line and #584 row text; the curation nextStep for #320/#321 was stale and is updated; the 0065 README gained a third-round paragraph.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -500,14 +509,16 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "3d0b1991a4250a4eeb873eda2fa7e6cc0290d098a6ed5082ce1586e57aed7aee",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "d9f6f8527a6ebb1b637717e312a3508b682a6bed71fa0f3efa2779705d19f5ea",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "94994efbdd4fdc15363ae99dabe6a033ff2c6f40231332852a243ab58283df31",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "355cd9c239f52525d52b3bee1d69fdbf2de23661c41a5e025dba2b0434f6f95d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -516,6 +527,7 @@
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
+          "docs/defects/mos-spc700-hint-outside-order.json": "0f402d6d0d46359556941e8a02d65753a29d5ff4ab91043d018198f41ea3f35c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -543,11 +555,11 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T03:59:30.581232+00:00",
-        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-01T07:29:19.688233+00:00",
+        "note": "Reviewed against the third-round records (late-opt #584, HuC6280 block move, SPC700 hint, far-fold closure) and the 0065 replay onto the rebuilt #321; pending-work and contribution status gained a third-round line and #584 row text; the curation nextStep for #320/#321 was stale and is updated; the 0065 README gained a third-round paragraph.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -708,11 +720,11 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T04:05:23.883945+00:00",
-        "note": "The carry-scheduling plan's dated pointer now records the 2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. agent-handoff gained the matching stack and toolchain line; its 0064 status and dated measurement statements are unchanged and still correct as dated evidence. The 0064 status, publication and measurement statements of the other two documents are unaffected: 0064/0067 are unchanged.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-01T07:31:26.135735+00:00",
+        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -992,12 +1004,12 @@
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-30T15:13:03.147777+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-10-01T07:31:32.508173+00:00",
+        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -1480,12 +1492,12 @@
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-30T15:13:03.720751+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-10-01T07:31:34.075857+00:00",
+        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -1509,11 +1521,11 @@
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T04:05:24.224720+00:00",
-        "note": "The carry-scheduling plan's dated pointer now records the 2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. agent-handoff gained the matching stack and toolchain line; its 0064 status and dated measurement statements are unchanged and still correct as dated evidence. The 0064 status, publication and measurement statements of the other two documents are unaffected: 0064/0067 are unchanged.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-01T07:31:34.327379+00:00",
+        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -1722,13 +1734,13 @@
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5"
         },
-        "reviewed_at": "2026-09-30T15:13:04.305428+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-10-01T07:29:21.318213+00:00",
+        "note": "Reviewed against the third-round records (late-opt #584, HuC6280 block move, SPC700 hint, far-fold closure) and the 0065 replay onto the rebuilt #321; pending-work and contribution status gained a third-round line and #584 row text; the curation nextStep for #320/#321 was stale and is updated; the 0065 README gained a third-round paragraph.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -2486,7 +2498,8 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-environment.json": "f1323091cf81d3bb57025bfc723e60cc936eb69678142f1e18f0b7f8d81d382e",
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-identity.json": "24f2aea2481100a84a88b6edfc1d10880afd9a58e217ba8776313902c6ef95e2",
           "docs/pr-preparations/2026-09-28/0065/evidence/series.json": "4e73fa3210ef23f059256a82b3487b5c24d46b9c8468b5f0b30de8648ca70c62",
-          "docs/pr-preparations/2026-09-28/0065/evidence/split-series.json": "e88e4ede03d765510ffd49ad3e8d7a8557c96231fab7021e908eaf42c7037e47",
+          "docs/pr-preparations/2026-09-28/0065/evidence/split-series-before-r3.json": "e88e4ede03d765510ffd49ad3e8d7a8557c96231fab7021e908eaf42c7037e47",
+          "docs/pr-preparations/2026-09-28/0065/evidence/split-series.json": "ae2666bebd847af93fa2aa64f0f0e27105078281bff6a5f2c7d8b5bd761e2b13",
           "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
@@ -2505,9 +2518,9 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSRegisterInfo.td.txt": "a96ed543ff671dfb59a66d55756681fddc48342c5ea987a09d12d7c02e4e76c9",
           "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSTargetMachine.cpp.txt": "a10b1fe04db6fb3f33f502e62e1f653543ac1e5e9188c824e1234e0e5b4ce3ba"
         },
-        "reviewed_at": "2026-09-30T15:13:05.179436+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-10-01T07:29:24.366965+00:00",
+        "note": "Reviewed against the third-round records (late-opt #584, HuC6280 block move, SPC700 hint, far-fold closure) and the 0065 replay onto the rebuilt #321; pending-work and contribution status gained a third-round line and #584 row text; the curation nextStep for #320/#321 was stale and is updated; the 0065 README gained a third-round paragraph.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -2520,14 +2533,14 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440",
           "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
           "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4"
         },
-        "reviewed_at": "2026-09-30T15:13:05.371191+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-10-01T07:31:35.014732+00:00",
+        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -2537,11 +2550,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-09-30T15:13:05.371241+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-10-01T07:31:35.014802+00:00",
+        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {

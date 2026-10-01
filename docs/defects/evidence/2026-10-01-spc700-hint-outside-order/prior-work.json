@@ -1,0 +1,8 @@
+{
+ "searched_ref": "origin/main 74e24d94, 2026-10-01",
+ "searches": {
+  "\"hint is outside allocation order\" in docs/defects, docs/plans, docs/investigations": "no hits",
+  "GitHub search repo:llvm-mos/llvm-mos spc700": "no allocation-hint report (see the late-opt record for the list)"
+ },
+ "findings": "Unreported. Seen only after #584 removes the earlier late-opt crash on the same inputs; on upstream main both crashes are in the way, depending on the function order."
+}

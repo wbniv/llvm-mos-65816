@@ -1,0 +1,13 @@
+{
+ "searched_ref": "origin/main 74e24d94 (llvm-mos-65816) and llvm-mos/llvm-mos public API, 2026-10-01",
+ "searches": {
+  "combineLdImm / late-opt-spc700 / non-GPR LDImm (docs/defects/*.json)": "no canonical record",
+  "docs/upstream-contribution-status.md": "row 15 and the Current PR progress table: PR #584, posted 2026-07-31, head 7f4c37de6219, awaiting maintainer review",
+  "docs/upstream-late-opt-nongpr-ldimm-pr.md": "published PR body mirror",
+  "docs/plans/2026-07-27-138-lzss-far-decode-mos-late-optimization-crash.md": "original discovery (138 LZSS far decode)",
+  "patches/llvm-mos/0003-late-opt-nongpr-ldimm-dest.patch": "downstream carry, re-synced 2026-09-14 to the published form",
+  "GitHub search repo:llvm-mos/llvm-mos combineLdImm / spc700 / Late Optimizations": "#584 (open, ours), #562 (merged, different defect: dead flags on TYX/TXY), #474 (closed, TAX/TAY following); no other report",
+  "upstream main": "still 06bc967d2668 on 2026-10-01; MOSLateOptimization.cpp unchanged there, so the defect is live upstream"
+ },
+ "findings": "The defect is known and fixed in our own open upstream PR #584 and downstream patch 0003, but had no canonical record. The third independent review (N17) rediscovered it as a hunk inside #320-2; that hunk is #584's guard. This record migrates the defect into the canonical workflow against current upstream."
+}

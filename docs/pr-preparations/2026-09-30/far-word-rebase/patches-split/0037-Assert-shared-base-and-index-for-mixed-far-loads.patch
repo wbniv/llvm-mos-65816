@@ -1,0 +1,87 @@
+From f299b753f0d5556b95d1f910563d5327d86fc1b9 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 28 Sep 2026 19:17:45 +0700
+Subject: [PATCH 37/37] Assert shared base and index for mixed far loads
+
+Check both byte-first and word-first traversal orders. Each access must
+retain the same runtime base and narrowed offset, its volatile memory
+operand, and its width; the explicit wide pointer addition disappears.
+
+Preparation and validation: OpenAI Codex CLI 0.157.1 (session source
+vscode), model gpt-6-astra, xhigh reasoning effort; verified session
+01a0e67f-298f-7a21-80af-06f867085f84.
+---
+ .../CodeGen/MOS/far-word-index-boundaries.mir | 50 +++++++++++++++++++
+ 1 file changed, 50 insertions(+)
+
+diff --git a/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir b/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
+index c1c5ee3efa68..f255fa9daf16 100644
+--- a/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
++++ b/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
+@@ -11,6 +11,8 @@
+   define void @atomic() { ret void }
+   define void @escape() { ret void }
+   define void @call_between() { ret void }
++  define void @mixed_word_first() { ret void }
++  define void @mixed_byte_first() { ret void }
+   define void @word_store_sibling() { ret void }
+   define void @byte_store_sibling() { ret void }
+ ...
+@@ -120,6 +122,54 @@ body: |
+     RTS
+ ...
+ 
++# CHECK-LABEL: name: mixed_word_first
++# CHECK: %[[BASE:[a-zA-Z0-9_]+]]:_(p2) = COPY $rl1
++# CHECK: %[[OFFSET:[a-zA-Z0-9_]+]]:_(s8) = G_AND
++# CHECK-NOT: G_PTR_ADD
++# CHECK-DAG: = G_LOAD16_FAR_INDIR_IDX{{ }}%[[BASE]](p2), %[[OFFSET]] :: (volatile load (s16), align 1, addrspace 2)
++# CHECK-DAG: = G_LOAD_FAR_INDIR_IDX{{ }}%[[BASE]](p2), %[[OFFSET]] :: (volatile load (s8), addrspace 2)
++# CHECK-NOT: G_PTR_ADD
++---
++name: mixed_word_first
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %mask:_(s8) = G_CONSTANT i8 254
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    %word:_(s16) = G_LOAD %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
++    %value:_(s8) = G_LOAD %ptr(p2) :: (volatile load (s8), addrspace 2)
++    RTS
++...
++
++# CHECK-LABEL: name: mixed_byte_first
++# CHECK: %[[BASE:[a-zA-Z0-9_]+]]:_(p2) = COPY $rl1
++# CHECK: %[[OFFSET:[a-zA-Z0-9_]+]]:_(s8) = G_AND
++# CHECK-NOT: G_PTR_ADD
++# CHECK-DAG: = G_LOAD16_FAR_INDIR_IDX{{ }}%[[BASE]](p2), %[[OFFSET]] :: (volatile load (s16), align 1, addrspace 2)
++# CHECK-DAG: = G_LOAD_FAR_INDIR_IDX{{ }}%[[BASE]](p2), %[[OFFSET]] :: (volatile load (s8), addrspace 2)
++# CHECK-NOT: G_PTR_ADD
++---
++name: mixed_byte_first
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl1, $a
++    %base:_(p2) = COPY $rl1
++    %byte:_(s8) = COPY $a
++    %mask:_(s8) = G_CONSTANT i8 254
++    %bound:_(s8) = G_AND %byte, %mask
++    %offset:_(s32) = G_ZEXT %bound(s8)
++    %ptr:_(p2) = G_PTR_ADD %base, %offset(s32)
++    %value:_(s8) = G_LOAD %ptr(p2) :: (volatile load (s8), addrspace 2)
++    %word:_(s16) = G_LOAD %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
++    RTS
++...
++
+ # A word store is never folded, so a word store sharing the address rejects the
+ # whole group: the word load keeps its explicit pointer too.
+ # CHECK-LABEL: name: word_store_sibling
+-- 
+2.53.0
+
