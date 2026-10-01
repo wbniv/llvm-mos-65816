@@ -1,7 +1,7 @@
 From 076489c7de87638d1cc7ad21dae8cbcb7306ba13 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 06/37] [MOS] Spill and copy native-width registers
+Subject: [PATCH 06/36] [MOS] Spill and copy native-width registers
 
 Give each native-width register class explicit copy and spill lowering. Copies between Xc16/Yc16 and an Imag16 pair use `ldx/ldy zp` and `stx/sty zp`. Static-stack spills of Ac16, Xc16 and Yc16 use one word absolute load or store. Soft-stack spills of Ac16 use one word `lda/sta (zp)` through the exact slot pointer; a nonzero offset first forms that pointer in the reserved scratch pair, because (zp) addressing has no index. X16 and Y16 are staged through A16 (`txa; sta (zp)` and `lda (zp); tax`), and the expansion is bracketed by PHA16/PLA16 when the accumulator is live across it. pushPullBalanced counts PHA16/PLA16 as one matched push and pull.
 

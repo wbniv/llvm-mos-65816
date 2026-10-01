@@ -1,7 +1,7 @@
 From 6d8547b02580801185d48f72504b0a507165c64e Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:45:14 +0700
-Subject: [PATCH 17/37] Honor explicit address widths for constant operands
+Subject: [PATCH 17/36] Honor explicit address widths for constant operands
 
 Carry downstream 0039 as an independent assembler prerequisite for the
 far-addressing series. Its implementation is unchanged. Original

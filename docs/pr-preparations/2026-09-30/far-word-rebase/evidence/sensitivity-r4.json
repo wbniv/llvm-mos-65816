@@ -1,0 +1,4356 @@
+{
+  "summary": {
+    "positive_passes": 8,
+    "functions": 111,
+    "functions_without_far_opcode": 0,
+    "mutations": 262,
+    "rejected": 262
+  },
+  "positives": [
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "command": [
+        "/work/build/split-320-321/llc/r4-fw-14",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/work/build/split-320-321/source/llvm/test/CodeGen/MOS/far-loop-range.mir",
+        "-o",
+        "-"
+      ],
+      "sha256": "4131a394b3892b2cb6b021c0cea5808eadec80c1fe407a38283aae5a6434a952"
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "command": [
+        "/work/build/split-320-321/llc/r4-fw-14",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/work/build/split-320-321/source/llvm/test/CodeGen/MOS/far-loop-range.mir",
+        "-o",
+        "-"
+      ],
+      "sha256": "458cfa00a2fef160a77fe7eb19ff36ddfe5931344f0ac6ffafafc93f98971d01"
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "command": [
+        "/work/build/split-320-321/llc/r4-fw-14",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/work/build/split-320-321/source/llvm/test/CodeGen/MOS/far-word-policy.mir",
+        "-o",
+        "-"
+      ],
+      "sha256": "7e26400e90f5c2203e8a96689a94a4f14d0016d554161353d26617d36c604051"
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "command": [
+        "/work/build/split-320-321/llc/r4-fw-14",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/work/build/split-320-321/source/llvm/test/CodeGen/MOS/far-word-policy.mir",
+        "-o",
+        "-"
+      ],
+      "sha256": "abe112983134977f6cc5d8dd353d10c1860fa29614781289bf8012218839dd48"
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "command": [
+        "/work/build/split-320-321/llc/r4-fw-14",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/work/build/split-320-321/source/llvm/test/CodeGen/MOS/far-word-policy.mir",
+        "-o",
+        "-"
+      ],
+      "sha256": "4a635f7dabb8d9c293fbf39d8b5929d617b89739a988077f3d5e11c5ecd5de47"
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "command": [
+        "/work/build/split-320-321/llc/r4-fw-14",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/work/build/split-320-321/source/llvm/test/CodeGen/MOS/far-loop-range-boundaries.mir",
+        "-o",
+        "-"
+      ],
+      "sha256": "9367bb9773baa31e7b25b92eac52cf439edfcc8733c7011075461b31ea00c0e0"
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "command": [
+        "/work/build/split-320-321/llc/r4-fw-14",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/work/build/split-320-321/source/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir",
+        "-o",
+        "-"
+      ],
+      "sha256": "a61f504e9e391c6402f9f627ff69f52238c09c2aeecbce79fa7dd71c8c2fd6fe"
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "command": [
+        "/work/build/split-320-321/llc/r4-fw-14",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/work/build/split-320-321/source/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir",
+        "-o",
+        "-"
+      ],
+      "sha256": "7baa14b2222fb10d605f75ebf755ee03f1dc02a3b7b064c5dd39d778e006f2b3"
+    }
+  ],
+  "functions": [
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "ne_backedge",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "eq_exit",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "nonzero_start",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "unsigned_end",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "offset_256",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "wrapped_induction",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "full_cycle",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "equal_start_end",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "step_two",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "eq_backedge",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "ne_exit",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "compare_phi",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "borrow_input",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "carry_flag",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "negative_flag",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "overflow_flag",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "zero_copy",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "four_copies",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "five_copies",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "scale_fits",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "scale_overflows_y",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_scale_wraps",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_add_wraps",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "multiple_blocks",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "generic_ne",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "generic_eq",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "ne_backedge",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "eq_exit",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "nonzero_start",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "unsigned_end",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "offset_256",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "wrapped_induction",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "full_cycle",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "equal_start_end",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "step_two",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "eq_backedge",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "ne_exit",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "compare_phi",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "borrow_input",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "carry_flag",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "negative_flag",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "overflow_flag",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "zero_copy",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "four_copies",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "five_copies",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "scale_fits",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "scale_overflows_y",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "narrow_scale_wraps",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "narrow_add_wraps",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "multiple_blocks",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "generic_ne",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "generic_eq",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_speed",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_size",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_minsize",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_noopt",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word129",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_wrap",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_nonunit",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_fullcycle",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_1",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX",
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_0",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX",
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_1",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX",
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_0",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR",
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_speed",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_size",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_minsize",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_noopt",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word129",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_wrap",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_nonunit",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_fullcycle",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_1",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX",
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_0",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX",
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_1",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX",
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_0",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR",
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_speed",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_size",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_minsize",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_noopt",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word129",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_wrap",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_nonunit",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_fullcycle",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_1",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX",
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_0",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR",
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_1",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX",
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_0",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR",
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "reverse_phi",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_scale",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "two_entries",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "depth_five",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "depth_six",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "end254",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "end255",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "atomic",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "escape",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "call_between",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_word_first",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX",
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_byte_first",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX",
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_store_sibling",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR",
+        "G_STORE16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "byte_store_sibling",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX",
+        "G_STORE_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "end254",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "end255",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "atomic",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "escape",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "call_between",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_word_first",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX",
+        "G_LOAD_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_byte_first",
+      "far_opcodes": [
+        "G_LOAD_FAR_INDIR_IDX",
+        "G_LOAD16_FAR_INDIR_IDX"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "word_store_sibling",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR",
+        "G_STORE16_FAR_INDIR"
+      ]
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "byte_store_sibling",
+      "far_opcodes": [
+        "G_LOAD16_FAR_INDIR_IDX",
+        "G_STORE_FAR_INDIR_IDX"
+      ]
+    }
+  ],
+  "mutations": [
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "ne_backedge",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "ne_backedge",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "eq_exit",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "eq_exit",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "nonzero_start",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "nonzero_start",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "unsigned_end",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "unsigned_end",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "offset_256",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "offset_256",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "wrapped_induction",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "wrapped_induction",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "full_cycle",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "full_cycle",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "equal_start_end",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "equal_start_end",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "step_two",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "step_two",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "eq_backedge",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "eq_backedge",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "ne_exit",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "ne_exit",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "compare_phi",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "compare_phi",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "borrow_input",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "borrow_input",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "carry_flag",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "carry_flag",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "negative_flag",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "negative_flag",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "overflow_flag",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "overflow_flag",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "zero_copy",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "zero_copy",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "four_copies",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "four_copies",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "five_copies",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "five_copies",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "scale_fits",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "scale_fits",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "scale_overflows_y",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "scale_overflows_y",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_scale_wraps",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_scale_wraps",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_add_wraps",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_add_wraps",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "multiple_blocks",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "multiple_blocks",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "generic_ne",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "generic_ne",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "generic_eq",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "A16",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "generic_eq",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "ne_backedge",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "ne_backedge",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "eq_exit",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "eq_exit",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "nonzero_start",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "nonzero_start",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "unsigned_end",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "unsigned_end",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "offset_256",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "offset_256",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "wrapped_induction",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "wrapped_induction",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "full_cycle",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "full_cycle",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "equal_start_end",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "equal_start_end",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "step_two",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "step_two",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "eq_backedge",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "eq_backedge",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "ne_exit",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "ne_exit",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "compare_phi",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "compare_phi",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "borrow_input",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "borrow_input",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "carry_flag",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "carry_flag",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "negative_flag",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "negative_flag",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "overflow_flag",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "overflow_flag",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "zero_copy",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "zero_copy",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "four_copies",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "four_copies",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "five_copies",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "five_copies",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "scale_fits",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "scale_fits",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "scale_overflows_y",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "scale_overflows_y",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "narrow_scale_wraps",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "narrow_scale_wraps",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "narrow_add_wraps",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "narrow_add_wraps",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "multiple_blocks",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "multiple_blocks",
+      "expected": "G_LOAD_FAR_INDIR_IDX16",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "generic_ne",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "generic_ne",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "generic_eq",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range.mir",
+      "prefix": "XY16",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "generic_eq",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_speed",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_speed",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_size",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_size",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_minsize",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_minsize",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_noopt",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_noopt",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word129",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word129",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_wrap",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_wrap",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_nonunit",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_nonunit",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_fullcycle",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_fullcycle",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "SPEED",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_speed",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_speed",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_size",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_size",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_minsize",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_minsize",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_noopt",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_noopt",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word129",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word129",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_wrap",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_wrap",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_nonunit",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_nonunit",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_fullcycle",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "word_fullcycle",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "ALL",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=all"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_speed",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_speed",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_size",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_size",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_minsize",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_minsize",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_noopt",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_noopt",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word129",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word129",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_wrap",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_wrap",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_nonunit",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_nonunit",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_fullcycle",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "word_fullcycle",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_1",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_1_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_1",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-policy.mir",
+      "prefix": "OFF",
+      "flags": [
+        "-mattr=+mos-a16",
+        "-mos-far-word-index=off"
+      ],
+      "function": "mixed_2_0",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "reverse_phi",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "reverse_phi",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_scale",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "narrow_scale",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "two_entries",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "two_entries",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "depth_five",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "depth_five",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "depth_six",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-loop-range-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "depth_six",
+      "expected": "G_LOAD_FAR_INDIR",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "end254",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "end254",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "end255",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "end255",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "atomic",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "atomic",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "escape",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "escape",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "call_between",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "call_between",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_word_first",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_word_first",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_word_first",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_word_first",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_byte_first",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_byte_first",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_byte_first",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "mixed_byte_first",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_store_sibling",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_store_sibling",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_store_sibling",
+      "expected": "G_STORE16_FAR_INDIR",
+      "replacement": "G_STORE16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "word_store_sibling",
+      "expected": "G_STORE16_FAR_INDIR",
+      "replacement": "G_STORE16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "byte_store_sibling",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "byte_store_sibling",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "byte_store_sibling",
+      "expected": "G_STORE_FAR_INDIR_IDX",
+      "replacement": "G_STORE_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16"
+      ],
+      "function": "byte_store_sibling",
+      "expected": "G_STORE_FAR_INDIR_IDX",
+      "replacement": "G_STORE_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "end254",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "end254",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "end255",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "end255",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "atomic",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "atomic",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "escape",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "escape",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "call_between",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "call_between",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_word_first",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_word_first",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_word_first",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_word_first",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_byte_first",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_byte_first",
+      "expected": "G_LOAD_FAR_INDIR_IDX",
+      "replacement": "G_LOAD_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_byte_first",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "mixed_byte_first",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "word_store_sibling",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "word_store_sibling",
+      "expected": "G_LOAD16_FAR_INDIR",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "word_store_sibling",
+      "expected": "G_STORE16_FAR_INDIR",
+      "replacement": "G_STORE16_FAR_INDIR_IDX",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "word_store_sibling",
+      "expected": "G_STORE16_FAR_INDIR",
+      "replacement": "G_STORE16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "byte_store_sibling",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "byte_store_sibling",
+      "expected": "G_LOAD16_FAR_INDIR_IDX",
+      "replacement": "G_LOAD16_FAR_INDIR_IDX16",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "byte_store_sibling",
+      "expected": "G_STORE_FAR_INDIR_IDX",
+      "replacement": "G_STORE_FAR_INDIR",
+      "returncode": 1
+    },
+    {
+      "file": "far-word-index-boundaries.mir",
+      "prefix": "CHECK",
+      "flags": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "function": "byte_store_sibling",
+      "expected": "G_STORE_FAR_INDIR_IDX",
+      "replacement": "G_STORE_FAR_INDIR_IDX16",
+      "returncode": 1
+    }
+  ]
+}

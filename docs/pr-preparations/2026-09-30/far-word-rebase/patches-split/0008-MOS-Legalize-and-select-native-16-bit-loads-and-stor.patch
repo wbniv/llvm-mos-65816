@@ -1,7 +1,7 @@
 From 6f7d9e07ad75cad965388c4e545a0679ec3b4288 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 08/37] [MOS] Legalize and select native 16-bit loads and
+Subject: [PATCH 08/36] [MOS] Legalize and select native 16-bit loads and
  stores
 
 Under +mos-a16, s16 G_LOAD and G_STORE are legalized before byte narrowing. An absolute address becomes G_LOAD16_ABS/G_STORE16_ABS. An absolute or runtime base with an 8-bit variable index, or a runtime pointer with a constant offset of 1-255, becomes an abs,X or (zp),Y word access. Any other runtime pointer on a 65C02-class CPU becomes G_LOAD16_INDIR/G_STORE16_INDIR. The selector lowers these to the word pseudos and moves the value between A16 and its Imag16 pair; a single-use word load feeding a store is folded straight into the store's accumulator load.

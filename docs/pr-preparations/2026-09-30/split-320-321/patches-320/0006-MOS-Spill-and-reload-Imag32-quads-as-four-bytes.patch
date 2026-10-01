@@ -1,11 +1,11 @@
-From f9072c2b93f36e51d37240ee0d277b0ba9b69d3e Mon Sep 17 00:00:00 2001
+From 9c2ebdf83982bc7fcbeeb04f1d85a51408c39752 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:12:12 +0700
 Subject: [PATCH 6/9] [MOS] Spill and reload Imag32 quads as four bytes
 
 An allocatable Imag32 quad must be spillable. Spill and reload a quad through its two Imag16 words: a static stack slot takes four byte accesses, and a dynamic stack operation (LDStk/STStk) expands into two Imag16 operations at offsets 0 and 2. Each piece carries a precise memory operand. When subregister operands are introduced after live intervals exist, fresh virtual registers carry them, and a reload defines the low word with an undef first lane. Without this, a quad spill fell into the byte fallback, which copies one byte through a GPR, or asserted in expandLDSTStkImpl.
 
-Default-mode effect: none; only quad spills change, and quads are allocated only on the 65816.
+Default-mode effect: identical on every MOS CPU for the fixed input set except mosspc700, which crashes in MOS Late Optimizations before and after; fixed separately by #584. Only quad spills change, and quads are allocated only on the 65816.
 
 Tests: prologepilog.mir checks that a static quad reload and store move all four bytes (__rc4-__rc7) in order. The next commit adds the end-to-end case: four far pointers live across a call.
 

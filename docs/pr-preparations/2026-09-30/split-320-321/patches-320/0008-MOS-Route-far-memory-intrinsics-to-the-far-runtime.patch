@@ -1,4 +1,4 @@
-From 7a5050aaeea30b9271c169adbb154dd08ceffab3 Mon Sep 17 00:00:00 2001
+From bb4b87e95175a824fae6980d37996fa3bd25b5e1 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 8/9] [MOS] Route far memory intrinsics to the far runtime
@@ -9,7 +9,7 @@ The length selects the entry. A length that provably fits 16 bits (a constant up
 
 This replaces the previous commit's legalization failure for far memory intrinsics that are not expanded inline; the generic memory libcall would pass the far pointer to the near runtime and drop the bank byte. A single 16-bit entry would silently truncate a longer length: 70000 would become 4464 and 65537 would become 1.
 
-Default-mode effect: none for the fixed input set (assembly and objects identical in mos6502 and mosw65816); only calls with far pointer operands change.
+Default-mode effect: identical on every MOS CPU for the fixed input set except mosspc700, which crashes in MOS Late Optimizations before and after; fixed separately by #584. Only calls with far pointer operands change.
 
 Tests: far-memset.ll checks a far constant fill over the inline limit and a variable-length far fill calling __memset_far, and a near variable fill still calling __memset. far-memop-length.ll checks constant lengths 65535, 65536, 65537 and 70000, unbounded runtime i32 lengths and the loop idiom's scaled length (the 32-bit entries), and provably bounded runtime lengths (the 16-bit entries), in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16. Its mixed-space cases pin the IRTranslator narrowing: a memcpy from a near source keeps a 40000-byte length and narrows 70000 to 4464.
 

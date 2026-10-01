@@ -1,7 +1,7 @@
 From 6c3e03e3ea093b8e30ecfbb2c2078008df585ad0 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 15/37] [MOS] Keep small 8-bit adds relocatable under +mos-a16
+Subject: [PATCH 15/36] [MOS] Keep small 8-bit adds relocatable under +mos-a16
 
 Under +mos-a16, an 8-bit add or subtract of 2 selects as two G_INC/G_DEC steps constrained to Anyi8 instead of `clc; adc #2`, whose operand is pinned to A.
 

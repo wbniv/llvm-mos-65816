@@ -1,7 +1,7 @@
 From e8441515e0092dbc39a96be81c3aea120704c8a1 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 01/37] [MOS] Model 65816 native-width registers and feature
+Subject: [PATCH 01/36] [MOS] Model 65816 native-width registers and feature
  gates
 
 Add two opt-in subtarget features for the WDC 65816: mos-a16 selects 16-bit accumulator codegen, and mos-xy16 selects 16-bit index registers and implies mos-a16. No CPU implies either feature.

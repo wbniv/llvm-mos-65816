@@ -1,7 +1,7 @@
-From f299b753f0d5556b95d1f910563d5327d86fc1b9 Mon Sep 17 00:00:00 2001
+From 00b68e60d18d201dfd6e8a272faab58fe60e389f Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:17:45 +0700
-Subject: [PATCH 37/37] Assert shared base and index for mixed far loads
+Subject: [PATCH 36/36] Assert shared base and index for mixed far loads
 
 Check both byte-first and word-first traversal orders. Each access must
 retain the same runtime base and narrowed offset, its volatile memory

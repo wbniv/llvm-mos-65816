@@ -5,7 +5,7 @@
  "status": "confirmed",
  "reproducer_origin": "original",
  "report": "docs/upstream-late-opt-nongpr-ldimm-pr.md",
- "summary": "MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On current upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The fix is our own open upstream PR #584 (restrict the immediate-load folding to GPR destinations), carried downstream as patch 0003 and, since the third round, as its own commit in the #320/#321 split series ahead of #320. Upstream is not fixed until #584 merges, so the status stays confirmed.",
+ "summary": "MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On current upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The fix is our own open upstream PR #584 (restrict the immediate-load folding to GPR destinations), carried downstream as patch 0003. It is not carried in the #320/#321 split series: the third round briefly carried it as its own commit, and on 2026-10-01 the user decided to sequence it instead (#584 files first). Until #584 lands, mosspc700 crashes in MOS Late Optimizations identically before and after the series. Upstream is not fixed until #584 merges, so the status stays confirmed.",
  "attribution": [
   "Found in the 138 LZSS far-decode investigation and fixed in PR #584 / patch 0003 (2026-07-31): credits as recorded in the PR commits (Will Norris, co-authored by Claude Opus 4.8 (1M context); agent/tool version and reasoning effort unknown).",
   "Rediscovered as finding N17 by the third independent review of the #320 series: Claude Code 2.1.285, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d.",
@@ -34,7 +34,7 @@
   "related_changes": [
    "llvm-mos PR #584 (wbniv:mos-late-opt-nongpr-ldimm @ 7f4c37de6219)",
    "patches/llvm-mos/0003-late-opt-nongpr-ldimm-dest.patch",
-   "split series commit \"[MOS] Fix non-GPR immediate loads in mos-late-opt\" (#584 squash)"
+   "round-three split series commit \"[MOS] Fix non-GPR immediate loads in mos-late-opt\" (#584 squash; dropped in round four)"
   ],
   "source_assessment": "Upstream 06bc967d2668 MOSLateOptimization.cpp combineLdImm has no destination-class filter; #584's net diff adds `!MOS::GPRRegClass.contains(MI.getOperand(0).getReg())` to the existing filtering condition. The #320-2 hunk the review found is the same guard without #584's comment change.",
   "binary_assessment": "Upstream llc p-321-00 segfaults on #584's own MIR test and on fcmp.ll at mosspc700 -O2; upstream + #584 (r3-584-up) and the series #584 commit pass both. Across 90 inputs x 14 CPUs at -O2, #584 turns exactly the 31 mosspc700 crashes into compiles and changes nothing else.",
@@ -141,7 +141,7 @@
    "observed": "passes"
   },
   {
-   "label": "Split series #584 commit: same input and configuration",
+   "label": "Round-three split series #584 commit (dropped in round four, when #584 was sequenced rather than carried): same input and configuration",
    "command": "build/split-320-321/llc/r3-584 -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir -o /dev/null",
    "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
    "configuration": {
@@ -166,7 +166,7 @@
    "observed": "passes"
   },
   {
-   "label": "Split series MC top (parent of the #584 commit): same input and configuration",
+   "label": "Split series MC top (the parent of the #320 series since round four): same input and configuration",
    "command": "build/split-320-321/llc/r3-mc-2 -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs docs/defects/evidence/2026-10-01-late-opt-nongpr-ldimm/late-opt-spc700.mir -o /dev/null",
    "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
    "configuration": {

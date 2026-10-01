@@ -1,7 +1,7 @@
-From 1c398e08fdad94a343fff972e496ace4da6f9061 Mon Sep 17 00:00:00 2001
+From 7f6f05729e9d1b3954ec276954e6315a315b0371 Mon Sep 17 00:00:00 2001
 From: mlund <mlund@localhost>
 Date: Mon, 10 Aug 2026 16:43:17 +0200
-Subject: [PATCH 21/37] [MOS] Accumulate composite zero-page CSR benefit
+Subject: [PATCH 20/36] [MOS] Accumulate composite zero-page CSR benefit
 
 Account for every byte before averaging a composite CSR candidate's
 benefit. Previously only the final byte contributed, underweighting

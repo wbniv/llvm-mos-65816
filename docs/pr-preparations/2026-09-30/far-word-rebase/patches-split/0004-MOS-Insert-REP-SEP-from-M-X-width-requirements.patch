@@ -1,7 +1,7 @@
 From e7943fff59cc464e290b159ab1443b47714c7cc8 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 04/37] [MOS] Insert REP/SEP from M/X width requirements
+Subject: [PATCH 04/36] [MOS] Insert REP/SEP from M/X width requirements
 
 Add MOSInsertREPSEP, which runs in addPreEmitPass before branch relaxation, so relaxation accounts for the inserted instructions. It is a no-op without +mos-a16.
 

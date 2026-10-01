@@ -1,7 +1,7 @@
 From ff8b09f53b78bbb2060c9c8f9e1a1f617abcc52f Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 05/37] [MOS] Preserve status flags across register scavenging
+Subject: [PATCH 05/36] [MOS] Preserve status flags across register scavenging
 
 Let the register scavenger preserve a live processor status register. On a balanced hard-stack range it saves P with PHP and restores it with PLP. On an unbalanced range, when the target has PHX/PHY and a dead index register exists at both ends, it moves P through that register into the reserved RC17 slot (`php; plx; stx rc17` and `ldx rc17; phx; plp`), each half stack-neutral. The PHP operand is marked undef when no part of P holds a defined value, matching the verifier's rule that any defined sub-register makes the composite defined. Any other case stops with a fatal error.
 

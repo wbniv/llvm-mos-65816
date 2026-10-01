@@ -86,16 +86,16 @@
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
           "docs/defects/mos-far-access-non-65816.json": "552b6483adfedf17890efc86ef069432227360cc96ee1188e8abda15206d0b3f",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "07f335500f42673c0eca96ed83e4fd40db8e5cd500971efcb72fbf6bc74a2087",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "4255ba97cc699409c19d7c2c1815884bc42be04e4c42a3b29967584084be5094",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "8f53dcac3d5ebf1a9782c0322ce26b4346244d6c2ea4e03e4f2148288bb01224",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "2723962e3606e07e617c4ebcfde823d3505d9168d4d87cf397d1b9e2a9439cd8",
           "docs/defects/mos-far-memop-length-truncation.json": "91f4fe1cc38b07aae2f03652fd45de84fd39bd23a2a90a80fd902c2949ade72d",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "bc62029675d6c745522a7f2dd823787379dd57877591b659d93f2dfb83695669",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
-          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "569b74d4b20abf78e29ae640bb8766d29e9bd8ac61e029238a51f9141700d78b",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "b8a79eb94eb3ff21937c03ef59ebe63b2da7556022756917c413eef17461d6e3",
           "docs/defects/mos-imag32-reserved-pair-units.json": "77c4e9eae0f1b77813cc9be6ac34a5e9a8ea290f0a7c4b3e9c1495f25c178ab4",
-          "docs/defects/mos-late-opt-nongpr-ldimm.json": "e91ac981bc70f769eac9aa99bca8daacea3c2e0de90e07b607a99ef62c4ef1a3",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "e2b9fba49bc40de689a68ff6c135fd5372f6a675de9fbf89ed62b237afc5090c",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "80663f5d8e17cf3203aba58c8dfa8e86a98cc3f45c4f1e6caee514ed44b8853a",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
           "docs/defects/mos-native-width-pressure-sets.json": "dcb44c4de5caf03bf4791f32c30d41c3fdeb5d7643117d030ee96be8118de119",
@@ -120,7 +120,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "ea41af4bcf6c0d33252a22ccf86519123448ab2c74627a5fef3fcef6a2242866"
+          "docs/upstream-dashboard.json": "720d7745c326904b789c6c127b62e7f63cd706f4f00c31fe045f44f124875d4e"
         }
       }
     },
@@ -141,13 +141,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "d493a0d785f8f83a271616813cc61c87a025650d89c9f2598bc76cd22f9bc09c",
+          "docs/upstream-pending-work.md": "ec9ee742a7bd38619272faefbe4b06d85b6372b8a7fc8a34fe4b9c6313dd35a5",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "ea41af4bcf6c0d33252a22ccf86519123448ab2c74627a5fef3fcef6a2242866",
+          "docs/upstream-dashboard.json": "720d7745c326904b789c6c127b62e7f63cd706f4f00c31fe045f44f124875d4e",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "9a3aad22f38af3f27adaec97a09f199495888e2fe43c011ddda93325cd0a9fcf"
+          "docs/upstream-dashboard-graph.json": "924428e86e7b693f6556eb2da51823c21b011b22899a99d31948d1864ccff428"
         }
       }
     },
@@ -315,16 +315,16 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "d9f6f8527a6ebb1b637717e312a3508b682a6bed71fa0f3efa2779705d19f5ea",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "e389aadcd8cb0d7e9c9dbdaac4e47e7ae43c6f1e67150524ae353e2648994ce6",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
-          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "94994efbdd4fdc15363ae99dabe6a033ff2c6f40231332852a243ab58283df31",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "b7dac5fc4e1eef0548a3267245e50e1aec1c03e7cecfd86f2d11de3c315911d0",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
-          "docs/defects/mos-late-opt-nongpr-ldimm.json": "355cd9c239f52525d52b3bee1d69fdbf2de23661c41a5e025dba2b0434f6f95d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -371,9 +371,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T07:45:09.539305+00:00",
-        "note": "Reviewed against round three (fa868802): the 0069/0070 items record the fixes and the HuC6280 split-out decision; the new records mos-huc-blockmove-frameindex-offset and mos-spc700-hint-outside-order are in the Inbox for the user's ranking; mos-late-opt-nongpr-ldimm is #584 (existing tracker row); mos-far-fold-dangling-dbg-sites is closed. The agent's placeholder receipt is superseded.",
-        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-10-01T13:07:11.771169+00:00",
+        "note": "NOT reviewed or edited by this agent (the coordinator maintains TODO.md). Round four changed the summaries of mos-late-opt-nongpr-ldimm (#584 sequenced, not carried), mos-huc-blockmove-frameindex-offset (split not clean; stays in #321-11) and the resolution of mos-far-fold-dangling-dbg-sites (round-four hashes).",
+        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
     {
@@ -416,16 +416,16 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "d9f6f8527a6ebb1b637717e312a3508b682a6bed71fa0f3efa2779705d19f5ea",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "e389aadcd8cb0d7e9c9dbdaac4e47e7ae43c6f1e67150524ae353e2648994ce6",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
-          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "94994efbdd4fdc15363ae99dabe6a033ff2c6f40231332852a243ab58283df31",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "b7dac5fc4e1eef0548a3267245e50e1aec1c03e7cecfd86f2d11de3c315911d0",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
-          "docs/defects/mos-late-opt-nongpr-ldimm.json": "355cd9c239f52525d52b3bee1d69fdbf2de23661c41a5e025dba2b0434f6f95d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -464,8 +464,8 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T07:29:19.675416+00:00",
-        "note": "Reviewed against the third-round records (late-opt #584, HuC6280 block move, SPC700 hint, far-fold closure) and the 0065 replay onto the rebuilt #321; pending-work and contribution status gained a third-round line and #584 row text; the curation nextStep for #320/#321 was stale and is updated; the 0065 README gained a third-round paragraph.",
+        "reviewed_at": "2026-10-01T13:03:53.795926+00:00",
+        "note": "Reviewed for round four: #584 is sequenced (files first, not carried by the series) and the HuC6280 fix stays in #321-11; both lines updated, matching the changed defect-record summaries.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -509,16 +509,16 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "d9f6f8527a6ebb1b637717e312a3508b682a6bed71fa0f3efa2779705d19f5ea",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "e389aadcd8cb0d7e9c9dbdaac4e47e7ae43c6f1e67150524ae353e2648994ce6",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
-          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "94994efbdd4fdc15363ae99dabe6a033ff2c6f40231332852a243ab58283df31",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "b7dac5fc4e1eef0548a3267245e50e1aec1c03e7cecfd86f2d11de3c315911d0",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
-          "docs/defects/mos-late-opt-nongpr-ldimm.json": "355cd9c239f52525d52b3bee1d69fdbf2de23661c41a5e025dba2b0434f6f95d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -557,8 +557,8 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T07:29:19.688233+00:00",
-        "note": "Reviewed against the third-round records (late-opt #584, HuC6280 block move, SPC700 hint, far-fold closure) and the 0065 replay onto the rebuilt #321; pending-work and contribution status gained a third-round line and #584 row text; the curation nextStep for #320/#321 was stale and is updated; the 0065 README gained a third-round paragraph.",
+        "reviewed_at": "2026-10-01T13:03:53.808609+00:00",
+        "note": "Reviewed for round four: #584 is sequenced (files first, not carried by the series) and the HuC6280 fix stays in #321-11; both lines updated, matching the changed defect-record summaries.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },

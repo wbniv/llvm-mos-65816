@@ -1,7 +1,7 @@
-From 863ec640a7600f0058d16d2fb39b9805522623eb Mon Sep 17 00:00:00 2001
+From c0314e963996bae55d578fbd2f5ce984ff6e429b Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:20:41 +0700
-Subject: [PATCH 34/37] Preserve undefined lane definitions in identity copies
+Subject: [PATCH 33/36] Preserve undefined lane definitions in identity copies
 
 Reuse the prepared 0028 extraction as a compiler prerequisite. The
 far-word boundary workload reaches its existing identity-copy lane
@@ -22,8 +22,10 @@ identity-copy contracts and passes without this change, as its header says.
 This generic VirtRegMap.cpp change needs its own llvm-project path or an
 explicit llvm-mos carry decision.
 
-Default-mode effect: unchanged from the reviewed patch. On the fixed input
-set, examples_snes_bf-vm changes on every MOS CPU except mosspc700 and
+Default-mode effect: unchanged from the reviewed patch. Outside the
+changes below the fixed input set is identical on every MOS CPU except
+mosspc700, which crashes in MOS Late Optimizations before and after;
+fixed separately by #584. On the fixed input set, examples_snes_bf-vm changes on every MOS CPU except mosspc700 and
 mossweet16 (+8 bytes of .text on mos6502, mos65c02 and mosw65816: a kept
 lane definition becomes a register copy before two pair spills), and
 examples_snes_metaball (+1 byte) and examples_snes_sodo (+8 bytes) change

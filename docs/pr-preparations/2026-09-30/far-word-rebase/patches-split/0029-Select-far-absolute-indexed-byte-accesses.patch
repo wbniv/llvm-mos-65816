@@ -1,7 +1,7 @@
-From d11ada6289b384b023c6e362680ef2658956b345 Mon Sep 17 00:00:00 2001
+From ae450c905cf5211359de3af0498a4dcaa6336ea2 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:46:28 +0700
-Subject: [PATCH 30/37] Select far absolute indexed byte accesses
+Subject: [PATCH 29/36] Select far absolute indexed byte accesses
 
 Rebase downstream 0061 onto the extracted far-data prerequisite.
 Retain the existing unsigned index and explicit long-address contracts.

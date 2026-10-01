@@ -4,6 +4,21 @@ Prepared September 30, 2026. This packet rebases the [September 28 extracted ser
 
 ## Split series (current)
 
+Status (2026‑10‑01, fourth round): **ready for a final check, not for filing.** Two user decisions changed the third-round series ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#fourth-round-sequence-584-test-the-huc6280-split)). llvm-mos#584 (open; fork patch `0003-late-opt-nongpr-ldimm-dest`) is no longer carried; it files first, and until it lands mosspc700 segfaults in MOS Late Optimizations identically before and after the series. The HuC6280 fix stays in #321‑11, because it is the rule #321‑11 needs for its own compares. The series is #321 ×16, MC ×2, #320 ×9, then this packet's patches 9, 5–8 and 11–14: 36 patches, top `00b68e60d18d` (branch `pkt-r4-far-word`), in [`patches-split/`](patches-split/).
+
+| Check | Result |
+| --- | --- |
+| Round trip | 36 patches on `06bc967d2668` reproduce every commit tree; final tree `87b0a138ccfe` ([record](evidence/split-series.json); round three: [`split-series-r3.json`](evidence/split-series-r3.json)) |
+| Per commit | patches 9, 5, 6, 7, 8, 11, 12, 13, 14: 180, 181, 182, 183, 184, 184, 185, 189, 189 pass, 1 unsupported each ([stages](../split-320-321/evidence/r4/stages.tsv)) |
+| Red/green | 33 red runs fail, 211 green runs pass, 7 characterization runs pass on their parents ([table](../split-320-321/evidence/r4/red-green.tsv)) |
+| Sensitivity | 262 of 262 substitutions rejected ([results](evidence/sensitivity-r4.json)) |
+| Replay objects | 58 of 58 identical to the reviewed carried packet ([comparison](evidence/split-r4-replay.json)); emulators not rerun |
+| Default mode | as in round three, except mosspc700 without #584 ([table](../split-320-321/evidence/r4/default-all-cpus.txt)) |
+
+The third-round changes per patch, the N9 rebase probes and the other results below still apply.
+
+## Split series, third round
+
 Status (2026‑10‑01, third round): **ready for a final check, not for filing.** The [third independent review](independent-review-3.md) found no blocker. Its nonblocking N17–N22 and the older N1, N2, N3 (patches 5 and 6), N5, N7, N8 and N9 are addressed below and in the [#320 map](../split-320-321/REVIEWER-MAP-320.md#where-the-reviews-findings-land). Filing still waits on mlund's answers on #594 (B5 numbering, B7 alignment including the 1b reservation fix, N18). [Plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#third-round-n17n22-and-the-older-open-items).
 
 The series is #321 in 16 commits (rebuilt for N3/N4), the two MC commits, llvm-mos#584 (our open SPC700 late-opt fix, formerly hidden in #320‑2), #320 in nine commits, then this packet's patches 9, 5–8 and 11–14 (top `f299b753f0d5`, branch `pkt-r3-far-word`). [`patches-split/`](patches-split/) holds all 37 patches in that order.
@@ -173,7 +188,8 @@ All but N6 apply to the patch text itself, so they belong to the split series be
   - Decide the far-quad DWARF representation (B5); escalated with B7.
   - ~~Apply N3 and N4 to the #320 commits.~~ Done. ~~N3/N4 in the #321 commits and far-word patches 5 and 6, and N1, N2, N5 and N7–N9.~~ Done in the third round (patch 10 is #320‑1d, which is clean).
   - ~~Third review's N17–N22.~~ Done in the third round, except N18, which is mlund's to answer.
-  - Decide whether the HuC6280 block-move fix inside #321‑11 should also go upstream on its own, like #584 ([record](../../../defects/mos-huc-blockmove-frameindex-offset.json)).
+  - ~~Decide whether the HuC6280 block-move fix inside #321‑11 should also go upstream on its own.~~ Not cleanly separable; it stays in #321‑11 (round four, [record](../../../defects/mos-huc-blockmove-frameindex-offset.json)).
+  - File #584 before this series ("sequence, don't carry").
   - ~~Rerun this packet's checks and the runtime replay.~~ Done on the carried split. Then have the series independently reviewed again.
 - **Reconcile with #594 (B7).** Settle this with its author and the maintainers before filing a competing register definition.
 - **Settle the #320/#321 scope.** This rebased series does not certify either feature issue. Compiler overhead and independent-application profitability remain unmeasured.

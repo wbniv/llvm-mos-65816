@@ -1,0 +1,27 @@
+# #321-11 (939f9f5fdd0d) with its eliminateFrameIndex hunk reverted to upstream's 'next immediate is the displacement' rule (probe r4-probe-321-11-nohunk)
+# MOS CodeGen+MC: PASS=149 UNSUPPORTED=1 (no lit test covers the rule)
+# examples_65816_a16frameidx (corpus), mosw65816 +mos-a16 -O2: < #321-11 as is, > without the hunk (CmpBrAbsImm16 adds its compare immediate to the stack address)
+82c82
+< 	lda	.Lcheck_sstk
+---
+> 	lda	.Lcheck_sstk+4
+86c86
+< 	lda	.Lcheck_sstk+2
+---
+> 	lda	.Lcheck_sstk+3
+93c93
+< 	lda	.Lcheck_sstk+4
+---
+> 	lda	.Lcheck_sstk+2
+97c97
+< 	lda	.Lcheck_sstk+6
+---
+> 	lda	.Lcheck_sstk+1
+101c101
+< 	lda	.Lcheck_sstk+8
+---
+> 	lda	.Lcheck_sstk+11
+108c108
+< 	lda	.Lcheck_sstk+10
+---
+> 	lda	.Lcheck_sstk+12

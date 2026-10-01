@@ -437,3 +437,48 @@ Per-commit build with assertions and MOS CodeGen+MC; red on parent and green on 
 
 Levels (lesson 4): no third-round change alters the output of an input that compiled before. The third-round tops produce the same assembly and objects as the second-round tops on every CPU, so the second round's per-level table still applies.
 
+
+## Fourth round: sequence #584, test the HuC6280 split
+
+Added 2026‑10‑01 after two user decisions (Will, relayed by the coordinator): "sequence, don't carry" for #584, and split the HuC6280 fix out of #321‑11 only if that can be done cleanly.
+
+### A. #584 is sequenced, not carried
+
+- Drop the #584 commit (`5f5d76c59fa9`) from the series; rebase the 18 commits above it onto the MC top `ed90d3aabae7` (`git rebase --onto`, no conflicts expected: nothing later touches `MOSLateOptimization.cpp` since round three). The 16 #321 and 2 MC commits keep their hashes.
+- Risk to check before anything else: round one put the guard into #320‑2 because the 138 LZSS far decode crashed the same way on the 65816 (an LDImm into an imaginary register). If any far test segfaults in "MOS Late Optimizations" without #584, the far series depends on #584 and the decision goes back to the user.
+- Re-gate the 18 commits as in round three: per-commit build and suites, all-14-CPU default tables, red/green, round trips, packet exports (far-word, near-index, 0065), and the 58 replay objects (expected identical).
+- Messages: "Default-mode effect" lines say the fixed set is identical on every MOS CPU except mosspc700, which crashes in MOS Late Optimizations before and after; fixed separately by #584. Commits with their own default-mode effects keep them and add that clause. The README, maps, tracker, record and the prepared #584 comment say #584 is filed first and not carried.
+
+### B. HuC6280: clean split or not
+
+The five criteria from the decision are checked in order: the HuC6280 effect separable from #321‑11's own change; a patch that applies to `06bc967d2668` alone; a HuC6280 test red there and green with the patch; no other change on any of the 14 CPUs; #321‑11 correct and passing without it. The hunk in question is #321‑11's opcode-keyed displacement rule in `eliminateFrameIndex`, which #321‑11 introduced for its own `CmpBrAbsImm16`. The probe for the last criterion is #321‑11 rebuilt without that hunk.
+
+### Fourth-round results
+
+**A. #584.** The risk check passed: without the guard, the series top passes MOS CodeGen+MC (189 pass, 1 unsupported; only `late-opt-spc700.mir` is gone), the 58 replay objects are byte-identical to the reviewed packet's, and the LZSS gallery IR fails the same way in the virtual register rewriter at `+mos-a16` O2 with and without the guard. No far code on the 65816 reaches the crash.
+
+**B. HuC6280: not clean, kept in #321‑11.** The HuC6280 change is not a separate hunk. It is #321‑11's opcode-keyed displacement rule in `eliminateFrameIndex`, the same rule #321‑11 needs for its own `CmpBrAbsImm16`. Reverting the rule at #321‑11 (probe `r4-probe-321-11-nohunk`) still passes the lit suites (149, 1 unsupported), because no lit test covers the rule. But it miscompiles native compares on stack values under `+mos-a16`: in the corpus input `examples_65816_a16frameidx`, every compare operand moves (`.Lcheck_sstk` → `+4`, `+2` → `+3`, `+4` → `+2`, …; [probe](../pr-preparations/2026-09-30/split-320-321/evidence/r4/huc-split-probe.txt)). So criteria 1 and 5 fail. A standalone upstream patch would be possible, as either the same rule or a narrower `HuCMemcpy` exclusion. But #321‑11 would then depend on it being upstream first, and the series could not keep HuC6280 behaviour unchanged without reintroducing the miscompile on purpose. The fix stays in #321‑11, whose message states the HuC6280 effect (round three). One gap remains: #321‑11 has no lit test for the rule; the record's reduced HuC6280 test or an `a16frameidx`-style MIR test would cover it.
+
+### Fourth-round verification
+
+1. Per commit, the 18 rebuilt commits (`r4-*` labels; final hashes in [final-map](../pr-preparations/2026-09-30/split-320-321/evidence/r4/final-map.tsv)).
+
+    ```text
+    #320 160 161 166 167 168 168 174 176 178; far-word 180 181 182 183 184 184 185 189 189 (1 unsupported each), gate_rc=0, hash_rc=0, 0 MOS warnings
+    ```
+
+    PASS.
+
+2. All 14 CPUs: every step as in round three; against round three only mosspc700 differs.
+
+    ```text
+    r3-fw-14 vs r4-fw-14: mosspc700 same=58 pass->fail=31 error=1 (k_mandel_far: far diagnostics, then the late-opt crash); every other CPU same=90
+    mosspc700 late-opt crashes: MC top 31, series top 32 (the same 31 + k_mandel_far)
+    ```
+
+    PASS as expected by the decision; k_mandel_far stated in #320‑2's message.
+
+3. Red/green: 33 red runs fail, 211 green runs pass, 7 characterization runs pass on their parents, nothing unexpected. PASS.
+4. Round trips: split 27 of 27 patches, final tree `dcbb521f6fa6`; far-word 36 patches, final tree `87b0a138ccfe`. PASS.
+5. Replay objects 58 of 58 identical; sensitivity 262 of 262. PASS.
+6. HuC6280 split probe: #321‑11 without the rule passes lit (149, 1 unsupported) and miscompiles `examples_65816_a16frameidx`. Outcome: not clean; kept in #321‑11.

@@ -1,7 +1,7 @@
 From 939f9f5fdd0d974aae4999e8d49a1d626398d7a7 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 11/37] [MOS] Select native 16-bit compares and fused branches
+Subject: [PATCH 11/36] [MOS] Select native 16-bit compares and fused branches
 
 Under +mos-a16, s16 unsigned ordering (UGE, and ULT through it) becomes one 16-bit G_SBC whose carry the branch reads, selected as `lda; cmp` with immediate, absolute, (zp) or Imag16 right operands. Signed less-than is rewritten to unsigned less-than on sign-flipped operands, (a ^ 0x8000) <u (b ^ 0x8000). Equality uses the native form when it feeds a branch or when both operands are already in Imag16, come from foldable absolute loads, or pair a foldable load with a nonzero constant; other equality compares keep the byte chain, which is cheaper for register-resident operands. A branch on native equality becomes a fused CmpBr pseudo (Imag16/immediate/absolute operand combinations) that expands after allocation to `lda; cmp; b<cc>`. The 8-bit compare matchers reject 16-bit G_SBC.
 

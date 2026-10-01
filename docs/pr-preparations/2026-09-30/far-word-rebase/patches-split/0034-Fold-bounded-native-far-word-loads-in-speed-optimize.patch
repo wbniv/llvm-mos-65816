@@ -1,7 +1,7 @@
-From 30746b44f4bd10f5673877441e9f7235dd0fe952 Mon Sep 17 00:00:00 2001
+From e6c8abdfb85c2430655a04a6c87a3fed5eb450e6 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:05:07 +0700
-Subject: [PATCH 35/37] Fold bounded native far word loads in speed-optimized
+Subject: [PATCH 34/36] Fold bounded native far word loads in speed-optimized
  functions
 
 Admit plain two-byte far loads to the all-users indexed-address walk.

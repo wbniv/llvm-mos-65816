@@ -1,7 +1,7 @@
-From 04b8ef0f4c50a0c242e86e180c6d7eba25115fe9 Mon Sep 17 00:00:00 2001
+From e02e641a88b02de8e1b50950140493a4a9c51b18 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:47:16 +0700
-Subject: [PATCH 31/37] Select native accumulator far word accesses
+Subject: [PATCH 30/36] Select native accumulator far word accesses
 
 Rebase downstream 0062 onto the pinned native/far compiler series.
 Original implementation, validation and review credits remain in the

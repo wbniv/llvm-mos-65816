@@ -1,7 +1,7 @@
 From 25e5dba45c103520b0f2ed209f8a84b6f2993854 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 07/37] [MOS] Keep call-clobbered imaginary copies out of
+Subject: [PATCH 07/36] [MOS] Keep call-clobbered imaginary copies out of
  Imag16 pairs
 
 Refuse to coalesce a sub-register copy into an Imag16 pair when one side is a virtual register whose only definition is `COPY $rcN` and that register is live across a call whose regmask clobbers $rcN. The pair would inherit the $rcN allocation hint and could be re-bound to $rcN across the clobbering call, leaving a use with no reaching definition that the machine verifier rejects. Keeping the COPY gives the value its own spillable register.

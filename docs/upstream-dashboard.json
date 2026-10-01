@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "d8d2a281ef2e82b8311824fed39b38606adef94b300f0c8514fe27930c1a1a0f",
+  "sourceHash": "98899cb71db9a72e71faa21d465edd55abb5dafc9c6f408f1118bfb9f0f7ec40",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -272,7 +272,7 @@
       "id": "defect:mos-huc-blockmove-frameindex-offset",
       "kind": "defect",
       "title": "HuC6280 block moves into a stack object get the block length as their destination offset",
-      "summary": "Upstream MOSRegisterInfo::eliminateFrameIndex adds the immediate operand that follows a frame index as its displacement. The HuC6280 HuCMemcpy pseudo (src, dst, length, descending) has its length right after the destination frame index, so a block move into a stack object gets length instead of the operand's own offset: a 32-byte constant copied into a local array becomes `tii line,sstk+16,#16; tii line+16,sstk+16,#16`, which writes the first half over the second and leaves bytes 0-15 unset. Silent wrong code on moshuc6280 at -O2 on upstream main 06bc967d2668 (two corpus inputs of the default-mode set change, cardioid and mvscrl). The #321 split commit 'Select native 16-bit compares and fused branches' (#321-11) replaces the heuristic with a per-opcode rule for its own CmpBrAbsImm16 pseudo and fixes this as a side effect; that commit's plan claimed no default-mode effect. Upstream is not fixed.",
+      "summary": "Upstream MOSRegisterInfo::eliminateFrameIndex adds the immediate operand that follows a frame index as its displacement. The HuC6280 HuCMemcpy pseudo (src, dst, length, descending) has its length right after the destination frame index, so a block move into a stack object gets length instead of the operand's own offset: a 32-byte constant copied into a local array becomes `tii line,sstk+16,#16; tii line+16,sstk+16,#16`, which writes the first half over the second and leaves bytes 0-15 unset. Silent wrong code on moshuc6280 at -O2 on upstream main 06bc967d2668 (two corpus inputs of the default-mode set change, cardioid and mvscrl). The #321 split commit 'Select native 16-bit compares and fused branches' (#321-11) replaces the heuristic with a per-opcode rule for its own CmpBrAbsImm16 pseudo and fixes this as a side effect; that commit's plan claimed no default-mode effect. Upstream is not fixed. Round four checked whether the fix can be split out as a standalone upstream patch: it cannot be done cleanly. The HuC6280 effect is the same opcode-keyed displacement rule that #321-11 needs for its own CmpBrAbsImm16 pseudo; with the rule reverted, #321-11 still passes its lit suites (no test covers the rule) but miscompiles native compares on stack values under +mos-a16 (examples_65816_a16frameidx loads .Lcheck_sstk+4 instead of +0, and so on; docs/pr-preparations/2026-09-30/split-320-321/evidence/r4/huc-split-probe.txt). So the fix stays in #321-11, whose message states the HuC6280 effect.",
       "localStatus": "qualified",
       "publicationStatus": "unknown",
       "evidenceUrls": [
@@ -304,7 +304,7 @@
       "id": "defect:mos-late-opt-nongpr-ldimm",
       "kind": "defect",
       "title": "mos-late-opt dereferences a null tracker on an SPC700 LDImm into an imaginary register",
-      "summary": "MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On current upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The fix is our own open upstream PR #584 (restrict the immediate-load folding to GPR destinations), carried downstream as patch 0003 and, since the third round, as its own commit in the #320/#321 split series ahead of #320. Upstream is not fixed until #584 merges, so the status stays confirmed.",
+      "summary": "MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On current upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The fix is our own open upstream PR #584 (restrict the immediate-load folding to GPR destinations), carried downstream as patch 0003. It is not carried in the #320/#321 split series: the third round briefly carried it as its own commit, and on 2026-10-01 the user decided to sequence it instead (#584 files first). Until #584 lands, mosspc700 crashes in MOS Late Optimizations identically before and after the series. Upstream is not fixed until #584 merges, so the status stays confirmed.",
       "localStatus": "qualified",
       "publicationStatus": "unknown",
       "evidenceUrls": [

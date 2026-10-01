@@ -1,7 +1,7 @@
-From 9c364c9637e4c7d8eb13060b01f44966c53c99d3 Mon Sep 17 00:00:00 2001
+From 75a97a9a99dfb86b54f358014627a5b839623af1 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:04:27 +0700
-Subject: [PATCH 29/37] Cost native index copies to imaginary register pairs
+Subject: [PATCH 28/36] Cost native index copies to imaginary register pairs
 
 Model the four legal X16/Y16 <-> Imag16 copy edges that physical-copy
 lowering already supports. Each uses a two-byte direct-page instruction

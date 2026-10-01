@@ -1,0 +1,252 @@
+test	version	role	llc	kind	llc_sha256_16	result	first_diagnostic
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	red-parent	r4-320-1a3	reg	8a3db83e465ba6b2	FAIL	RUN 1: LLVM ERROR: Use not jointly dominated by defs.
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-320-1b	reg	baa60685ed403859	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-320-1c	reg	2594386231e77852	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-320-1d	reg	90c7e0978e68f759	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/imag32-reserved-pairs.ll	r4-320-1b	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	red-parent	r4-320-1b	reg	baa60685ed403859	FAIL	RUN 1: error: /work/build/split-320-321/probe-r4/r4-320-1c__imag32-allocation-gate.mir: Cannot use non-allocatable class 'Imag32' for virtual register 0 in function 'imag32_vreg'
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-320-1c	reg	2594386231e77852	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-320-1d	reg	90c7e0978e68f759	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/imag32-allocation-gate.mir	r4-320-1c	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	red-parent	r4-320-1b	reg	baa60685ed403859	FAIL	RUN 1: error: CHECK-NEXT: expected string not found in input
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	red-unrepaired	c-320-01	reg	d5022893511ee122	FAIL	RUN 1: Assertion `TmpVec.size() > 1' failed.
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-320-1c	reg	2594386231e77852	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-320-1d	reg	90c7e0978e68f759	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-1c	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	red-parent	r4-320-1c	reg	2594386231e77852	FAIL	RUN 1: Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-320-1d	reg	90c7e0978e68f759	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/prologepilog.mir	r4-320-1d	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	red-parent	r4-320-1d	reg	90c7e0978e68f759	FAIL	RUN 4: LLVM ERROR: unable to legalize instruction: %6:_(s8) = G_LOAD %3:_(p2) :: (volatile load (s8) from %ir.d, addrspace 2) (in function: callee4)
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	red-unrepaired	c-320-02	reg	58540bdeab7b6ef5	FAIL	RUN 6: error: STACK: expected string not found in input
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-arg-exhaustion.ll	r4-320-2	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	red-parent	r4-320-1d	reg	90c7e0978e68f759	FAIL	RUN 1: LLVM ERROR: unable to legalize instruction: %8:_(s8) = G_LOAD %3:_(p2) :: (volatile load (s8) from %ir.p3, addrspace 2) (in function: f)
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	red-unrepaired	c-320-02	reg	58540bdeab7b6ef5	FAIL	RUN 1: Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-quad-spill-call.ll	r4-320-2	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	red-parent	r4-320-1d	reg	90c7e0978e68f759	FAIL	RUN 2: LLVM ERROR: unable to legalize instruction: %2:_(s8) = G_LOAD %0:_(p2) :: (load (s8) from %ir.p, addrspace 2) (in function: ld_rt)
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	red-unrepaired	r2-320-2	reg	9f52795b3f2eb45c	FAIL	RUN 6: LLVM ERROR: far (address space 2) pointer value requires the 65816; the target CPU has no far pointer registers (in function: pass_far)
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-access-non-65816.ll	r4-320-2	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	red-parent	r4-320-1d	reg	90c7e0978e68f759	FAIL	RUN 2: LLVM ERROR: unable to legalize instruction: %3:_(s8) = G_LOAD %2:_(p2) :: (load (s8) from %ir.q, addrspace 2) (in function: walk)
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	red-unrepaired	c-320-02	reg	58540bdeab7b6ef5	FAIL	RUN 2: error: DROP: expected string not found in input
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-2	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	red-parent	r4-320-1d	reg	90c7e0978e68f759	FAIL	RUN 1: LLVM ERROR: unable to legalize instruction: %1:_(p0) = G_ADDRSPACE_CAST %0:_(p2) (in function: far_to_near)
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	red-unrepaired	p-320-02	reg	053193836fc67412	FAIL	RUN 1: Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed.
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-320-2	reg	059ab2344b862767	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-ptr-trunc.ll	r4-320-2	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	red-parent	r4-320-2	reg	059ab2344b862767	FAIL	RUN 2: LLVM ERROR: unable to legalize instruction: G_MEMSET %0:_(p2), %1:_(s8), %2:_(s32), 0 :: (store (s8) into %ir.d, addrspace 2) (in function: set_65535)
+CodeGen/MOS/far-memop-length.ll	r4-320-3	red-unrepaired	p-320-03	reg	9176eb386b7a6627	FAIL	RUN 2: error: CHECK: expected string not found in input
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-320-3	reg	96b7cf205d9e244a	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-memop-length.ll	r4-320-3	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	red-parent	r4-320-3	reg	96b7cf205d9e244a	FAIL	RUN 9: error: SALV1: expected string not found in input
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	red-unrepaired	r2-320-4	reg	70d96dbc4e78218c	FAIL	RUN 9: error: SALV1: expected string not found in input
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-320-4	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	red-parent	r4-320-3	reg	96b7cf205d9e244a	FAIL	RUN 2: error: CHECK: expected string not found in input
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	red-unrepaired	p-320-04	reg	5b7d45e7da478195	FAIL	RUN 2: error: CHECK: expected string not found in input
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-320-4	reg	78359db68be0ecc3	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-320-4	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	red-parent	r4-320-4	reg	78359db68be0ecc3	FAIL	RUN 1: error: '<stdin>' is empty.
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/native-index-copy-cost.mir	r4-fw-9	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	red-parent	r4-320-4	reg	78359db68be0ecc3	FAIL	RUN 2: LLVM ERROR: MOS: no lowering for a native 16-bit copy from X16 to Y16
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	red-unrepaired	r2-fw-9	reg	cda3200958d98920	FAIL	RUN 2: LLVM ERROR: MOS: no lowering for a native 16-bit copy from X16 to Y16
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-9	reg	a5510abe3b648daf	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/native-copy-unlowered.mir	r4-fw-9	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	red-parent	r4-fw-9	reg	a5510abe3b648daf	FAIL	RUN 1: error: CHECK: expected string not found in input
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-global-long-x.ll	r4-fw-5	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	red-parent	r4-fw-9	reg	a5510abe3b648daf	FAIL	RUN 28: error: DROP: expected string not found in input
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	red-unrepaired	c-fw-14	reg	cce5eb24ccd61411	FAIL	RUN 2: error: DROP: expected string not found in input
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	green	r4-fw-5	reg	7f354ed2616a1ac0	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	green	r4-fw-6	reg	a956d3c4e4b5e81c	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	green	r4-fw-7	reg	b99ae356aa4372d4	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-fold-debug.ll	r4-fw-5	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-loop-range.mir	r4-fw-8	red-parent	r4-fw-7	reg	b99ae356aa4372d4	FAIL	RUN 1: error: A16: expected string not found in input
+CodeGen/MOS/far-loop-range.mir	r4-fw-8	green	r4-fw-8	reg	fa97eff36f65d247	PASS	
+CodeGen/MOS/far-loop-range.mir	r4-fw-8	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/MOS/far-loop-range.mir	r4-fw-8	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-loop-range.mir	r4-fw-8	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-loop-range.mir	r4-fw-8	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir	r4-fw-11	red-parent	r4-fw-8	reg	fa97eff36f65d247	FAIL	RUN 1: LLVM ERROR: Found 1 machine code errors.
+CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir	r4-fw-11	green	r4-fw-11	reg	9fdad8006f535aee	PASS	
+CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir	r4-fw-11	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir	r4-fw-11	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir	r4-fw-11	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/X86/virtregrewriter-x86-copy-contracts.mir	r4-fw-11	red-parent	r4-fw-8	char	fa97eff36f65d247	PASS	
+CodeGen/X86/virtregrewriter-x86-copy-contracts.mir	r4-fw-11	green	r4-fw-11	char	9fdad8006f535aee	PASS	
+CodeGen/X86/virtregrewriter-x86-copy-contracts.mir	r4-fw-11	green	r4-fw-12	char	95e21160b5ae0c31	PASS	
+CodeGen/X86/virtregrewriter-x86-copy-contracts.mir	r4-fw-11	green	r4-fw-13	char	95e21160b5ae0c31	PASS	
+CodeGen/X86/virtregrewriter-x86-copy-contracts.mir	r4-fw-11	green	r4-fw-14	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-policy.mir	r4-fw-12	red-parent	r4-fw-11	reg	9fdad8006f535aee	FAIL	RUN 1: error: SPEED: expected string not found in input
+CodeGen/MOS/far-word-policy.mir	r4-fw-12	red-unrepaired	r2-fw-14	reg	c90f96487d2fe6d3	FAIL	RUN 7: error: ALL: expected string not found in input
+CodeGen/MOS/far-word-policy.mir	r4-fw-12	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-policy.mir	r4-fw-12	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-policy.mir	r4-fw-12	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-fw-12	red-parent	r4-fw-11	reg	9fdad8006f535aee	FAIL	RUN 3: error: CHECK: expected string not found in input
+CodeGen/MOS/far-index-fold-debug.ll	r4-fw-12	red-unrepaired	fw-old	reg	d7fde754bb0222b4	FAIL	RUN 2: error: CHECK: expected string not found in input
+CodeGen/MOS/far-index-fold-debug.ll	r4-fw-12	green	r4-fw-12	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-fw-12	green	r4-fw-13	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-index-fold-debug.ll	r4-fw-12	green	r4-fw-14	reg	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-policy.mir	r4-fw-13	red-parent	r4-fw-12	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-policy.mir	r4-fw-13	green	r4-fw-13	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-policy.mir	r4-fw-13	green	r4-fw-14	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-index-boundaries.mir	r4-fw-13	red-parent	r4-fw-12	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-index-boundaries.mir	r4-fw-13	green	r4-fw-13	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-index-boundaries.mir	r4-fw-13	green	r4-fw-14	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-loop-range-boundaries.mir	r4-fw-13	red-parent	r4-fw-12	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-loop-range-boundaries.mir	r4-fw-13	green	r4-fw-13	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-loop-range-boundaries.mir	r4-fw-13	green	r4-fw-14	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-rep-sep.mir	r4-fw-13	red-parent	r4-fw-12	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-rep-sep.mir	r4-fw-13	green	r4-fw-13	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-rep-sep.mir	r4-fw-13	green	r4-fw-14	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-index-integration.ll	r4-fw-13	red-parent	r4-fw-12	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-index-integration.ll	r4-fw-13	green	r4-fw-13	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-index-integration.ll	r4-fw-13	green	r4-fw-14	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-index-boundaries.mir	r4-fw-14	red-parent	r4-fw-13	char	95e21160b5ae0c31	PASS	
+CodeGen/MOS/far-word-index-boundaries.mir	r4-fw-14	green	r4-fw-14	char	95e21160b5ae0c31	PASS	

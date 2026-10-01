@@ -1,7 +1,7 @@
 From 9cf29583ac1b15423b79e6043661deab75aff261 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 09/37] [MOS] Legalize native s32/s64 lanes and wide
+Subject: [PATCH 09/36] [MOS] Legalize native s32/s64 lanes and wide
  any-extensions
 
 Under +mos-a16, an s32 value is represented as two s16 lanes and an s64 value as two s32 halves: G_ANYEXT to s32 from s8/s16 and G_TRUNC from s32 to s16 are legal, G_MERGE_VALUES/G_UNMERGE_VALUES between s32 and 2 x s16 and between s64 and 2 x s32 are legal, and the four-piece forms (4 x s8 <-> s32, 4 x s16 <-> s64) are split into those two-level forms, because the selector handles only two-part merges. Extensions to s64 are custom.

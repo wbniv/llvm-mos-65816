@@ -1,7 +1,7 @@
-From 1a49ff6be74cc4e9954d062575f0c97576de16b2 Mon Sep 17 00:00:00 2001
+From 9d476f439c4f47be5889df17fcdd26fbc2da38a7 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 24/37] [MOS] Add the far address space and allocate Imag32
+Subject: [PATCH 23/36] [MOS] Add the far address space and allocate Imag32
  quads on the 65816
 
 Add address space 2 for far data pointers: `p2:32:8` in the MOS data layout (TargetDataLayout and MOSTargetMachine) and AS_Far in MOS::AddressSpace. A far pointer is a 32-bit value whose low three bytes are the 65816 long address; 32 bits keep it a simple MVT, since there is no MVT::i24.
@@ -12,7 +12,7 @@ Calls: where quads are allocatable, a far pointer argument is assigned to RL1-RL
 
 Address space 2 changes meaning on every MOS CPU. Upstream has no p2 entry in the data layout, so an addrspace(2) pointer there is a 16-bit pointer like any other. With this commit it is a 32-bit far pointer on every MOS CPU, not only the 65816: IR that used addrspace(2) for some other purpose now gets 32-bit pointers, and on CPUs without the 65816 the next commit rejects far accesses and far pointer values with far-specific errors.
 
-Default-mode effect: the data layout string gains p2:32:8 for every MOS CPU. Generated code for the fixed input set is identical on all 14 MOS CPUs (assembly and objects). On mosspc700, 18 corpus inputs that already abort upstream in the greedy allocator ("Target hint is outside allocation order", record mos-spc700-hint-outside-order) fail differently: the strong-hint filter turns the assertion into "ran out of registers during register allocation" followed by an abort in the virtual register rewriter.
+Default-mode effect: the data layout string gains p2:32:8 for every MOS CPU. Generated code (assembly and objects) is identical on every MOS CPU for the fixed input set except mosspc700, which crashes in MOS Late Optimizations before and after; fixed separately by #584. On mosspc700, 18 corpus inputs that abort earlier, already upstream, in the greedy allocator ("Target hint is outside allocation order", record mos-spc700-hint-outside-order) fail differently: the strong-hint filter turns the assertion into "ran out of registers during register allocation" followed by an abort in the virtual register rewriter.
 
 Tests: imag32-allocation-gate.mir checks that the 65816 allocates a quad and that mos6502 reports that no register is available, with no hint from a quad outside the order; it replaces #594's imag32-nonalloc.mir, whose non-allocatable class this commit changes. far-ptr-arg-exhaustion.ll checks call lowering for a fourth far pointer and for near/far interleavings in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16, and that mos6502 passes every far pointer on the stack. Nothing produces address space 2 values until the next commits.
 

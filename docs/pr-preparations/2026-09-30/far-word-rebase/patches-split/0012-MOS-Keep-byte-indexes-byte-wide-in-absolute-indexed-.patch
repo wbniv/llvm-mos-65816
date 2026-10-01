@@ -1,7 +1,7 @@
 From fc7a64f9d59e43c59bbf4fd13fc09af85569d2f2 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 12/37] [MOS] Keep byte indexes byte-wide in absolute indexed
+Subject: [PATCH 12/36] [MOS] Keep byte indexes byte-wide in absolute indexed
  addressing
 
 In absolute indexed addressing, an index that is already s8 (a zero-page pointer offset) is used directly. An s16 index known to fit in 8 bits is truncated for the access, and its other users are rewritten to an explicit G_MERGE_VALUES of the low byte and a zero byte, inserted after the definition (after the PHIs for a PHI), with the legalizer observer notified around each rewrite so GISel CSE stays consistent.

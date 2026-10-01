@@ -1,0 +1,113 @@
+# All 14 MOS CPUs, 90 inputs, -O2 (default-hashes-cpus.sh). Each row: commit vs its parent; the first #320 commit vs the MC top (r3-mc-2, unchanged).
+r4-320-1a1: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-320-1a2: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-320-1a3: total        same=1204 fail->pass=0 pass->fail=19 output=0 error=37
+   mos4510      same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mos45gs02    same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mos6502      same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mos6502x     same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mos65c02     same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mos65ce02    same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mos65dtv02   same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mos65el02    same= 86 fail->pass=0 pass->fail=3 output=0 error=1
+   moshuc6280   same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mosr65c02    same= 86 fail->pass=0 pass->fail=1 output=0 error=3
+   mosspc700    same= 86 fail->pass=0 pass->fail=0 output=0 error=4
+   mossweet16   same= 86 fail->pass=0 pass->fail=0 output=0 error=4
+   mosw65816    same= 86 fail->pass=0 pass->fail=4 output=0 error=0
+   mosw65c02    same= 86 fail->pass=0 pass->fail=3 output=0 error=1
+r4-320-1b: total        same=1204 fail->pass=19 pass->fail=0 output=0 error=37
+   mos4510      same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mos45gs02    same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mos6502      same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mos6502x     same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mos65c02     same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mos65ce02    same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mos65dtv02   same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mos65el02    same= 86 fail->pass=3 pass->fail=0 output=0 error=1
+   moshuc6280   same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mosr65c02    same= 86 fail->pass=1 pass->fail=0 output=0 error=3
+   mosspc700    same= 86 fail->pass=0 pass->fail=0 output=0 error=4
+   mossweet16   same= 86 fail->pass=0 pass->fail=0 output=0 error=4
+   mosw65816    same= 86 fail->pass=4 pass->fail=0 output=0 error=0
+   mosw65c02    same= 86 fail->pass=3 pass->fail=0 output=0 error=1
+r4-320-1c: total        same=1242 fail->pass=0 pass->fail=0 output=0 error=18
+   mosspc700    same= 72 fail->pass=0 pass->fail=0 output=0 error=18
+r4-320-1d: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-320-2: total        same=1191 fail->pass=0 pass->fail=0 output=0 error=69
+   mos4510      same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mos45gs02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mos6502      same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mos6502x     same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mos65c02     same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mos65ce02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mos65dtv02   same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mos65el02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   moshuc6280   same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mosr65c02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mosspc700    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mossweet16   same= 86 fail->pass=0 pass->fail=0 output=0 error=4
+   mosw65816    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+   mosw65c02    same= 85 fail->pass=0 pass->fail=0 output=0 error=5
+r4-320-3: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-320-4: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-fw-9: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-fw-5: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-fw-6: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-fw-7: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-fw-8: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-fw-11: total        same=1246 fail->pass=0 pass->fail=0 output=14 error=0
+   mos4510      same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mos45gs02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mos6502      same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mos6502x     same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mos65c02     same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mos65ce02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mos65dtv02   same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mos65el02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   moshuc6280   same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mosr65c02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+   mosw65816    same= 87 fail->pass=0 pass->fail=0 output=3 error=0
+   mosw65c02    same= 89 fail->pass=0 pass->fail=0 output=1 error=0
+r4-fw-12: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-fw-13: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+r4-fw-14: total        same=1260 fail->pass=0 pass->fail=0 output=0 error=0
+
+# Against round three (with #584 carried)
+r3-fw-14 vs r4-fw-14:
+mosspc700    same= 58 fail->pass=0 pass->fail=31 output=0 error=1
+total        same=1228 fail->pass=0 pass->fail=31 output=0 error=1
+pass->fail O2 corpus/examples_65816_a16scavnz.c.default.ll mosspc700 ('0', '2275f990824b29ed', '0', '303a0b8a83a10c2e') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_65816_k_bits.c.default.ll mosspc700 ('0', 'f391c2e277c0e188', '0', 'ab7c56d28ca487af') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+error O2 corpus/examples_65816_k_mandel_far.c.default.ll mosspc700 ('1', 'err:aac7169617e8', '1', '-') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_65816_mixedwidth-probe.c.default.ll mosspc700 ('0', 'f76c1700f84d7541', '0', '5e718d78ebe169d5') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_avalanche_sim.c.default.ll mosspc700 ('0', 'f38262f0dc56c749', '0', '9f1e3e0a7d57b68f') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_boids_sim.c.default.ll mosspc700 ('0', '97fe46eea72e299d', '0', '6457e9ee7061f4cf') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_cgrade_sim.c.default.ll mosspc700 ('0', 'eb6f5d849b7d0f54', '0', '9837f40abc3ac56c') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_critters_sim.c.default.ll mosspc700 ('0', '76f55befe27ada2f', '0', '80c12eb8e570a52d') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_fenwick_sim.c.default.ll mosspc700 ('0', '0d53f5ea1562992f', '0', 'ad713e45f3978b4b') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_grid3d_sim.c.default.ll mosspc700 ('0', '603a878ed9e3e4ce', '0', '7bc582ba2baee56e') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_jt256_sim.c.default.ll mosspc700 ('0', '5df95ae57583e1e7', '0', 'bd8642e78b65337a') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_lzdec_sim.c.default.ll mosspc700 ('0', '31f32d72e4312f3d', '0', '99b4962113f007ec') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_montorbit_sim.c.default.ll mosspc700 ('0', '4511e368e45bcd1f', '0', '54ca65b15d5c4328') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_nmitally_sim.c.default.ll mosspc700 ('0', 'fc7c4e369276009f', '0', '9350260095ebec6a') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_perlin_sim.c.default.ll mosspc700 ('0', '488a89c4f6758e6e', '0', 'ddd0fe27eabb8483') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_rangecode_sim.c.default.ll mosspc700 ('0', '5e041536563bfeee', '0', 'd52a5a0a8ea126d9') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_sodo_sim.c.default.ll mosspc700 ('0', '5b02e06add35ce24', '0', '49de6623df7ec649') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_tea_sim.c.default.ll mosspc700 ('0', '9efffb58f402842c', '0', 'f83d6d97046c905a') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 corpus/examples_snes_corpus_ulam_sim.c.default.ll mosspc700 ('0', '5f634dbd3066ec5a', '0', '971399b1b21200be') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/callee-saved-regs.ll mosspc700 ('0', 'ec11a0802396430a', '0', '02c957d7f119b5eb') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/char-stats-norecurse.ll mosspc700 ('0', '63bf26bee98cdc3f', '0', '345c089ea0c1e78c') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/char-stats.ll mosspc700 ('0', '53999960688dfb36', '0', '4f95f02ec98ef4a6') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/fcmp.ll mosspc700 ('0', '5bf98902aab42276', '0', 'ca744d33670e19e9') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/getchar-regression.ll mosspc700 ('0', 'b184afe2cbeeaf0c', '0', 'ea7092af99ebeeae') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/immediate-remat.ll mosspc700 ('0', 'eb4632a58bfbdd85', '0', 'f1027df28c09b746') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/indvar-simplify-20230930.ll mosspc700 ('0', 'bd87cad119368200', '0', '88f611ea4bd1e6ce') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/light-spill.ll mosspc700 ('0', '6f803fe8f304e486', '0', 'f74c480e98702734') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/scmp-ucmp.ll mosspc700 ('0', '425c17ed0b2ac430', '0', 'ca800a8f55a9f0af') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/shift-rotate.ll mosspc700 ('0', '7a3e401b4c8c3cec', '0', 'b0be13794b9d01f4') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/vector-scalarize.ll mosspc700 ('0', 'afc2ea08ff9b885e', '0', '3648b0fb6b6a8512') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/whole-program-zp.ll mosspc700 ('0', '6b122c720b04bd39', '0', '9e548d9b1059b3e6') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+pass->fail O2 tests/zp-alloc.ll mosspc700 ('0', 'e13a6dc2d46aa8e6', '0', '12893036f2779d42') -> ('139', 'err:3dff6dfc75e0', '139', '-')
+
+# mosspc700 'MOS Late Optimizations' crashes: MC top 31, series top 32 (the same 31 plus examples_65816_k_mandel_far, which at #320-2 first reports the far-access diagnostics and then reaches the crash)

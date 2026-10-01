@@ -1,7 +1,7 @@
-From e801be3ce227156ecc3cef5214f426d54f7d729a Mon Sep 17 00:00:00 2001
+From 8c3546e8a19ee71ab0dc6c4af12a48077bb159f0 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 18:47:56 +0700
-Subject: [PATCH 33/37] Prove bounded byte-loop ranges for far runtime indexing
+Subject: [PATCH 32/36] Prove bounded byte-loop ranges for far runtime indexing
 
 Rebase downstream 0069 onto the pinned native/far compiler series.
 Original implementation, validation and review credits remain in the

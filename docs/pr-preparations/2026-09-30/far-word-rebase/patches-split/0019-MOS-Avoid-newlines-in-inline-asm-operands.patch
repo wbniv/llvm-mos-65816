@@ -1,7 +1,7 @@
-From dec9150f0d0b6aff7d8e2f33e0c57e1c5466989e Mon Sep 17 00:00:00 2001
+From f63ae2a066a86a9060cd9d45f64d3f6ec447b240 Mon Sep 17 00:00:00 2001
 From: mlund <mlund@localhost>
 Date: Mon, 10 Aug 2026 16:42:13 +0200
-Subject: [PATCH 20/37] [MOS] Avoid newlines in inline asm operands
+Subject: [PATCH 19/36] [MOS] Avoid newlines in inline asm operands
 
 PrintAsmOperand must emit only operand text. An embedded newline corrupts
 templates that add syntax after a zero-page CSR operand.

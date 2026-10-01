@@ -6,7 +6,7 @@ Both folds erase the access, which can leave the pointer add and any constant-of
 
 With a 16-bit Y, the index stays in an Imag16 pair until emission: LDIndirLongYIdx/STIndirLongYIdx are emitted as `ldy zp` directly followed by the access, so no spill code can insert a `sep #$10` that clears Y's high byte.
 
-Default-mode effect: none; only far byte accesses change.
+Default-mode effect: identical on every MOS CPU for the fixed input set except mosspc700, which crashes in MOS Late Optimizations before and after; fixed separately by #584. Only far byte accesses change.
 
 Tests: far-indir-indexed.ll covers 16-bit reads through a runtime far pointer and a far array subscript; constant displacements 1 and 3 (and 0 and 4, which are not folded); runtime byte offsets for loads, stores and a blit, with 8-bit and 16-bit (+mos-xy16) Y, masked, sign-extended and 16-bit-wrapping offsets; and the declining cases: unbounded 32-bit offsets, absolute bases, escaping pointers, calls between the add and its accesses, multiple accesses in a function with calls, and a sibling access out of range. It checks assembly and object bytes ($a7/$b7/$97) in +mos-a16 and +mos-a16,+mos-xy16 modes, and the fused pseudos after instruction selection. far-index-fold-debug.ll checks a -g runtime-offset byte fold under -verify-machineinstrs: the dead pointer's DBG_VALUE becomes $noreg, the base pointer's location is kept, and the fold happens. far-fold-debug.ll adds -g displacement-window cases (a load at base + 1, a store at base + 3, and a runtime offset plus 1), compiled verifier-clean at O0 and O2, and checks after the legalizer that each is salvaged to its live base with DW_OP_plus_uconst 1 or 3.
 

@@ -1,6 +1,6 @@
 # #320/#321 split into reviewable commit series
 
-Status: split landed on branch `split-320-321` in `build/split-320-321/source` (a worktree of `.scratch/carry-clang-upstream/source`), head `1a616f08ea67`. Nothing is posted. On 2026‑09‑30 the series was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application): `GeneratePressureSet = 0` in #321‑1 and the pressure hooks with the `-O3` gate in #321‑8. Every commit hash changed, and every gate below was rerun on the new commits. On 2026‑10‑01 the far-prerequisite repairs (B1–B4, the B6 trunc pattern) and the N3/N4 cleanups were carried into the four #320 commits ([carry](#far-prerequisite-carry-2026-10-01)); the #321 and MC commits are unchanged. Contract: [the split plan](../../../plans/2026-09-30-split-320-321-series.md) and [the carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md). **Current series (2026‑10‑01, third round):** branch `split-320-321-r3`, with every #321 commit rebuilt for N3/N4, llvm-mos#584 as its own commit after MC, and nine #320 commits on #594; see [Third round](#third-round-2026-10-01). The second-round #320 stays on `split-320-321-r2`.
+Status: split landed on branch `split-320-321` in `build/split-320-321/source` (a worktree of `.scratch/carry-clang-upstream/source`), head `1a616f08ea67`. Nothing is posted. On 2026‑09‑30 the series was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application): `GeneratePressureSet = 0` in #321‑1 and the pressure hooks with the `-O3` gate in #321‑8. Every commit hash changed, and every gate below was rerun on the new commits. On 2026‑10‑01 the far-prerequisite repairs (B1–B4, the B6 trunc pattern) and the N3/N4 cleanups were carried into the four #320 commits ([carry](#far-prerequisite-carry-2026-10-01)); the #321 and MC commits are unchanged. Contract: [the split plan](../../../plans/2026-09-30-split-320-321-series.md) and [the carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md). **Current series (2026‑10‑01, fourth round):** branch `split-320-321-r4`: every #321 commit rebuilt for N3/N4, the two MC commits, and nine #320 commits on #594. llvm-mos#584 is not carried; it is filed first ([Fourth round](#fourth-round-2026-10-01)). Earlier: `split-320-321-r3` (third round, with #584 as a commit) and `split-320-321-r2`.
 
 Attribution: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. Far-prerequisite carry: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Pressure-set regeneration: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F).
 
@@ -10,14 +10,13 @@ Attribution: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`c
 | [REVIEWER-MAP-320.md](REVIEWER-MAP-320.md) | 4 #320 commits, the #594 reconciliation point, and where the independent review's B1–B7/N3/N4 findings land |
 | [patches-321/](patches-321/) | `git format-patch` of the #321 series on `06bc967d2668` |
 | [patches-mc/](patches-mc/) | the two MC address-width commits, unchanged apart from their parent |
-| [patches-584/](patches-584/) | llvm-mos#584 (our open upstream SPC700 late-opt fix), applied after `patches-mc/` |
-| [patches-320/](patches-320/) | the #320 series, applied after `patches-584/` |
+| [patches-320/](patches-320/) | the #320 series, applied after `patches-mc/` (llvm-mos#584 is filed first and not carried) |
 | [spec/](spec/) | everything needed to rebuild the series and its evidence (see [Reproducing](#reproducing)) |
 | [evidence/](evidence/) | per-commit suite summaries, default-mode comparisons, red/green proofs, invariant lists, and sha256 of the large logs |
 
 ## Chain
 
-Current (third round): `06bc967d2668` → #321 1–16 (`e8441515e009`..`2140dc93cb73`) → MC `6d8547b02580`, `ed90d3aabae7` → #584 `5f5d76c59fa9` → #320: #594 ×3 (`dec9150f0d0b`..`03cd24fdcb9f`) → `47e53302ee3f`..`36d569637f6a` (branch `split-320-321-r3`). The far-word packet continues to `f299b753f0d5` (branch `pkt-r3-far-word`). Earlier states:
+Current (fourth round): `06bc967d2668` → #321 1–16 (`e8441515e009`..`2140dc93cb73`) → MC `6d8547b02580`, `ed90d3aabae7` → #320: #594 ×3 (`f63ae2a066a8`, `7f6f05729e9d`, `9a27d86d5d9f`) → `878468d8bebb`..`a0e244102ff9` (branch `split-320-321-r4`). The far-word packet continues to `00b68e60d18d` (branch `pkt-r4-far-word`). Round three had #584 (`5f5d76c59fa9`) between MC and #594, with #320 at `dec9150f0d0b`..`36d569637f6a` and the packet top `f299b753f0d5`. Earlier states:
 
 `06bc967d2668` → #321 1–16 (`45bc97d89c6a`..`aa868b952570`) → MC `3721ab9a5c0e` "Honor explicit address widths for constant operands" → MC `25c40909b44a` "Preserve long address widths in printed assembly" → #320 1–4 (`abfb29168fca`..`59d98c37ab77`, branch `split-320-321-carry`; before the carry `42785c3bef21`..`1a616f08ea67`, branch `split-320-321`). Current #320: #594 ×3 (`ad7b2f4239a2`..`fcb88211d861`) → `733b59e025ee`..`d19b7155d3c6` (branch `split-320-321-r2`); the reviewed carry `abfb29168fca`..`59d98c37ab77` stays on `split-320-321-carry`.
 
@@ -73,6 +72,23 @@ After the [second independent review](../far-word-rebase/independent-review-2.md
 | B8/B9 probes (second review) | no far probe fails the verifier on the new #320‑4 or packet; the spill assertion is gone; the near upstream shapes still fail, as recorded ([sweep](evidence/r2/b8-sweep.tsv)) |
 | Replay | the 58 far-word configurations give objects identical to the reviewed packet's ([comparison](../far-word-rebase/evidence/split-r2-replay.json)) |
 | N3/N4 | 0 clang-format lines in each of our commits; #594's register commit (unchanged) has 5; no history tags |
+
+## Fourth round (2026-10-01)
+
+Two user decisions ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#fourth-round-sequence-584-test-the-huc6280-split)):
+
+- **#584 is sequenced, not carried.** The #584 commit is dropped; the guard is [llvm-mos/llvm-mos#584](https://github.com/llvm-mos/llvm-mos/pull/584) (open; fork patch `0003-late-opt-nongpr-ldimm-dest`), and it files first. mosspc700 segfaults in MOS Late Optimizations identically before and after this series until #584 lands. No far code on the 65816 reaches the crash: the suites, the 58 replay objects and the LZSS gallery IR behave the same without the guard.
+- **HuC6280: not split.** The HuC6280 fix is #321‑11's opcode-keyed frame-index rule, which #321‑11 needs for its own `CmpBrAbsImm16`. Without it, #321‑11 still passes its lit suites (no test covers the rule) but miscompiles native compares on stack values ([probe](evidence/r4/huc-split-probe.txt)). It stays in #321‑11, whose message states the HuC6280 effect. #321‑11 has no lit test for the rule; that gap remains.
+
+| Gate | Result |
+|---|---|
+| Per commit: build, MOS CodeGen+MC, MOS warnings | The 18 rebuilt commits pass: #320 160, 161, 166, 167, 168, 168, 174, 176, 178; far-word 180 → 189 (1 unsupported each); 0 MOS warnings ([stages](evidence/r4/stages.tsv)). #321 and MC are unchanged from round three |
+| Default mode, all 14 CPUs | Each step as in round three; against round three, only mosspc700 differs (31 #584 crashes again, plus `k_mandel_far`) ([table](evidence/r4/default-all-cpus.txt)) |
+| Red/green | 33 red runs fail, 211 green runs pass, 7 characterization runs pass on their parents ([table](evidence/r4/red-green.tsv)) |
+| Round trip | 27 patches (`patches-321/`, `patches-mc/`, `patches-320/`) reproduce every commit tree; final tree `dcbb521f6fa6` ([log](evidence/r4/roundtrip.txt)) |
+| Replay | 58 of 58 objects identical to the reviewed packet's ([comparison](../far-word-rebase/evidence/split-r4-replay.json)) |
+| Messages | Default-mode lines state the mosspc700 exception and #584 ([mapping](evidence/r4/final-map.tsv)) |
+| Near-index and 0065 packets | unchanged: they sit on the #321 top, which round four does not touch |
 
 ## Third round (2026-10-01)
 
