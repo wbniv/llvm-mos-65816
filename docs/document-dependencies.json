@@ -371,9 +371,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
         },
-        "reviewed_at": "2026-10-01T07:34:09.136064+00:00",
-        "note": "NOT reviewed or edited by this agent: the coordinator maintains TODO.md and asked agents to leave it alone. Its sources changed through four defect records (mos-late-opt-nongpr-ldimm, mos-huc-blockmove-frameindex-offset and mos-spc700-hint-outside-order are new and confirmed; mos-far-fold-dangling-dbg-sites is now fixed) and the 0065 README; the coordinator should triage them into TODO.md.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-01T07:45:09.539305+00:00",
+        "note": "Reviewed against round three (fa868802): the 0069/0070 items record the fixes and the HuC6280 split-out decision; the new records mos-huc-blockmove-frameindex-offset and mos-spc700-hint-outside-order are in the Inbox for the user's ranking; mos-late-opt-nongpr-ldimm is #584 (existing tracker row); mos-far-fold-dangling-dbg-sites is closed. The agent's placeholder receipt is superseded.",
+        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
@@ -2645,10 +2645,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "56651b446401247715c61fcb95e0bafd8f2baef4f3fa550c07d5df437ff32047"
+          "TODO.md": "5bb59044f53d1cf48d92254e88c0159082618927348808d9775eb32366733640"
         },
-        "reviewed_at": "2026-10-01T04:22:41.711377+00:00",
-        "note": "TODO narrows the carry-scheduling item after the 0071 landing and adds an SDK-rebuild-on-toolchain-change item; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-10-01T07:46:29.997800+00:00",
+        "note": "The 0069/0070 items record round three, and two upstream defects are in the Inbox; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
