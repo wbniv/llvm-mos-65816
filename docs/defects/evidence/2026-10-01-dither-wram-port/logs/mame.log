@@ -1,0 +1,9 @@
+2026-10-01T02:56:23Z MAME O2-a16 corpus_result@0x7E13E7: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-10-01T02:57:09Z MAME O2-default corpus_result@0x7E13E7: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-10-01T02:57:44Z MAME O2-xy16 corpus_result@0x7E13E7: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-10-01T02:58:09Z MAME O3-a16 corpus_result@0x7E13E7: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-10-01T02:58:38Z MAME O3-default corpus_result@0x7E13E7: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-10-01T02:59:18Z MAME O3-xy16 corpus_result@0x7E13E7: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+rc=0
+
+[exited with code 0]

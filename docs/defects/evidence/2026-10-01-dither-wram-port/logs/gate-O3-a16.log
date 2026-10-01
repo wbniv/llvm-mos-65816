@@ -1,0 +1,12 @@
+2026-10-01T02:40:13Z toolchain: clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c lld c89b04cb2fb93cd3959ce8a1251ca1a967eb550b1d03e5dbdc81bf12f25323a4 mos-snes.cfg f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205 link.ld 9eb48681d0088e3766fb49541a0eb31e571859c33eeb9711e90adb453308a048
+2026-10-01T02:40:14Z input: /home/will/llvm-mos-65816-ditherwram/examples/snes/dither.c 1371123c4e26b81779ef65263ccc66e335236c8b2d8ca0b9c80c551921207d1c
+2026-10-01T02:40:14Z command (cwd /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/B/O3-a16-stock): /home/will/llvm-mos-65816-ditherwram/build/llvm-mos-install/bin/mos-clang --config /home/will/llvm-mos-65816-ditherwram/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O3 -I /home/will/llvm-mos-65816-ditherwram/examples/65816 -I /home/will/llvm-mos-65816-ditherwram/examples/snes -I /home/will/llvm-mos-65816-ditherwram/build /home/will/llvm-mos-65816-ditherwram/examples/snes/dither.c -o rom.sfc -save-temps=obj -Wl,--save-temps -Wl,-Map=rom.map
+2026-10-01T02:40:15Z build rc=0
+2026-10-01T02:40:15Z rom.sfc sha256 53686dc3609ba90b8aed0541e149eeaaf2c2460d17c851eacf8a7e39138a524d (unchecksummed, as in the report)
+main soft-stack frame: 353 B -> [0x1e9f, 0x2000)
+__bss_end=0x1629 __heap_start=0x16ae soft-stack headroom above __heap_start: 2386 B
+  no overlap with named .bss objects or .noinit
+2026-10-01T02:40:16Z bsnes-jg: jgxcheck rom.sfc 0x13e7 2 0x80C4 600 (jgxcheck 4c9a88d21a6098b4f0a4443aebf03a75c7f6fd5f8b7dee18a4ac5f4d76e7006f)
+SMOKE: PASS off=0x13E7 len=2 got=0x80C4 (ran 600 frames, bsnes-jg)
+2026-10-01T02:40:28Z gate rc=0
+rc=0

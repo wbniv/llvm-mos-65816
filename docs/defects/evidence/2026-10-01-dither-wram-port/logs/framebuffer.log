@@ -1,0 +1,10 @@
+after-O2-a16 rc=0 SMOKE: PASS off=0x13E7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+after-O2-a16xy16 rc=0 SMOKE: PASS off=0x13E7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+after-O2-default rc=0 SMOKE: PASS off=0x13E7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+after-O3-a16 rc=0 SMOKE: PASS off=0x13E7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+after-O3-a16xy16 rc=0 SMOKE: PASS off=0x13E7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+after-O3-default rc=0 SMOKE: PASS off=0x13E7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+before-O2-a16 rc=0 SMOKE: PASS off=0x1CE7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+before-O2-a16xy16 rc=0 SMOKE: PASS off=0x1CE7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+before-O2-default rc=0 SMOKE: PASS off=0x1CE7 len=2 got=0x80C4 (ran 1500 frames, bsnes-jg) png=f5742ebc454bfe23
+rc=0

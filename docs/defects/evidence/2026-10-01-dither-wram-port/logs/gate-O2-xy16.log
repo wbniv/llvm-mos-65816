@@ -1,0 +1,5 @@
+2026-10-01T02:52:26Z build rc=0 clang-23 254624ba26462f49
+corpus_result 0x13e7  __heap_start 0x000016ae  headroom to __stack: 2386 B
+SMOKE: PASS off=0x13E7 len=2 got=0x80C4 (ran 600 frames, bsnes-jg)
+2026-10-01T02:52:50Z gate rc=0
+rc=0

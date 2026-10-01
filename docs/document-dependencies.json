@@ -113,11 +113,11 @@
           "docs/defects/selectiondag-inline-asm-register-bounds.json": "fde070950bc0fe9e941061619ad5aca6cd31adc7c65bb28a3748f8fa46c943b0",
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "0fe97bab63ba3f6aab5ae5e59072bb32e7100439478bd1f249eef5441c813497",
           "docs/defects/shift64-narrow-count.json": "f838d2f297cd5723db603e66c195b8cf870af624c52b74203b2f0510afd834c6",
-          "docs/defects/snes-soft-stack-static-data-collision.json": "ae4921fcbd64aa20099ab6edb891768b63359b2b67c5a4e3023f576270bf54fd",
+          "docs/defects/snes-soft-stack-static-data-collision.json": "113adb475409771273958893d47937366112720a3272ff3e34fa9c3fa7e6c687",
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "c123978d756e1d8e5ad5dc7fea31f6c8adba728978ee2efbb2ee63af9e325a42"
+          "docs/upstream-dashboard.json": "dda2324ddfa2d98d668caf36e1138b5aa78fb192cf767f679bfacdc696ec3bea"
         }
       }
     },
@@ -140,11 +140,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "88010a7fca6babe47b84767690e8f9efba1d045d1d725d2809eae9a59b406bde",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "c123978d756e1d8e5ad5dc7fea31f6c8adba728978ee2efbb2ee63af9e325a42",
+          "docs/upstream-dashboard.json": "dda2324ddfa2d98d668caf36e1138b5aa78fb192cf767f679bfacdc696ec3bea",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "a85df862493bbdcc639d236be361e0ce37e26a7d9e2615c60bb0f26754e72c58"
+          "docs/upstream-dashboard-graph.json": "07ebc4dd643d0236d6d3d8bcea7ee4d0db9b331b877d346b33188fe34b3265f9"
         }
       }
     },

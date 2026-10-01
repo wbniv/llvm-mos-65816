@@ -168,6 +168,190 @@
    },
    "exit_code": 0,
    "observed": "0x80C4"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O2 default stock (on the fixed tree)",
+   "working_directory": "/home/will/llvm-mos-65816-ditherwram",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result",
+    "fix": "frame buffer in high WRAM via the WRAM data port (wt/dither-wram-headroom)"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (a real copy of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-dither-wram-port/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/input/dither.c",
+    "sha256": "1371123c4e26b81779ef65263ccc66e335236c8b2d8ca0b9c80c551921207d1c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O2-default.log",
+    "sha256": "d3d16fc129927bea530888241ef28b1895fc65f1c7014dab9fba6432070a1721"
+   },
+   "exit_code": 0,
+   "observed": "0x80C4 (margin 2386 B above static data)"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O2 a16 stock (on the fixed tree)",
+   "working_directory": "/home/will/llvm-mos-65816-ditherwram",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result",
+    "fix": "frame buffer in high WRAM via the WRAM data port (wt/dither-wram-headroom)"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (a real copy of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-dither-wram-port/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/input/dither.c",
+    "sha256": "1371123c4e26b81779ef65263ccc66e335236c8b2d8ca0b9c80c551921207d1c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O2-a16.log",
+    "sha256": "71fe19d1fe50231e3f1d9dd6c899ac425090156944516455db45fc394778e3f1"
+   },
+   "exit_code": 0,
+   "observed": "0x80C4 (margin 2386 B above static data)"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-dither-wram-port/tools/gate-xy16.sh OUT O2",
+   "working_directory": "/home/will/llvm-mos-65816-ditherwram",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16",
+     "+mos-xy16"
+    ],
+    "optimization": "O2",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result",
+    "fix": "frame buffer in high WRAM via the WRAM data port (wt/dither-wram-headroom)"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (a real copy of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-dither-wram-port/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/input/dither.c",
+    "sha256": "1371123c4e26b81779ef65263ccc66e335236c8b2d8ca0b9c80c551921207d1c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O2-xy16.log",
+    "sha256": "c70c0a74f76a218b73f50961ad79c4f7e218ba651439a46dd93a670c3f353ec5"
+   },
+   "exit_code": 0,
+   "observed": "0x80C4 (margin 2386 B above static data)"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O3 default stock (on the fixed tree)",
+   "working_directory": "/home/will/llvm-mos-65816-ditherwram",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O3",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result",
+    "fix": "frame buffer in high WRAM via the WRAM data port (wt/dither-wram-headroom)"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (a real copy of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-dither-wram-port/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/input/dither.c",
+    "sha256": "1371123c4e26b81779ef65263ccc66e335236c8b2d8ca0b9c80c551921207d1c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O3-default.log",
+    "sha256": "a6e951e428c362b9f25cc493b394d58b53c36367d61d6820b589ec0de4c9c915"
+   },
+   "exit_code": 0,
+   "observed": "0x80C4 (margin 2386 B above static data)"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O3 a16 stock (on the fixed tree)",
+   "working_directory": "/home/will/llvm-mos-65816-ditherwram",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O3",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result",
+    "fix": "frame buffer in high WRAM via the WRAM data port (wt/dither-wram-headroom)"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (a real copy of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-dither-wram-port/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/input/dither.c",
+    "sha256": "1371123c4e26b81779ef65263ccc66e335236c8b2d8ca0b9c80c551921207d1c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O3-a16.log",
+    "sha256": "067a3972327c410234dfd8635bd1329cf03079f8c7742d3ea84b86be1b9b2c95"
+   },
+   "exit_code": 0,
+   "observed": "0x80C4 (margin 2386 B above static data)"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-dither-wram-port/tools/gate-xy16.sh OUT O3",
+   "working_directory": "/home/will/llvm-mos-65816-ditherwram",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16",
+     "+mos-xy16"
+    ],
+    "optimization": "O3",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result",
+    "fix": "frame buffer in high WRAM via the WRAM data port (wt/dither-wram-headroom)"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (a real copy of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-dither-wram-port/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/input/dither.c",
+    "sha256": "1371123c4e26b81779ef65263ccc66e335236c8b2d8ca0b9c80c551921207d1c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O3-xy16.log",
+    "sha256": "5de1080da22ac10b8de4897e6b43f0f365c344ca3efa1ab9fdbba949f21758ea"
+   },
+   "exit_code": 0,
+   "observed": "0x80C4 (margin 2386 B above static data)"
   }
  ],
  "root_cause": {
@@ -422,6 +606,133 @@
   {
    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh",
    "sha256": "568e4d529fa0610ed81e4f6e0cc9e76fd8b8b85abd90f09772f2bc5a46d6cfbb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/README.md",
+   "sha256": "512e1b364f143eb267433624dbb8aa58240d0af8e459e2a84f427d300b881d4e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/input/dither.c",
+   "sha256": "1371123c4e26b81779ef65263ccc66e335236c8b2d8ca0b9c80c551921207d1c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/input/dither.h",
+   "sha256": "457e71f6f26a0e309268e6ca0174ca82a817009a20f10459b3ac54891db7bd19"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/harness/dither_run.c",
+   "sha256": "55a3c2fbd9bba2881de4490345b8ba98d69fa45ae4d01b7c7ec4750621fdd126"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/harness/dither_png.c",
+   "sha256": "6739c1fc9b2c4a9fb0d5857fb6b1c183e90786ae1d0401526340f0ca0974267d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/tools/clocks.sh",
+   "sha256": "545088854798f07ff6acadb2e90473c63e938334b56dfcf64e73e1d29cd81ce1"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/tools/framebuffer.sh",
+   "sha256": "8be63fdc380ef9a130a9ec4983dfd36375a6c455d85544f45ccee3ed543512d9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/tools/gate-xy16.sh",
+   "sha256": "8501f54ab2542ac73f45ca6883ef867dab5c07c74156a639c23d0174b91d2c87"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/tools/jgxstackhw.cpp",
+   "sha256": "4e8de1d66011ca4904b0b1e5f4b8483646fa6acef439fecad23cb6a8c3272097"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/clocks-O2.tsv",
+   "sha256": "cb625c9b4b117c473683ccec2da218ec0df1180362af2d83974854277a899230"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/corpus-identity.txt",
+   "sha256": "c2222b14b626e3cb59df3c71f438079616d5b58ef17144706d5c6ee11ffd41b7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/framebuffer-K10.png",
+   "sha256": "f5742ebc454bfe23075f9367cbe17733315979b4307fafff88a3db1bb4251315"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/framebuffer.log",
+   "sha256": "64b533230b45bd61fa9699a0f58f0fbbc8c240765e2ab1263a940f3b1da8d286"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O2-a16.log",
+   "sha256": "71fe19d1fe50231e3f1d9dd6c899ac425090156944516455db45fc394778e3f1"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O2-default.log",
+   "sha256": "d3d16fc129927bea530888241ef28b1895fc65f1c7014dab9fba6432070a1721"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O2-xy16.log",
+   "sha256": "c70c0a74f76a218b73f50961ad79c4f7e218ba651439a46dd93a670c3f353ec5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O3-a16.log",
+   "sha256": "067a3972327c410234dfd8635bd1329cf03079f8c7742d3ea84b86be1b9b2c95"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O3-default.log",
+   "sha256": "a6e951e428c362b9f25cc493b394d58b53c36367d61d6820b589ec0de4c9c915"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/gate-O3-xy16.log",
+   "sha256": "5de1080da22ac10b8de4897e6b43f0f365c344ca3efa1ab9fdbba949f21758ea"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/mame.log",
+   "sha256": "a511c14ab8fc5355461ab0bbf4180b379d39d85cfc746dc5b665481ec8853cef"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/stackhw-O2-a16.log",
+   "sha256": "761e4a975e67d7611c15a5aefc97634bf6d63cd84582e4e7e1baecf5423db910"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/stackhw-O2-default.log",
+   "sha256": "b3746d8ed818419351ecc18d12bde2c88930e38153c88af6749069d07ff2db11"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/stackhw-O2-xy16.log",
+   "sha256": "761e4a975e67d7611c15a5aefc97634bf6d63cd84582e4e7e1baecf5423db910"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/stackhw-O3-a16.log",
+   "sha256": "5ffdb113d2321ba1c53aa2d24f122407404bc744dce2f040caaf398a822a764e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/stackhw-O3-default.log",
+   "sha256": "be5d02443c2203386c89e3aa673a4f6ec342c31849432d7b08c8fdbcc3b18cec"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/stackhw-O3-xy16.log",
+   "sha256": "4e83b69809561b6db5d2fd9f727346ac21c451ef0e3ba0adcb618030865310cf"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/verify-O2-a16.log",
+   "sha256": "a069be501f91466bec4f35e9a8d83afd38fe10d9e599a6716dc2aedc0e542573"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/verify-O2-default.log",
+   "sha256": "276fbc437ddd8f2f77c06363628281b334c224df7bfda0bf33c205b286b2c8a7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/verify-O3-a16.log",
+   "sha256": "640e3748d02ddadae872a7e31e7d3ce540f065019275ebb96d4998a35d566c3e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/verify-O3-default.log",
+   "sha256": "11bf9e3594c9c3e518e0ebc366fb0da92650363b8fc5f1e1db4a5be32ca525c3"
   }
- ]
+ ],
+ "mitigation_observation": {
+  "date": "2026-10-01",
+  "status": "demo mitigated; defect record open (platform guard is separate work)",
+  "summary": "examples/snes/dither.c keeps its 2304 B frame buffer in high WRAM ($7E:2000) behind the WRAM data port instead of low WRAM. Static data now ends at $16AE, leaving 2386 B to __stack (was 82 B). The gate passes (0x80C4) at -O2 and -O3 in default, +mos-a16 and +mos-a16,+mos-xy16 on bsnes-jg, and on MAME for all six. Measured soft-stack depth: 279/286/286 B at -O2 and 313/353/356 B at -O3 (default/a16/xy16), so at least 2030 B stays untouched. -O2 master clocks fall (loop per frame -19.7% default, -26.2% a16, -34.2% a16xy16). The corpus slice object is byte-identical; -verify-machineinstrs is clean at -O2/-O3 (default, a16); the picture is pixel-identical at equal iteration count. Far pointers were rejected because they fail to legalize in default mosw65816.",
+  "baseline_replay": "reproduce.sh gate now builds the fixed examples/snes/dither.c; the red baseline replays only by running reproduce.sh from a checkout of origin/main 85f7972a (baseline.input and baseline.log are unchanged).",
+  "attribution": "Claude Code 2.1.286 (claude --version), model Claude Sonnet 5.5 (claude-sonnet-5-5), t2-sonnet-high agent definition (effort not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F."
+ }
 }

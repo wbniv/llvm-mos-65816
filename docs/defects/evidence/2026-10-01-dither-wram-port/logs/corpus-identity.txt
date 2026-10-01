@@ -1,0 +1,10 @@
+examples/snes/corpus/dither_sim.c: object before (origin/main 85f7972a dither.h) vs after, mos-clang --target=mos -mcpu=mosw65816 -c (clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c)
+identical default -Os 30047526c83dae91ed3d1a23f10eaf5d048dfdb35f6960ba775b273898098212
+identical default -O2 bfe0056f2c22f1eaaff04b6a585f1a28969cc389cbc96b87612485cc455d08a8
+identical default -O3 55e319989046c7b6079533616d1aaddc72b6884d60b0cff7879b65e18e06d554
+identical a16 -Os 96055c4ab1f99f703413ce3109c99dbd87f2c32e33ecdfdb48b54e9b42fc6220
+identical a16 -O2 0161ebbeb9e3539ef28a32c80cecfff44eff84cb8a23724ec903a772d2f96cec
+identical a16 -O3 2ddb73097c58232e9ae540803d34db7d81fc2477d1b80d610873a8d1be45421c
+identical xy16 -Os 96526dbe6be066adcdde3ab60687efa3f2cc42fcc69b8ba0ce156994d05ac484
+identical xy16 -O2 d471b9a76ede8fba8a353d5e9a4c00af4c2ff709ce3812475e64e2f1aea8d0cc
+identical xy16 -O3 f6edcfba1dfd70a422065df1c60be13263292bc59578403ff86f014e42f8aed3
