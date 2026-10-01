@@ -365,9 +365,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-10-01T04:02:40.743171+00:00",
-        "note": "Sources changed by the 2026-10-01 carry-pressure landing (0002 split pressure-set design, standalone 0071, record landing runs). TODO.md itself was not edited here: the coordinator owns it and is updating the carry item, whose text still predates the landing.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-01T04:18:48.209323+00:00",
+        "note": "Reviewed against the 0071 landing (0ec78ab1): the carry item now records the landed pressure contract and keeps only the profitability comparison; the agent's placeholder receipt is superseded.",
+        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
@@ -2632,10 +2632,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "23dd09806a65b3e2d915198cf0abe2c99c1bdd518063bf9a902ecda6b4839bc3"
+          "TODO.md": "56651b446401247715c61fcb95e0bafd8f2baef4f3fa550c07d5df437ff32047"
         },
-        "reviewed_at": "2026-10-01T03:44:55.148013+00:00",
-        "note": "The finished dither buffer item left TODO (07f4fe2f), and the link-reserve item notes that dither no longer caps N; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-10-01T04:22:41.711377+00:00",
+        "note": "TODO narrows the carry-scheduling item after the 0071 landing and adds an SDK-rebuild-on-toolchain-change item; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
