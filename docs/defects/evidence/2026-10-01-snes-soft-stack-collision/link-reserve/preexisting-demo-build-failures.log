@@ -1,0 +1,22 @@
+# 2026-10-01T14:55:10Z the three demos dev/run.sh build reports as BUILD FAILED (ascast, ascast_sim, lzss-gallery), compiled by hand with the pre-0071 toolchain and SDK and with the current ones
+# old: clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c + the pre-stamp-change SDK copy;  new: clang-23 e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9 + the reserve SDK
+
+## old: ascast.c (snes-far cfg, -Os)
+LLVM ERROR: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %4:_(s8), %5:_(s8), %6:_(s8), %6:_(s8) (in function: ac_to_far)
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+rc=1
+
+## old: lzss-gallery.c (snes-gallery cfg, +mos-a16, -Os)
+ld.lld: error: <unknown>:0:0: ran out of registers during register allocation in function 'record_result'
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+rc=1
+
+## new: ascast.c (snes-far cfg, -Os)
+LLVM ERROR: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %4:_(s8), %5:_(s8), %6:_(s8), %6:_(s8) (in function: ac_to_far)
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+rc=1
+
+## new: lzss-gallery.c (snes-gallery cfg, +mos-a16, -Os)
+ld.lld: error: <unknown>:0:0: ran out of registers during register allocation in function 'record_result'
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+rc=1

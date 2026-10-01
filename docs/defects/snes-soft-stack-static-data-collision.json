@@ -808,7 +808,7 @@
   },
   {
    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/README.md",
-   "sha256": "f32a76e1eb7c38442a0038d10bc5c0faa12b6d79ef767bfd4fa603fb95cc8101"
+   "sha256": "cce25f694f477498a36dcbff79277c36bf4c6054524c6a88578bf8d0a6f09933"
   },
   {
    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/dither-85f7972a-link.log",
@@ -845,6 +845,14 @@
   {
    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/sdk-install-after-stamp-change.sha256",
    "sha256": "3e480fbd5c3b4809181ba142f7de10e8fa81099670a4003703a4a64bd7f8cf36"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/sdk-install-after-reserve.sha256",
+   "sha256": "e10f2fe828906b74f3225480bfe6ce777c5bc8dcda18dcd2d7102fd80427c92f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/preexisting-demo-build-failures.log",
+   "sha256": "239cd07b5285ad7f2b09e3c5a827cb448cffa10519ea9261da5da0ba06e85268"
   }
  ],
  "mitigation_observation": {
@@ -873,7 +881,7 @@
    "regression": "dev/stackguard-check.sh (dev/run.sh stackguard, task stackguard) leg 5; 21 pass on the reserve SDK, 8 link-time legs fail against the pre-reserve SDK (SDK_INSTALL=), logs beside this record",
    "toolchain": "clang-23 e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9, lld 0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1"
   },
-  "sweeps": "249 corpus links (83 programs x default/a16/xy16, -Os) build, link and pass on bsnes-jg; 35 demo gates with the smallest gaps (every ROM under 2,500 B of room in the guard sweep) link and run; smallest gap 338 B (msquares). dev/run.sh corpus (84/84) and corpus-a16 (83/83) pass on the shared SDK after the stamp rebuild; the shared-SDK install results are in the evidence README addendum.",
+  "sweeps": "249 corpus links (83 programs x default/a16/xy16, -Os) build, link and pass on bsnes-jg; 35 demo gates with the smallest gaps (every ROM under 2,500 B of room in the guard sweep) link and run; smallest gap 338 B (msquares). dev/run.sh corpus (84/84) and corpus-a16 (83/83) pass on the shared SDK after the stamp rebuild; the reserve is installed in the shared SDK (seven link.ld differ, every library byte-identical), dev/run.sh build links all 296 default-config demos with it (3 pre-existing compiler failures: ascast, ascast_sim, lzss-gallery, identical on the pre-0071 toolchain) and dev/run.sh corpus passes 84/84 after the install; see the evidence README addendum.",
   "why_open": "The reserve bounds the STATIC side only: it proves nothing about frame depth, so a program with 300 B of room and 400 B of frames still overlaps silently (the runtime guard measures depth, in gated runs only; irqgate is 569 B deep). The dither -O3 inliner behaviour that made main's frame 313 B is unchanged (not a code-generation error per root_cause, and the demo was repaired by moving its buffers, 07f4fe2f). The schema's fixed status needs a candidate run that PASSES the same input; the link-time assert makes that input fail to link, so it is evidence of rejection, not of a repaired build. Left at confirmed; closing needs either a compile-time or link-time bound on soft-stack depth, or a decision that the contract is 'reserve plus gated runtime guard'.",
   "attribution": "Claude Code 2.1.286 (claude --version), model Claude Sonnet 5.5 (claude-sonnet-5-5), high reasoning effort (T2 agent definition; not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F",
   "evidence": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/README.md"
