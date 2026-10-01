@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|lit|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_memops32|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|farbank|farblit|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|vlanest|jtedge|jtsparse|byvaledge|ovmatrix|stackguard|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|lit|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_memops32|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|farbank|farblit|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|vlanest|jtedge|jtsparse|byvaledge|ovmatrix|stackguard|toolchain-stamp-check|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -38,6 +38,9 @@ Targets:
   stackguard regression check for the soft-stack overlap guard in build/jgxcheck (dev/stackguard-check.sh):
              the dither -O3 ROM from the soft-stack collision record must fail with a 231 B overlap,
              the -O2 ROM and a clean ROM must not; needs build/jgxcheck from the patched core (xcheck)
+  toolchain-stamp-check  proves the SDK rebuild stamp (dev/toolchain-stamp.sh: toolchain prefix + sha256 of the installed
+             clang/llc/lld, compared by dev/build.sh) wipes the SDK build tree on any toolchain change and keeps it
+             otherwise; host-only, touches nothing under build/
   mandel-shot #321: render the canonical on-SNES Mandelbrot tester ON the SNES
              (examples/snes/mandel-display.c, +mos-a16; far-stored into high WRAM,
              displayed via Mode 7) and capture a REAL emulator screenshot from BOTH cores
@@ -629,7 +632,10 @@ fi
 
 # AWS credentials deliberately stay on the host. For scripts using the shared
 # MAME BIOS gate, materialize the IPL before Docker mounts the repository.
-target_script="$HERE/$TARGET.sh"
+# `stackguard` is dev/stackguard-check.sh (the script is named for what it does, the target for the feature).
+SCRIPT="$TARGET"
+[ "$TARGET" != stackguard ] || SCRIPT=stackguard-check
+target_script="$HERE/$SCRIPT.sh"
 if [ "${JG_ONLY:-}" != 1 ] && [ -f "$target_script" ] &&
    grep -Eq '(^|[^[:alnum:]_])require_bios([^[:alnum:]_]|$)' "$target_script"; then
   "$HERE/fetch-spc700.sh"
@@ -698,6 +704,6 @@ docker run --rm \
   ${GALLERY_RUN_COLOR:+-e GALLERY_RUN_COLOR} \
   ${APOLLO_REEL_CORPUS:+-e APOLLO_REEL_CORPUS} \
   ${APOLLO_REEL_RGB_SHA:+-e APOLLO_REEL_RGB_SHA} \
-  "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
+  "$IMAGE" bash "/work/dev/${SCRIPT}.sh" "${@:2}" \
   2> >(grep -vF 'different data layouts' | cat -s >&2)
 exit $?

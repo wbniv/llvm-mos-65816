@@ -199,6 +199,17 @@ performed the recheck and enforcement work; original credits are preserved.
 ## Build / compile / disasm / test — the exact commands
 
 - **Rebuild the toolchain after a `vendor/` edit** (Docker container; incremental): `dev/run.sh toolchain`.
+- **`dev/run.sh build` rebuilds the SDK whenever the toolchain changes** (2026-10-01). ninja tracks neither the compiler
+  nor the linker binary, so after a toolchain rebuild `build/install` used to keep libraries built by the previous
+  compiler (the stamp was the install *path*, which never changes). The stamp in `build/.mos-toolchain` is now
+  `<prefix> clang=<sha256> llc=<sha256> lld=<sha256>` ([`dev/toolchain-stamp.sh`](../dev/toolchain-stamp.sh), the one
+  place it is defined; [`dev/build.sh`](../dev/build.sh) compares it); any difference wipes the SDK build tree and
+  rebuilds it, so a toolchain rebuild is followed by `dev/run.sh build` (or `task release-sdk`) and nothing else.
+  `dev/run.sh toolchain-stamp-check` proves the unchanged/changed/legacy-stamp cases against the real stamp block.
+  Note `llc` here is the *installed* `build/llvm-mos-install/bin/llc`, which `dev/toolchain.sh` does not refresh (it
+  builds the lit tools into `build/llvm-mos/bin/` only), so it can lag `clang-23`; the SDK is compiled by `clang-23` and
+  linked by `lld`, and those two carry the invalidation. The first build after this change finds the old path-only stamp
+  and rebuilds once.
 - **Ad-hoc commands in the dev container go through `dev/container.sh -- CMD`** (extra mounts with
   `-v HOST:CONTAINER`). It runs as the host user like `dev/run.sh` does; a bare `docker run` without
   `--user` runs as root and leaves root-owned files under `build/`, which breaks the next host-side

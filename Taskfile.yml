@@ -107,6 +107,11 @@ tasks:
     cmds:
       - dev/run.sh stackguard
 
+  toolchain-stamp-check:
+    desc: "Proves dev/build.sh rebuilds the SDK when the toolchain changes: the stamp is the prefix plus the sha256 of the installed clang/llc/lld (dev/toolchain-stamp.sh); unchanged -> SDK build tree kept, any change -> wiped. Host-only, touches nothing under build/."
+    cmds:
+      - dev/run.sh toolchain-stamp-check
+
   repro:
     desc: "Clean-room: fresh checkout, then build + smoke inside it (host-side orchestration)"
     cmds:
@@ -123,8 +128,9 @@ tasks:
     desc: "Clean-rebuild build/install (SNES SDK) against the PATCHED toolchain so libc/crt0/libcrt carry the far-pointer data layout — eliminates the ld.lld 'different data layouts' warnings. Forces a CLEAN build (sentinel stamp) because an incremental SDK build does NOT re-merge libcrt after release-builtins refreshes the toolchain's builtins.a."
     deps: [release-builtins]
     cmds:
-      # Make dev/build.sh wipe + clean-rebuild: its toolchain stamp is path-based and
-      # can't see that release-builtins changed the toolchain's builtins.a *content*.
+      # Make dev/build.sh wipe + clean-rebuild: its toolchain stamp (prefix + clang/llc/lld
+      # sha256, dev/toolchain-stamp.sh) can't see that release-builtins changed the
+      # toolchain's builtins.a *content*.
       # A clean build is the only thing that reliably re-merges libcrt.
       - echo 'release-clean' > build/.mos-toolchain
       - MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build

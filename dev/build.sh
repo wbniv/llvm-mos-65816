@@ -40,11 +40,15 @@ for p in "$ROOT"/platforms/*/; do
 done
 
 # CMake can't change the cross-compiler on an already-configured build tree (it
-# re-runs the compiler check and bails). If MOS_TOOLCHAIN differs from the last build,
-# wipe the SDK build artifacts (only — never the llvm-mos build/install/.ccache).
+# re-runs the compiler check and bails), and ninja does not track the compiler or linker
+# binary, so an in-place toolchain rebuild would leave the SDK libraries built by the old one.
+# The stamp is the prefix plus the sha256 of the installed clang/llc/lld (dev/toolchain-stamp.sh);
+# if it differs from the last build, wipe the SDK build artifacts (only — never the
+# llvm-mos build/install/.ccache).
 STAMP="$BUILD/.mos-toolchain"
-if [ -f "$STAMP" ] && [ "$(cat "$STAMP")" != "$MOS_TOOLCHAIN" ]; then
-  echo "==> toolchain changed ($(cat "$STAMP") -> $MOS_TOOLCHAIN); wiping SDK build tree"
+NEW_STAMP="$("$ROOT/dev/toolchain-stamp.sh" "$MOS_TOOLCHAIN")"
+if [ -f "$STAMP" ] && [ "$(cat "$STAMP")" != "$NEW_STAMP" ]; then
+  echo "==> toolchain changed ($(cat "$STAMP") -> $NEW_STAMP); wiping SDK build tree"
   rm -rf "$BUILD/CMakeCache.txt" "$BUILD/CMakeFiles" "$BUILD/mos-platform" \
          "$BUILD/build.ninja" "$BUILD/cmake_install.cmake" "$INSTALL"
 fi
@@ -57,7 +61,7 @@ cmake -S "$VENDOR" -B "$BUILD" -G Ninja \
   -DCMAKE_INSTALL_PREFIX="$INSTALL"
 cmake --build "$BUILD"
 cmake --install "$BUILD"
-echo "$MOS_TOOLCHAIN" > "$STAMP"
+echo "$NEW_STAMP" > "$STAMP"
 
 echo "==> build + checksum every SNES program (examples/snes/**/*.c)"
 shopt -s globstar nullglob
