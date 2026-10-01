@@ -37,7 +37,9 @@ Targets:
              Closes the "corpus only ever built default 8-bit" gap that hid it.
   stackguard regression check for the soft-stack overlap guard in build/jgxcheck (dev/stackguard-check.sh):
              the dither -O3 ROM from the soft-stack collision record must fail with a 231 B overlap,
-             the -O2 ROM and a clean ROM must not; needs build/jgxcheck from the patched core (xcheck)
+             the -O2 ROM and a clean ROM must not; also the link-time soft-stack reserve (__soft_stack_min = 256 in
+             every platforms/snes*/link.ld: the 85f7972a dither at 82 B of room is rejected at link, exact boundary);
+             needs build/jgxcheck from the patched core (xcheck) and the installed SDK (build)
   toolchain-stamp-check  proves the SDK rebuild stamp (dev/toolchain-stamp.sh: toolchain prefix + sha256 of the installed
              clang/llc/lld, compared by dev/build.sh) wipes the SDK build tree on any toolchain change and keeps it
              otherwise; host-only, touches nothing under build/

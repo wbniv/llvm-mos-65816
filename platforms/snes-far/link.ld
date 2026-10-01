@@ -24,6 +24,11 @@ ASSERT(__rc31 == 0x1f, "Inconsistent zero page map.")
 /* Soft-stack top: grows down from the top of low WRAM. */
 __stack = 0x2000;
 
+/* Soft-stack reserve (link-time contract; rationale in platforms/snes/link.ld). */
+PROVIDE(__soft_stack_min = 256);
+ASSERT(__heap_start + __soft_stack_min <= __stack,
+  "soft-stack reserve violated: static data ends at __heap_start, leaving fewer than __soft_stack_min bytes below __stack (shortfall = __heap_start + __soft_stack_min - __stack; shrink .data/.bss/.noinit, or lower __soft_stack_min with --defsym)")
+
 MEMORY {
   zp     : ORIGIN = __rc31 + 1, LENGTH = 0x100 - (__rc31 + 1)   /* $0020-$00FF */
   ram    : ORIGIN = 0x0200,     LENGTH = 0x1E00                 /* $0200-$1FFF */

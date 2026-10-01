@@ -17,6 +17,18 @@ ASSERT(__rc31 == 0x1f, "Inconsistent zero page map.")
 /* Soft-stack top: grows down from the top of low WRAM. */
 __stack = 0x2000;
 
+/* Soft-stack reserve (link-time contract). Static data (.data/.bss/.noinit, ending at
+ * __heap_start) grows up from $0200 and the C soft stack grows down from __stack; nothing else
+ * keeps them apart, so a program whose static data crowds the stack silently overwrites itself
+ * (the dither -O3 hang, docs/defects/snes-soft-stack-static-data-collision.json). Require
+ * __soft_stack_min bytes between the two: the smallest gap of any shipped corpus program or demo
+ * is 338 B (msquares), so 256 B rejects none of them. Override per link with
+ * -Wl,--defsym=__soft_stack_min=N (0 disables). The ASSERT is evaluated after layout, so it sees
+ * the final __heap_start. The runtime guard (tools/stackguard.h) measures the real stack depth. */
+PROVIDE(__soft_stack_min = 256);
+ASSERT(__heap_start + __soft_stack_min <= __stack,
+  "soft-stack reserve violated: static data ends at __heap_start, leaving fewer than __soft_stack_min bytes below __stack (shortfall = __heap_start + __soft_stack_min - __stack; shrink .data/.bss/.noinit, or lower __soft_stack_min with --defsym)")
+
 MEMORY {
   zp     : ORIGIN = __rc31 + 1, LENGTH = 0x100 - (__rc31 + 1)   /* $0020-$00FF */
   ram    : ORIGIN = 0x0200,     LENGTH = 0x1E00                 /* $0200-$1FFF */

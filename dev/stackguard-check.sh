@@ -13,8 +13,14 @@
 #      ELF) -> FAIL even though its result value matches; a tiny clean program -> the PASS line is
 #      byte-identical with the guard on and off, and the ELF and map give identical bounds.
 #   4. JGX_STACKGUARD=require on a ROM with no metadata -> rc 2 (a skipped check cannot pass silently).
+#   5. The link-time soft-stack reserve (__soft_stack_min = 256 in every platforms/snes*/link.ld, plus the
+#      ASSERT in the same scripts): the dither source from 85f7972a (82 B between static data and __stack)
+#      links with the reserve off but is REJECTED with it on, the boundary is exact (gap 256 links, 254
+#      does not), every installed SNES linker script enforces it, and a program with room links as before.
+#      Needs mos-clang and the installed SDK, not jgxcheck.
 #
-# Prereqs: build/jgxcheck with the patched core (dev/run.sh xcheck builds both). Host or container.
+# Prereqs: build/jgxcheck with the patched core (dev/run.sh xcheck builds both) for legs 1-4; legs 3 and 5
+# also need mos-clang and the installed SDK (dev/run.sh build). Host or container.
 set -euo pipefail
 
 usage() {
@@ -33,7 +39,8 @@ JGX="${JGX:-$ROOT/build/jgxcheck}"
 DB="$ROOT/vendor/bsnes-jg/Database"
 EV="$ROOT/docs/defects/evidence/2026-10-01-snes-soft-stack-collision"
 TOOL="${MOS_TOOLCHAIN:-$ROOT/build/llvm-mos-install}/bin"
-CFG="$ROOT/build/install/bin/mos-snes.cfg"
+INSTALL="${SDK_INSTALL:-$ROOT/build/install}"
+CFG="$INSTALL/bin/mos-snes.cfg"
 FRAMES="${STACKGUARD_CHECK_FRAMES:-60}"   # the overlap is reached in main's prologue; no long run needed
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/stackguard-check.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
@@ -194,6 +201,93 @@ PY
   fi
 else
   echo "  SKIP  synthetic ROM legs (no $TOOL/mos-clang or $CFG): the dither evidence legs above still ran"
+fi
+
+# --- 5. link-time reserve ---------------------------------------------------------------------------
+# The SDK driver for one platform: $INSTALL/bin/mos-<platform>.cfg (SDK_INSTALL overrides build/install). link_rc leaves the compiler output in $WORK/lk.log.
+link_rc() { # link_rc CFG OUT.sfc SRC [extra clang args...]
+  local cfg=$1 out=$2 src=$3; shift 3
+  local rc=0
+  ( ulimit -v 2000000; timeout 600 "$TOOL/mos-clang" --config "$cfg" -mcpu=mosw65816 "$@" -Wl,-Map="${out%.sfc}.map" -o "$out" "$src" ) >"$WORK/lk.log" 2>&1 || rc=$?
+  echo "$rc"
+}
+gap_of() { # gap_of ROM -> bytes between __heap_start and __stack (decimal), from the ROM's ELF symbols
+  local nm h st
+  nm=$("$TOOL/llvm-nm" "$1.elf" 2>/dev/null || true)
+  h=$(awk '$3 == "__heap_start" {print $1; exit}' <<<"$nm" || true)
+  st=$(awk '$3 == "__stack" {print $1; exit}' <<<"$nm" || true)
+  if [ -n "$h" ] && [ -n "$st" ]; then echo $((16#$st - 16#$h)); else echo -1; fi
+}
+MSG='soft-stack reserve violated'
+if [ -x "$TOOL/mos-clang" ] && [ -f "$CFG" ]; then
+  # 5a. The dither source from 85f7972a, laid out as examples/snes/dither.c + examples/65816/dither.h (the
+  # evidence copies; snesgfx headers come from the checkout), at -O3 default: 82 B of headroom, the build
+  # whose ROM the committed evidence shows hanging.
+  DS="$WORK/dither-src"; mkdir -p "$DS/examples/snes" "$DS/examples/65816"
+  cp "$EV/input/dither.c" "$DS/examples/snes/dither.c"; cp "$EV/input/dither.h" "$DS/examples/65816/dither.h"
+  dither_link() { # dither_link OUT [extra args]
+    local out=$1; shift
+    link_rc "$CFG" "$out" "$DS/examples/snes/dither.c" -O3 -I "$DS/examples/snes" -I "$ROOT/examples/snes" -I "$ROOT/examples/65816" -I "$ROOT/build" "$@"
+  }
+  r=$(dither_link "$WORK/dither-on.sfc")
+  if [ "$r" -ne 0 ] && grep -q "$MSG" "$WORK/lk.log" && [ ! -e "$WORK/dither-on.sfc" ]; then
+    ok "85f7972a dither -O3 (82 B of headroom) is rejected at link time: $(grep -o "$MSG" "$WORK/lk.log" | head -1), no ROM written"
+  else
+    bad "85f7972a dither -O3 was not rejected (rc=$r)"; cat "$WORK/lk.log"
+  fi
+  r=$(dither_link "$WORK/dither-off.sfc" -Wl,--defsym=__soft_stack_min=0)
+  g=$(gap_of "$WORK/dither-off.sfc")
+  if [ "$r" -eq 0 ] && [ -s "$WORK/dither-off.sfc" ] && [ "$g" -eq 82 ]; then
+    ok "same input, reserve off (--defsym=__soft_stack_min=0): links as before, ROM written, gap $g B between __heap_start and __stack"
+  else
+    bad "dither with the reserve off: rc=$r gap=$g"; cat "$WORK/lk.log"
+  fi
+  r1=$(dither_link "$WORK/dither-82.sfc" -Wl,--defsym=__soft_stack_min=82)
+  r2=$(dither_link "$WORK/dither-83.sfc" -Wl,--defsym=__soft_stack_min=83)
+  if [ "$r1" -eq 0 ] && [ "$r2" -ne 0 ] && grep -q "$MSG" "$WORK/lk.log"; then
+    ok "the boundary is exact on the real input: __soft_stack_min=82 links, 83 is rejected"
+  else
+    bad "boundary on dither: =82 rc=$r1, =83 rc=$r2"
+  fi
+  # the current dither (buffers in high WRAM, 07f4fe2f) keeps its room
+  r=$(link_rc "$CFG" "$WORK/dither-now.sfc" "$ROOT/examples/snes/dither.c" -O3 -I "$ROOT/examples/snes" -I "$ROOT/examples/65816" -I "$ROOT/build")
+  if [ "$r" -eq 0 ]; then ok "current examples/snes/dither.c -O3 links, gap $(gap_of "$WORK/dither-now.sfc") B"; else bad "current dither -O3 rejected"; cat "$WORK/lk.log"; fi
+
+  # 5b. A synthetic program sized to leave exactly 256 B (links) and 254 B (rejected).
+  mkfill() { printf 'volatile unsigned short corpus_result;\nvolatile unsigned char fill[%s];\nint main(void) { fill[0] = 1; corpus_result = 1; for (;;) { } }\n' "$1" >"$WORK/fill.c"; }
+  mkfill 2; r=$(link_rc "$CFG" "$WORK/fill0.sfc" "$WORK/fill.c" -Os); g0=$(gap_of "$WORK/fill0.sfc")
+  n=$((2 + g0 - 256))
+  mkfill "$n"; r1=$(link_rc "$CFG" "$WORK/fill256.sfc" "$WORK/fill.c" -Os); g1=$(gap_of "$WORK/fill256.sfc")
+  mkfill "$((n + 2))"; r2=$(link_rc "$CFG" "$WORK/fill254.sfc" "$WORK/fill.c" -Os)
+  if [ "$r" -eq 0 ] && [ "$r1" -eq 0 ] && [ "$g1" -eq 256 ] && [ "$r2" -ne 0 ] && grep -q "$MSG" "$WORK/lk.log"; then
+    ok "synthetic boundary: gap 256 B links, gap 254 B is rejected (default reserve 256)"
+  else
+    bad "synthetic boundary: base gap $g0 rc=$r; fill[$n] gap=$g1 rc=$r1; fill[$((n + 2))] rc=$r2"; cat "$WORK/lk.log"
+  fi
+
+  # 5c. Every SNES platform's installed linker script enforces it (the same 254 B program, each driver).
+  for plat in snes snes-far snes-hirom snes-exhirom snes-gallery; do
+    pcfg="$INSTALL/bin/mos-$plat.cfg"
+    [ -f "$pcfg" ] || { bad "$plat: no $pcfg"; continue; }
+    mkfill 2; r1=$(link_rc "$pcfg" "$WORK/p-ok-$plat.sfc" "$WORK/fill.c" -Os)
+    mkfill "$((n + 2))"; r2=$(link_rc "$pcfg" "$WORK/p-bad-$plat.sfc" "$WORK/fill.c" -Os)
+    if [ "$r1" -eq 0 ] && [ "$r2" -ne 0 ] && grep -q "$MSG" "$WORK/lk.log"; then
+      ok "$plat: a program with room links, one leaving 254 B is rejected"
+    else
+      bad "$plat: room rc=$r1, 254 B rc=$r2"; cat "$WORK/lk.log"
+    fi
+  done
+  # The generated platforms (tools/snes-cartcanary.py emit-platform) carry the same lines.
+  mkdir -p "$WORK/gen-install/bin"
+  if python3 "$ROOT/tools/snes-cartcanary.py" emit-platform --mapping lorom --size 512K --speed slow --name snes-cart-stackguard-check --install "$WORK/gen-install" >/dev/null 2>"$WORK/gen.err" &&
+     grep -q 'PROVIDE(__soft_stack_min = 256);' "$WORK/gen-install/mos-platform/snes-cart-stackguard-check/lib/link.ld" &&
+     grep -q 'ASSERT(__heap_start + __soft_stack_min <= __stack' "$WORK/gen-install/mos-platform/snes-cart-stackguard-check/lib/link.ld"; then
+    ok "tools/snes-cartcanary.py emits the reserve into generated platforms"
+  else
+    bad "generated platform does not carry the reserve"; cat "$WORK/gen.err" 2>/dev/null || true
+  fi
+else
+  echo "  SKIP  link-time reserve legs (no $TOOL/mos-clang or $CFG)"
 fi
 
 # --- 4. require: a missing bounds source is a failure, not a silent pass --------------------------

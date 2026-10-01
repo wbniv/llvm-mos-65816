@@ -1,0 +1,23 @@
+# 2026-10-01T13:10:39Z dither.c blob 1be807bc12c4fcb7eceff3d910468b7d7b87479f (= 85f7972a:examples/snes/dither.c), dither.h blob 8c6c0f74c52e5552b5763dfd1965090a403bbec3
+# toolchain: clang-23 e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9  lld 0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1
+
+## BASELINE (pre-reserve SDK, link.ld sha256 9eb48681d0088e37)
+$ mos-clang --config <sdk>/bin/mos-snes.cfg -mcpu=mosw65816 -O3 dither.c -o rom-old.sfc
+rc=0
+ROM written: 32768 B, sha256 a5a9582e636f5106...; __heap_start 00001fae __stack 00002000
+
+## FIXED (reserve SDK, link.ld sha256 f7648ebf372e5fdc)
+$ mos-clang --config <sdk>/bin/mos-snes.cfg -mcpu=mosw65816 -O3 dither.c -o rom-new.sfc
+ld.lld: error: soft-stack reserve violated: static data ends at __heap_start, leaving fewer than __soft_stack_min bytes below __stack (shortfall = __heap_start + __soft_stack_min - __stack; shrink .data/.bss/.noinit, or lower __soft_stack_min with --defsym)
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+rc=1
+no ROM written
+
+## BASELINE ROM run on the same toolchain (build/jgxcheck.real, 600 frames, want 0x80C4; guard on)
+$ jgxcheck rom-old.sfc Database 0x1ce7 2 0x80C4 600
+jgxcheck: STACKGUARD FAIL: dither [-O3 default] soft stack overlaps static data by 231 B
+  min soft SP $1EC7 (first reached near pc $806B, in main) < end of static data $1FAE (__heap_start); stack top $2000, margin -231 B
+  rom=rom-old.sfc  bounds=rom-old.sfc.elf
+  Frames in [$1EC7, $1FAE) alias .bss/.noinit; see docs/defects/snes-soft-stack-static-data-collision.json
+SMOKE: FAIL off=0x1CE7 len=2 got=0x8185 want=0x80C4 stackguard: soft stack overlaps static data by 231 B (program=dither, config=-O3 default)
+rc=1

@@ -103,7 +103,7 @@ tasks:
       - dev/run.sh smoke
 
   stackguard:
-    desc: "Regression check for the soft-stack overlap guard in build/jgxcheck: the dither -O3 ROM from the soft-stack collision record must fail (231 B), -O2 and a clean ROM must not, plus a synthetic ELF-bounds overlap and the corpus-engine wiring. Needs build/jgxcheck from the patched bsnes-jg core (dev/run.sh xcheck)."
+    desc: "Regression check for the soft-stack overlap guard in build/jgxcheck: the dither -O3 ROM from the soft-stack collision record must fail (231 B), -O2 and a clean ROM must not, plus a synthetic ELF-bounds overlap and the corpus-engine wiring, and the link-time soft-stack reserve (__soft_stack_min = 256 in every platforms/snes*/link.ld: the 85f7972a dither at 82 B is rejected, exact boundary, all five platforms). Needs build/jgxcheck from the patched bsnes-jg core (dev/run.sh xcheck) and the installed SDK (dev/run.sh build)."
     cmds:
       - dev/run.sh stackguard
 

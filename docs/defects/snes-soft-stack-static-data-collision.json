@@ -805,6 +805,46 @@
   {
    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/dither-post-move-records.tsv",
    "sha256": "7d94553699ecf42e22bd0e59febfeb9c7384d5d63e09b506c70288705e7dde64"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/README.md",
+   "sha256": "f32a76e1eb7c38442a0038d10bc5c0faa12b6d79ef767bfd4fa603fb95cc8101"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/dither-85f7972a-link.log",
+   "sha256": "21bd9f97f547815c0015c719653374cc1d90751db72cb8d82717d2ff8ab7872b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/stackguard-check-reserve-sdk.log",
+   "sha256": "e334da23416ec89a12eb9465ca740d96bdad6a68dc7b0ff9e08bc3ad71d5e597"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/stackguard-check-pre-reserve-sdk.log",
+   "sha256": "e6851b033ac498e026c5cbfaaa09b53640ec05c6911ff5c8d6f3a76a45a7b754"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/corpus-links-results.tsv",
+   "sha256": "bc999cdb4506e746d25b5e8a4d676c319bd6ee8605d20f0ac973033e7e16d1ff"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/corpus-links-records.tsv",
+   "sha256": "5384daa323b70b0fb97065f255a444198854ec7f9d6884f58dc5da99eb40a9e4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/demos-lowgap-results.tsv",
+   "sha256": "89a4f1fa10827359aa24be88564e02489e8432cffea62f366273e1cea7d7e580"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/demos-lowgap-records.tsv",
+   "sha256": "331add566c21aa6822bc544350b3fb21037533df5d7aa0b7b954336bcaa5abf4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/sdk-install-before-stamp-change.sha256",
+   "sha256": "5b52e344a643827238b14b7004073ad12e855329282bf867058c5a6774489017"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/sdk-install-after-stamp-change.sha256",
+   "sha256": "3e480fbd5c3b4809181ba142f7de10e8fa81099670a4003703a4a64bd7f8cf36"
   }
  ],
  "mitigation_observation": {
@@ -821,5 +861,21 @@
   "evidence": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/README.md",
   "attribution": "Claude Code 2.1.286 (claude --version), model Claude Sonnet 5.5 (claude-sonnet-5-5), high reasoning effort (T2 agent definition; not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F",
   "post_move": "After 07f4fe2f (dither buffers moved to high WRAM) the guard measures dither at -O3 default 2,073 B, -O3 a16 2,033 B, -O2 default 2,107 B of margin (pre-10:06 toolchain); static data ends at $16AE."
+ },
+ "link_reserve": {
+  "status": "implemented 2026-10-01 (second of the proposed guards); defect record stays open",
+  "summary": "Every SNES linker script (platforms/snes, snes-far, snes-hirom, snes-exhirom, snes-gallery, and the scripts tools/snes-cartcanary.py emit-platform generates) carries PROVIDE(__soft_stack_min = 256) and ASSERT(__heap_start + __soft_stack_min <= __stack, 'soft-stack reserve violated: ...'). __heap_start is the end of .noinit, so of all static data in low WRAM; -Wl,--defsym=__soft_stack_min=N overrides it per link. N = 256 B was chosen by the user from the guard sweep (smallest gap of 279 programs: msquares 338 B).",
+  "red_green": {
+   "input": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.c (examples/snes/dither.c at 85f7972a, git blob 1be807bc12c4fcb7eceff3d910468b7d7b87479f) with input/dither.h, -O3, default mosw65816, LTO: 82 B between __heap_start ($1FAE) and __stack",
+   "red": "pre-reserve SDK (link.ld sha256 9eb48681d0088e37, the one the baseline used): links and writes a ROM; on bsnes-jg STACKGUARD FAIL, 231 B overlap, min SP $1EC7, got=0x8185 want=0x80C4 (new toolchain; baseline toolchain gave 0x0000)",
+   "green": "reserve SDK (link.ld sha256 f7648ebf372e5fdc): ld.lld: error: soft-stack reserve violated ..., exit 1, no ROM written; --defsym=__soft_stack_min=82 links and =83 is rejected",
+   "log": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/dither-85f7972a-link.log",
+   "regression": "dev/stackguard-check.sh (dev/run.sh stackguard, task stackguard) leg 5; 21 pass on the reserve SDK, 8 link-time legs fail against the pre-reserve SDK (SDK_INSTALL=), logs beside this record",
+   "toolchain": "clang-23 e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9, lld 0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1"
+  },
+  "sweeps": "249 corpus links (83 programs x default/a16/xy16, -Os) build, link and pass on bsnes-jg; 35 demo gates with the smallest gaps (every ROM under 2,500 B of room in the guard sweep) link and run; smallest gap 338 B (msquares). dev/run.sh corpus (84/84) and corpus-a16 (83/83) pass on the shared SDK after the stamp rebuild; the shared-SDK install results are in the evidence README addendum.",
+  "why_open": "The reserve bounds the STATIC side only: it proves nothing about frame depth, so a program with 300 B of room and 400 B of frames still overlaps silently (the runtime guard measures depth, in gated runs only; irqgate is 569 B deep). The dither -O3 inliner behaviour that made main's frame 313 B is unchanged (not a code-generation error per root_cause, and the demo was repaired by moving its buffers, 07f4fe2f). The schema's fixed status needs a candidate run that PASSES the same input; the link-time assert makes that input fail to link, so it is evidence of rejection, not of a repaired build. Left at confirmed; closing needs either a compile-time or link-time bound on soft-stack depth, or a decision that the contract is 'reserve plus gated runtime guard'.",
+  "attribution": "Claude Code 2.1.286 (claude --version), model Claude Sonnet 5.5 (claude-sonnet-5-5), high reasoning effort (T2 agent definition; not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F",
+  "evidence": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/README.md"
  }
 }

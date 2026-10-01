@@ -372,7 +372,11 @@ leg fails loudly instead of hanging or reading a wrong CRC.
 - **Regression check:** `dev/run.sh stackguard` (`dev/stackguard-check.sh`) proves the dither `-O3` ROM committed with the
   record fails (231 B, min SP `$1EC7` against `__heap_start` `$1FAE`), the `-O2` ROM does not, a synthetic VLA overlap is
   caught by its ELF even though its result matches, the guard is byte-silent on a clean ROM, the torn-pair control holds,
-  and the corpus engine fails an overlapping program in all three configurations.
+  and the corpus engine fails an overlapping program in all three configurations. Its link-time legs (5) need only
+  `mos-clang` and the installed SDK: the 85f7972a dither is rejected at `-O3` and links with `--defsym=__soft_stack_min=0`,
+  the boundary is exact (`=82` links, `=83` fails; a synthetic gap of 256 B links, 254 B fails), each of the five installed
+  SNES linker scripts enforces it, and the generated platforms carry the lines. `SDK_INSTALL=<dir>` points it at another SDK
+  (run against a pre-reserve SDK it fails 8 legs, which is the red baseline).
 - **Sweep (2026-10-01):** `dev/stackguard-sweep.py corpus|demos|report` runs the guard across every corpus program
   (83 x default/a16/xy16, `-Os`) and every demo gate (154, `JG_ONLY=1`) and prints the margins smallest first.
   **608 runs, no overlap.** Margins: median 7,228 B; 2 under 256 B (dither 76 B at the pre-move source, msquares 246 B),
@@ -381,6 +385,21 @@ leg fails loudly instead of hanging or reading a wrong CRC.
   torn-SP case). Records, per-program table and toolchain identity:
   [`evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/`](defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/README.md).
   The link-time reserve (the record's proposed fix 2) can size its `__soft_stack_min` from these depths.
+- **Link-time reserve (2026-10-01): every SNES linker script requires `__soft_stack_min = 256` bytes between static data
+  and `__stack`.** `platforms/snes*/link.ld` (and the scripts `tools/snes-cartcanary.py emit-platform` generates) carry
+  `PROVIDE(__soft_stack_min = 256);` and `ASSERT(__heap_start + __soft_stack_min <= __stack, …)` right after `__stack`
+  (rationale comment in [`platforms/snes/link.ld`](../platforms/snes/link.ld)). A program that leaves less fails at link
+  with `soft-stack reserve violated: static data ends at __heap_start, leaving fewer than __soft_stack_min bytes below __stack (shortfall = __heap_start + __soft_stack_min - __stack; …)`:
+  the shortfall is `__heap_start + 256 - $2000` (the map and `llvm-nm <rom>.elf` give `__heap_start`). Fixes: move big
+  buffers out of low WRAM (the dither fix, `07f4fe2f`, put them behind the WRAM port in high WRAM), shrink
+  `.data`/`.bss`/`.noinit`, or `-Wl,--defsym=__soft_stack_min=N` for one link (0 turns it off). `__heap_start` is the end of
+  `.noinit` and so of all static data in low WRAM (`.data`, `.bss`, `.noinit`); only a `.ram`-section user would be
+  missed (none exists). **It bounds the static side only**: it proves nothing about how deep the frames go, so a program
+  with 300 B of room and 400 B of frames still collides; the runtime guard above is what measures depth, and only in
+  gated runs. 256 B was chosen because the smallest gap of the 279 programs swept is msquares at 338 B (the deepest soft
+  stack is `irqgate`, 569 B, which has far more room). The installed scripts are `build/install/mos-platform/<p>/lib/link.ld`,
+  refreshed by `dev/run.sh build`; `dev/run.sh stackguard` links the evidence's 85f7972a dither (82 B of room) and the boundary
+  cases against them.
 
 ### Never force-blank outside boot — and the v-blank budget
 

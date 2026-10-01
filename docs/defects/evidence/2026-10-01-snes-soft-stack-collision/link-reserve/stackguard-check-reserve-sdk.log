@@ -1,0 +1,35 @@
+
+
+
+
+
+
+
+
+
+
+
+
+2026-10-01T13:51:39Z ==> stackguard regression check (jgxcheck sha256 04ac88b80f4a2844…, frames=60)
+  PASS  dither -O3 flagged: rc=1, 231 B overlap, min SP $1EC7 < __heap_start $1FAE (value gate also red: got=0x0000)
+  PASS  dither -O3 under JGX_STACKGUARD_ONLY=1: rc=4 (the engine's stack-only run fails on the overlap alone)
+  PASS  JGX_STACKGUARD=0 restores the original harness output (value gate red only, no guard text)
+  PASS  dither -O2: no overlap, margin 82 B (min SP $2000, static end $1FAE)
+  PASS  synthetic VLA overlap (ELF bounds): rc=4 although corpus_result == want; overlaps static data by 124 B
+  PASS  clean program: stdout/stderr/rc byte-identical with the guard on and off (SMOKE: PASS off=0x203 len=2 got=0x1234 (ran 60 frames, bsnes-jg))
+  PASS  torn SP pair ignored: 300 B frame freed 20 times, min SP $1ED4 (a torn epilogue read would show about $1E00)
+  PASS  corpus engine: stackguard off -> PASS, on -> FAIL naming the program and all three configurations
+  PASS  ELF and map bounds agree: ok $2000 $0206 $2000 7674
+  PASS  85f7972a dither -O3 (82 B of headroom) is rejected at link time: soft-stack reserve violated, no ROM written
+  PASS  same input, reserve off (--defsym=__soft_stack_min=0): links as before, ROM written, gap 82 B between __heap_start and __stack
+  PASS  the boundary is exact on the real input: __soft_stack_min=82 links, 83 is rejected
+  PASS  current examples/snes/dither.c -O3 links, gap 2386 B
+  PASS  synthetic boundary: gap 256 B links, gap 254 B is rejected (default reserve 256)
+  PASS  snes: a program with room links, one leaving 254 B is rejected
+  PASS  snes-far: a program with room links, one leaving 254 B is rejected
+  PASS  snes-hirom: a program with room links, one leaving 254 B is rejected
+  PASS  snes-exhirom: a program with room links, one leaving 254 B is rejected
+  PASS  snes-gallery: a program with room links, one leaving 254 B is rejected
+  PASS  tools/snes-cartcanary.py emits the reserve into generated platforms
+  PASS  JGX_STACKGUARD=require with no ELF/map beside the ROM: rc=2
+2026-10-01T13:52:14Z ==> stackguard check: 21 passed, 0 failed
