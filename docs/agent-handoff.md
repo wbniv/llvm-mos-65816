@@ -206,10 +206,12 @@ performed the recheck and enforcement work; original credits are preserved.
   place it is defined; [`dev/build.sh`](../dev/build.sh) compares it); any difference wipes the SDK build tree and
   rebuilds it, so a toolchain rebuild is followed by `dev/run.sh build` (or `task release-sdk`) and nothing else.
   `dev/run.sh toolchain-stamp-check` proves the unchanged/changed/legacy-stamp cases against the real stamp block.
-  Note `llc` here is the *installed* `build/llvm-mos-install/bin/llc`, which `dev/toolchain.sh` does not refresh (it
-  builds the lit tools into `build/llvm-mos/bin/` only), so it can lag `clang-23`; the SDK is compiled by `clang-23` and
-  linked by `lld`, and those two carry the invalidation. The first build after this change finds the old path-only stamp
-  and rebuilds once.
+  `llc` here is the *installed* `build/llvm-mos-install/bin/llc`. It is not a distribution component, so
+  `install-distribution` never refreshed it and it lagged `clang-23` (2026-10-02: installed `cf5355d3…` from 2026-09-28
+  vs build tree `6f303945…`); `dev/toolchain.sh` now copies `build/llvm-mos/bin/llc` into the install dir after every
+  build, so `build/llvm-mos-install/bin/llc` and `build/llvm-mos/bin/llc` are the same compiler after a toolchain build.
+  The other lit tools (`opt`, `llvm-config`, `count`, `split-file`, `FileCheck`, `not`) are still build-tree only; nothing
+  reads them from the install dir. The first build after this change finds the old path-only stamp and rebuilds once.
 - **Ad-hoc commands in the dev container go through `dev/container.sh -- CMD`** (extra mounts with
   `-v HOST:CONTAINER`). It runs as the host user like `dev/run.sh` does; a bare `docker run` without
   `--user` runs as root and leaves root-owned files under `build/`, which breaks the next host-side

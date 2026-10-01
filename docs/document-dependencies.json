@@ -2212,16 +2212,16 @@
           "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
           "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
           "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
-          "dev/toolchain.sh": "1f6a77dc569755ca1df4855d014f2c50f1e070b13ec18f45fd609a53bd58f57c",
+          "dev/toolchain.sh": "25c464bf9b0e61799b6b0aff81b71925e46abbecf636a12b697461fd6575c1df",
           "dev/regen-patch.sh": "54f07f5243010e00a136c6ba23a654f831d2b904b0e1c068def11f7a8f3e32a2",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-10-01T03:59:33.227170+00:00",
-        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-01T23:41:09.075915+00:00",
+        "note": "agent-handoff only gained the note that toolchain.sh now installs llc. This dated record's statement that the rebuilt llc was under build/llvm-mos/bin on 2026-09-28 remains correct as dated evidence; no status, publication or result changed.",
+        "attribution": "Claude Code 2.1.287, model Claude Sonnet 5.5 (claude-sonnet-5-5), reasoning effort low"
       }
     },
     {

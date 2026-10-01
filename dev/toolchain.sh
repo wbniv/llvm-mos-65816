@@ -334,6 +334,13 @@ cmake --build "$BUILDDIR" --target install-distribution
 echo "==> refresh the lit tool set in $BUILDDIR (-j$JOBS)"
 cmake --build "$BUILDDIR" --target llc opt llvm-mc llvm-objdump llvm-readobj llvm-readelf llvm-config count split-file FileCheck not --parallel "$JOBS"
 
+# llc is not an LLVM_DISTRIBUTION_COMPONENTS member, so install-distribution never refreshes it and
+# $INSTALL/bin/llc went stale (the SDK stamp, dev/toolchain-stamp.sh, hashes it). Install it here.
+# Copy to a temp name + mv so a hardlinked copy of the old inode (cp -al worktrees) is not rewritten.
+echo "==> install llc -> $INSTALL/bin/llc"
+install -m 755 "$BUILDDIR/bin/llc" "$INSTALL/bin/llc.new"
+mv -f "$INSTALL/bin/llc.new" "$INSTALL/bin/llc"
+
 echo "==> done in $((SECONDS/60))m $((SECONDS%60))s: $("$INSTALL/bin/mos-clang" --version | head -1)"
 echo "    use it: MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build && ... corpus"
 echo "    lit: dev/run.sh lit [PATHS...]   (runs llvm-lit -s against the MOS suites; refreshes these tools first)"
