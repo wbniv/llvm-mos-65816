@@ -7,7 +7,8 @@
  "report": "docs/investigations/2026-10-01-dither-o3-soft-stack-collision.md",
  "attribution": [
   "Claude Code 2.1.286 (claude --version), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (T4 design-and-build agent definition; effort not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F. Capture, prior-work reconciliation, root cause and proposal, 2026-10-01.",
-  "Original sighting (not diagnosed): Claude Code 2.1.285 (T3 plan-execution subagent), model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort, commit 18e7f8a0, o2-large/o3-dither/report.txt."
+  "Original sighting (not diagnosed): Claude Code 2.1.285 (T3 plan-execution subagent), model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort, commit 18e7f8a0, o2-large/o3-dither/report.txt.",
+  "Soft-stack guard in the bsnes-jg probe, regression check and sweep, 2026-10-01: Claude Code 2.1.286 (claude --version), model Claude Sonnet 5.5 (claude-sonnet-5-5), high reasoning effort (T2 agent definition; not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F."
  ],
  "summary": "examples/snes/dither.c built with the SDK driver at -O3 (LTO) never writes corpus_result (0x0000 against 0x80C4) in default mosw65816 and +mos-a16, on bsnes-jg and MAME; -O2 passes. There is no miscompile: the same -O3 instruction stream passes when only the data layout changes. Cause: the SNES platform (platforms/snes/link.ld) puts the soft stack at $2000, growing down into the same low-WRAM region as .bss/.noinit, with no reservation or check. The demo's static data ends at $1FAD (82 B free). At -O3 the pre-link inliner (threshold 250; opt-bisect pass 4016, inline on main) inlines dither_gate_crc and its three unrolled ds_dither calls into main, adding six [66 x i16] locals. main makes 7 indirect calls, so MOSNonReentrant never marks it nonreentrant and its 313 B frame (353 B with +mos-a16) goes on the soft stack at [$1EC7,$2000). The frame overlaps dither_gate_crc.out[478..575] and the whole .noinit static stack. The gate's out[] stores in row 21 overwrite main's spilled row counter and row pointer, and the loop livelocks. Reproduces with upstream llc 06bc967d2668 on the same IR and with an unpatched upstream clang 742d554bf080 full build using this repo's SNES SDK. Placing main's frame on the static stack turns it into a link error (.noinit overflowed by 181 bytes). An earlier instance (rdiff, e3bb5a62, 2026-09-25) was fixed in the demo without a record or guard. Fix location: our SNES platform (a link-time soft-stack reservation and assertion) and/or the differential gate (a soft-SP low-water check); an optional upstream MOSNonReentrant enhancement; not 0002, the #320/#321 patches or generic LLVM. Not fixed; the guard policy is a user decision.",
  "prior_work": {
@@ -352,6 +353,36 @@
    },
    "exit_code": 0,
    "observed": "0x80C4 (margin 2386 B above static data)"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O3 default stock  (build/jgxcheck with the soft-stack guard; dev/stackguard-check.sh also replays the committed baseline ROM)",
+   "working_directory": "/home/will/llvm-mos-65816-stackguard (branch wt/321-stackguard off origin/main 85f7972a)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O3",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result",
+    "note": "guard sighting 2026-10-01: same input and flags as the baseline; the probe now names the overlap"
+   },
+   "toolchain_location": "private copy of build/llvm-mos-install taken before the 2026-10-01 10:06 rebuild; identities in docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.c",
+    "sha256": "3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/dither-O3-reproduce.log",
+    "sha256": "61550159d0d8162bb3691f05ebd90d7449c0f0af7d7276e3f4d51bc4c4a3b893"
+   },
+   "exit_code": 1,
+   "failure_signature": "stackguard: soft stack overlaps static data by 231 B (program=rom, config=unspecified)",
+   "observed": "0x0000 with a 231 B overlap (default); +mos-a16 271 B; -O2 passes with no overlap"
   }
  ],
  "root_cause": {
@@ -367,7 +398,7 @@
    "__attribute__((nonreentrant)) main in a copy of dither.c: -O2 builds and passes, -O3 fails to link (.noinit overflowed by 181 bytes)"
   ],
   "proposed_fix": [
-   "Differential gate (ours): record the soft stack pointer low-water mark on bsnes-jg and fail below __heap_start",
+   "Differential gate (ours): record the soft stack pointer low-water mark on bsnes-jg and fail below __heap_start (implemented 2026-10-01; see guard)",
    "SNES platform (ours, platforms/snes*/link.ld): reserve soft-stack space and ASSERT __heap_start + reserve <= __stack; the reserve size is a policy decision (any value of 83 B or more also rejects the passing -O2 dither build)",
    "Optional upstream llvm-mos enhancement (MOSNonReentrant.cpp): exclude a non-address-taken main from the indirect-call recursion edge, making this overflow a loud link error",
    "Per-program source guard available now: __attribute__((nonreentrant)) on main puts its frame on the static stack; dither then passes at -O2 and fails to link at -O3 (.noinit overflowed by 181 bytes)",
@@ -726,6 +757,54 @@
   {
    "path": "docs/defects/evidence/2026-10-01-dither-wram-port/logs/verify-O3-default.log",
    "sha256": "11bf9e3594c9c3e518e0ebc366fb0da92650363b8fc5f1e1db4a5be32ca525c3"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/README.md",
+   "sha256": "cc90733a99cc2df373d14cdba640439e93137054788a2785ab91322e220cd7d4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/report.txt",
+   "sha256": "91c291315533a559443b0520f8a43649744601a98442befbeeaa59385719b16a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/corpus-records.tsv",
+   "sha256": "9ad68ff085535b403de7ca040ff08ae2597c9bf61e4762e474688dcf34feb329"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/corpus-results.tsv",
+   "sha256": "bc999cdb4506e746d25b5e8a4d676c319bd6ee8605d20f0ac973033e7e16d1ff"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/demos-records.tsv",
+   "sha256": "2bb91699c7ac39d160fd7d1dfe054edd191f4a58f7362264b3bcc48781413276"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/demos-results.tsv",
+   "sha256": "55d46b8567e8fc05f8a354aacbaccff4f70c6d294275700c2120a8ae8a3f3b07"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/demo-verdict-lines.txt",
+   "sha256": "b67528e5517c051fad1599e878b0eecb22cb224f8840229c7024d31706fa0db8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/check.log",
+   "sha256": "4f83d902928f84da108ecfbd532628a3ce9ba37c3e36210d1ad7d74ec6102d7a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/dither-O3-reproduce.log",
+   "sha256": "61550159d0d8162bb3691f05ebd90d7449c0f0af7d7276e3f4d51bc4c4a3b893"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/dither-reproduce-records.tsv",
+   "sha256": "a3c1852125f9863b34199a3c9e8843ffd48294e07bcb941ee27a69ddc436fc7a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/identity-sweep-start.txt",
+   "sha256": "a09d8f65c1fd2834fa3ade3468dade436a8f5aa1cfd1ee8139510669523c688b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/dither-post-move-records.tsv",
+   "sha256": "7d94553699ecf42e22bd0e59febfeb9c7384d5d63e09b506c70288705e7dde64"
   }
  ],
  "mitigation_observation": {
@@ -734,5 +813,13 @@
   "summary": "examples/snes/dither.c keeps its 2304 B frame buffer in high WRAM ($7E:2000) behind the WRAM data port instead of low WRAM. Static data now ends at $16AE, leaving 2386 B to __stack (was 82 B). The gate passes (0x80C4) at -O2 and -O3 in default, +mos-a16 and +mos-a16,+mos-xy16 on bsnes-jg, and on MAME for all six. Measured soft-stack depth: 279/286/286 B at -O2 and 313/353/356 B at -O3 (default/a16/xy16), so at least 2030 B stays untouched. -O2 master clocks fall (loop per frame -19.7% default, -26.2% a16, -34.2% a16xy16). The corpus slice object is byte-identical; -verify-machineinstrs is clean at -O2/-O3 (default, a16); the picture is pixel-identical at equal iteration count. Far pointers were rejected because they fail to legalize in default mosw65816.",
   "baseline_replay": "reproduce.sh gate now builds the fixed examples/snes/dither.c; the red baseline replays only by running reproduce.sh from a checkout of origin/main 85f7972a (baseline.input and baseline.log are unchanged).",
   "attribution": "Claude Code 2.1.286 (claude --version), model Claude Sonnet 5.5 (claude-sonnet-5-5), t2-sonnet-high agent definition (effort not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F."
+ },
+ "guard": {
+  "status": "implemented 2026-10-01 (probe check, first of the proposed guards)",
+  "summary": "build/jgxcheck records the lowest soft-stack pointer (__rc0/__rc1, committed when the __rc1 store lands) and fails the run when it is below the end of static data; bounds from <rom>.elf or the lld map. dev/stackguard-check.sh replays the committed dither -O3 ROM (231 B overlap, min SP $1EC7 against __heap_start $1FAE). Plan: docs/plans/2026-10-01-soft-stack-guard.md.",
+  "sweep": "608 runs (83 corpus programs x default/a16/xy16 at -Os, 359 demo-gate ROMs from 154 gates), measured on source 85f7972a (before the dither buffer move) with the pre-10:06 toolchain: no overlap. Smallest margins: dither 76 B (pre-move source), msquares 246 B, lsystem 577 B, vlastack 614 B, packrec 755 B. Deepest soft stacks: irqgate 569 B and dpbank 305 B (NMI handlers). No new violation, so no repeat sighting beyond the original dither -O3 build; rdiff (e3bb5a62) measures 1,060 B of margin at its current size.",
+  "evidence": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/README.md",
+  "attribution": "Claude Code 2.1.286 (claude --version), model Claude Sonnet 5.5 (claude-sonnet-5-5), high reasoning effort (T2 agent definition; not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F",
+  "post_move": "After 07f4fe2f (dither buffers moved to high WRAM) the guard measures dither at -O3 default 2,073 B, -O3 a16 2,033 B, -O2 default 2,107 B of margin (pre-10:06 toolchain); static data ends at $16AE."
  }
 }

@@ -321,6 +321,56 @@ performed the recheck and enforcement work; original credits are preserved.
   ~1h46m; cached thereafter); `torture`/`fuzz-csmith` are locally green (sampled 4-way), on-runner dispatch
   pending.
 
+### Soft-stack overlap guard in the bsnes-jg probe — a gate can now fail with "soft stack overlaps static data"
+
+On the SNES platform static data and the C soft stack share low WRAM (`ram` = `$0200-$1FFF`, `__stack = $2000`
+in `platforms/snes/link.ld`, stack growing down) and nothing links the two. A program whose frames reach below
+the end of static data silently overwrites its own variables: the dither `-O3` hang
+([record](defects/snes-soft-stack-static-data-collision.json), [investigation](investigations/2026-10-01-dither-o3-soft-stack-collision.md)),
+and rdiff (`e3bb5a62`) before it. **`build/jgxcheck` now measures it on every run**, so every gate with a bsnes-jg
+leg fails loudly instead of hanging or reading a wrong CRC.
+
+- **What it reads.** The core carries [`dev/bsnes-jg-wramwatch.patch`](../dev/bsnes-jg-wramwatch.patch), a WRAM
+  write watch (empty by default: one compare per WRAM write; `dev/xcheck.sh` applies it and rebuilds the core and
+  harness). [`tools/stackguard.h`](../tools/stackguard.h) arms it on `__rc0`/`__rc1`, the soft-stack pointer, and
+  commits a new SP **only when the `__rc1` store lands**: `MOSFrameLowering::offsetSP` writes the low byte first, so
+  an instruction-boundary sample would see a torn pair up to 255 B *below* the true SP in every epilogue that
+  carries (`dev/stackguard-check.sh` has a control for this). Bounds are never hard-coded: `__rc0`, `__stack` and
+  `__heap_start` come from `<rom>.elf` (the SDK driver leaves `foo.sfc.elf` beside `foo.sfc`), else the lld map
+  `<stem>.map`; end of static data = max(`__heap_start`, end of any allocated section in `[$0100, __stack)`).
+  **Margin = min SP − end of static data; negative fails.**
+- **How a gate fails.** The verdict is folded into the `SMOKE:` line, because the corpus engine and most gates read only
+  that line, and a result that happens to match must not hide an overlap:
+  `SMOKE: FAIL off=0x1CE7 len=2 got=0x0000 want=0x80C4 stackguard: soft stack overlaps static data by 231 B (program=dither, config=-O3 default)`
+  (or `SMOKE: FAIL (… got=0x80C4 matched, but stackguard: …)`), plus a block on stderr naming the minimum SP, the
+  function it was reached in, the bounds source and the ROM, and **exit code 4** when the value check had passed.
+  With no overlap (or no ELF/map beside the ROM) stdout, stderr and the exit code are byte-identical to the stock
+  harness. Knobs: `JGX_STACKGUARD=0` off, `=require` a missing ELF/map or an unpatched core is itself a failure,
+  `JGX_STACKGUARD_ONLY=1` run the frames and report only the guard verdict, `JGX_STACKGUARD_LOG=<file>` append
+  one TSV record per run (program, config, status, min SP, static end, stack top, margin, pc, function, bounds source),
+  `JGX_PROGRAM` / `JGX_CONFIG` label the message (the config is otherwise inferred from the ROM's name and directory).
+  `dev/run.sh` forwards `JGX_STACKGUARD` and `JGX_STACKGUARD_LOG` into the container.
+- **Gate wiring.** Any gate that runs `$JGX` and honours its exit status or `SMOKE:` line is covered with no edit,
+  *provided its `build/jgxcheck` was rebuilt against the patched core*: `rm build/jgxcheck && dev/run.sh xcheck`
+  (a harness linked against a stale core prints `stackguard UNAVAILABLE` on stderr and checks nothing). The corpus
+  engine (`tools/a16_fuzz.py check`, i.e. `dev/run.sh corpus-a16`) opts in explicitly: its a16 bsnes-jg leg is asserted
+  overlap-free, and the **default and xy16 ROMs, which it value-checks only on MAME, get a stack-only bsnes-jg run**
+  (`STACKGUARD_ALL_CONFIGS=0` turns that off). The fuzz/Csmith/torture callers of the same engine run with the guard off
+  and stay bit-identical. Gates with no jgxcheck leg (the compile-only probes) and MAME-only gates (`dev/run.sh corpus`) are
+  not covered.
+- **Regression check:** `dev/run.sh stackguard` (`dev/stackguard-check.sh`) proves the dither `-O3` ROM committed with the
+  record fails (231 B, min SP `$1EC7` against `__heap_start` `$1FAE`), the `-O2` ROM does not, a synthetic VLA overlap is
+  caught by its ELF even though its result matches, the guard is byte-silent on a clean ROM, the torn-pair control holds,
+  and the corpus engine fails an overlapping program in all three configurations.
+- **Sweep (2026-10-01):** `dev/stackguard-sweep.py corpus|demos|report` runs the guard across every corpus program
+  (83 x default/a16/xy16, `-Os`) and every demo gate (154, `JG_ONLY=1`) and prints the margins smallest first.
+  **608 runs, no overlap.** Margins: median 7,228 B; 2 under 256 B (dither 76 B at the pre-move source, msquares 246 B),
+  4 in 256-1,023 B, 192 in 1,024-4,095 B, 407 at 4,096 B or more. 207 runs never touched the soft stack. The deepest
+  soft stacks are the two ISR demos (`irqgate` 569 B, `dpbank` 305 B, both in `nmi`; an ISR reserves 256 B extra for the
+  torn-SP case). Records, per-program table and toolchain identity:
+  [`evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/`](defects/evidence/2026-10-01-snes-soft-stack-collision/guard-sweep/README.md).
+  The link-time reserve (the record's proposed fix 2) can size its `__soft_stack_min` from these depths.
+
 ### Never force-blank outside boot — and the v-blank budget
 
 **Standing rule for every SNES program here: do not blank. Clear the screen instead, and transfer to

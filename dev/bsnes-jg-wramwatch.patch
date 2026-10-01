@@ -1,0 +1,34 @@
+llvm-mos-65816: WRAM write watch for bsnes-jg 2.1.0 (pinned; src/cpu.cpp sha256 9c3fa4a17e0c6386ad01b7e040ccbfafa4971b4d1288e52ddd30b953c4dbbcee).
+
+Calls jgx_wram_watch_cb(offset, data, pc) after every CPU/DMA write whose WRAM offset lies in
+[jgx_wram_watch_lo, +jgx_wram_watch_len). The window defaults to empty (one compare per WRAM write).
+dev/jgxcheck.cpp (tools/stackguard.h) arms it on __rc0/__rc1 to track the lowest soft-stack pointer.
+Applied by dev/xcheck.sh; dev/build-cycle-probe.py copies the patched tree and its needles are untouched.
+
+--- a/src/cpu.cpp
++++ b/src/cpu.cpp
+@@ -31,6 +31,16 @@
+ 
+ #include "cpu.hpp"
+ 
++// llvm-mos-65816 WRAM write watch (dev/bsnes-jg-wramwatch.patch). A harness sets
++// [jgx_wram_watch_lo, +jgx_wram_watch_len) and jgx_wram_watch_cb; every CPU/DMA write whose WRAM
++// offset (0..0x1FFFF) falls inside the window then calls cb(offset, data, pc) after wram[] is
++// updated. The default window is empty, so the cost to everything else is one compare per write.
++extern "C" {
++  unsigned jgx_wram_watch_lo = 0;
++  unsigned jgx_wram_watch_len = 0;
++  void (*jgx_wram_watch_cb)(unsigned offset, uint8_t data, uint32_t pc) = nullptr;
++}
++
+ namespace SuperFamicom {
+ 
+ CPU cpu;
+@@ -445,6 +455,7 @@
+ 
+ void CPU::writeRAM(unsigned addr, uint8_t data) {
+   wram[addr] = data;
++  if(addr - jgx_wram_watch_lo < jgx_wram_watch_len) jgx_wram_watch_cb(addr, data, r.pc.d);
+ }
+ 
+ void CPU::writeAPU(unsigned addr, uint8_t data) {

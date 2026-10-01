@@ -1039,18 +1039,59 @@ def run_mame(rom, addr, want, length):
     return (int(g.group(1), 16) if g else None), m.group(0)
 
 
-def run_bsnes(rom, off, length, want):
+def _guard_env(guard, program, config):
+    """Environment for a jgxcheck run. The soft-stack guard is opt-in per engine caller (the corpus
+    check passes guard=True): every other caller (Csmith/fuzz/torture) gets JGX_STACKGUARD=0, so its
+    verdicts stay bit-identical. With the guard on, an overlap names the program and configuration
+    (the engine's scratch ROMs are all called chk_*.sfc). None = inherit the environment unchanged."""
+    if not guard:
+        env = dict(os.environ)
+        env["JGX_STACKGUARD"] = "0"
+        return env
+    env = dict(os.environ)
+    if program:
+        env["JGX_PROGRAM"] = program
+    if config:
+        env["JGX_CONFIG"] = config
+    return env
+
+
+def run_bsnes(rom, off, length, want, program=None, config=None, guard=False):
     if not (JGX.exists() and JG_DB.is_dir()):
         return "skip", "(bsnes-jg unavailable)"
     # bsnes-jg frame budget: default 180; BSNES_FRAMES widens it for heavy slices (headless jgxcheck is
     # unthrottled, so more frames is cheap). Kept in step with the MAME SMOKE_SETTLE window.
     cmd = [str(JGX), str(rom), str(JG_DB), "0x%X" % off, str(length), "0x%X" % want,
            os.environ.get("BSNES_FRAMES", "180")]
-    p = _run_emu(cmd, timeout=90)
+    p = _run_emu(cmd, timeout=90, env=_guard_env(guard, program, config))
     line = (p.stdout + p.stderr).strip().splitlines()
     line = next((l for l in line if l.startswith("SMOKE:")), "(no SMOKE line)")
     g = GOT_RE.search(line)
     return (int(g.group(1), 16) if g else None), line
+
+
+def run_stackguard(rom, program, config):
+    """Soft-stack overlap check of a ROM the engine does not value-check on bsnes-jg (the default and
+    xy16 builds; only the a16 build has a bsnes-jg value leg). jgxcheck runs the same frame budget with
+    JGX_STACKGUARD_ONLY=1, so the value assert cannot change any verdict: only a measured overlap
+    returns a failure line. Anything that stops the check running (no bsnes-jg, a timeout, a core
+    without the write watch) returns None, which leaves the engine's verdicts exactly as they were.
+    STACKGUARD_ALL_CONFIGS=0 turns the extra runs off."""
+    if os.environ.get("STACKGUARD_ALL_CONFIGS", "1") == "0":
+        return None
+    if not (JGX.exists() and JG_DB.is_dir()):
+        return None
+    env = _guard_env(True, program, config)
+    env["JGX_STACKGUARD_ONLY"] = "1"
+    cmd = [str(JGX), str(rom), str(JG_DB), "0x0", "1", "0x0", os.environ.get("BSNES_FRAMES", "180")]
+    try:
+        p = _run_emu(cmd, timeout=90, env=env)
+    except subprocess.TimeoutExpired:
+        return None
+    if p.returncode == 4:
+        line = (p.stdout + p.stderr).strip().splitlines()
+        return next((l for l in line if l.startswith("SMOKE:")), "SMOKE: FAIL (stackguard)")
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -1170,7 +1211,8 @@ def triage(seed, csrc, reason, extra=None):
         pass
 
 
-def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verify_config=None):
+def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verify_config=None,
+             stackguard=False):
     """The shared safety net: verify-machineinstrs (a16) + compile default/a16 + run
     both on MAME (+ a16 on bsnes-jg) + assert every value agrees.
 
@@ -1188,6 +1230,10 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verif
                   `--config` LTO link in compile_rom is the crash gate there (it already
                   aborts on a backend ICE, caught below as a CompileError and run through
                   classify_known).
+    stackguard    soft-stack overlap check (docs/defects/snes-soft-stack-static-data-collision.json):
+                  the a16 bsnes-jg leg is asserted overlap-free and the default and xy16 ROMs get a
+                  stack-only bsnes-jg run. Off by default so the fuzz/Csmith callers stay unchanged;
+                  the corpus check (cmd_check) turns it on.
     verify_config forwarded to verify_machineinstrs() as `config` (default None -> bare
                   `--target=mos`, unchanged for the plain-fuzz caller). The corpus/`cmd_check`
                   caller passes the SNES SDK cfg so a TU that #includes real libc headers
@@ -1283,12 +1329,22 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verif
 
     # 3) run default@MAME, a16@MAME, xy16@MAME, a16@bsnes
     want = expected if expected is not None else 0
+    prog = Path(src).stem
     got_default, ml_d  = run_mame(dft_rom,  0x7E0000 + dvma, want, length)
     got_a16, ml_a      = run_mame(a16_rom,  0x7E0000 + vma,  want, length)
     got_xy16, ml_xy    = run_mame(xy16_rom, 0x7E0000 + xvma, want, length)
     got_jg, jl = (None, "skip")
     if want_bsnes:
-        got_jg, jl = run_bsnes(a16_rom, vma, length, want)
+        got_jg, jl = run_bsnes(a16_rom, vma, length, want, program=prog, config="+mos-a16 -Os",
+                               guard=stackguard)
+    stack_fail = []
+    if stackguard and want_bsnes:
+        if "soft stack overlaps static data" in str(jl):
+            stack_fail.append("a16@bsnes: " + jl)
+        for rom_, cfg_ in ((dft_rom, "default -Os"), (xy16_rom, "+mos-xy16 -Os")):
+            line_ = run_stackguard(rom_, prog, cfg_)
+            if line_:
+                stack_fail.append("%s@bsnes: %s" % (cfg_.split()[0], line_))
 
     # The reference: the host/baked value if given, else the trusted default build.
     ref = expected if expected is not None else got_default
@@ -1306,7 +1362,11 @@ def evaluate(src, expected, want_bsnes, on_triage, cflags=(), verify=True, verif
             "mame_default": ml_d, "mame_a16": ml_a, "mame_xy16": ml_xy, "bsnes_a16": jl,
         })
         return "FAIL", "mismatch: " + ", ".join(
-            "%s=%s" % (k, ("0x%04X" % vals[k] if isinstance(vals[k], int) else vals[k])) for k in vals), ref
+            "%s=%s" % (k, ("0x%04X" % vals[k] if isinstance(vals[k], int) else vals[k])) for k in vals) + (
+            "; SOFT-STACK OVERLAP: " + " | ".join(stack_fail) if stack_fail else ""), ref
+    if stack_fail:
+        on_triage("soft-stack overlap", {"stackguard": "\n".join(stack_fail)})
+        return "FAIL", "SOFT-STACK OVERLAP (values agree): " + " | ".join(stack_fail), ref
     tag = "0x%04X" % ref if isinstance(ref, int) else str(ref)
     if known_kid:
         # Verify rejected it with an already-diagnosed signature, but every leg agrees with the
@@ -1453,7 +1513,7 @@ def cmd_check(args):
              ("expected 0x%04X" % expected) if expected is not None else "default build as reference",
              "yes" if want_bsnes else "no"))
     status, msg, ref = evaluate(src, expected, want_bsnes, lambda r, e: triage_file(name, src, r, e),
-                                 verify_config=CFG)
+                                 verify_config=CFG, stackguard=True)
     print("  [%s] %s  %s" % (status, name, msg))
     if status == "PASS":
         print("RESULT: PASS — %s: default == +mos-a16%s on both emulators" % (

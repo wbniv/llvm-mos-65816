@@ -1,0 +1,41 @@
+=== O3 default stock
+2026-10-01T03:23:21Z toolchain: clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c lld c89b04cb2fb93cd3959ce8a1251ca1a967eb550b1d03e5dbdc81bf12f25323a4 mos-snes.cfg f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205 link.ld 9eb48681d0088e3766fb49541a0eb31e571859c33eeb9711e90adb453308a048
+2026-10-01T03:23:24Z input: /home/will/llvm-mos-65816-stackguard/examples/snes/dither.c 3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7
+2026-10-01T03:23:24Z command (cwd /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/dither/O3-default-stock): /home/will/llvm-mos-65816-stackguard/build/llvm-mos-install/bin/mos-clang --config /home/will/llvm-mos-65816-stackguard/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -O3 -I /home/will/llvm-mos-65816-stackguard/examples/65816 -I /home/will/llvm-mos-65816-stackguard/examples/snes -I /home/will/llvm-mos-65816-stackguard/build /home/will/llvm-mos-65816-stackguard/examples/snes/dither.c -o rom.sfc -save-temps=obj -Wl,--save-temps -Wl,-Map=rom.map
+2026-10-01T03:23:27Z build rc=0
+2026-10-01T03:23:27Z rom.sfc sha256 ffdc0ff1e6a44bcb84f1f92c714f823e2b7ae37ff825d040a50510eb4f85309b (unchecksummed, as in the report)
+main soft-stack frame: 313 B -> [0x1ec7, 0x2000)
+__bss_end=0x1f29 __heap_start=0x1fae soft-stack headroom above __heap_start: 82 B
+  overlaps dither_gate_crc.out [0x1ce9, 0x1f29) by 98 B
+  overlaps .noinit (static stack) [0x1f29, 0x1fad) by 132 B
+2026-10-01T03:23:27Z bsnes-jg: jgxcheck rom.sfc 0x1ce7 2 0x80C4 600 (jgxcheck 2c1ebd9ed763a3323e870ca441fb5382c27cdff951ef085dabfbdb24362626a3)
+SMOKE: FAIL off=0x1CE7 len=2 got=0x0000 want=0x80C4 stackguard: soft stack overlaps static data by 231 B (program=rom, config=unspecified)
+2026-10-01T03:23:46Z gate rc=1
+rc=1
+=== O3 a16 stock
+2026-10-01T03:23:46Z toolchain: clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c lld c89b04cb2fb93cd3959ce8a1251ca1a967eb550b1d03e5dbdc81bf12f25323a4 mos-snes.cfg f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205 link.ld 9eb48681d0088e3766fb49541a0eb31e571859c33eeb9711e90adb453308a048
+2026-10-01T03:23:49Z input: /home/will/llvm-mos-65816-stackguard/examples/snes/dither.c 3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7
+2026-10-01T03:23:49Z command (cwd /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/dither/O3-a16-stock): /home/will/llvm-mos-65816-stackguard/build/llvm-mos-install/bin/mos-clang --config /home/will/llvm-mos-65816-stackguard/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O3 -I /home/will/llvm-mos-65816-stackguard/examples/65816 -I /home/will/llvm-mos-65816-stackguard/examples/snes -I /home/will/llvm-mos-65816-stackguard/build /home/will/llvm-mos-65816-stackguard/examples/snes/dither.c -o rom.sfc -save-temps=obj -Wl,--save-temps -Wl,-Map=rom.map
+2026-10-01T03:23:51Z build rc=0
+2026-10-01T03:23:51Z rom.sfc sha256 f467cfd88052d34bed3559ca0ac7cf23ded3d0c11126b359056bbec684365ff5 (unchecksummed, as in the report)
+main soft-stack frame: 353 B -> [0x1e9f, 0x2000)
+__bss_end=0x1f29 __heap_start=0x1fae soft-stack headroom above __heap_start: 82 B
+  overlaps dither_gate_crc.out [0x1ce9, 0x1f29) by 138 B
+  overlaps .noinit (static stack) [0x1f29, 0x1fad) by 132 B
+2026-10-01T03:23:52Z bsnes-jg: jgxcheck rom.sfc 0x1ce7 2 0x80C4 600 (jgxcheck 2c1ebd9ed763a3323e870ca441fb5382c27cdff951ef085dabfbdb24362626a3)
+SMOKE: FAIL off=0x1CE7 len=2 got=0x0000 want=0x80C4 stackguard: soft stack overlaps static data by 271 B (program=rom, config=unspecified)
+2026-10-01T03:24:11Z gate rc=1
+rc=1
+=== O2 default stock
+2026-10-01T03:24:11Z toolchain: clang-23 254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c lld c89b04cb2fb93cd3959ce8a1251ca1a967eb550b1d03e5dbdc81bf12f25323a4 mos-snes.cfg f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205 link.ld 9eb48681d0088e3766fb49541a0eb31e571859c33eeb9711e90adb453308a048
+2026-10-01T03:24:14Z input: /home/will/llvm-mos-65816-stackguard/examples/snes/dither.c 3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7
+2026-10-01T03:24:14Z command (cwd /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/dither/O2-default-stock): /home/will/llvm-mos-65816-stackguard/build/llvm-mos-install/bin/mos-clang --config /home/will/llvm-mos-65816-stackguard/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -O2 -I /home/will/llvm-mos-65816-stackguard/examples/65816 -I /home/will/llvm-mos-65816-stackguard/examples/snes -I /home/will/llvm-mos-65816-stackguard/build /home/will/llvm-mos-65816-stackguard/examples/snes/dither.c -o rom.sfc -save-temps=obj -Wl,--save-temps -Wl,-Map=rom.map
+2026-10-01T03:24:16Z build rc=0
+2026-10-01T03:24:16Z rom.sfc sha256 fc1de17a378006ee5298d0da780f294e889bb1db6fa89a2cea534839d096e47d (unchecksummed, as in the report)
+main soft-stack frame: 0 B -> [0x2000, 0x2000)
+__bss_end=0x1f29 __heap_start=0x1fae soft-stack headroom above __heap_start: 82 B
+  no overlap with named .bss objects or .noinit
+2026-10-01T03:24:17Z bsnes-jg: jgxcheck rom.sfc 0x1ce7 2 0x80C4 600 (jgxcheck 2c1ebd9ed763a3323e870ca441fb5382c27cdff951ef085dabfbdb24362626a3)
+SMOKE: PASS off=0x1CE7 len=2 got=0x80C4 (ran 600 frames, bsnes-jg)
+2026-10-01T03:24:37Z gate rc=0
+rc=0

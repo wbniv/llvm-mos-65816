@@ -1,0 +1,3 @@
+rom.sfc	rom	unspecified	overlap	$1EC7	$1FAE	$2000	-231	$806B	main	rom.sfc.elf
+rom.sfc	rom	unspecified	overlap	$1E9F	$1FAE	$2000	-271	$8051	main	rom.sfc.elf
+rom.sfc	rom	unspecified	ok	$2000	$1FAE	$2000	82	$8020	__do_zero_bss	rom.sfc.elf

@@ -1,0 +1,538 @@
+== 1d-ca
+SMOKE: PASS off=0x5A6 len=2 got=0xAB2C (ran 400 frames, bsnes-jg)
+RESULT: PASS — Rule 90/110 CA rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xAB2C host == +mos-a16
+== absdiff
+SMOKE: PASS off=0x13F7 len=2 got=0x3482 (ran 360 frames, bsnes-jg)
+SMOKE: PASS off=0x13F7 len=2 got=0x3482 (ran 360 frames, bsnes-jg)
+SMOKE: PASS off=0x13F7 len=2 got=0x3482 (ran 360 frames, bsnes-jg)
+RESULT: PASS — Motion-Detect Difference Field; host == default == a16 == xy16 == 0x3482
+== adpcm
+SMOKE: PASS off=0x31 len=2 got=0xCA56 (ran 500 frames, bsnes-jg)
+RESULT: PASS — ADPCM Waverider on SNES; MAME + bsnes-jg + corpus hash 0xCA56 host == +mos-a16
+== arityfan
+RESULT: PASS — round8-arityfan: default == +mos-a16 == host on both emulators
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0xAC len=2 got=0xA09E (ran 600 frames, bsnes-jg)
+RESULT: PASS — arityfan host/target and emulator gates agree at 0xA09E
+== ascast
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x3D8 len=2 got=0xF1BD (ran 600 frames, bsnes-jg)
+RESULT: PASS — ascast host/target and emulator gates agree at 0xF1BD
+== asmisland
+SMOKE: PASS off=0xBD len=2 got=0x260B (ran 300 frames, bsnes-jg)
+SMOKE: PASS off=0xBD len=2 got=0x260B (ran 300 frames, bsnes-jg)
+SMOKE: PASS off=0xBD len=2 got=0x260B (ran 300 frames, bsnes-jg)
+RESULT: PASS — Inline-Asm Island; host == default == a16 == xy16 == 0x260B
+== avalanche
+SMOKE: PASS off=0x20 len=2 got=0x27EA (ran 800 frames, bsnes-jg)
+RESULT: PASS — 64-bit Avalanche rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x27EA host == +mos-a16
+== backtrack
+SMOKE: PASS off=0x13E7 len=2 got=0x7336 (ran 600 frames, bsnes-jg)
+RESULT: PASS — Backtracking Solver on SNES; MAME + bsnes-jg + corpus hash 0x7336 host == +mos-a16
+== bankwalk
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E6 len=2 got=0x4ED7 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E6 len=2 got=0x4ED7 (ran 480 frames, bsnes-jg)
+RESULT: PASS — BankWalk host == a16 == xy16 == 0x4ED7
+== bf-vm
+SMOKE: PASS off=0xC46 len=2 got=0x9954 (ran 400 frames, bsnes-jg)
+RESULT: PASS — Brainfuck threaded-code VM rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x9954 host == +mos-a16
+== bhut
+SMOKE: PASS off=0x13E7 len=2 got=0xEF0B (ran 500 frames, bsnes-jg)
+RESULT: PASS — Barnes-Hut galaxy rendered on SNES; hash 0xEF0B host == +mos-a16
+== bigbyval
+SMOKE: PASS off=0x31 len=2 got=0xBD6B (ran 600 frames, bsnes-jg)
+RESULT: PASS — Affine Stage Pipeline on SNES; MAME + bsnes-jg + corpus hash 0xBD6B host == +mos-a16
+== bitboard64
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13F1 len=2 got=0xC074 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13F1 len=2 got=0xC074 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13F1 len=2 got=0xC074 (ran 480 frames, bsnes-jg)
+RESULT: PASS — Bitboard Knight Tour; host == default == a16 == xy16 == 0xC074 on MAME + bsnes-jg
+== bitcensus
+SMOKE: PASS off=0x13EC len=2 got=0x9516 (ran 500 frames, bsnes-jg)
+RESULT: PASS — bit-census field rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x9516 host == +mos-a16
+== bitshuffle
+SMOKE: PASS off=0x13E8 len=2 got=0x2A4A (ran 500 frames, bsnes-jg)
+RESULT: PASS — perfect-shuffle bit-permutation rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x2A4A host == +mos-a16
+== bitweave
+SMOKE: PASS off=0x31 len=2 got=0x0E03 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Serial Bit-Reversal Weave on SNES; MAME + bsnes-jg + corpus hash 0x0E03 host == +mos-a16
+== blossom
+    SMOKE: PASS off=0x54 len=2 got=0x9047 (ran 1500 frames, bsnes-jg)
+RESULT: PASS — interactive Hopalong attractor on SNES; grid hash 0x9047 host == +mos-a16 (MAME + bsnes-jg); state-math host == ROM (bsnes-jg)
+== boids
+SMOKE: PASS off=0x6C6 len=2 got=0xA8AB (ran 1400 frames, bsnes-jg)
+RESULT: PASS — Boids flock rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xA8AB host == +mos-a16
+== borrowlad
+SMOKE: PASS off=0x31 len=2 got=0x1BE3 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Borrow-Ladder Odometer on SNES; MAME + bsnes-jg + corpus hash 0x1BE3 host == +mos-a16
+== borrowov
+SMOKE: PASS off=0x13E7 len=2 got=0x81FB (ran 600 frames, bsnes-jg)
+RESULT: PASS — Reservoir Ladder on SNES; MAME + bsnes-jg + corpus hash 0x81FB host == +mos-a16
+== brkcop
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+RESULT: PASS — Software Vectors; host == default == a16 == xy16 == 0xA34C; a16 3x deterministic
+== bsearchviz
+SMOKE: PASS off=0x13E7 len=2 got=0x7FF5 (ran 600 frames, bsnes-jg)
+RESULT: PASS — Bisection Oracle on SNES; MAME + bsnes-jg + corpus hash 0x7FF5 host == +mos-a16
+== buddha
+SMOKE: PASS off=0x22 len=2 got=0x7C31 (ran 6000 frames, bsnes-jg)
+RESULT: PASS — Buddhabrot density on SNES; grid hash 0x7C31 host == +mos-a16 (bsnes-jg + MAME)
+== burning-ship
+SMOKE: PASS off=0x580 len=2 got=0x6F2D (ran 1500 frames, bsnes-jg)
+RESULT: FAIL — see the per-emulator lines above
+== byvaledge
+SMOKE: PASS off=0x13E7 len=2 got=0x4FAB (ran 600 frames, bsnes-jg)
+RESULT: PASS — By-Value Boundary Trio on SNES; MAME + bsnes-jg + corpus hash 0x4FAB host == +mos-a16
+== cardioid
+SMOKE: PASS off=0x170D len=2 got=0x523B (ran 500 frames, bsnes-jg)
+RESULT: PASS — cardioid times-table rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x523B host == +mos-a16
+== cgrade
+SMOKE: PASS off=0x13E7 len=2 got=0x783F (ran 500 frames, bsnes-jg)
+RESULT: PASS — many-argument color-grade kernel rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x783F host == +mos-a16
+== compass
+SMOKE: PASS off=0x31 len=2 got=0xB9CB (ran 500 frames, bsnes-jg)
+RESULT: PASS — Copysign Compass on SNES; MAME + bsnes-jg + corpus hash 0xB9CB host == +mos-a16
+== cordic
+SMOKE: PASS off=0x1360 len=2 got=0x4D41 (ran 500 frames, bsnes-jg)
+RESULT: PASS — CORDIC rotator rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x4D41 host == +mos-a16
+== cosmzoom
+SMOKE: PASS off=0x13F0 len=2 got=0x502F (ran 1400 frames, bsnes-jg)
+RESULT: FAIL — see the per-emulator lines above
+== cpu6502
+SMOKE: PASS off=0xB6A len=2 got=0xAC8A (ran 1000 frames, bsnes-jg)
+RESULT: PASS — 6502/65C02 CPU Disassembler+Simulator on SNES; gate_crc=0xAC8A host==+mos-a16
+== crctex
+SMOKE: PASS off=0x13E6 len=2 got=0xDBBA (ran 500 frames, bsnes-jg)
+RESULT: PASS — CRC32 procedural texture rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xDBBA host == +mos-a16
+== crcwall
+SMOKE: PASS off=0x13E8 len=2 got=0x8E47 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Bit-Serial CRC Wall on SNES; MAME + bsnes-jg + corpus hash 0x8E47 host == +mos-a16
+== critters
+SMOKE: PASS off=0x14ED len=2 got=0xAD9F (ran 500 frames, bsnes-jg)
+RESULT: PASS — protothread critter swarm rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xAD9F host == +mos-a16
+== csrjmp
+SMOKE: PASS off=0x13E7 len=2 got=0xADD8 (ran 600 frames, bsnes-jg)
+RESULT: PASS — Callee-Saved Restore Curve on SNES; MAME + bsnes-jg + corpus hash 0xADD8 host == +mos-a16
+== dblbridge
+SMOKE: PASS off=0x13E7 len=2 got=0xF829 (ran 2200 frames, bsnes-jg)
+RESULT: PASS — Precision Bridge on SNES; MAME + bsnes-jg + corpus hash 0xF829 host == +mos-a16
+== dctbloom
+SMOKE: PASS off=0x31 len=2 got=0x5364 (ran 500 frames, bsnes-jg)
+RESULT: PASS — DCT Bloom on SNES; MAME + bsnes-jg + corpus hash 0x5364 host == +mos-a16
+== dhmix
+SMOKE: PASS off=0x13EC len=2 got=0x69AA (ran 700 frames, bsnes-jg)
+RESULT: PASS — Diffie-Hellman colour-mixer rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x69AA host == +mos-a16
+== disbits
+SMOKE: PASS off=0x13E6 len=2 got=0x31D7 (ran 500 frames, bsnes-jg)
+RESULT: PASS — cross-byte-boundary bitfield disassembler rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x31D7 host == +mos-a16
+== dither
+SMOKE: PASS off=0x1CE7 len=2 got=0x80C4 (ran 2000 frames, bsnes-jg)
+RESULT: PASS — FS dither rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x80C4 host == +mos-a16
+== divclock
+SMOKE: PASS off=0x13ED len=2 got=0xF72E (ran 500 frames, bsnes-jg)
+RESULT: PASS — constant-divisor clock/odometer rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xF72E host == +mos-a16
+== domcol
+SMOKE: PASS off=0x13E9 len=2 got=0xF3FD (ran 700 frames, bsnes-jg)
+RESULT: PASS — complex domain-colouring rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xF3FD host == +mos-a16
+== doom-fire
+SMOKE: PASS off=0x302 len=2 got=0x3C59 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Doom-fire rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x3C59 host == +mos-a16
+== double-pendulum
+SMOKE: PASS off=0x1369 len=2 got=0xE859 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Double Pendulum on SNES; MAME + bsnes-jg + corpus hash 0xE859 host == +mos-a16
+== dpbank
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+RESULT: PASS — dpbank; host == default == a16 == xy16 == 0x4D5F; a16 3x deterministic; 20 D-window + 20 B-window NMI landings per run
+== duff
+SMOKE: PASS off=0x13E8 len=2 got=0x5531 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Duff-device dissolve transition rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x5531 host == +mos-a16
+== editdist
+SMOKE: PASS off=0x15EB len=2 got=0xFB59 (ran 500 frames, bsnes-jg)
+RESULT: PASS — edit-distance DP rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xFB59 host == +mos-a16
+== epicycles
+SMOKE: PASS off=0x13EE len=2 got=0x4F6C (ran 500 frames, bsnes-jg)
+RESULT: PASS — Fourier epicycles rendered on SNES; bsnes-jg (+ MAME if present) + corpus hash 0x4F6C host == +mos-a16
+== extload
+RESULT: PASS — round8-extload: default == +mos-a16 == host on both emulators
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x3D8 len=2 got=0xF97F (ran 600 frames, bsnes-jg)
+RESULT: PASS — extload host/target and emulator gates agree at 0xF97F
+== fabsridge
+SMOKE: PASS off=0x13EA len=2 got=0x161A (ran 500 frames, bsnes-jg)
+RESULT: PASS — Fabs Ridgeline on SNES; MAME + bsnes-jg + corpus hash 0x161A host == +mos-a16
+== factorial
+SMOKE: PASS off=0xFD5 len=2 got=0x772F (ran 500 frames, bsnes-jg)
+RESULT: PASS — bignum factorial rendered on SNES; MAME + bsnes-jg + corpus hash 0x772F host == +mos-a16
+== farptrcmp
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E6 len=2 got=0x5B40 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E6 len=2 got=0x5B40 (ran 480 frames, bsnes-jg)
+RESULT: PASS — FarPtrCmp host == a16 == xy16 == 0x5B40
+== farspill
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E9 len=2 got=0x7F3B (ran 420 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E9 len=2 got=0x7F3B (ran 420 frames, bsnes-jg)
+RESULT: PASS — Far-Spill Stress; host == a16 == xy16 == 0x7F3B on MAME + bsnes-jg
+== fenwick
+SMOKE: PASS off=0x142B len=2 got=0x3454 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Fenwick tree rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x3454 host == +mos-a16
+== fft
+SMOKE: PASS off=0x1409 len=2 got=0x6D7A (ran 500 frames, bsnes-jg)
+RESULT: PASS — FFT spectrum rendered on SNES; hash 0x6D7A host == +mos-a16
+== fn-plot
+SMOKE: PASS off=0x13EC len=2 got=0x2EBE (ran 500 frames, bsnes-jg)
+RESULT: PASS — fn-plot rendered on SNES; corpus hash 0x2EBE host == +mos-a16
+== funnelkal
+SMOKE: PASS off=0x13EA len=2 got=0xEED4 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Funnel-Shift Kaleidoscope on SNES; MAME + bsnes-jg + corpus hash 0xEED4 host == +mos-a16
+== gf256
+SMOKE: PASS off=0x1408 len=2 got=0xC028 (ran 500 frames, bsnes-jg)
+RESULT: PASS — GF(2^8) finite-field rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xC028 host == +mos-a16
+== gouraud
+SMOKE: PASS off=0x13E6 len=2 got=0xC5E9 (ran 1500 frames, bsnes-jg)
+RESULT: PASS — Gouraud triangle rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xC5E9 host == +mos-a16
+== grid3d
+SMOKE: PASS off=0x13E8 len=2 got=0xFCDE (ran 800 frames, bsnes-jg)
+RESULT: PASS — 3-D voxel life rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xFCDE host == +mos-a16
+== harmonograph
+SMOKE: PASS off=0x1421 len=2 got=0x0EBB (ran 500 frames, bsnes-jg)
+RESULT: PASS — Harmonograph rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x0EBB host == +mos-a16
+== hdr-bloom
+SMOKE: PASS off=0x98F len=2 got=0xF951 (ran 500 frames, bsnes-jg)
+RESULT: PASS — HDR additive-bloom rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xF951 host == +mos-a16
+== hilbert
+SMOKE: PASS off=0x13EE len=2 got=0x5999 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Hilbert curve rendered on SNES; hash 0x5999 host == +mos-a16
+== huffman
+SMOKE: PASS off=0x144B len=2 got=0xE8E4 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Huffman decode reveal rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xE8E4 host == +mos-a16
+== hull
+SMOKE: PASS off=0x1449 len=2 got=0x84E3 (ran 700 frames, bsnes-jg)
+RESULT: PASS — convex hull rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x84E3 host == +mos-a16
+== iir-scope
+SMOKE: PASS off=0x150C len=2 got=0x49BD (ran 700 frames, bsnes-jg)
+RESULT: PASS — IIR resonant-filter scope rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x49BD host == +mos-a16
+== invaders
+    SMOKE: PASS addr=0x7E0020 len=2 got=0x9D57 (ran 1800 ticks)
+    SMOKE: PASS addr=0x7E0020 len=2 got=0x9D57 (ran 1800 ticks)
+SMOKE: PASS off=0x20 len=2 got=0x9D57 (ran 1800 frames, bsnes-jg)
+SMOKE: PASS off=0x20 len=2 got=0x9D57 (ran 1800 frames, bsnes-jg)
+RESULT: PASS — Space Invaders attract CRC 0x9D57: host == default == a16 on MAME + bsnes-jg; screenshots in build/invaders-{mame,jg}.png
+== irqgate
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+RESULT: PASS — IRQ Gate; host == default == a16 == xy16 == 0x24F6; a16 3x deterministic
+== isrbracket
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+RESULT: PASS — Mid-Bracket Interrupt Torture; host == default == a16 == xy16 == 0x1014; bsnes-jg 3x deterministic
+== jt256
+SMOKE: PASS off=0x31 len=2 got=0xB8CC (ran 600 frames, bsnes-jg)
+RESULT: PASS — ISA-256 Bytecode Machine on SNES; MAME + bsnes-jg + corpus hash 0xB8CC host == +mos-a16
+== jtedge
+SMOKE: PASS off=0x31 len=2 got=0xC199 (ran 600 frames, bsnes-jg)
+RESULT: PASS — Jump-Table Boundary Sweep on SNES; MAME + bsnes-jg + corpus hash 0xC199 host == +mos-a16
+== jtsparse
+SMOKE: PASS off=0x13E7 len=2 got=0xA131 (ran 600 frames, bsnes-jg)
+RESULT: PASS — Sparse Switch Ladder on SNES; MAME + bsnes-jg + corpus hash 0xA131 host == +mos-a16
+== julia
+SMOKE: PASS off=0x200 len=2 got=0x3490 (ran 800 frames, bsnes-jg)
+RESULT: PASS — Julia z^2+c rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x3490 host == +mos-a16
+== keycmp64
+SMOKE: PASS off=0x14EB len=2 got=0xB8AD (ran 500 frames, bsnes-jg)
+RESULT: PASS — 64-bit Multi-Key Record Sort on SNES; MAME + bsnes-jg + corpus hash 0xB8AD host == +mos-a16
+== lfsr2
+SMOKE: PASS off=0x31 len=2 got=0x6AA3 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Dual-LFSR Scrambler on SNES; MAME + bsnes-jg + corpus hash 0x6AA3 host == +mos-a16
+== life
+SMOKE: PASS off=0x1387 len=2 got=0xDDF1 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Conway's Life rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xDDF1 host == +mos-a16
+== llabs64
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13F9 len=2 got=0x8490 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13F9 len=2 got=0x8490 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13F9 len=2 got=0x8490 (ran 480 frames, bsnes-jg)
+RESULT: PASS — Seismograph Absolute Trace; host == default == a16 == xy16 == 0x8490 on MAME + bsnes-jg
+== lsystem
+SMOKE: PASS off=0x135D len=2 got=0x8073 (ran 1200 frames, bsnes-jg)
+RESULT: PASS — L-System Plant rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x8073 host == +mos-a16
+== lzdec
+SMOKE: PASS off=0x14E9 len=2 got=0x0100 (ran 500 frames, bsnes-jg)
+RESULT: PASS — LZ77 image-decompress reveal rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x0100 host == +mos-a16
+== mandel-double
+SMOKE: PASS off=0x200 len=2 got=0x0EDF (ran 2200 frames, bsnes-jg)
+RESULT: PASS — soft-float Mandelbrot rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x0EDF host == +mos-a16
+== mandel-float
+SMOKE: PASS off=0x200 len=2 got=0x4169 (ran 2200 frames, bsnes-jg)
+RESULT: PASS — soft-float Mandelbrot rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x4169 host == +mos-a16
+== mandel-oop
+SMOKE: PASS off=0x897 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+RESULT: PASS — mandel-oop OOP gate GREEN; corpus_result==0x204F on host == +mos-a16@bsnes-jg
+== mandel-shot
+SMOKE: PASS off=0x580 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+RESULT: PASS — Mandelbrot rendered on SNES; MAME + bsnes-jg screenshots match host (CRC 0x204F)
+== matcascade
+SMOKE: PASS off=0x41 len=2 got=0x8064 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Matrix Cascade on SNES; MAME + bsnes-jg + corpus hash 0x8064 host == +mos-a16
+== maze
+SMOKE: PASS off=0xE44 len=2 got=0x0749 (ran 400 frames, bsnes-jg)
+RESULT: PASS — maze gen+solve rendered on SNES; bsnes-jg (+ MAME if present) + corpus hash 0x0749 host == +mos-a16
+== medfilt
+SMOKE: PASS off=0x14E9 len=2 got=0x87FE (ran 500 frames, bsnes-jg)
+RESULT: PASS — median denoiser rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x87FE host == +mos-a16
+== metaball
+SMOKE: PASS off=0x1406 len=2 got=0xAEBE (ran 900 frames, bsnes-jg)
+RESULT: PASS — union type-pun fast-inverse-sqrt metaballs rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xAEBE host == +mos-a16
+== mixedwidth
+SMOKE: PASS off=0x13E7 len=2 got=0x83B7 (ran 300 frames, bsnes-jg)
+SMOKE: PASS off=0x13E7 len=2 got=0x83B7 (ran 300 frames, bsnes-jg)
+SMOKE: PASS off=0x13E7 len=2 got=0x83B7 (ran 300 frames, bsnes-jg)
+RESULT: PASS — Split-Personality Link; host == default == a16 == xy16 == 0x83B7
+== modethread
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E7 len=2 got=0x0489 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E7 len=2 got=0x0489 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x13E7 len=2 got=0x0489 (ran 480 frames, bsnes-jg)
+RESULT: PASS — ModeThread host == default == a16 == xy16 == 0x0489
+== modexp256
+SMOKE: PASS off=0x39 len=2 got=0x31D4 (ran 1500 frames, bsnes-jg)
+RESULT: PASS — 256-bit Modular Exponentiation on SNES; MAME + bsnes-jg + corpus hash 0x31D4 host == +mos-a16
+== montorbit
+SMOKE: PASS off=0x31 len=2 got=0xBA9B (ran 500 frames, bsnes-jg)
+RESULT: PASS — Montgomery Orbit on SNES; MAME + bsnes-jg + corpus hash 0xBA9B host == +mos-a16
+== msquares
+SMOKE: PASS off=0x1C69 len=2 got=0x86A7 (ran 1800 frames, bsnes-jg)
+RESULT: PASS — marching-squares contours rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x86A7 host == +mos-a16
+== mulov64
+SMOKE: PASS off=0x1435 len=2 got=0x3A69 (ran 1500 frames, bsnes-jg)
+RESULT: PASS — 64-bit Multiply-Overflow on SNES; MAME + bsnes-jg + corpus hash 0x3A69 host == +mos-a16
+== multibase
+SMOKE: PASS off=0x835 len=2 got=0x371A (ran 700 frames, bsnes-jg)
+RESULT: PASS — multi-base clock rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x371A host == +mos-a16
+== mvscrl
+SMOKE: PASS off=0x31 len=2 got=0x72A7 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Descending memmove Scroll Slabs on SNES; MAME + bsnes-jg + corpus hash 0x72A7 host == +mos-a16
+== n-body
+SMOKE: PASS off=0x1589 len=2 got=0xCC65 (ran 500 frames, bsnes-jg)
+RESULT: PASS — N-body orbits rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xCC65 host == +mos-a16
+== newton
+SMOKE: PASS off=0x994 len=2 got=0x4D8B (ran 6500 frames, bsnes-jg)
+RESULT: PASS — Newton fractal rendered on SNES; MAME + bsnes-jg + corpus hash 0x4D8B host == +mos-a16
+== nmitally
+SMOKE: PASS off=0x34 len=2 got=0xDA3B (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x34 len=2 got=0xDA3B (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x34 len=2 got=0xDA3B (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x34 len=2 got=0xDA3B (ran 500 frames, bsnes-jg)
+SMOKE: PASS off=0x34 len=2 got=0xDA3B (ran 500 frames, bsnes-jg)
+RESULT: PASS — VBlank Interrupt Tally; host == default == a16 == xy16 == 0xDA3B; a16 3x deterministic
+== nrecip
+SMOKE: PASS off=0x13E9 len=2 got=0x044A (ran 500 frames, bsnes-jg)
+RESULT: PASS — Newton-Raphson reciprocal perspective floor rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x044A host == +mos-a16
+== oddmask
+SMOKE: PASS off=0x31 len=2 got=0x1FD9 (ran 1500 frames, bsnes-jg)
+RESULT: PASS — Odd-Width Mask Sculptor on SNES; MAME + bsnes-jg + corpus hash 0x1FD9 host == +mos-a16
+== ovmatrix
+SMOKE: PASS off=0x31 len=2 got=0xD4D0 (ran 600 frames, bsnes-jg)
+RESULT: PASS — Overflow Family Matrix on SNES; MAME + bsnes-jg + corpus hash 0xD4D0 host == +mos-a16
+== ovmove
+SMOKE: PASS off=0x1568 len=2 got=0xA990 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Overlap-Move Mosaic on SNES; MAME + bsnes-jg + corpus hash 0xA990 host == +mos-a16
+== packrec
+SMOKE: PASS off=0x13E7 len=2 got=0x4676 (ran 600 frames, bsnes-jg)
+RESULT: PASS — Unaligned Record Reader on SNES; MAME + bsnes-jg + corpus hash 0x4676 host == +mos-a16
+== pcooker
+SMOKE: PASS off=0x39 len=2 got=0xEE6D (ran 1500 frames, bsnes-jg)
+RESULT: PASS — Pressure-Cooker Fixed-Point Evaluator on SNES; MAME + bsnes-jg + corpus hash 0xEE6D host == +mos-a16
+== percol
+SMOKE: PASS off=0x16EF len=2 got=0x025B (ran 900 frames, bsnes-jg)
+RESULT: FAIL — see the per-emulator lines above
+== perlin
+SMOKE: PASS off=0x13E8 len=2 got=0xA72D (ran 500 frames, bsnes-jg)
+RESULT: PASS — Perlin gradient noise rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xA72D host == +mos-a16
+== permscat
+SMOKE: PASS off=0x13E8 len=2 got=0x0C2C (ran 500 frames, bsnes-jg)
+RESULT: PASS — Gather-Scatter Permutation on SNES; MAME + bsnes-jg + corpus hash 0x0C2C host == +mos-a16
+== pi
+SMOKE: PASS off=0x1720 len=2 got=0x7711 (ran 500 frames, bsnes-jg)
+RESULT: PASS — π spigot+MC rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x7711 host == +mos-a16
+== plyoracle
+SMOKE: PASS off=0x31 len=2 got=0x6146 (ran 500 frames, bsnes-jg)
+RESULT: PASS — PlyOracle on SNES; MAME + bsnes-jg + corpus hash 0x6146 host == +mos-a16
+== polyfill
+SMOKE: PASS off=0x13EA len=2 got=0x8ED9 (ran 700 frames, bsnes-jg)
+RESULT: PASS — polygon scanline fill (VLA) rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x8ED9 host == +mos-a16
+== poolfx
+SMOKE: PASS off=0x1629 len=2 got=0x2B9B (ran 500 frames, bsnes-jg)
+RESULT: PASS — free-list particle fountain rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x2B9B host == +mos-a16
+== qsortviz
+SMOKE: PASS off=0xAC len=2 got=0x8EA5 (ran 440 frames, bsnes-jg)
+RESULT: PASS — qsort + comparator-callback sort visualizer rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x8EA5 host == +mos-a16
+== radix
+SMOKE: PASS off=0x140A len=2 got=0x123E (ran 500 frames, bsnes-jg)
+RESULT: PASS — radix counting sort rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x123E host == +mos-a16
+== rangecode
+SMOKE: PASS off=0x31 len=2 got=0x6D21 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Range Coder on SNES; MAME + bsnes-jg + corpus hash 0x6D21 host == +mos-a16
+== raycaster
+SMOKE: PASS off=0x13EA len=2 got=0xB200 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Raycaster maze rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xB200 host == +mos-a16
+== rdiff
+SMOKE: PASS off=0x400 len=2 got=0x5555 (ran 6000 frames, bsnes-jg)
+RESULT: PASS — Gray-Scott rdiff rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x5555 host == +mos-a16
+== retryjmp
+SMOKE: PASS off=0x31 len=2 got=0x3388 (ran 600 frames, bsnes-jg)
+    SKIP MAME (JG_ONLY)
+RESULT: PASS — Retry-On-Fault Ladder on SNES; corpus hash 0x3388 host == +mos-a16, bsnes-jg confirmed (MAME skipped); +mos-xy16 -verify clean at -O1/-Os/-Oz/-O2
+== ropeedit
+SMOKE: PASS off=0x31 len=2 got=0x2361 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Gap-Buffer Rope Editor on SNES; MAME + bsnes-jg + corpus hash 0x2361 host == +mos-a16
+== rotkal
+SMOKE: PASS off=0x13F2 len=2 got=0x300C (ran 500 frames, bsnes-jg)
+RESULT: PASS — Rotate-Register Kaleidoscope on SNES; MAME + bsnes-jg + corpus hash 0x300C host == +mos-a16
+== rotozoom
+SMOKE: PASS off=0x13E8 len=2 got=0x391B (ran 700 frames, bsnes-jg)
+RESULT: PASS — affine rotozoom rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x391B host == +mos-a16
+== rotslab
+SMOKE: PASS off=0x16E8 len=2 got=0xB93A (ran 500 frames, bsnes-jg)
+RESULT: PASS — In-Place Block Rotate on SNES; MAME + bsnes-jg + corpus hash 0xB93A host == +mos-a16
+== satcast
+SMOKE: PASS off=0x31 len=2 got=0xC8CF (ran 500 frames, bsnes-jg)
+RESULT: PASS — Saturating-Cast Kaleidoscope on SNES; MAME + bsnes-jg + corpus hash 0xC8CF host == +mos-a16
+== satcomet
+SMOKE: PASS off=0x14FF len=2 got=0xC2AF (ran 500 frames, bsnes-jg)
+RESULT: PASS — Saturating Comet Trails on SNES; MAME + bsnes-jg + corpus hash 0xC2AF host == +mos-a16
+== sbitfld
+SMOKE: PASS off=0x31 len=2 got=0x40C5 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Signed-Bitfield Terrain on SNES; MAME + bsnes-jg + corpus hash 0x40C5 host == +mos-a16
+== scopeguard
+SMOKE: PASS off=0x31 len=2 got=0x05A3 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Scope-Guard Ripple Tank on SNES; MAME + bsnes-jg + corpus hash 0x05A3 host == +mos-a16
+== seamdemo
+SMOKE: PASS off=0x4D len=2 got=0xF0E2 (ran 7200 frames, bsnes-jg)
+  act1_status: SMOKE: PASS off=0x41 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+  act2_crc: SMOKE: PASS off=0x4F len=2 got=0x36B6 (ran 7200 frames, bsnes-jg)
+  act2_status: SMOKE: PASS off=0x57 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+  act3_crc: SMOKE: PASS off=0x47 len=2 got=0x6D21 (ran 7200 frames, bsnes-jg)
+  act3_status: SMOKE: PASS off=0x49 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+  cycle_status: SMOKE: PASS off=0x53 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+  corpus_result: SMOKE: PASS off=0x51 len=2 got=0x3277 (ran 7200 frames, bsnes-jg)
+RESULT: PASS — all three acts read the 6 MiB ExHiROM cartridge with different access patterns and folded to the generated oracle: Act 1 marched its 24-bit file PC across the whole image and executed the instruction split across the physical device seam, Act 2 walked the covering cycle through all 374 decode cells (mirrors included) and closed on its entry, Act 3 swept the atlas over every available page — and corpus_result latched the three-act fold
+== seqvm
+SMOKE: PASS off=0x13F1 len=2 got=0xE8C5 (ran 500 frames, bsnes-jg)
+RESULT: PASS — sparse-switch step-sequencer VM rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xE8C5 host == +mos-a16
+== shift64seam
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x1409 len=2 got=0x2007 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x1409 len=2 got=0x2007 (ran 480 frames, bsnes-jg)
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x1409 len=2 got=0x2007 (ran 480 frames, bsnes-jg)
+RESULT: PASS — Limb-Seam Barrel; host == default == a16 == xy16 == 0x2007 on MAME + bsnes-jg
+== smulorbit
+SMOKE: PASS off=0x1405 len=2 got=0xD81B (ran 500 frames, bsnes-jg)
+RESULT: PASS — Signed Multiply-Overflow Orbit on SNES; MAME + bsnes-jg + corpus hash 0xD81B host == +mos-a16
+== snes-video-reel
+SMOKE: PASS off=0x2F len=4 got=0x00000000 (ran 4000 frames, bsnes-jg)
+SMOKE: PASS off=0x39 len=2 got=0x0777 (ran 4000 frames, bsnes-jg)
+== sobel
+SMOKE: PASS off=0x31 len=2 got=0x2849 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Sobelscope on SNES; MAME + bsnes-jg + corpus hash 0x2849 host == +mos-a16
+== sodo
+SMOKE: PASS off=0xA62 len=2 got=0xD2A2 (ran 500 frames, bsnes-jg)
+RESULT: PASS — signed-64 odometer rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xD2A2 host == +mos-a16
+== sort-race
+SMOKE: PASS off=0x1735 len=2 got=0xB28F (ran 500 frames, bsnes-jg)
+RESULT: PASS — Sorting Race rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xB28F host == +mos-a16
+== spaceship
+SMOKE: PASS off=0x152F len=2 got=0xF20F (ran 500 frames, bsnes-jg)
+RESULT: PASS — Width-Sweep Sort Gallery on SNES; MAME + bsnes-jg + corpus hash 0xF20F host == +mos-a16
+== speedcap
+SMOKE: PASS off=0x31 len=2 got=0x0116 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Speed Cap Particles on SNES; MAME + bsnes-jg + corpus hash 0x0116 host == +mos-a16
+== spirograph
+SMOKE: PASS off=0x1409 len=2 got=0x32D4 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Spirograph rendered on SNES; MAME + bsnes-jg screenshots + curve hash 0x32D4 host == +mos-a16
+== sretrec
+RESULT: PASS — round8-sretrec: default == +mos-a16 == host on both emulators
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x3D8 len=2 got=0x01AB (ran 600 frames, bsnes-jg)
+RESULT: PASS — sretrec host/target and emulator gates agree at 0x01AB
+== strcmprace
+SMOKE: PASS off=0x13E7 len=2 got=0xF0BA (ran 600 frames, bsnes-jg)
+RESULT: PASS — Lexicographic Race on SNES; MAME + bsnes-jg + corpus hash 0xF0BA host == +mos-a16
+== tea
+SMOKE: PASS off=0x13EA len=2 got=0xDF0E (ran 500 frames, bsnes-jg)
+RESULT: PASS — TEA cipher avalanche rendered on SNES; hash 0xDF0E host == +mos-a16
+== trapguard
+SMOKE: PASS off=0x43 len=2 got=0x2C2D (ran 600 frames, bsnes-jg)
+RESULT: PASS — Unreachable Sentinel on SNES; MAME + bsnes-jg + corpus hash 0x2C2D host == +mos-a16
+== trimerge
+SMOKE: PASS off=0x31 len=2 got=0xCCCC (ran 500 frames, bsnes-jg)
+RESULT: PASS — Three-Way Merge Diff on SNES; MAME + bsnes-jg + corpus hash 0xCCCC host == +mos-a16
+== truchet
+SMOKE: PASS off=0x15E6 len=2 got=0xB3E6 (ran 800 frames, bsnes-jg)
+RESULT: PASS — Truchet bitfields rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xB3E6 host == +mos-a16
+== truncstair
+SMOKE: PASS off=0x31 len=2 got=0x02CA (ran 500 frames, bsnes-jg)
+RESULT: PASS — Truncation Staircase on SNES; MAME + bsnes-jg + corpus hash 0x02CA host == +mos-a16
+== turtle-vm
+SMOKE: PASS off=0x171F len=2 got=0x4007 (ran 600 frames, bsnes-jg)
+RESULT: PASS — Bytecode-VM Turtle rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x4007 host == +mos-a16
+== uarteye
+SMOKE: PASS off=0x15EA len=2 got=0x3F09 (ran 500 frames, bsnes-jg)
+RESULT: PASS — Bit-Banged UART Eye on SNES; MAME + bsnes-jg + corpus hash 0x3F09 host == +mos-a16
+== ucmprank
+SMOKE: PASS off=0x20 len=2 got=0x4CDD (ran 500 frames, bsnes-jg)
+RESULT: PASS — Unsigned Rank Percentile Field on SNES; MAME + bsnes-jg + corpus hash 0x4CDD host == +mos-a16
+== ulam
+SMOKE: PASS off=0x31 len=2 got=0x1F2F (ran 500 frames, bsnes-jg)
+RESULT: PASS — Ulam Prime Sieve on SNES; MAME + bsnes-jg + corpus hash 0x1F2F host == +mos-a16
+== vaprintf
+SMOKE: PASS off=0x13EF len=2 got=0xE1F3 (ran 500 frames, bsnes-jg)
+RESULT: PASS — va_arg Lissajous rendered on SNES; hash 0xE1F3 host == +mos-a16
+== vawidth
+RESULT: PASS — round8-vawidth: default == +mos-a16 == host on both emulators
+SMOKE: SKIP (JG_ONLY — MAME leg skipped; bsnes-jg leg still runs)
+SMOKE: PASS off=0x3D8 len=2 got=0x3D17 (ran 600 frames, bsnes-jg)
+RESULT: PASS — vawidth host/target and emulator gates agree at 0x3D17
+== vlanest
+SMOKE: PASS off=0x13E7 len=2 got=0x153B (ran 600 frames, bsnes-jg)
+RESULT: PASS — Nested VLA Pyramid on SNES; MAME + bsnes-jg + corpus hash 0x153B host == +mos-a16
+== vlastack
+SMOKE: PASS off=0x31 len=2 got=0xD77B (ran 600 frames, bsnes-jg)
+RESULT: PASS — Run-Length Scanline Decoder on SNES; MAME + bsnes-jg + corpus hash 0xD77B host == +mos-a16
+== wireframe
+SMOKE: PASS off=0x142A len=2 got=0xE737 (ran 500 frames, bsnes-jg)
+RESULT: PASS — 3-D Wireframe rendered on SNES; MAME + bsnes-jg screenshots + 3-D hash 0xE737 host == +mos-a16

@@ -1,0 +1,359 @@
+/work/build/1d-ca.sfc	1d-ca	unspecified	ok	$1FFE	$05EA	$2000	6676	$8067	main	/work/build/1d-ca.sfc.elf
+/work/build/absdiff-default.sfc	absdiff-default	default (inferred from the ROM path)	ok	$1FEB	$13FA	$2000	3057	$8051	main	/work/build/absdiff-default.sfc.elf
+/work/build/absdiff-a16.sfc	absdiff-a16	a16 (inferred from the ROM path)	ok	$1FEA	$13FA	$2000	3056	$8051	main	/work/build/absdiff-a16.sfc.elf
+/work/build/absdiff-xy16.sfc	absdiff-xy16	xy16 (inferred from the ROM path)	ok	$1FEA	$13FA	$2000	3056	$8051	main	/work/build/absdiff-xy16.sfc.elf
+/work/build/adpcm.sfc	adpcm	unspecified	ok	$1FDF	$13F2	$2000	3053	$8081	main	/work/build/adpcm.sfc.elf
+/work/build/fuzz-work/chk_a16.sfc	arityfan_sim	+mos-a16 -Os	ok	$1FF8	$0200	$2000	7672	$8051	main	/work/build/fuzz-work/chk_a16.sfc.elf
+/work/build/fuzz-work/chk_default.sfc	arityfan_sim	default -Os	ok	$1FF8	$0200	$2000	7672	$8051	main	/work/build/fuzz-work/chk_default.sfc.elf
+/work/build/fuzz-work/chk_xy16.sfc	arityfan_sim	+mos-xy16 -Os	ok	$1FF8	$0200	$2000	7672	$8051	main	/work/build/fuzz-work/chk_xy16.sfc.elf
+/work/build/arityfan.sfc	arityfan	unspecified	ok	$1FF6	$034C	$2000	7338	$8067	main	/work/build/arityfan.sfc.elf
+/work/build/fuzz-work/chk_a16.sfc	arityfan_sim	+mos-a16 -Os	ok	$1FF8	$0200	$2000	7672	$8051	main	/work/build/fuzz-work/chk_a16.sfc.elf
+/work/build/fuzz-work/chk_default.sfc	arityfan_sim	default -Os	ok	$1FF8	$0200	$2000	7672	$8051	main	/work/build/fuzz-work/chk_default.sfc.elf
+/work/build/fuzz-work/chk_xy16.sfc	arityfan_sim	+mos-xy16 -Os	ok	$1FF8	$0200	$2000	7672	$8051	main	/work/build/fuzz-work/chk_xy16.sfc.elf
+/work/build/arityfan.sfc	arityfan	unspecified	ok	$1FF6	$034C	$2000	7338	$8067	main	/work/build/arityfan.sfc.elf
+/work/build/ascast.sfc	ascast	unspecified	ok	$1FFE	$03DA	$2000	7204	$8067	main	/work/build/ascast.sfc.elf
+/work/build/asmisland-default.sfc	asmisland-default	default (inferred from the ROM path)	ok	$1FD9	$135C	$2000	3197	$8081	main	/work/build/asmisland-default.sfc.elf
+/work/build/asmisland-a16.sfc	asmisland-a16	a16 (inferred from the ROM path)	ok	$1FE5	$135C	$2000	3209	$8081	main	/work/build/asmisland-a16.sfc.elf
+/work/build/asmisland-xy16.sfc	asmisland-xy16	xy16 (inferred from the ROM path)	ok	$1FE5	$135C	$2000	3209	$8081	main	/work/build/asmisland-xy16.sfc.elf
+/work/build/avalanche.sfc	avalanche	unspecified	ok	$2000	$1012	$2000	4078	$8020	__do_zero_bss	/work/build/avalanche.sfc.elf
+/work/build/backtrack.sfc	backtrack	unspecified	ok	$1FE0	$167E	$2000	2402	$93E7	backtrack_gate_crc	/work/build/backtrack.sfc.elf
+/work/build/bankwalk-a16.sfc	bankwalk-a16	a16 (inferred from the ROM path)	ok	$1FF5	$13E8	$2000	3085	$8067	main	/work/build/bankwalk-a16.sfc.elf
+/work/build/bankwalk-xy16.sfc	bankwalk-xy16	xy16 (inferred from the ROM path)	ok	$1FF5	$13E8	$2000	3085	$8067	main	/work/build/bankwalk-xy16.sfc.elf
+/work/build/bf-vm.sfc	bf-vm	unspecified	ok	$1FFE	$0F46	$2000	4280	$806B	main	/work/build/bf-vm.sfc.elf
+/work/build/bhut.sfc	bhut	unspecified	ok	$1F82	$15D6	$2000	2476	$9D5F	bh_force	/work/build/bhut.sfc.elf
+/work/build/bigbyval.sfc	bigbyval	unspecified	ok	$1FB4	$1840	$2000	1908	$8081	main	/work/build/bigbyval.sfc.elf
+/work/build/bitboard64-default.sfc	bitboard64-default	default (inferred from the ROM path)	ok	$1F6C	$13F4	$2000	2936	$8067	main	/work/build/bitboard64-default.sfc.elf
+/work/build/bitboard64-a16.sfc	bitboard64-a16	a16 (inferred from the ROM path)	ok	$1F9C	$13F4	$2000	2984	$8067	main	/work/build/bitboard64-a16.sfc.elf
+/work/build/bitboard64-xy16.sfc	bitboard64-xy16	xy16 (inferred from the ROM path)	ok	$1F9C	$13F4	$2000	2984	$8067	main	/work/build/bitboard64-xy16.sfc.elf
+/work/build/bitcensus.sfc	bitcensus	unspecified	ok	$1FF4	$13EE	$2000	3078	$8051	main	/work/build/bitcensus.sfc.elf
+/work/build/bitshuffle.sfc	bitshuffle	unspecified	ok	$1FFE	$13EA	$2000	3092	$8051	main	/work/build/bitshuffle.sfc.elf
+/work/build/bitweave.sfc	bitweave	unspecified	ok	$1FE4	$14EA	$2000	2810	$8081	main	/work/build/bitweave.sfc.elf
+/work/build/blossom.sfc	blossom	unspecified	ok	$2000	$0A82	$2000	5502	$8020	__do_zero_bss	/work/build/blossom.sfc.elf
+/work/build/boids.sfc	boids	unspecified	ok	$1FF2	$0708	$2000	6378	$8051	main	/work/build/boids.sfc.elf
+/work/build/borrowlad.sfc	borrowlad	unspecified	ok	$1FD5	$1508	$2000	2765	$8081	main	/work/build/borrowlad.sfc.elf
+/work/build/borrowov.sfc	borrowov	unspecified	ok	$1FE3	$162A	$2000	2489	$8081	main	/work/build/borrowov.sfc.elf
+/work/build/brkcop-default.sfc	brkcop-default	default (inferred from the ROM path)	ok	$1EE0	$13E8	$2000	2808	$8092	brk	/work/build/brkcop-default.sfc.elf
+/work/build/brkcop-a16.sfc	brkcop-a16	a16 (inferred from the ROM path)	ok	$1EE2	$13E8	$2000	2810	$8092	brk	/work/build/brkcop-a16.sfc.elf
+/work/build/brkcop-xy16.sfc	brkcop-xy16	xy16 (inferred from the ROM path)	ok	$1EE2	$13E8	$2000	2810	$8092	brk	/work/build/brkcop-xy16.sfc.elf
+/work/build/brkcop-a16.sfc	brkcop-a16	a16 (inferred from the ROM path)	ok	$1EE2	$13E8	$2000	2810	$8092	brk	/work/build/brkcop-a16.sfc.elf
+/work/build/brkcop-a16.sfc	brkcop-a16	a16 (inferred from the ROM path)	ok	$1EE2	$13E8	$2000	2810	$8092	brk	/work/build/brkcop-a16.sfc.elf
+/work/build/bsearchviz.sfc	bsearchviz	unspecified	ok	$1FE5	$16AA	$2000	2363	$8081	main	/work/build/bsearchviz.sfc.elf
+/work/build/buddha.sfc	buddha	unspecified	ok	$2000	$0802	$2000	6142	$8020	__do_zero_bss	/work/build/buddha.sfc.elf
+/work/build/burning-ship.sfc	burning-ship	unspecified	ok	$1F38	$0D12	$2000	4646	$8067	main	/work/build/burning-ship.sfc.elf
+/work/build/byvaledge.sfc	byvaledge	unspecified	ok	$1FDF	$1B6A	$2000	1141	$8081	main	/work/build/byvaledge.sfc.elf
+/work/build/cardioid.sfc	cardioid	unspecified	ok	$1FFE	$1710	$2000	2286	$8051	main	/work/build/cardioid.sfc.elf
+/work/build/cartsize-hirom4.sfc	cartsize-hirom4	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom4.sfc.elf
+/work/build/cartsize-hirom4.sfc	cartsize-hirom4	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom4.sfc.elf
+/work/build/cartsize-hirom4.sfc	cartsize-hirom4	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom4.sfc.elf
+/work/build/cartsize-hirom4.sfc	cartsize-hirom4	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom4.sfc.elf
+/work/build/cartsize-hirom4.sfc	cartsize-hirom4	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom4.sfc.elf
+/work/build/cartsize-hirom4.sfc	cartsize-hirom4	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom4.sfc.elf
+/work/build/cartsize-hirom4.sfc	cartsize-hirom4	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom4.sfc.elf
+/work/build/cartsize-hirom4.sfc	cartsize-hirom4	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom4.sfc.elf
+/work/build/cartsize-exhirom6.sfc	cartsize-exhirom6	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom6.sfc.elf
+/work/build/cartsize-exhirom6.sfc	cartsize-exhirom6	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom6.sfc.elf
+/work/build/cartsize-exhirom6.sfc	cartsize-exhirom6	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom6.sfc.elf
+/work/build/cartsize-exhirom6.sfc	cartsize-exhirom6	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom6.sfc.elf
+/work/build/cartsize-exhirom6.sfc	cartsize-exhirom6	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom6.sfc.elf
+/work/build/cartsize-exhirom6.sfc	cartsize-exhirom6	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom6.sfc.elf
+/work/build/cartsize-exhirom6.sfc	cartsize-exhirom6	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom6.sfc.elf
+/work/build/cartsize-exhirom6.sfc	cartsize-exhirom6	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom6.sfc.elf
+/work/build/cartsize-exhirom8.sfc	cartsize-exhirom8	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom8.sfc.elf
+/work/build/cartsize-exhirom8.sfc	cartsize-exhirom8	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom8.sfc.elf
+/work/build/cartsize-exhirom8.sfc	cartsize-exhirom8	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom8.sfc.elf
+/work/build/cartsize-exhirom8.sfc	cartsize-exhirom8	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom8.sfc.elf
+/work/build/cartsize-exhirom8.sfc	cartsize-exhirom8	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom8.sfc.elf
+/work/build/cartsize-exhirom8.sfc	cartsize-exhirom8	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom8.sfc.elf
+/work/build/cartsize-exhirom8.sfc	cartsize-exhirom8	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom8.sfc.elf
+/work/build/cartsize-exhirom8.sfc	cartsize-exhirom8	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-exhirom8.sfc.elf
+/work/build/cartsize-lorom512k_slow.sfc	cartsize-lorom512k_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_slow.sfc.elf
+/work/build/cartsize-lorom512k_slow.sfc	cartsize-lorom512k_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_slow.sfc.elf
+/work/build/cartsize-lorom512k_slow.sfc	cartsize-lorom512k_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_slow.sfc.elf
+/work/build/cartsize-lorom512k_slow.sfc	cartsize-lorom512k_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_slow.sfc.elf
+/work/build/cartsize-lorom512k_slow.sfc	cartsize-lorom512k_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_slow.sfc.elf
+/work/build/cartsize-lorom512k_slow.sfc	cartsize-lorom512k_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_slow.sfc.elf
+/work/build/cartsize-lorom512k_slow.sfc	cartsize-lorom512k_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_slow.sfc.elf
+/work/build/cartsize-lorom512k_slow.sfc	cartsize-lorom512k_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_slow.sfc.elf
+/work/build/cartsize-lorom512k_fast.sfc	cartsize-lorom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_fast.sfc.elf
+/work/build/cartsize-lorom512k_fast.sfc	cartsize-lorom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_fast.sfc.elf
+/work/build/cartsize-lorom512k_fast.sfc	cartsize-lorom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_fast.sfc.elf
+/work/build/cartsize-lorom512k_fast.sfc	cartsize-lorom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_fast.sfc.elf
+/work/build/cartsize-lorom512k_fast.sfc	cartsize-lorom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_fast.sfc.elf
+/work/build/cartsize-lorom512k_fast.sfc	cartsize-lorom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_fast.sfc.elf
+/work/build/cartsize-lorom512k_fast.sfc	cartsize-lorom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_fast.sfc.elf
+/work/build/cartsize-lorom512k_fast.sfc	cartsize-lorom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom512k_fast.sfc.elf
+/work/build/cartsize-lorom1m_slow.sfc	cartsize-lorom1m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_slow.sfc.elf
+/work/build/cartsize-lorom1m_slow.sfc	cartsize-lorom1m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_slow.sfc.elf
+/work/build/cartsize-lorom1m_slow.sfc	cartsize-lorom1m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_slow.sfc.elf
+/work/build/cartsize-lorom1m_slow.sfc	cartsize-lorom1m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_slow.sfc.elf
+/work/build/cartsize-lorom1m_slow.sfc	cartsize-lorom1m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_slow.sfc.elf
+/work/build/cartsize-lorom1m_slow.sfc	cartsize-lorom1m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_slow.sfc.elf
+/work/build/cartsize-lorom1m_slow.sfc	cartsize-lorom1m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_slow.sfc.elf
+/work/build/cartsize-lorom1m_slow.sfc	cartsize-lorom1m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_slow.sfc.elf
+/work/build/cartsize-lorom1m_fast.sfc	cartsize-lorom1m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_fast.sfc.elf
+/work/build/cartsize-lorom1m_fast.sfc	cartsize-lorom1m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_fast.sfc.elf
+/work/build/cartsize-lorom1m_fast.sfc	cartsize-lorom1m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_fast.sfc.elf
+/work/build/cartsize-lorom1m_fast.sfc	cartsize-lorom1m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_fast.sfc.elf
+/work/build/cartsize-lorom1m_fast.sfc	cartsize-lorom1m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_fast.sfc.elf
+/work/build/cartsize-lorom1m_fast.sfc	cartsize-lorom1m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_fast.sfc.elf
+/work/build/cartsize-lorom1m_fast.sfc	cartsize-lorom1m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_fast.sfc.elf
+/work/build/cartsize-lorom1m_fast.sfc	cartsize-lorom1m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom1m_fast.sfc.elf
+/work/build/cartsize-lorom3m_slow.sfc	cartsize-lorom3m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_slow.sfc.elf
+/work/build/cartsize-lorom3m_slow.sfc	cartsize-lorom3m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_slow.sfc.elf
+/work/build/cartsize-lorom3m_slow.sfc	cartsize-lorom3m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_slow.sfc.elf
+/work/build/cartsize-lorom3m_slow.sfc	cartsize-lorom3m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_slow.sfc.elf
+/work/build/cartsize-lorom3m_slow.sfc	cartsize-lorom3m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_slow.sfc.elf
+/work/build/cartsize-lorom3m_slow.sfc	cartsize-lorom3m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_slow.sfc.elf
+/work/build/cartsize-lorom3m_slow.sfc	cartsize-lorom3m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_slow.sfc.elf
+/work/build/cartsize-lorom3m_slow.sfc	cartsize-lorom3m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_slow.sfc.elf
+/work/build/cartsize-lorom3m_fast.sfc	cartsize-lorom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_fast.sfc.elf
+/work/build/cartsize-lorom3m_fast.sfc	cartsize-lorom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_fast.sfc.elf
+/work/build/cartsize-lorom3m_fast.sfc	cartsize-lorom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_fast.sfc.elf
+/work/build/cartsize-lorom3m_fast.sfc	cartsize-lorom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_fast.sfc.elf
+/work/build/cartsize-lorom3m_fast.sfc	cartsize-lorom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_fast.sfc.elf
+/work/build/cartsize-lorom3m_fast.sfc	cartsize-lorom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_fast.sfc.elf
+/work/build/cartsize-lorom3m_fast.sfc	cartsize-lorom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_fast.sfc.elf
+/work/build/cartsize-lorom3m_fast.sfc	cartsize-lorom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom3m_fast.sfc.elf
+/work/build/cartsize-lorom4m_slow.sfc	cartsize-lorom4m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_slow.sfc.elf
+/work/build/cartsize-lorom4m_slow.sfc	cartsize-lorom4m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_slow.sfc.elf
+/work/build/cartsize-lorom4m_slow.sfc	cartsize-lorom4m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_slow.sfc.elf
+/work/build/cartsize-lorom4m_slow.sfc	cartsize-lorom4m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_slow.sfc.elf
+/work/build/cartsize-lorom4m_slow.sfc	cartsize-lorom4m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_slow.sfc.elf
+/work/build/cartsize-lorom4m_slow.sfc	cartsize-lorom4m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_slow.sfc.elf
+/work/build/cartsize-lorom4m_slow.sfc	cartsize-lorom4m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_slow.sfc.elf
+/work/build/cartsize-lorom4m_slow.sfc	cartsize-lorom4m_slow	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_slow.sfc.elf
+/work/build/cartsize-lorom4m_fast.sfc	cartsize-lorom4m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_fast.sfc.elf
+/work/build/cartsize-lorom4m_fast.sfc	cartsize-lorom4m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_fast.sfc.elf
+/work/build/cartsize-lorom4m_fast.sfc	cartsize-lorom4m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_fast.sfc.elf
+/work/build/cartsize-lorom4m_fast.sfc	cartsize-lorom4m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_fast.sfc.elf
+/work/build/cartsize-lorom4m_fast.sfc	cartsize-lorom4m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_fast.sfc.elf
+/work/build/cartsize-lorom4m_fast.sfc	cartsize-lorom4m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_fast.sfc.elf
+/work/build/cartsize-lorom4m_fast.sfc	cartsize-lorom4m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_fast.sfc.elf
+/work/build/cartsize-lorom4m_fast.sfc	cartsize-lorom4m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-lorom4m_fast.sfc.elf
+/work/build/cartsize-hirom512k_fast.sfc	cartsize-hirom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom512k_fast.sfc.elf
+/work/build/cartsize-hirom512k_fast.sfc	cartsize-hirom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom512k_fast.sfc.elf
+/work/build/cartsize-hirom512k_fast.sfc	cartsize-hirom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom512k_fast.sfc.elf
+/work/build/cartsize-hirom512k_fast.sfc	cartsize-hirom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom512k_fast.sfc.elf
+/work/build/cartsize-hirom512k_fast.sfc	cartsize-hirom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom512k_fast.sfc.elf
+/work/build/cartsize-hirom512k_fast.sfc	cartsize-hirom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom512k_fast.sfc.elf
+/work/build/cartsize-hirom512k_fast.sfc	cartsize-hirom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom512k_fast.sfc.elf
+/work/build/cartsize-hirom512k_fast.sfc	cartsize-hirom512k_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom512k_fast.sfc.elf
+/work/build/cartsize-hirom2m_fast.sfc	cartsize-hirom2m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom2m_fast.sfc.elf
+/work/build/cartsize-hirom2m_fast.sfc	cartsize-hirom2m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom2m_fast.sfc.elf
+/work/build/cartsize-hirom2m_fast.sfc	cartsize-hirom2m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom2m_fast.sfc.elf
+/work/build/cartsize-hirom2m_fast.sfc	cartsize-hirom2m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom2m_fast.sfc.elf
+/work/build/cartsize-hirom2m_fast.sfc	cartsize-hirom2m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom2m_fast.sfc.elf
+/work/build/cartsize-hirom2m_fast.sfc	cartsize-hirom2m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom2m_fast.sfc.elf
+/work/build/cartsize-hirom2m_fast.sfc	cartsize-hirom2m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom2m_fast.sfc.elf
+/work/build/cartsize-hirom2m_fast.sfc	cartsize-hirom2m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom2m_fast.sfc.elf
+/work/build/cartsize-hirom3m_fast.sfc	cartsize-hirom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom3m_fast.sfc.elf
+/work/build/cartsize-hirom3m_fast.sfc	cartsize-hirom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom3m_fast.sfc.elf
+/work/build/cartsize-hirom3m_fast.sfc	cartsize-hirom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom3m_fast.sfc.elf
+/work/build/cartsize-hirom3m_fast.sfc	cartsize-hirom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom3m_fast.sfc.elf
+/work/build/cartsize-hirom3m_fast.sfc	cartsize-hirom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom3m_fast.sfc.elf
+/work/build/cartsize-hirom3m_fast.sfc	cartsize-hirom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom3m_fast.sfc.elf
+/work/build/cartsize-hirom3m_fast.sfc	cartsize-hirom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom3m_fast.sfc.elf
+/work/build/cartsize-hirom3m_fast.sfc	cartsize-hirom3m_fast	unspecified	ok	$2000	$0208	$2000	7672	$8020	__do_zero_bss	/work/build/cartsize-hirom3m_fast.sfc.elf
+/work/build/cgrade.sfc	cgrade	unspecified	ok	$1FF3	$13EA	$2000	3081	$946E	grade_step	/work/build/cgrade.sfc.elf
+/work/build/compass.sfc	compass	unspecified	ok	$1FDD	$13E8	$2000	3061	$8081	main	/work/build/compass.sfc.elf
+/work/build/cordic.sfc	cordic	unspecified	ok	$1FF4	$1362	$2000	3218	$8067	main	/work/build/cordic.sfc.elf
+/work/build/cosmzoom.sfc	cosmzoom	unspecified	ok	$1FDE	$13F2	$2000	3052	$8051	main	/work/build/cosmzoom.sfc.elf
+/work/build/cpu6502.sfc	cpu6502	unspecified	ok	$1EF7	$0E6C	$2000	4235	$8051	main	/work/build/cpu6502.sfc.elf
+/work/build/crctex.sfc	crctex	unspecified	ok	$1FFA	$13E8	$2000	3090	$8051	main	/work/build/crctex.sfc.elf
+/work/build/crcwall.sfc	crcwall	unspecified	ok	$1FE9	$13EA	$2000	3071	$8051	main	/work/build/crcwall.sfc.elf
+/work/build/critters.sfc	critters	unspecified	ok	$1FFC	$15F8	$2000	2564	$8051	main	/work/build/critters.sfc.elf
+/work/build/csrjmp.sfc	csrjmp	unspecified	ok	$1FD5	$1452	$2000	2947	$9C61	cj_worker	/work/build/csrjmp.sfc.elf
+/work/build/dblbridge.sfc	dblbridge	unspecified	ok	$1FE1	$16F6	$2000	2283	$8081	main	/work/build/dblbridge.sfc.elf
+/work/build/dctbloom.sfc	dctbloom	unspecified	ok	$1F78	$13EA	$2000	2958	$8081	main	/work/build/dctbloom.sfc.elf
+/work/build/dhmix.sfc	dhmix	unspecified	ok	$1FCC	$13EE	$2000	3038	$8051	main	/work/build/dhmix.sfc.elf
+/work/build/disbits.sfc	disbits	unspecified	ok	$1FFE	$13E8	$2000	3094	$8051	main	/work/build/disbits.sfc.elf
+/work/build/dither.sfc	dither	unspecified	ok	$1FFA	$1FAE	$2000	76	$8051	main	/work/build/dither.sfc.elf
+/work/build/divclock.sfc	divclock	unspecified	ok	$1FE6	$13F0	$2000	3062	$8051	main	/work/build/divclock.sfc.elf
+/work/build/domcol.sfc	domcol	unspecified	ok	$1FF6	$13EC	$2000	3082	$806B	main	/work/build/domcol.sfc.elf
+/work/build/doom-fire.sfc	doom-fire	unspecified	ok	$1F38	$0E14	$2000	4388	$806B	main	/work/build/doom-fire.sfc.elf
+/work/build/double-pendulum.sfc	double-pendulum	unspecified	ok	$1FF8	$136C	$2000	3212	$8051	main	/work/build/double-pendulum.sfc.elf
+/work/build/dpbank-default.sfc	dpbank-default	default (inferred from the ROM path)	ok	$1ED0	$13A6	$2000	2858	$8092	nmi	/work/build/dpbank-default.sfc.elf
+/work/build/dpbank-a16.sfc	dpbank-a16	a16 (inferred from the ROM path)	ok	$1ECF	$13A6	$2000	2857	$8092	nmi	/work/build/dpbank-a16.sfc.elf
+/work/build/dpbank-xy16.sfc	dpbank-xy16	xy16 (inferred from the ROM path)	ok	$1ECF	$13A6	$2000	2857	$8092	nmi	/work/build/dpbank-xy16.sfc.elf
+/work/build/dpbank-a16.sfc	dpbank-a16	a16 (inferred from the ROM path)	ok	$1ECF	$13A6	$2000	2857	$8092	nmi	/work/build/dpbank-a16.sfc.elf
+/work/build/dpbank-a16.sfc	dpbank-a16	a16 (inferred from the ROM path)	ok	$1ECF	$13A6	$2000	2857	$8092	nmi	/work/build/dpbank-a16.sfc.elf
+/work/build/duff.sfc	duff	unspecified	ok	$1FFC	$144A	$2000	2994	$8051	main	/work/build/duff.sfc.elf
+/work/build/editdist.sfc	editdist	unspecified	ok	$1FCD	$19F4	$2000	1497	$8051	main	/work/build/editdist.sfc.elf
+/work/build/epicycles.sfc	epicycles	unspecified	ok	$1FFE	$13F0	$2000	3086	$8051	main	/work/build/epicycles.sfc.elf
+/work/build/fuzz-work/chk_a16.sfc	extload_sim	+mos-a16 -Os	ok	$1FA0	$0202	$2000	7582	$804E	main	/work/build/fuzz-work/chk_a16.sfc.elf
+/work/build/fuzz-work/chk_default.sfc	extload_sim	default -Os	ok	$1F90	$0202	$2000	7566	$804E	main	/work/build/fuzz-work/chk_default.sfc.elf
+/work/build/fuzz-work/chk_xy16.sfc	extload_sim	+mos-xy16 -Os	ok	$1FA0	$0202	$2000	7582	$804E	main	/work/build/fuzz-work/chk_xy16.sfc.elf
+/work/build/extload.sfc	extload	unspecified	ok	$1F98	$03DA	$2000	7102	$8051	main	/work/build/extload.sfc.elf
+/work/build/fabsridge.sfc	fabsridge	unspecified	ok	$1FFE	$13EC	$2000	3090	$8051	main	/work/build/fabsridge.sfc.elf
+/work/build/factorial.sfc	factorial	unspecified	ok	$1FFE	$1554	$2000	2730	$8051	main	/work/build/factorial.sfc.elf
+/work/build/farptrcmp-a16.sfc	farptrcmp-a16	a16 (inferred from the ROM path)	ok	$1FBC	$1404	$2000	3000	$8067	main	/work/build/farptrcmp-a16.sfc.elf
+/work/build/farptrcmp-xy16.sfc	farptrcmp-xy16	xy16 (inferred from the ROM path)	ok	$1FBC	$13E8	$2000	3028	$8067	main	/work/build/farptrcmp-xy16.sfc.elf
+/work/build/farspill-a16.sfc	farspill-a16	a16 (inferred from the ROM path)	ok	$1FF3	$13EC	$2000	3079	$8081	main	/work/build/farspill-a16.sfc.elf
+/work/build/farspill-xy16.sfc	farspill-xy16	xy16 (inferred from the ROM path)	ok	$1FF3	$13EC	$2000	3079	$8081	main	/work/build/farspill-xy16.sfc.elf
+/work/build/fenwick.sfc	fenwick	unspecified	ok	$1FFE	$1472	$2000	2956	$8067	main	/work/build/fenwick.sfc.elf
+/work/build/fft.sfc	fft	unspecified	ok	$1F7A	$14AC	$2000	2766	$8051	main	/work/build/fft.sfc.elf
+/work/build/fn-plot.sfc	fn-plot	unspecified	ok	$1FE2	$13EE	$2000	3060	$9C05	fn_eval_factor	/work/build/fn-plot.sfc.elf
+/work/build/funnelkal.sfc	funnelkal	unspecified	ok	$1FDD	$13EC	$2000	3057	$8051	main	/work/build/funnelkal.sfc.elf
+/work/build/gf256.sfc	gf256	unspecified	ok	$1FD9	$170C	$2000	2253	$806B	main	/work/build/gf256.sfc.elf
+/work/build/gouraud.sfc	gouraud	unspecified	ok	$1F99	$13E8	$2000	2993	$8051	main	/work/build/gouraud.sfc.elf
+/work/build/grid3d.sfc	grid3d	unspecified	ok	$1FF8	$159A	$2000	2654	$8051	main	/work/build/grid3d.sfc.elf
+/work/build/harmonograph.sfc	harmonograph	unspecified	ok	$1FFE	$1458	$2000	2982	$8051	main	/work/build/harmonograph.sfc.elf
+/work/build/hdr-bloom.sfc	hdr-bloom	unspecified	ok	$1F38	$11E8	$2000	3408	$8051	main	/work/build/hdr-bloom.sfc.elf
+/work/build/hilbert.sfc	hilbert	unspecified	ok	$1FE4	$13F0	$2000	3060	$8051	main	/work/build/hilbert.sfc.elf
+/work/build/huffman.sfc	huffman	unspecified	ok	$1FFC	$15AE	$2000	2638	$806B	main	/work/build/huffman.sfc.elf
+/work/build/hull.sfc	hull	unspecified	ok	$1F95	$144C	$2000	2889	$8051	main	/work/build/hull.sfc.elf
+/work/build/iir-scope.sfc	iir-scope	unspecified	ok	$1FFE	$1636	$2000	2504	$806B	main	/work/build/iir-scope.sfc.elf
+/work/build/invaders.sfc	invaders	unspecified	ok	$2000	$05C2	$2000	6718	$8020	__do_zero_bss	/work/build/invaders.sfc.elf
+/work/build/invaders-a16.sfc	invaders-a16	a16 (inferred from the ROM path)	ok	$1FF8	$05C2	$2000	6710	$8067	main	/work/build/invaders-a16.sfc.elf
+/work/build/invaders-a16.sfc	invaders-a16	a16 (inferred from the ROM path)	ok	$1FF8	$05C2	$2000	6710	$8067	main	/work/build/invaders-a16.sfc.elf
+/work/build/invaders-a16.sfc	invaders-a16	a16 (inferred from the ROM path)	ok	$1FF8	$05C2	$2000	6710	$8067	main	/work/build/invaders-a16.sfc.elf
+/work/build/invaders-a16.sfc	invaders-a16	a16 (inferred from the ROM path)	ok	$1FF8	$05C2	$2000	6710	$8067	main	/work/build/invaders-a16.sfc.elf
+/work/build/irqgate-default.sfc	irqgate-default	default (inferred from the ROM path)	ok	$1DC7	$13F0	$2000	2519	$8092	nmi	/work/build/irqgate-default.sfc.elf
+/work/build/irqgate-a16.sfc	irqgate-a16	a16 (inferred from the ROM path)	ok	$1DC7	$13F0	$2000	2519	$8092	nmi	/work/build/irqgate-a16.sfc.elf
+/work/build/irqgate-xy16.sfc	irqgate-xy16	xy16 (inferred from the ROM path)	ok	$1DC7	$13F0	$2000	2519	$8092	nmi	/work/build/irqgate-xy16.sfc.elf
+/work/build/irqgate-a16.sfc	irqgate-a16	a16 (inferred from the ROM path)	ok	$1DC7	$13F0	$2000	2519	$8092	nmi	/work/build/irqgate-a16.sfc.elf
+/work/build/irqgate-a16.sfc	irqgate-a16	a16 (inferred from the ROM path)	ok	$1DC7	$13F0	$2000	2519	$8092	nmi	/work/build/irqgate-a16.sfc.elf
+/work/build/isrbracket-default.sfc	isrbracket-default	default (inferred from the ROM path)	ok	$1ED8	$13EE	$2000	2794	$8078	nmi	/work/build/isrbracket-default.sfc.elf
+/work/build/isrbracket-default.sfc	isrbracket-default	default (inferred from the ROM path)	ok	$1ED8	$13EE	$2000	2794	$8078	nmi	/work/build/isrbracket-default.sfc.elf
+/work/build/isrbracket-default.sfc	isrbracket-default	default (inferred from the ROM path)	ok	$1ED8	$13EE	$2000	2794	$8078	nmi	/work/build/isrbracket-default.sfc.elf
+/work/build/isrbracket-a16.sfc	isrbracket-a16	a16 (inferred from the ROM path)	ok	$1ED4	$13EE	$2000	2790	$8078	nmi	/work/build/isrbracket-a16.sfc.elf
+/work/build/isrbracket-a16.sfc	isrbracket-a16	a16 (inferred from the ROM path)	ok	$1ED4	$13EE	$2000	2790	$8078	nmi	/work/build/isrbracket-a16.sfc.elf
+/work/build/isrbracket-a16.sfc	isrbracket-a16	a16 (inferred from the ROM path)	ok	$1ED4	$13EE	$2000	2790	$8078	nmi	/work/build/isrbracket-a16.sfc.elf
+/work/build/isrbracket-xy16.sfc	isrbracket-xy16	xy16 (inferred from the ROM path)	ok	$1ED4	$13EE	$2000	2790	$8078	nmi	/work/build/isrbracket-xy16.sfc.elf
+/work/build/isrbracket-xy16.sfc	isrbracket-xy16	xy16 (inferred from the ROM path)	ok	$1ED4	$13EE	$2000	2790	$8078	nmi	/work/build/isrbracket-xy16.sfc.elf
+/work/build/isrbracket-xy16.sfc	isrbracket-xy16	xy16 (inferred from the ROM path)	ok	$1ED4	$13EE	$2000	2790	$8078	nmi	/work/build/isrbracket-xy16.sfc.elf
+/work/build/jt256.sfc	jt256	unspecified	ok	$1FE3	$1AF2	$2000	1265	$8081	main	/work/build/jt256.sfc.elf
+/work/build/jtedge.sfc	jtedge	unspecified	ok	$1FD8	$1888	$2000	1872	$8081	main	/work/build/jtedge.sfc.elf
+/work/build/jtsparse.sfc	jtsparse	unspecified	ok	$1FD8	$18EA	$2000	1774	$8081	main	/work/build/jtsparse.sfc.elf
+/work/build/julia.sfc	julia	unspecified	ok	$2000	$05A8	$2000	6744	$8020	__do_zero_bss	/work/build/julia.sfc.elf
+/work/build/keycmp64.sfc	keycmp64	unspecified	ok	$1FE9	$169E	$2000	2379	$8051	main	/work/build/keycmp64.sfc.elf
+/work/build/lfsr2.sfc	lfsr2	unspecified	ok	$1FE9	$14EA	$2000	2815	$8081	main	/work/build/lfsr2.sfc.elf
+/work/build/life.sfc	life	unspecified	ok	$1F37	$1716	$2000	2081	$8051	main	/work/build/life.sfc.elf
+/work/build/llabs64-default.sfc	llabs64-default	default (inferred from the ROM path)	ok	$1FE8	$13FC	$2000	3052	$8051	main	/work/build/llabs64-default.sfc.elf
+/work/build/llabs64-a16.sfc	llabs64-a16	a16 (inferred from the ROM path)	ok	$1FF3	$13FC	$2000	3063	$8051	main	/work/build/llabs64-a16.sfc.elf
+/work/build/llabs64-xy16.sfc	llabs64-xy16	xy16 (inferred from the ROM path)	ok	$1FF3	$13FC	$2000	3063	$8051	main	/work/build/llabs64-xy16.sfc.elf
+/work/build/lsystem.sfc	lsystem	unspecified	ok	$1F01	$1CC0	$2000	577	$8051	main	/work/build/lsystem.sfc.elf
+/work/build/lzdec.sfc	lzdec	unspecified	ok	$1FFE	$15EC	$2000	2578	$8051	main	/work/build/lzdec.sfc.elf
+/work/build/lzss-gallery-bench.sfc	lzss-gallery-bench	unspecified	ok	$1FF6	$038C	$2000	7274	$8857	benchmark_near_decode	/work/build/lzss-gallery-bench.sfc.elf
+/work/build/lzss-gallery.sfc	lzss-gallery	unspecified	ok	$1F98	$0EBA	$2000	4318	$B932	compress_far	/work/build/lzss-gallery.sfc.elf
+/work/build/lzss-gallery.sfc	lzss-gallery	unspecified	ok	$1F98	$0EBA	$2000	4318	$B932	compress_far	/work/build/lzss-gallery.sfc.elf
+/work/build/mandel-double.sfc	mandel-double	unspecified	ok	$1FFE	$0316	$2000	7400	$9465	compute_coarse_row	/work/build/mandel-double.sfc.elf
+/work/build/mandel-float.sfc	mandel-float	unspecified	ok	$2000	$0308	$2000	7416	$8020	__do_zero_bss	/work/build/mandel-float.sfc.elf
+/work/build/mandel-oop.sfc	mandel-oop	unspecified	ok	$1FF4	$089A	$2000	5978	$8067	main	/work/build/mandel-oop.sfc.elf
+/work/build/mandel-display.sfc	mandel-display	unspecified	ok	$2000	$0784	$2000	6268	$8020	__do_zero_bss	/work/build/mandel-display.sfc.elf
+/work/build/matcascade.sfc	matcascade	unspecified	ok	$1F76	$13EA	$2000	2956	$8081	main	/work/build/matcascade.sfc.elf
+/work/build/maze.sfc	maze	unspecified	ok	$1FD3	$0E46	$2000	4493	$A079	maze_divide	/work/build/maze.sfc.elf
+/work/build/medfilt.sfc	medfilt	unspecified	ok	$1FDF	$14EC	$2000	2803	$8051	main	/work/build/medfilt.sfc.elf
+/work/build/metaball.sfc	metaball	unspecified	ok	$1FFE	$1408	$2000	3062	$8051	main	/work/build/metaball.sfc.elf
+/work/build/mixedwidth-default.sfc	mixedwidth-default	default (inferred from the ROM path)	ok	$1FD8	$13EA	$2000	3054	$8051	main	/work/build/mixedwidth-default.sfc.elf
+/work/build/mixedwidth-a16.sfc	mixedwidth-a16	a16 (inferred from the ROM path)	ok	$1FE6	$13EA	$2000	3068	$8051	main	/work/build/mixedwidth-a16.sfc.elf
+/work/build/mixedwidth-xy16.sfc	mixedwidth-xy16	xy16 (inferred from the ROM path)	ok	$1FE6	$13EA	$2000	3068	$8051	main	/work/build/mixedwidth-xy16.sfc.elf
+/work/build/modethread-default.sfc	modethread-default	default (inferred from the ROM path)	ok	$1FF7	$13EA	$2000	3085	$8081	main	/work/build/modethread-default.sfc.elf
+/work/build/modethread-a16.sfc	modethread-a16	a16 (inferred from the ROM path)	ok	$1FF5	$13EA	$2000	3083	$8081	main	/work/build/modethread-a16.sfc.elf
+/work/build/modethread-xy16.sfc	modethread-xy16	xy16 (inferred from the ROM path)	ok	$1FF5	$13EA	$2000	3083	$8081	main	/work/build/modethread-xy16.sfc.elf
+/work/build/modexp256.sfc	modexp256	unspecified	ok	$1F5C	$160A	$2000	2386	$8081	main	/work/build/modexp256.sfc.elf
+/work/build/montorbit.sfc	montorbit	unspecified	ok	$1FDC	$13EA	$2000	3058	$8081	main	/work/build/montorbit.sfc.elf
+/work/build/msquares.sfc	msquares	unspecified	ok	$1FA4	$1EAE	$2000	246	$A289	contour_frame	/work/build/msquares.sfc.elf
+/work/build/mulov64.sfc	mulov64	unspecified	ok	$1F8E	$1438	$2000	2902	$8051	main	/work/build/mulov64.sfc.elf
+/work/build/multibase.sfc	multibase	unspecified	ok	$1FE1	$0838	$2000	6057	$8051	main	/work/build/multibase.sfc.elf
+/work/build/mvscrl.sfc	mvscrl	unspecified	ok	$1FFC	$161C	$2000	2528	$8081	main	/work/build/mvscrl.sfc.elf
+/work/build/n-body.sfc	n-body	unspecified	ok	$1FF4	$158C	$2000	2664	$806B	main	/work/build/n-body.sfc.elf
+/work/build/newton.sfc	newton	unspecified	ok	$1F2C	$0996	$2000	5526	$8051	main	/work/build/newton.sfc.elf
+/work/build/nmitally-default.sfc	nmitally-default	default (inferred from the ROM path)	ok	$1EE1	$13EC	$2000	2805	$8092	nmi	/work/build/nmitally-default.sfc.elf
+/work/build/nmitally-a16.sfc	nmitally-a16	a16 (inferred from the ROM path)	ok	$1EE3	$13EC	$2000	2807	$8092	nmi	/work/build/nmitally-a16.sfc.elf
+/work/build/nmitally-xy16.sfc	nmitally-xy16	xy16 (inferred from the ROM path)	ok	$1EE3	$13EC	$2000	2807	$8092	nmi	/work/build/nmitally-xy16.sfc.elf
+/work/build/nmitally-a16.sfc	nmitally-a16	a16 (inferred from the ROM path)	ok	$1EE3	$13EC	$2000	2807	$8092	nmi	/work/build/nmitally-a16.sfc.elf
+/work/build/nmitally-a16.sfc	nmitally-a16	a16 (inferred from the ROM path)	ok	$1EE3	$13EC	$2000	2807	$8092	nmi	/work/build/nmitally-a16.sfc.elf
+/work/build/nrecip.sfc	nrecip	unspecified	ok	$1FFC	$13EC	$2000	3088	$8051	main	/work/build/nrecip.sfc.elf
+/work/build/oddmask.sfc	oddmask	unspecified	ok	$1FE5	$14F8	$2000	2797	$809B	main	/work/build/oddmask.sfc.elf
+/work/build/ovmatrix.sfc	ovmatrix	unspecified	ok	$1FE5	$141C	$2000	3017	$8081	main	/work/build/ovmatrix.sfc.elf
+/work/build/ovmove.sfc	ovmove	unspecified	ok	$1FE9	$16EA	$2000	2303	$8051	main	/work/build/ovmove.sfc.elf
+/work/build/packrec.sfc	packrec	unspecified	ok	$1FE1	$1CEE	$2000	755	$8081	main	/work/build/packrec.sfc.elf
+/work/build/pcooker.sfc	pcooker	unspecified	ok	$1FE1	$14EE	$2000	2803	$8081	main	/work/build/pcooker.sfc.elf
+/work/build/percol.sfc	percol	unspecified	ok	$1FFE	$19F6	$2000	1544	$8051	main	/work/build/percol.sfc.elf
+/work/build/perlin.sfc	perlin	unspecified	ok	$1FFC	$15EC	$2000	2576	$8051	main	/work/build/perlin.sfc.elf
+/work/build/permscat.sfc	permscat	unspecified	ok	$1FE9	$1CEA	$2000	767	$8051	main	/work/build/permscat.sfc.elf
+/work/build/spigot.sfc	spigot	unspecified	ok	$1FFE	$1722	$2000	2268	$8051	main	/work/build/spigot.sfc.elf
+/work/build/plyoracle.sfc	plyoracle	unspecified	ok	$1FAB	$13F4	$2000	2999	$9CBA	po_negamax	/work/build/plyoracle.sfc.elf
+/work/build/polyfill.sfc	polyfill	unspecified	ok	$1FAA	$13EC	$2000	3006	$9649	draw_frame	/work/build/polyfill.sfc.elf
+/work/build/poolfx.sfc	poolfx	unspecified	ok	$1FFE	$1870	$2000	1934	$806B	main	/work/build/poolfx.sfc.elf
+/work/build/qsortviz.sfc	qsortviz	unspecified	ok	$1FC5	$145C	$2000	2921	$9AED	sort_anim_tick	/work/build/qsortviz.sfc.elf
+/work/build/radix.sfc	radix	unspecified	ok	$1FD8	$140C	$2000	3020	$8051	main	/work/build/radix.sfc.elf
+/work/build/rangecode.sfc	rangecode	unspecified	ok	$1FDD	$13F6	$2000	3047	$8081	main	/work/build/rangecode.sfc.elf
+/work/build/raycaster.sfc	raycaster	unspecified	ok	$1FFE	$13EC	$2000	3090	$8051	main	/work/build/raycaster.sfc.elf
+/work/build/rdiff.sfc	rdiff	unspecified	ok	$1F36	$1B12	$2000	1060	$8067	main	/work/build/rdiff.sfc.elf
+/work/build/retryjmp.sfc	retryjmp	unspecified	ok	$1FAB	$142A	$2000	2945	$9C34	rj_work	/work/build/retryjmp.sfc.elf
+/work/build/ropeedit.sfc	ropeedit	unspecified	ok	$1FE6	$1872	$2000	1908	$8081	main	/work/build/ropeedit.sfc.elf
+/work/build/rotkal.sfc	rotkal	unspecified	ok	$1FE9	$13F4	$2000	3061	$806B	main	/work/build/rotkal.sfc.elf
+/work/build/rotozoom.sfc	rotozoom	unspecified	ok	$1FE0	$13EA	$2000	3062	$8051	main	/work/build/rotozoom.sfc.elf
+/work/build/rotslab.sfc	rotslab	unspecified	ok	$1FE9	$19EA	$2000	1535	$8051	main	/work/build/rotslab.sfc.elf
+/work/build/satcast.sfc	satcast	unspecified	ok	$1FDC	$13EA	$2000	3058	$8081	main	/work/build/satcast.sfc.elf
+/work/build/satcomet.sfc	satcomet	unspecified	ok	$1FFE	$161A	$2000	2532	$8051	main	/work/build/satcomet.sfc.elf
+/work/build/sbitfld.sfc	sbitfld	unspecified	ok	$1FE9	$17E8	$2000	2049	$8081	main	/work/build/sbitfld.sfc.elf
+/work/build/scopeguard.sfc	scopeguard	unspecified	ok	$1FD1	$1A2C	$2000	1445	$8081	main	/work/build/scopeguard.sfc.elf
+/work/build/seamdemo-bench.sfc	seamdemo-bench	unspecified	ok	$1FF6	$13AC	$2000	3146	$85D3	seamvm_step	/work/build/seamdemo-bench.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seamdemo.sfc	seamdemo	unspecified	ok	$1FEC	$1638	$2000	2484	$ABDC	seamvm_step	/work/build/seamdemo.sfc.elf
+/work/build/seqvm.sfc	seqvm	unspecified	ok	$1FF2	$13F4	$2000	3070	$8051	main	/work/build/seqvm.sfc.elf
+/work/build/shift64seam-default.sfc	shift64seam-default	default (inferred from the ROM path)	ok	$1FF7	$140C	$2000	3051	$806B	main	/work/build/shift64seam-default.sfc.elf
+/work/build/shift64seam-a16.sfc	shift64seam-a16	a16 (inferred from the ROM path)	ok	$1FF5	$140C	$2000	3049	$806B	main	/work/build/shift64seam-a16.sfc.elf
+/work/build/shift64seam-xy16.sfc	shift64seam-xy16	xy16 (inferred from the ROM path)	ok	$1FF5	$140C	$2000	3049	$806B	main	/work/build/shift64seam-xy16.sfc.elf
+/work/build/smulorbit.sfc	smulorbit	unspecified	ok	$1FD9	$1408	$2000	3025	$8051	main	/work/build/smulorbit.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/svx2-video-reel.sfc	svx2-video-reel	unspecified	ok	$1FD3	$1442	$2000	2961	$C097AF	seek_frame	/work/build/svx2-video-reel.sfc.elf
+/work/build/sobel.sfc	sobel	unspecified	ok	$1FCD	$13EA	$2000	3043	$8081	main	/work/build/sobel.sfc.elf
+/work/build/sodo.sfc	sodo	unspecified	ok	$1FBE	$0A64	$2000	5466	$8051	main	/work/build/sodo.sfc.elf
+/work/build/sort-race.sfc	sort-race	unspecified	ok	$1F5E	$1878	$2000	1766	$9BD7	sr_qsort	/work/build/sort-race.sfc.elf
+/work/build/spaceship.sfc	spaceship	unspecified	ok	$1FA4	$15DA	$2000	2506	$ABF8	qsort	/work/build/spaceship.sfc.elf
+/work/build/speedcap.sfc	speedcap	unspecified	ok	$1F4D	$14AA	$2000	2723	$8081	main	/work/build/speedcap.sfc.elf
+/work/build/spirograph.sfc	spirograph	unspecified	ok	$1FFA	$140C	$2000	3054	$806B	main	/work/build/spirograph.sfc.elf
+/work/build/spirograph.sfc	spirograph	unspecified	ok	$1FFA	$140C	$2000	3054	$806B	main	/work/build/spirograph.sfc.elf
+/work/build/spirograph.sfc	spirograph	unspecified	ok	$1FFA	$140C	$2000	3054	$806B	main	/work/build/spirograph.sfc.elf
+/work/build/spirograph.sfc	spirograph	unspecified	ok	$1FFA	$140C	$2000	3054	$806B	main	/work/build/spirograph.sfc.elf
+/work/build/fuzz-work/chk_a16.sfc	sretrec_sim	+mos-a16 -Os	ok	$1F5C	$0202	$2000	7514	$8138	sr_recur	/work/build/fuzz-work/chk_a16.sfc.elf
+/work/build/fuzz-work/chk_default.sfc	sretrec_sim	default -Os	ok	$1EFF	$0202	$2000	7421	$81A1	sr_recur	/work/build/fuzz-work/chk_default.sfc.elf
+/work/build/fuzz-work/chk_xy16.sfc	sretrec_sim	+mos-xy16 -Os	ok	$1F5C	$0202	$2000	7514	$8138	sr_recur	/work/build/fuzz-work/chk_xy16.sfc.elf
+/work/build/sretrec.sfc	sretrec	unspecified	ok	$1F5A	$03DA	$2000	7040	$8FC1	sr_recur	/work/build/sretrec.sfc.elf
+/work/build/strcmprace.sfc	strcmprace	unspecified	ok	$1FDC	$181C	$2000	1984	$8081	main	/work/build/strcmprace.sfc.elf
+/work/build/tea.sfc	tea	unspecified	ok	$1FF6	$13EC	$2000	3082	$8051	main	/work/build/tea.sfc.elf
+/work/build/trapguard.sfc	trapguard	unspecified	ok	$1FD7	$1524	$2000	2739	$95DE	tg_run	/work/build/trapguard.sfc.elf
+/work/build/trimerge.sfc	trimerge	unspecified	ok	$1FCC	$17E6	$2000	2022	$8081	main	/work/build/trimerge.sfc.elf
+/work/build/truchet.sfc	truchet	unspecified	ok	$1FF9	$17A8	$2000	2129	$806B	main	/work/build/truchet.sfc.elf
+/work/build/truncstair.sfc	truncstair	unspecified	ok	$1FE6	$141C	$2000	3018	$8081	main	/work/build/truncstair.sfc.elf
+/work/build/turtle-vm.sfc	turtle-vm	unspecified	ok	$1FB7	$1722	$2000	2197	$8051	main	/work/build/turtle-vm.sfc.elf
+/work/build/uarteye.sfc	uarteye	unspecified	ok	$1FE7	$15EC	$2000	2555	$8051	main	/work/build/uarteye.sfc.elf
+/work/build/ucmprank.sfc	ucmprank	unspecified	ok	$1FA8	$1A3C	$2000	1388	$AB27	qsort	/work/build/ucmprank.sfc.elf
+/work/build/ulam.sfc	ulam	unspecified	ok	$1FD7	$146A	$2000	2925	$8081	main	/work/build/ulam.sfc.elf
+/work/build/vaprintf.sfc	vaprintf	unspecified	ok	$1FD2	$13F2	$2000	3040	$9556	hud_update	/work/build/vaprintf.sfc.elf
+/work/build/fuzz-work/chk_a16.sfc	vawidth_sim	+mos-a16 -Os	ok	$1FEE	$0202	$2000	7660	$804E	main	/work/build/fuzz-work/chk_a16.sfc.elf
+/work/build/fuzz-work/chk_default.sfc	vawidth_sim	default -Os	ok	$1FEE	$0202	$2000	7660	$804E	main	/work/build/fuzz-work/chk_default.sfc.elf
+/work/build/fuzz-work/chk_xy16.sfc	vawidth_sim	+mos-xy16 -Os	ok	$1FEE	$0202	$2000	7660	$804E	main	/work/build/fuzz-work/chk_xy16.sfc.elf
+/work/build/vawidth.sfc	vawidth	unspecified	ok	$1FEC	$03DA	$2000	7186	$8051	main	/work/build/vawidth.sfc.elf
+/work/build/vlanest.sfc	vlanest	unspecified	ok	$1FB0	$171E	$2000	2194	$9B7A	vn_reduce	/work/build/vlanest.sfc.elf
+/work/build/vlastack.sfc	vlastack	unspecified	ok	$1FC8	$1D62	$2000	614	$98D7	vs_decode	/work/build/vlastack.sfc.elf
+/work/build/wireframe.sfc	wireframe	unspecified	ok	$1FFA	$142C	$2000	3022	$806B	main	/work/build/wireframe.sfc.elf
+/work/build/wireframe.sfc	wireframe	unspecified	ok	$1FFA	$142C	$2000	3022	$806B	main	/work/build/wireframe.sfc.elf
+/work/build/wireframe.sfc	wireframe	unspecified	ok	$1FFA	$142C	$2000	3022	$806B	main	/work/build/wireframe.sfc.elf
+/work/build/wireframe.sfc	wireframe	unspecified	ok	$1FFA	$142C	$2000	3022	$806B	main	/work/build/wireframe.sfc.elf

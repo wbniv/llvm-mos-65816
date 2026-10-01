@@ -19,6 +19,7 @@
 #include "settings.hpp"  // SuperFamicom::configuration — entropy is not on the public Bsnes API
 #include "png_write.h"   // dependency-free RGB8 PNG writer (shared with tools/mandel-render.c)
 #include "task_progress.h"
+#include "stackguard.h"  // soft-stack overlap check (see tools/stackguard.h; needs the patched core)
 
 #if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
 // Interactive-demo input differential (built only by dev/mandel-interactive.sh / dev/mandel-zoom.sh
@@ -361,6 +362,10 @@ int main(int argc, char **argv) {
   const char *png_out = argc > 7 ? argv[7] : nullptr;
   if (len < 1) len = 1;
 
+  // Soft-stack guard: arm the core's WRAM write watch on __rc0/__rc1 before the ROM runs.
+  { std::string sgerr;
+    if (!stackguard::init(rompath, sgerr)) { fprintf(stderr, "jgxcheck: %s\n", sgerr.c_str()); return 2; } }
+
   std::ifstream fs(rompath, std::ios::in | std::ios::binary);
   if (!fs.is_open()) { fprintf(stderr, "jgxcheck: cannot open %s\n", rompath); return 2; }
   game = std::vector<uint8_t>((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
@@ -550,12 +555,27 @@ int main(int argc, char **argv) {
   for (unsigned i = 0; i < len; ++i) got |= (unsigned)wram[off + i] << (8 * i);
 
   int rc = 0;
-  if (got == want) {
-    printf("SMOKE: PASS off=0x%X len=%u got=0x%0*X (ran %d frames, bsnes-jg)\n", off, len, 2 * len, got, frames);
+  // The guard verdict is folded into the SMOKE line itself: the corpus engine and most gates read
+  // only that line, and a value that happens to match must not hide a stack overlap. With no overlap
+  // (or no metadata) every line below is byte-identical to what this harness printed before.
+  const stackguard::Verdict sg = stackguard::finish();
+  const bool sg_overlap = strcmp(sg.status, "overlap") == 0;
+  if (getenv("JGX_STACKGUARD_ONLY")) {
+    if (sg_overlap) { printf("SMOKE: FAIL (%s)\n", sg.summary.c_str()); rc = 4; }
+    else printf("SMOKE: PASS (stackguard only, ran %d frames, bsnes-jg)\n", frames);
+  } else if (got == want) {
+    if (sg_overlap) {
+      printf("SMOKE: FAIL (off=0x%X len=%u got=0x%0*X matched, but %s)\n", off, len, 2 * len, got, sg.summary.c_str());
+      rc = 4;
+    } else {
+      printf("SMOKE: PASS off=0x%X len=%u got=0x%0*X (ran %d frames, bsnes-jg)\n", off, len, 2 * len, got, frames);
+    }
   } else {
-    printf("SMOKE: FAIL off=0x%X len=%u got=0x%0*X want=0x%0*X\n", off, len, 2 * len, got, 2 * len, want);
+    printf("SMOKE: FAIL off=0x%X len=%u got=0x%0*X want=0x%0*X%s%s\n", off, len, 2 * len, got, 2 * len, want,
+           sg_overlap ? " " : "", sg_overlap ? sg.summary.c_str() : "");
     rc = 1;
   }
+  if (sg_overlap) fprintf(stderr, "%s\n", sg.detail.c_str());
 
 #ifdef JGX_VIEW
   // Input differential: replay view.h over the ROM's ground-truth pad log; assert host == ROM.

@@ -102,6 +102,11 @@ tasks:
     cmds:
       - dev/run.sh smoke
 
+  stackguard:
+    desc: "Regression check for the soft-stack overlap guard in build/jgxcheck: the dither -O3 ROM from the soft-stack collision record must fail (231 B), -O2 and a clean ROM must not, plus a synthetic ELF-bounds overlap and the corpus-engine wiring. Needs build/jgxcheck from the patched bsnes-jg core (dev/run.sh xcheck)."
+    cmds:
+      - dev/run.sh stackguard
+
   repro:
     desc: "Clean-room: fresh checkout, then build + smoke inside it (host-side orchestration)"
     cmds:

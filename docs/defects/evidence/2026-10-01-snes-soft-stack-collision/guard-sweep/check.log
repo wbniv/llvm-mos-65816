@@ -1,0 +1,12 @@
+2026-10-01T07:27:12Z ==> stackguard regression check (jgxcheck sha256 04ac88b80f4a2844…, frames=60)
+  PASS  dither -O3 flagged: rc=1, 231 B overlap, min SP $1EC7 < __heap_start $1FAE (value gate also red: got=0x0000)
+  PASS  dither -O3 under JGX_STACKGUARD_ONLY=1: rc=4 (the engine's stack-only run fails on the overlap alone)
+  PASS  JGX_STACKGUARD=0 restores the original harness output (value gate red only, no guard text)
+  PASS  dither -O2: no overlap, margin 82 B (min SP $2000, static end $1FAE)
+  PASS  synthetic VLA overlap (ELF bounds): rc=4 although corpus_result == want; overlaps static data by 124 B
+  PASS  clean program: stdout/stderr/rc byte-identical with the guard on and off (SMOKE: PASS off=0x203 len=2 got=0x1234 (ran 60 frames, bsnes-jg))
+  PASS  torn SP pair ignored: 300 B frame freed 20 times, min SP $1ED4 (a torn epilogue read would show about $1E00)
+  PASS  corpus engine: stackguard off -> PASS, on -> FAIL naming the program and all three configurations
+  PASS  ELF and map bounds agree: ok $2000 $0206 $2000 7674
+  PASS  JGX_STACKGUARD=require with no ELF/map beside the ROM: rc=2
+2026-10-01T07:27:36Z ==> stackguard check: 10 passed, 0 failed

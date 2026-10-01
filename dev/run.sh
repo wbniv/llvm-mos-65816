@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side driver: (re)build the dev image and run a dev/<target>.sh inside it
-# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|lit|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_memops32|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|farbank|farblit|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|vlanest|jtedge|jtsparse|byvaledge|ovmatrix|repro] (default: build)
+# against this repo. Usage: dev/run.sh [build|compile|validate|crt0native|smoke|corpus|dwarf|toolchain|lit|asserts-build|far|far-run|far-bank1|far_indir|far_cast|far_arith|far_store|far_memops|far_memops32|far_call|far_near_call|far_tail|far_fnptr|far_indir_tail|farindex|farbank|farblit|xcheck|xcheck-suite|a16|a16add|a16sub|a16bit|a16imm|a16chain|a16local|a16localx|a16localsub|a16localbit|a16localimm|a16loadfold|a16cmp|a16loop|a16call|a16shift|a16ashift|a16eq|a16scmp|a16abscmp|a16mixfold|a16sunfold|a16chainld|a16chainimm|a16bitchain|a16incdec|a16loopred|a16incabs|a16ptr|a16abs|a16copy|a16spill|a16spillr|a16spillir|a16unmerge|a16eqval|a16eqvalp|a16eqvalg|a16eqvalc|a16eqvalmg|a16ret|a16absidx|a16frameidx|a16indiry|a16cmpidx|a16cmpaudit|a16loadcall|a16s32|a16scavnz|xy16inplace|xy16basic|xy16spill|xy16spillr|xy16ops|xy16indiry|xy16call|known-issues|rcundef|spirograph|n-body|pi|maze|epicycles|legalindexdom|double-pendulum|backtrack|csrjmp|retryjmp|jt256|vlastack|borrowov|bigbyval|dblbridge|bsearchviz|strcmprace|packrec|trapguard|vlanest|jtedge|jtsparse|byvaledge|ovmatrix|stackguard|repro] (default: build)
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -35,6 +35,9 @@ Targets:
              +mos-xy16 on MAME + bsnes-jg (all programs PASS — globals.c's
              regalloc-out-of-registers was fixed in patch 0009, now a positive gate).
              Closes the "corpus only ever built default 8-bit" gap that hid it.
+  stackguard regression check for the soft-stack overlap guard in build/jgxcheck (dev/stackguard-check.sh):
+             the dither -O3 ROM from the soft-stack collision record must fail with a 231 B overlap,
+             the -O2 ROM and a clean ROM must not; needs build/jgxcheck from the patched core (xcheck)
   mandel-shot #321: render the canonical on-SNES Mandelbrot tester ON the SNES
              (examples/snes/mandel-display.c, +mos-a16; far-stored into high WRAM,
              displayed via Mode 7) and capture a REAL emulator screenshot from BOTH cores
@@ -571,6 +574,7 @@ Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for
 Env forwarded into the container (when set): SMOKE_WANT, SMOKE_SETTLE, SNES_ROMPATH,
 MOS_TOOLCHAIN (toolchain install prefix to build the bench with), BUILD_JOBS,
 JG_ONLY (=1 → bsnes-jg-only: skip the MAME leg, used by xcheck-suite / a single test).
+JGX_STACKGUARD / JGX_STACKGUARD_LOG (soft-stack overlap guard in build/jgxcheck: off|require; per-run TSV record).
 USAGE
   exit 0
 fi
@@ -682,6 +686,8 @@ docker run --rm \
   ${STAGE_REL:+-e STAGE_REL} \
   ${JG_ONLY:+-e JG_ONLY} \
   ${JG_FRAMES:+-e JG_FRAMES} \
+  ${JGX_STACKGUARD:+-e JGX_STACKGUARD} \
+  ${JGX_STACKGUARD_LOG:+-e JGX_STACKGUARD_LOG} \
   ${CANARY_ONLY:+-e CANARY_ONLY} \
   ${SNESGFX_CFLAGS:+-e SNESGFX_CFLAGS} \
   ${BENCH_FRAMES:+-e BENCH_FRAMES} \

@@ -1,0 +1,3 @@
+rom.sfc	rom	unspecified	ok	$1EC7	$16AE	$2000	2073	$806B	main	rom.sfc.elf
+rom.sfc	rom	unspecified	ok	$1E9F	$16AE	$2000	2033	$8051	main	rom.sfc.elf
+rom.sfc	rom	unspecified	ok	$1EE9	$16AE	$2000	2107	$806B	main	rom.sfc.elf

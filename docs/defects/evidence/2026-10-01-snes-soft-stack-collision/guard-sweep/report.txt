@@ -1,0 +1,621 @@
+records: 608 (608 measured, 0 skipped/no SP)
+
+ margin  status   program                  config           minSP  end     function@pc
+     76  ok       dither                   unspecified      $1FFA  $1FAE   main@$8051
+    246  ok       msquares                 unspecified      $1FA4  $1EAE   contour_frame@$A289
+    577  ok       lsystem                  unspecified      $1F01  $1CC0   main@$8051
+    614  ok       vlastack                 unspecified      $1FC8  $1D62   vs_decode@$98D7
+    755  ok       packrec                  unspecified      $1FE1  $1CEE   main@$8081
+    767  ok       permscat                 unspecified      $1FE9  $1CEA   main@$8051
+   1060  ok       rdiff                    unspecified      $1F36  $1B12   main@$8067
+   1141  ok       byvaledge                unspecified      $1FDF  $1B6A   main@$8081
+   1265  ok       jt256                    unspecified      $1FE3  $1AF2   main@$8081
+   1388  ok       ucmprank                 unspecified      $1FA8  $1A3C   qsort@$AB27
+   1445  ok       scopeguard               unspecified      $1FD1  $1A2C   main@$8081
+   1497  ok       editdist                 unspecified      $1FCD  $19F4   main@$8051
+   1535  ok       rotslab                  unspecified      $1FE9  $19EA   main@$8051
+   1544  ok       percol                   unspecified      $1FFE  $19F6   main@$8051
+   1766  ok       sort-race                unspecified      $1F5E  $1878   sr_qsort@$9BD7
+   1774  ok       jtsparse                 unspecified      $1FD8  $18EA   main@$8081
+   1872  ok       jtedge                   unspecified      $1FD8  $1888   main@$8081
+   1908  ok       bigbyval                 unspecified      $1FB4  $1840   main@$8081
+   1908  ok       ropeedit                 unspecified      $1FE6  $1872   main@$8081
+   1934  ok       poolfx                   unspecified      $1FFE  $1870   main@$806B
+   1984  ok       strcmprace               unspecified      $1FDC  $181C   main@$8081
+   2022  ok       trimerge                 unspecified      $1FCC  $17E6   main@$8081
+   2049  ok       sbitfld                  unspecified      $1FE9  $17E8   main@$8081
+   2081  ok       life                     unspecified      $1F37  $1716   main@$8051
+   2129  ok       truchet                  unspecified      $1FF9  $17A8   main@$806B
+   2194  ok       vlanest                  unspecified      $1FB0  $171E   vn_reduce@$9B7A
+   2197  ok       turtle-vm                unspecified      $1FB7  $1722   main@$8051
+   2253  ok       gf256                    unspecified      $1FD9  $170C   main@$806B
+   2268  ok       spigot                   unspecified      $1FFE  $1722   main@$8051
+   2283  ok       dblbridge                unspecified      $1FE1  $16F6   main@$8081
+   2286  ok       cardioid                 unspecified      $1FFE  $1710   main@$8051
+   2303  ok       ovmove                   unspecified      $1FE9  $16EA   main@$8051
+   2363  ok       bsearchviz               unspecified      $1FE5  $16AA   main@$8081
+   2379  ok       keycmp64                 unspecified      $1FE9  $169E   main@$8051
+   2386  ok       modexp256                unspecified      $1F5C  $160A   main@$8081
+   2402  ok       backtrack                unspecified      $1FE0  $167E   backtrack_gate_crc@$93E7
+   2476  ok       bhut                     unspecified      $1F82  $15D6   bh_force@$9D5F
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2484  ok       seamdemo                 unspecified      $1FEC  $1638   seamvm_step@$ABDC
+   2489  ok       borrowov                 unspecified      $1FE3  $162A   main@$8081
+   2504  ok       iir-scope                unspecified      $1FFE  $1636   main@$806B
+   2506  ok       spaceship                unspecified      $1FA4  $15DA   qsort@$ABF8
+   2519  ok       irqgate-default          default (inferre $1DC7  $13F0   nmi@$8092
+   2519  ok       irqgate-a16              a16 (inferred fr $1DC7  $13F0   nmi@$8092
+   2519  ok       irqgate-xy16             xy16 (inferred f $1DC7  $13F0   nmi@$8092
+   2519  ok       irqgate-a16              a16 (inferred fr $1DC7  $13F0   nmi@$8092
+   2519  ok       irqgate-a16              a16 (inferred fr $1DC7  $13F0   nmi@$8092
+   2528  ok       mvscrl                   unspecified      $1FFC  $161C   main@$8081
+   2532  ok       satcomet                 unspecified      $1FFE  $161A   main@$8051
+   2555  ok       uarteye                  unspecified      $1FE7  $15EC   main@$8051
+   2564  ok       critters                 unspecified      $1FFC  $15F8   main@$8051
+   2576  ok       perlin                   unspecified      $1FFC  $15EC   main@$8051
+   2578  ok       lzdec                    unspecified      $1FFE  $15EC   main@$8051
+   2638  ok       huffman                  unspecified      $1FFC  $15AE   main@$806B
+   2654  ok       grid3d                   unspecified      $1FF8  $159A   main@$8051
+   2664  ok       n-body                   unspecified      $1FF4  $158C   main@$806B
+   2723  ok       speedcap                 unspecified      $1F4D  $14AA   main@$8081
+   2730  ok       factorial                unspecified      $1FFE  $1554   main@$8051
+   2739  ok       trapguard                unspecified      $1FD7  $1524   tg_run@$95DE
+   2765  ok       borrowlad                unspecified      $1FD5  $1508   main@$8081
+   2766  ok       fft                      unspecified      $1F7A  $14AC   main@$8051
+   2790  ok       isrbracket-a16           a16 (inferred fr $1ED4  $13EE   nmi@$8078
+   2790  ok       isrbracket-a16           a16 (inferred fr $1ED4  $13EE   nmi@$8078
+   2790  ok       isrbracket-a16           a16 (inferred fr $1ED4  $13EE   nmi@$8078
+   2790  ok       isrbracket-xy16          xy16 (inferred f $1ED4  $13EE   nmi@$8078
+   2790  ok       isrbracket-xy16          xy16 (inferred f $1ED4  $13EE   nmi@$8078
+   2790  ok       isrbracket-xy16          xy16 (inferred f $1ED4  $13EE   nmi@$8078
+   2794  ok       isrbracket-default       default (inferre $1ED8  $13EE   nmi@$8078
+   2794  ok       isrbracket-default       default (inferre $1ED8  $13EE   nmi@$8078
+   2794  ok       isrbracket-default       default (inferre $1ED8  $13EE   nmi@$8078
+   2797  ok       oddmask                  unspecified      $1FE5  $14F8   main@$809B
+   2803  ok       medfilt                  unspecified      $1FDF  $14EC   main@$8051
+   2803  ok       pcooker                  unspecified      $1FE1  $14EE   main@$8081
+   2805  ok       nmitally-default         default (inferre $1EE1  $13EC   nmi@$8092
+   2807  ok       nmitally-a16             a16 (inferred fr $1EE3  $13EC   nmi@$8092
+   2807  ok       nmitally-xy16            xy16 (inferred f $1EE3  $13EC   nmi@$8092
+   2807  ok       nmitally-a16             a16 (inferred fr $1EE3  $13EC   nmi@$8092
+   2807  ok       nmitally-a16             a16 (inferred fr $1EE3  $13EC   nmi@$8092
+   2808  ok       brkcop-default           default (inferre $1EE0  $13E8   brk@$8092
+   2810  ok       bitweave                 unspecified      $1FE4  $14EA   main@$8081
+   2810  ok       brkcop-a16               a16 (inferred fr $1EE2  $13E8   brk@$8092
+   2810  ok       brkcop-xy16              xy16 (inferred f $1EE2  $13E8   brk@$8092
+   2810  ok       brkcop-a16               a16 (inferred fr $1EE2  $13E8   brk@$8092
+   2810  ok       brkcop-a16               a16 (inferred fr $1EE2  $13E8   brk@$8092
+   2815  ok       lfsr2                    unspecified      $1FE9  $14EA   main@$8081
+   2857  ok       dpbank-a16               a16 (inferred fr $1ECF  $13A6   nmi@$8092
+   2857  ok       dpbank-xy16              xy16 (inferred f $1ECF  $13A6   nmi@$8092
+   2857  ok       dpbank-a16               a16 (inferred fr $1ECF  $13A6   nmi@$8092
+   2857  ok       dpbank-a16               a16 (inferred fr $1ECF  $13A6   nmi@$8092
+   2858  ok       dpbank-default           default (inferre $1ED0  $13A6   nmi@$8092
+   2889  ok       hull                     unspecified      $1F95  $144C   main@$8051
+   2902  ok       mulov64                  unspecified      $1F8E  $1438   main@$8051
+   2921  ok       qsortviz                 unspecified      $1FC5  $145C   sort_anim_tick@$9AED
+   2925  ok       ulam                     unspecified      $1FD7  $146A   main@$8081
+   2936  ok       bitboard64-default       default (inferre $1F6C  $13F4   main@$8067
+   2945  ok       retryjmp                 unspecified      $1FAB  $142A   rj_work@$9C34
+   2947  ok       csrjmp                   unspecified      $1FD5  $1452   cj_worker@$9C61
+   2956  ok       fenwick                  unspecified      $1FFE  $1472   main@$8067
+   2956  ok       matcascade               unspecified      $1F76  $13EA   main@$8081
+   2958  ok       dctbloom                 unspecified      $1F78  $13EA   main@$8081
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2961  ok       svx2-video-reel          unspecified      $1FD3  $1442   seek_frame@$C097AF
+   2982  ok       harmonograph             unspecified      $1FFE  $1458   main@$8051
+   2984  ok       bitboard64-a16           a16 (inferred fr $1F9C  $13F4   main@$8067
+   2984  ok       bitboard64-xy16          xy16 (inferred f $1F9C  $13F4   main@$8067
+   2993  ok       gouraud                  unspecified      $1F99  $13E8   main@$8051
+   2994  ok       duff                     unspecified      $1FFC  $144A   main@$8051
+   2999  ok       plyoracle                unspecified      $1FAB  $13F4   po_negamax@$9CBA
+   3000  ok       farptrcmp-a16            a16 (inferred fr $1FBC  $1404   main@$8067
+   3006  ok       polyfill                 unspecified      $1FAA  $13EC   draw_frame@$9649
+   3017  ok       ovmatrix                 unspecified      $1FE5  $141C   main@$8081
+   3018  ok       truncstair               unspecified      $1FE6  $141C   main@$8081
+   3020  ok       radix                    unspecified      $1FD8  $140C   main@$8051
+   3022  ok       wireframe                unspecified      $1FFA  $142C   main@$806B
+   3022  ok       wireframe                unspecified      $1FFA  $142C   main@$806B
+   3022  ok       wireframe                unspecified      $1FFA  $142C   main@$806B
+   3022  ok       wireframe                unspecified      $1FFA  $142C   main@$806B
+   3025  ok       smulorbit                unspecified      $1FD9  $1408   main@$8051
+   3028  ok       farptrcmp-xy16           xy16 (inferred f $1FBC  $13E8   main@$8067
+   3038  ok       dhmix                    unspecified      $1FCC  $13EE   main@$8051
+   3040  ok       vaprintf                 unspecified      $1FD2  $13F2   hud_update@$9556
+   3043  ok       sobel                    unspecified      $1FCD  $13EA   main@$8081
+   3047  ok       rangecode                unspecified      $1FDD  $13F6   main@$8081
+   3049  ok       shift64seam-a16          a16 (inferred fr $1FF5  $140C   main@$806B
+   3049  ok       shift64seam-xy16         xy16 (inferred f $1FF5  $140C   main@$806B
+   3051  ok       shift64seam-default      default (inferre $1FF7  $140C   main@$806B
+   3052  ok       cosmzoom                 unspecified      $1FDE  $13F2   main@$8051
+   3052  ok       llabs64-default          default (inferre $1FE8  $13FC   main@$8051
+   3053  ok       adpcm                    unspecified      $1FDF  $13F2   main@$8081
+   3054  ok       mixedwidth-default       default (inferre $1FD8  $13EA   main@$8051
+   3054  ok       spirograph               unspecified      $1FFA  $140C   main@$806B
+   3054  ok       spirograph               unspecified      $1FFA  $140C   main@$806B
+   3054  ok       spirograph               unspecified      $1FFA  $140C   main@$806B
+   3054  ok       spirograph               unspecified      $1FFA  $140C   main@$806B
+   3056  ok       absdiff-a16              a16 (inferred fr $1FEA  $13FA   main@$8051
+   3056  ok       absdiff-xy16             xy16 (inferred f $1FEA  $13FA   main@$8051
+   3057  ok       absdiff-default          default (inferre $1FEB  $13FA   main@$8051
+   3057  ok       funnelkal                unspecified      $1FDD  $13EC   main@$8051
+   3058  ok       montorbit                unspecified      $1FDC  $13EA   main@$8081
+   3058  ok       satcast                  unspecified      $1FDC  $13EA   main@$8081
+   3060  ok       fn-plot                  unspecified      $1FE2  $13EE   fn_eval_factor@$9C05
+   3060  ok       hilbert                  unspecified      $1FE4  $13F0   main@$8051
+   3061  ok       compass                  unspecified      $1FDD  $13E8   main@$8081
+   3061  ok       rotkal                   unspecified      $1FE9  $13F4   main@$806B
+   3062  ok       divclock                 unspecified      $1FE6  $13F0   main@$8051
+   3062  ok       metaball                 unspecified      $1FFE  $1408   main@$8051
+   3062  ok       rotozoom                 unspecified      $1FE0  $13EA   main@$8051
+   3063  ok       llabs64-a16              a16 (inferred fr $1FF3  $13FC   main@$8051
+   3063  ok       llabs64-xy16             xy16 (inferred f $1FF3  $13FC   main@$8051
+   3068  ok       mixedwidth-a16           a16 (inferred fr $1FE6  $13EA   main@$8051
+   3068  ok       mixedwidth-xy16          xy16 (inferred f $1FE6  $13EA   main@$8051
+   3070  ok       seqvm                    unspecified      $1FF2  $13F4   main@$8051
+   3071  ok       crcwall                  unspecified      $1FE9  $13EA   main@$8051
+   3078  ok       bitcensus                unspecified      $1FF4  $13EE   main@$8051
+   3079  ok       farspill-a16             a16 (inferred fr $1FF3  $13EC   main@$8081
+   3079  ok       farspill-xy16            xy16 (inferred f $1FF3  $13EC   main@$8081
+   3081  ok       cgrade                   unspecified      $1FF3  $13EA   grade_step@$946E
+   3082  ok       domcol                   unspecified      $1FF6  $13EC   main@$806B
+   3082  ok       tea                      unspecified      $1FF6  $13EC   main@$8051
+   3083  ok       modethread-a16           a16 (inferred fr $1FF5  $13EA   main@$8081
+   3083  ok       modethread-xy16          xy16 (inferred f $1FF5  $13EA   main@$8081
+   3085  ok       bankwalk-a16             a16 (inferred fr $1FF5  $13E8   main@$8067
+   3085  ok       bankwalk-xy16            xy16 (inferred f $1FF5  $13E8   main@$8067
+   3085  ok       modethread-default       default (inferre $1FF7  $13EA   main@$8081
+   3086  ok       epicycles                unspecified      $1FFE  $13F0   main@$8051
+   3088  ok       nrecip                   unspecified      $1FFC  $13EC   main@$8051
+   3090  ok       crctex                   unspecified      $1FFA  $13E8   main@$8051
+   3090  ok       fabsridge                unspecified      $1FFE  $13EC   main@$8051
+   3090  ok       raycaster                unspecified      $1FFE  $13EC   main@$8051
+   3092  ok       bitshuffle               unspecified      $1FFE  $13EA   main@$8051
+   3094  ok       disbits                  unspecified      $1FFE  $13E8   main@$8051
+   3146  ok       seamdemo-bench           unspecified      $1FF6  $13AC   seamvm_step@$85D3
+   3197  ok       asmisland-default        default (inferre $1FD9  $135C   main@$8081
+   3209  ok       asmisland-a16            a16 (inferred fr $1FE5  $135C   main@$8081
+   3209  ok       asmisland-xy16           xy16 (inferred f $1FE5  $135C   main@$8081
+   3212  ok       double-pendulum          unspecified      $1FF8  $136C   main@$8051
+   3218  ok       cordic                   unspecified      $1FF4  $1362   main@$8067
+   3408  ok       hdr-bloom                unspecified      $1F38  $11E8   main@$8051
+   4078  ok       avalanche                unspecified      $2000  $1012   __do_zero_bss@$8020
+   4235  ok       cpu6502                  unspecified      $1EF7  $0E6C   main@$8051
+   4280  ok       bf-vm                    unspecified      $1FFE  $0F46   main@$806B
+   4318  ok       lzss-gallery             unspecified      $1F98  $0EBA   compress_far@$B932
+   4318  ok       lzss-gallery             unspecified      $1F98  $0EBA   compress_far@$B932
+   4388  ok       doom-fire                unspecified      $1F38  $0E14   main@$806B
+   4493  ok       maze                     unspecified      $1FD3  $0E46   maze_divide@$A079
+   4646  ok       burning-ship             unspecified      $1F38  $0D12   main@$8067
+   5024  ok       lsystem_sim              xy16 -Os         $1F02  $0B62   main@$804E
+   5025  ok       lsystem_sim              a16 -Os          $1F03  $0B62   main@$804E
+   5027  ok       lsystem_sim              default -Os      $1F05  $0B62   main@$804E
+   5198  ok       vlastack_sim             default -Os      $1FE2  $0B94   vs_decode@$8539
+   5198  ok       vlastack_sim             a16 -Os          $1FE2  $0B94   vs_decode@$8656
+   5198  ok       vlastack_sim             xy16 -Os         $1FE2  $0B94   vs_decode@$866B
+   5366  ok       packrec_sim              a16 -Os          $1FFC  $0B06   main@$8064
+   5366  ok       packrec_sim              xy16 -Os         $1FFC  $0B06   main@$8064
+   5367  ok       packrec_sim              default -Os      $1FFD  $0B06   main@$8064
+   5466  ok       maze_sim                 xy16 -Os         $1FD6  $0A7C   maze_divide@$8145
+   5466  ok       maze_sim                 a16 -Os          $1FD6  $0A7C   maze_divide@$8145
+   5466  ok       sodo                     unspecified      $1FBE  $0A64   main@$8051
+   5478  ok       maze_sim                 default -Os      $1FE2  $0A7C   maze_divide@$8137
+   5502  ok       blossom                  unspecified      $2000  $0A82   __do_zero_bss@$8020
+   5526  ok       newton                   unspecified      $1F2C  $0996   main@$8051
+   5750  ok       byvaledge_sim            a16 -Os          $1FFA  $0984   main@$804E
+   5750  ok       byvaledge_sim            xy16 -Os         $1FFA  $0984   main@$804E
+   5753  ok       byvaledge_sim            default -Os      $1FFD  $0984   main@$804E
+   5844  ok       jt256_sim                default -Os      $2000  $092C   __do_zero_bss@$8020
+   5844  ok       jt256_sim                a16 -Os          $2000  $092C   __do_zero_bss@$8020
+   5844  ok       jt256_sim                xy16 -Os         $2000  $092C   __do_zero_bss@$8020
+   5978  ok       mandel-oop               unspecified      $1FF4  $089A   main@$8067
+   6057  ok       multibase                unspecified      $1FE1  $0838   main@$8051
+   6142  ok       buddha                   unspecified      $2000  $0802   __do_zero_bss@$8020
+   6268  ok       mandel-display           unspecified      $2000  $0784   __do_zero_bss@$8020
+   6274  ok       factorial_sim            default -Os      $2000  $077E   __do_zero_bss@$8020
+   6274  ok       factorial_sim            a16 -Os          $2000  $077E   __do_zero_bss@$8020
+   6274  ok       factorial_sim            xy16 -Os         $2000  $077E   __do_zero_bss@$8020
+   6304  ok       pi_sim                   default -Os      $2000  $0760   __do_zero_bss@$8020
+   6304  ok       pi_sim                   a16 -Os          $2000  $0760   __do_zero_bss@$8020
+   6304  ok       pi_sim                   xy16 -Os         $2000  $0760   __do_zero_bss@$8020
+   6378  ok       boids                    unspecified      $1FF2  $0708   main@$8051
+   6386  ok       jtsparse_sim             a16 -Os          $1FF4  $0702   main@$8064
+   6386  ok       jtsparse_sim             xy16 -Os         $1FF4  $0702   main@$8064
+   6390  ok       jtsparse_sim             default -Os      $1FF8  $0702   main@$8064
+   6480  ok       jtedge_sim               a16 -Os          $1FF4  $06A4   main@$804E
+   6480  ok       jtedge_sim               xy16 -Os         $1FF4  $06A4   main@$804E
+   6497  ok       bigbyval_sim             default -Os      $1FBB  $065A   main@$8064
+   6498  ok       bigbyval_sim             xy16 -Os         $1FBC  $065A   main@$8064
+   6498  ok       bigbyval_sim             a16 -Os          $1FBC  $065A   main@$8064
+   6520  ok       jtedge_sim               default -Os      $1FF8  $0680   main@$80F3
+   6571  ok       strcmprace_sim           xy16 -Os         $1FF7  $064C   main@$807E
+   6572  ok       strcmprace_sim           a16 -Os          $1FF8  $064C   main@$8064
+   6576  ok       strcmprace_sim           default -Os      $1FFC  $064C   main@$8064
+   6597  ok       editdist_sim             a16 -Os          $1FCD  $0608   main@$804E
+   6597  ok       editdist_sim             xy16 -Os         $1FCD  $0608   main@$804E
+   6604  ok       editdist_sim             default -Os      $1FD4  $0608   main@$804E
+   6676  ok       1d-ca                    unspecified      $1FFE  $05EA   main@$8067
+   6710  ok       invaders-a16             a16 (inferred fr $1FF8  $05C2   main@$8067
+   6710  ok       invaders-a16             a16 (inferred fr $1FF8  $05C2   main@$8067
+   6710  ok       invaders-a16             a16 (inferred fr $1FF8  $05C2   main@$8067
+   6710  ok       invaders-a16             a16 (inferred fr $1FF8  $05C2   main@$8067
+   6718  ok       invaders                 unspecified      $2000  $05C2   __do_zero_bss@$8020
+   6744  ok       julia                    unspecified      $2000  $05A8   __do_zero_bss@$8020
+   6805  ok       vlanest_sim              a16 -Os          $1FCB  $0536   vn_reduce@$885F
+   6805  ok       vlanest_sim              xy16 -Os         $1FCB  $0536   vn_reduce@$885F
+   6809  ok       vlanest_sim              default -Os      $1FCF  $0536   vn_reduce@$8537
+   6820  ok       dither_sim               a16 -Os          $1EE6  $0442   main@$804E
+   6820  ok       dither_sim               xy16 -Os         $1EE6  $0442   main@$8068
+   6823  ok       dither_sim               default -Os      $1EE9  $0442   main@$8068
+   6869  ok       dblbridge_sim            a16 -Os          $1FE9  $0514   main@$804E
+   6869  ok       dblbridge_sim            xy16 -Os         $1FE9  $0514   main@$804E
+   6878  ok       dblbridge_sim            default -Os      $1FF2  $0514   main@$804E
+   6892  ok       gf256_sim                default -Os      $1FF0  $0504   main@$80D0
+   6892  ok       gf256_sim                a16 -Os          $1FF0  $0504   main@$804E
+   6892  ok       gf256_sim                xy16 -Os         $1FF0  $0504   main@$804E
+   6904  ok       percol_sim               a16 -Os          $1FFE  $0506   main@$804E
+   6904  ok       percol_sim               xy16 -Os         $1FFE  $0506   main@$804E
+   6906  ok       percol_sim               default -Os      $2000  $0506   __do_zero_bss@$8020
+   6910  ok       life_sim                 default -Os      $2000  $0502   __do_zero_bss@$8020
+   6910  ok       life_sim                 a16 -Os          $2000  $0502   __do_zero_bss@$8020
+   6910  ok       life_sim                 xy16 -Os         $2000  $0502   __do_zero_bss@$8020
+   7024  ok       msquares_sim             a16 -Os          $1FB4  $0444   main@$804E
+   7024  ok       msquares_sim             xy16 -Os         $1FB4  $0444   main@$804E
+   7029  ok       backtrack_sim            a16 -Os          $1FFB  $0486   backtrack_gate_crc@$814A
+   7029  ok       backtrack_sim            xy16 -Os         $1FFB  $0486   backtrack_gate_crc@$814A
+   7031  ok       backtrack_sim            default -Os      $1FFD  $0486   backtrack_gate_crc@$814A
+   7035  ok       msquares_sim             default -Os      $1FBF  $0444   main@$804E
+   7038  ok       bhut_sim                 default -Os      $1F6C  $03EE   bh_force@$8740
+   7040  ok       sretrec                  unspecified      $1F5A  $03DA   sr_recur@$8FC1
+   7044  ok       bhut_sim                 xy16 -Os         $1F72  $03EE   bh_force@$87D6
+   7054  ok       bhut_sim                 a16 -Os          $1F7C  $03EE   bh_force@$8802
+   7102  ok       borrowov_sim             default -Os      $2000  $0442   __do_zero_bss@$8020
+   7102  ok       borrowov_sim             a16 -Os          $2000  $0442   __do_zero_bss@$8020
+   7102  ok       extload                  unspecified      $1F98  $03DA   main@$8051
+   7141  ok       perlin_sim               xy16 -Os         $1FE9  $0404   main@$804E
+   7142  ok       perlin_sim               a16 -Os          $1FEA  $0404   main@$804E
+   7144  ok       perlin_sim               default -Os      $1FEC  $0404   main@$804E
+   7150  ok       borrowov_sim             xy16 -Os         $2000  $0412   __do_zero_bss@$8020
+   7166  ok       rdiff_sim                default -Os      $2000  $0402   __do_zero_bss@$8020
+   7166  ok       rdiff_sim                a16 -Os          $2000  $0402   __do_zero_bss@$8020
+   7166  ok       rdiff_sim                xy16 -Os         $2000  $0402   __do_zero_bss@$8020
+   7186  ok       vawidth                  unspecified      $1FEC  $03DA   main@$8051
+   7204  ok       ascast                   unspecified      $1FFE  $03DA   main@$8067
+   7228  ok       truchet_sim              default -Os      $1FFE  $03C2   main@$804E
+   7228  ok       truchet_sim              a16 -Os          $1FFE  $03C2   main@$804E
+   7228  ok       truchet_sim              xy16 -Os         $1FFE  $03C2   main@$804E
+   7235  ok       grid3d_sim               xy16 -Os         $1FF5  $03B2   main@$804E
+   7235  ok       grid3d_sim               a16 -Os          $1FF5  $03B2   main@$804E
+   7237  ok       grid3d_sim               default -Os      $1FF7  $03B2   main@$804E
+   7274  ok       lzss-gallery-bench       unspecified      $1FF6  $038C   benchmark_near_decode@$8857
+   7326  ok       huffman_sim              default -Os      $2000  $0362   __do_zero_bss@$8020
+   7326  ok       huffman_sim              a16 -Os          $2000  $0362   __do_zero_bss@$8020
+   7338  ok       arityfan                 unspecified      $1FF6  $034C   main@$8067
+   7338  ok       arityfan                 unspecified      $1FF6  $034C   main@$8067
+   7348  ok       trapguard_sim            a16 -Os          $1FF2  $033E   tg_run@$82C1
+   7353  ok       trapguard_sim            default -Os      $1FF7  $033E   tg_run@$8267
+   7354  ok       bsearchviz_sim           default -Os      $2000  $0346   __do_zero_bss@$8020
+   7354  ok       bsearchviz_sim           a16 -Os          $2000  $0346   __do_zero_bss@$8020
+   7354  ok       bsearchviz_sim           xy16 -Os         $2000  $0346   __do_zero_bss@$8020
+   7360  ok       trapguard_sim            xy16 -Os         $1FF2  $0332   tg_run@$82C1
+   7400  ok       mandel-double            unspecified      $1FFE  $0316   compute_coarse_row@$9465
+   7416  ok       mandel-float             unspecified      $2000  $0308   __do_zero_bss@$8020
+   7421  ok       sretrec_sim              default -Os      $1EFF  $0202   sr_recur@$81A1
+   7421  ok       sretrec_sim              default -Os      $1EFF  $0202   sr_recur@$81A1
+   7422  ok       doom-fire_sim            a16 -Os          $2000  $0302   __do_zero_bss@$8020
+   7422  ok       doom-fire_sim            default -Os      $2000  $0302   __do_zero_bss@$8020
+   7422  ok       doom-fire_sim            xy16 -Os         $2000  $0302   __do_zero_bss@$8020
+   7422  ok       huffman_sim              xy16 -Os         $2000  $0302   __do_zero_bss@$8020
+   7514  ok       sretrec_sim              a16 -Os          $1F5C  $0202   sr_recur@$8138
+   7514  ok       sretrec_sim              xy16 -Os         $1F5C  $0202   sr_recur@$8138
+   7514  ok       sretrec_sim              +mos-a16 -Os     $1F5C  $0202   sr_recur@$8138
+   7514  ok       sretrec_sim              +mos-xy16 -Os    $1F5C  $0202   sr_recur@$8138
+   7527  ok       fft_sim                  a16 -Os          $1F69  $0202   main@$804E
+   7528  ok       fft_sim                  xy16 -Os         $1F6A  $0202   main@$8068
+   7529  ok       invaders_sim             default -Os      $1F6B  $0202   main@$804E
+   7529  ok       retryjmp_sim             a16 -Os          $1FAD  $0244   rj_work@$8429
+   7530  ok       retryjmp_sim             default -Os      $1FAE  $0244   rj_work@$83A0
+   7532  ok       fft_sim                  default -Os      $1F6E  $0202   main@$804E
+   7541  ok       invaders_sim             a16 -Os          $1F77  $0202   main@$804E
+   7541  ok       invaders_sim             xy16 -Os         $1F77  $0202   main@$804E
+   7552  ok       csrjmp_sim               a16 -Os          $1FEC  $026C   cj_worker@$835A
+   7552  ok       csrjmp_sim               xy16 -Os         $1FEC  $026C   cj_worker@$835A
+   7554  ok       csrjmp_sim               default -Os      $1FEE  $026C   cj_worker@$8325
+   7564  ok       hull_sim                 a16 -Os          $1F8E  $0202   main@$804E
+   7564  ok       hull_sim                 xy16 -Os         $1F8E  $0202   main@$804E
+   7566  ok       extload_sim              default -Os      $1F90  $0202   main@$804E
+   7566  ok       extload_sim              default -Os      $1F90  $0202   main@$804E
+   7575  ok       retryjmp_sim             xy16 -Os         $1FAB  $0214   rj_work@$8475
+   7581  ok       hull_sim                 default -Os      $1F9F  $0202   main@$804E
+   7581  ok       gouraud_sim              a16 -Os          $1F9F  $0202   main@$804E
+   7581  ok       gouraud_sim              xy16 -Os         $1F9F  $0202   main@$804E
+   7582  ok       extload_sim              xy16 -Os         $1FA0  $0202   main@$804E
+   7582  ok       extload_sim              a16 -Os          $1FA0  $0202   main@$804E
+   7582  ok       extload_sim              +mos-a16 -Os     $1FA0  $0202   main@$804E
+   7582  ok       extload_sim              +mos-xy16 -Os    $1FA0  $0202   main@$804E
+   7586  ok       gouraud_sim              default -Os      $1FA4  $0202   main@$804E
+   7589  ok       mandel-double_sim        a16 -Os          $1FD9  $0234   main@$804E
+   7589  ok       mandel-double_sim        xy16 -Os         $1FD9  $0234   main@$804E
+   7593  ok       mandel-double_sim        default -Os      $1FDD  $0234   main@$804E
+   7605  ok       boids_sim                default -Os      $1FF7  $0242   main@$804E
+   7605  ok       boids_sim                a16 -Os          $1FF7  $0242   main@$804E
+   7609  ok       turtle-vm_sim            xy16 -Os         $1FBB  $0202   main@$8051
+   7610  ok       turtle-vm_sim            a16 -Os          $1FBC  $0202   main@$8051
+   7610  ok       fenwick_sim              default -Os      $2000  $0246   __do_zero_bss@$8020
+   7610  ok       fenwick_sim              a16 -Os          $2000  $0246   __do_zero_bss@$8020
+   7614  ok       ca1d_sim                 default -Os      $2000  $0242   __do_zero_bss@$8020
+   7614  ok       ca1d_sim                 a16 -Os          $2000  $0242   __do_zero_bss@$8020
+   7614  ok       ca1d_sim                 xy16 -Os         $2000  $0242   __do_zero_bss@$8020
+   7616  ok       turtle-vm_sim            default -Os      $1FC2  $0202   main@$8051
+   7617  ok       mandel-float_sim         a16 -Os          $1FE7  $0226   main@$804E
+   7617  ok       mandel-float_sim         xy16 -Os         $1FE7  $0226   main@$8068
+   7619  ok       mandel-float_sim         default -Os      $1FE9  $0226   main@$804E
+   7626  ok       harmonograph_sim         default -Os      $2000  $0236   __do_zero_bss@$8020
+   7626  ok       harmonograph_sim         a16 -Os          $2000  $0236   __do_zero_bss@$8020
+   7626  ok       harmonograph_sim         xy16 -Os         $2000  $0236   __do_zero_bss@$8020
+   7626  ok       ovmatrix_sim             a16 -Os          $2000  $0236   __do_zero_bss@$8020
+   7626  ok       ovmatrix_sim             xy16 -Os         $2000  $0236   __do_zero_bss@$8020
+   7628  ok       dhmix_sim                a16 -Os          $1FCE  $0202   main@$804E
+   7628  ok       dhmix_sim                xy16 -Os         $1FCE  $0202   main@$804E
+   7631  ok       julia_sim                xy16 -Os         $1FF5  $0226   main@$804E
+   7631  ok       julia_sim                a16 -Os          $1FF5  $0226   main@$804E
+   7633  ok       julia_sim                default -Os      $1FF7  $0226   main@$804E
+   7637  ok       dhmix_sim                default -Os      $1FD7  $0202   main@$804E
+   7639  ok       vaprintf_sim             a16 -Os          $1FD9  $0202   main@$8068
+   7639  ok       vaprintf_sim             xy16 -Os         $1FD9  $0202   main@$8068
+   7640  ok       vaprintf_sim             default -Os      $1FDA  $0202   main@$8068
+   7640  ok       domcol_sim               a16 -Os          $1FDA  $0202   main@$804E
+   7640  ok       domcol_sim               xy16 -Os         $1FDA  $0202   main@$804E
+   7640  ok       radix_sim                a16 -Os          $1FDA  $0202   main@$804E
+   7640  ok       radix_sim                xy16 -Os         $1FDA  $0202   main@$804E
+   7643  ok       domcol_sim               default -Os      $1FDD  $0202   main@$804E
+   7643  ok       radix_sim                default -Os      $1FDD  $0202   main@$804E
+   7647  ok       medfilt_sim              a16 -Os          $1FE1  $0202   main@$804E
+   7647  ok       medfilt_sim              xy16 -Os         $1FE1  $0202   main@$804E
+   7649  ok       multibase_sim            a16 -Os          $1FE3  $0202   main@$804E
+   7649  ok       multibase_sim            xy16 -Os         $1FE3  $0202   main@$804E
+   7650  ok       rotozoom_sim             a16 -Os          $1FE4  $0202   main@$804E
+   7650  ok       rotozoom_sim             xy16 -Os         $1FE4  $0202   main@$804E
+   7651  ok       fn_plot_sim              default -Os      $1FE5  $0202   fn_eval_factor@$83BD
+   7651  ok       medfilt_sim              default -Os      $1FE5  $0202   main@$804E
+   7652  ok       fn_plot_sim              a16 -Os          $1FE6  $0202   fn_eval_factor@$83C0
+   7652  ok       fn_plot_sim              xy16 -Os         $1FE6  $0202   fn_eval_factor@$83C0
+   7653  ok       hilbert_sim              a16 -Os          $1FE7  $0202   main@$804E
+   7653  ok       hilbert_sim              xy16 -Os         $1FE7  $0202   main@$804E
+   7653  ok       multibase_sim            default -Os      $1FE7  $0202   main@$804E
+   7657  ok       rotozoom_sim             default -Os      $1FEB  $0202   main@$804E
+   7658  ok       setjmp_sim               default -Os      $2000  $0216   __do_zero_bss@$8020
+   7658  ok       setjmp_sim               a16 -Os          $2000  $0216   __do_zero_bss@$8020
+   7658  ok       setjmp_sim               xy16 -Os         $2000  $0216   __do_zero_bss@$8020
+   7659  ok       hilbert_sim              default -Os      $1FED  $0202   main@$804E
+   7660  ok       vawidth_sim              default -Os      $1FEE  $0202   main@$804E
+   7660  ok       vawidth_sim              a16 -Os          $1FEE  $0202   main@$804E
+   7660  ok       vawidth_sim              xy16 -Os         $1FEE  $0202   main@$804E
+   7660  ok       vawidth_sim              +mos-a16 -Os     $1FEE  $0202   main@$804E
+   7660  ok       vawidth_sim              default -Os      $1FEE  $0202   main@$804E
+   7660  ok       vawidth_sim              +mos-xy16 -Os    $1FEE  $0202   main@$804E
+   7662  ok       ovmatrix_sim             default -Os      $2000  $0212   __do_zero_bss@$8020
+   7663  ok       avalanche_sim            a16 -Os          $1FF1  $0202   main@$804E
+   7663  ok       avalanche_sim            xy16 -Os         $1FF1  $0202   main@$804E
+   7663  ok       nmitally_sim             a16 -Os          $1FF1  $0202   main@$804E
+   7663  ok       nmitally_sim             xy16 -Os         $1FF1  $0202   main@$804E
+   7664  ok       arith                    a16 -Os          $2000  $0210   __do_zero_bss@$8020
+   7664  ok       arith                    xy16 -Os         $2000  $0210   __do_zero_bss@$8020
+   7664  ok       structs                  default -Os      $2000  $0210   __do_zero_bss@$8020
+   7664  ok       structs                  xy16 -Os         $2000  $0210   __do_zero_bss@$8020
+   7664  ok       structs                  a16 -Os          $2000  $0210   __do_zero_bss@$8020
+   7664  ok       nmitally_sim             default -Os      $1FF2  $0202   main@$804E
+   7666  ok       arith                    default -Os      $2000  $020E   __do_zero_bss@$8020
+   7666  ok       wire3d_ctrl_sim          default -Os      $1FF4  $0202   main@$804E
+   7667  ok       spiro_ctrl_sim           a16 -Os          $1FF5  $0202   main@$804E
+   7667  ok       spiro_ctrl_sim           xy16 -Os         $1FF5  $0202   main@$804E
+   7667  ok       wire3d_ctrl_sim          a16 -Os          $1FF5  $0202   main@$804E
+   7667  ok       wire3d_ctrl_sim          xy16 -Os         $1FF5  $0202   main@$804E
+   7668  ok       arrays                   default -Os      $1FF8  $0204   main@$8068
+   7668  ok       arrays                   a16 -Os          $1FF8  $0204   main@$8068
+   7668  ok       arrays                   xy16 -Os         $1FF8  $0204   main@$8068
+   7668  ok       spiro_ctrl_sim           default -Os      $1FF6  $0202   main@$804E
+   7669  ok       boids_sim                xy16 -Os         $1FF7  $0202   main@$8064
+   7669  ok       bitcensus_sim            a16 -Os          $1FF7  $0202   main@$804E
+   7669  ok       bitcensus_sim            xy16 -Os         $1FF7  $0202   main@$804E
+   7669  ok       cosmzoom_sim             default -Os      $1FF7  $0202   main@$804E
+   7670  ok       tea_sim                  a16 -Os          $1FF8  $0202   main@$804E
+   7670  ok       tea_sim                  xy16 -Os         $1FF8  $0202   main@$804E
+   7671  ok       cosmzoom_sim             a16 -Os          $1FF9  $0202   main@$804E
+   7671  ok       cosmzoom_sim             xy16 -Os         $1FF9  $0202   main@$804E
+   7672  ok       funcs                    default -Os      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       funcs                    a16 -Os          $2000  $0208   __do_zero_bss@$8020
+   7672  ok       funcs                    xy16 -Os         $2000  $0208   __do_zero_bss@$8020
+   7672  ok       avalanche_sim            default -Os      $1FFA  $0202   main@$804E
+   7672  ok       arityfan_sim             default -Os      $1FF8  $0200   main@$8051
+   7672  ok       arityfan_sim             a16 -Os          $1FF8  $0200   main@$8051
+   7672  ok       arityfan_sim             xy16 -Os         $1FF8  $0200   main@$8051
+   7672  ok       arityfan_sim             +mos-a16 -Os     $1FF8  $0200   main@$8051
+   7672  ok       arityfan_sim             default -Os      $1FF8  $0200   main@$8051
+   7672  ok       arityfan_sim             +mos-xy16 -Os    $1FF8  $0200   main@$8051
+   7672  ok       arityfan_sim             +mos-a16 -Os     $1FF8  $0200   main@$8051
+   7672  ok       arityfan_sim             default -Os      $1FF8  $0200   main@$8051
+   7672  ok       arityfan_sim             +mos-xy16 -Os    $1FF8  $0200   main@$8051
+   7672  ok       cartsize-hirom4          unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom4          unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom4          unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom4          unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom4          unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom4          unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom4          unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom4          unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom6        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom6        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom6        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom6        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom6        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom6        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom6        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom6        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom8        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom8        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom8        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom8        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom8        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom8        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom8        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-exhirom8        unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_slow  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_slow  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_slow  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_slow  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_slow  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_slow  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_slow  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_slow  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom1m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_slow    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-lorom4m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom512k_fast  unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom2m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom2m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom2m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom2m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom2m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom2m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom2m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom2m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7672  ok       cartsize-hirom3m_fast    unspecified      $2000  $0208   __do_zero_bss@$8020
+   7674  ok       bitcensus_sim            default -Os      $1FFC  $0202   main@$804E
+   7676  ok       control                  default -Os      $2000  $0204   __do_zero_bss@$8020
+   7676  ok       control                  a16 -Os          $2000  $0204   __do_zero_bss@$8020
+   7676  ok       control                  xy16 -Os         $2000  $0204   __do_zero_bss@$8020
+   7676  ok       tea_sim                  default -Os      $1FFE  $0202   main@$804E
+   7678  ok       globals                  default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       globals                  a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       globals                  xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       spiro_sim                default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       spiro_sim                a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       spiro_sim                xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       nbody_sim                default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       nbody_sim                a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       nbody_sim                xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       newton_sim               a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       newton_sim               default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       cordic_sim               default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       cordic_sim               a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       newton_sim               xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       cordic_sim               xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       epicycles_sim            default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       epicycles_sim            a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       epicycles_sim            xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       raycaster_sim            default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       raycaster_sim            xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       raycaster_sim            a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       burning-ship_sim         a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       burning-ship_sim         default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       burning-ship_sim         xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       wire3d_sim               default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       wire3d_sim               a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       wire3d_sim               xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       cardioid_sim             default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       cardioid_sim             a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       cardioid_sim             xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       bitshuffle_sim           default -Os      $2000  $0202   __do_zero_bss@$8020
+   7678  ok       bitshuffle_sim           a16 -Os          $2000  $0202   __do_zero_bss@$8020
+   7678  ok       bitshuffle_sim           xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+   7678  ok       fenwick_sim              xy16 -Os         $2000  $0202   __do_zero_bss@$8020
+
+violations: 0
+
+margin histogram (bytes):
+   < 0 (overlap): 0
+            0-63: 0
+          64-255: 2
+        256-1023: 4
+       1024-4095: 195
+         >= 4096: 407

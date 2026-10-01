@@ -35,13 +35,21 @@ BSNES_SHA=a8e0fd36711406198afe1110ddc6960c9d795f4ab73d0badd8878396ac3d0c42
 [ -f "$INSTALL/bin/mos-snes-far.cfg" ] || { echo "FATAL: SDK/snes-far not built (run: MOS_TOOLCHAIN=$BUILD/llvm-mos-install dev/run.sh build)"; exit 1; }
 
 # 1. Fetch (pinned) + build the bsnes-jg core + the jgxcheck harness (cached).
-if [ ! -x "$JGX" ]; then
+# The core carries dev/bsnes-jg-wramwatch.patch (the WRAM write watch the soft-stack guard in
+# jgxcheck needs; docs/defects/snes-soft-stack-static-data-collision.json). A vendor tree or harness
+# built without the patch is rebuilt here.
+core_patched() { grep -q jgx_wram_watch_cb "$VENDOR/src/cpu.cpp" 2>/dev/null; }
+if [ ! -x "$JGX" ] || ! core_patched || [ "$ROOT/dev/jgxcheck.cpp" -nt "$JGX" ] || [ "$ROOT/tools/stackguard.h" -nt "$JGX" ]; then
   if [ ! -d "$VENDOR/src" ]; then
     echo "==> fetch bsnes-jg $BSNES_VER (pinned) into vendor/ (gitignored)"
     mkdir -p "$VENDOR"
     curl -fsSL "https://gitlab.com/jgemu/bsnes/-/archive/$BSNES_VER/bsnes-$BSNES_VER.tar.gz" -o /tmp/bsnes-jg.tgz
     echo "$BSNES_SHA  /tmp/bsnes-jg.tgz" | sha256sum -c -
     tar xzf /tmp/bsnes-jg.tgz -C "$VENDOR" --strip-components=1
+  fi
+  if ! core_patched; then
+    echo "==> apply dev/bsnes-jg-wramwatch.patch to the bsnes-jg core"
+    patch -p1 -d "$VENDOR" < "$ROOT/dev/bsnes-jg-wramwatch.patch"
   fi
   echo "==> build bsnes-jg core (ENABLE_STATIC, no SDL/jg.h) + jgxcheck harness"
   ( cd "$VENDOR" && make ENABLE_STATIC=1 DISABLE_MODULE=1 -j"$(nproc)" >/dev/null )
