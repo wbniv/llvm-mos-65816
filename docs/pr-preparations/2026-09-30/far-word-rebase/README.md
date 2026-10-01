@@ -4,11 +4,11 @@ Prepared September 30, 2026. This packet rebases the [September 28 extracted ser
 
 ## Split series (current)
 
-Status (2026‑10‑01, fourth round): **ready for a final check, not for filing.** Two user decisions changed the third-round series ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#fourth-round-sequence-584-test-the-huc6280-split)). llvm-mos#584 (open; fork patch `0003-late-opt-nongpr-ldimm-dest`) is no longer carried; it files first, and until it lands mosspc700 segfaults in MOS Late Optimizations identically before and after the series. The HuC6280 fix stays in #321‑11, because it is the rule #321‑11 needs for its own compares. The series is #321 ×16, MC ×2, #320 ×9, then this packet's patches 9, 5–8 and 11–14: 36 patches, top `00b68e60d18d` (branch `pkt-r4-far-word`), in [`patches-split/`](patches-split/).
+Status (2026‑10‑01, fourth round): **ready for a final check, not for filing.** Two user decisions changed the third-round series ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#fourth-round-sequence-584-test-the-huc6280-split)). llvm-mos#584 (open; fork patch `0003-late-opt-nongpr-ldimm-dest`) is no longer carried; it files first, and until it lands mosspc700 segfaults in MOS Late Optimizations identically before and after the series. The HuC6280 fix stays in #321‑11, because it is the rule #321‑11 needs for its own compares. The series is #321 ×16, MC ×2, #320 ×9, then this packet's patches 9, 5–8 and 11–14: 36 patches, top `6db94230bf03` (branch `pkt-r5-far-word`; round five added the #321‑11 frame-index test, test-only), in [`patches-split/`](patches-split/).
 
 | Check | Result |
 | --- | --- |
-| Round trip | 36 patches on `06bc967d2668` reproduce every commit tree; final tree `87b0a138ccfe` ([record](evidence/split-series.json); round three: [`split-series-r3.json`](evidence/split-series-r3.json)) |
+| Round trip | 36 patches on `06bc967d2668` reproduce every commit tree; final tree `cf5525839c2c` after round five ([record](evidence/split-series.json); round four: [`split-series-r4.json`](evidence/split-series-r4.json), final `87b0a138ccfe`; round three: [`split-series-r3.json`](evidence/split-series-r3.json)) |
 | Per commit | patches 9, 5, 6, 7, 8, 11, 12, 13, 14: 180, 181, 182, 183, 184, 184, 185, 189, 189 pass, 1 unsupported each ([stages](../split-320-321/evidence/r4/stages.tsv)) |
 | Red/green | 33 red runs fail, 211 green runs pass, 7 characterization runs pass on their parents ([table](../split-320-321/evidence/r4/red-green.tsv)) |
 | Sensitivity | 262 of 262 substitutions rejected ([results](evidence/sensitivity-r4.json)) |

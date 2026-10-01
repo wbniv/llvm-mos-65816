@@ -1,0 +1,31 @@
+test	version	role	llc	result	first_diagnostic
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	red-parent	r3-321-10	FAIL	RUN 2: error: CMP: expected string not found in input
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	red-rule-reverted	r4-probe-321-11-nohunk	FAIL	RUN 2: error: CMP: expected string not found in input
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-321-11	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-321-12	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-321-13	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-321-14	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-321-15	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-321-16	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-mc-1	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-mc-2	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-1a1	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-1a2	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-1a3	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-1b	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-1c	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-1d	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-2	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-3	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-320-4	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-9	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-5	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-6	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-7	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-8	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-11	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-12	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-13	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-fw-14	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-pkt-near-index	PASS	
+CodeGen/MOS/frame-index-displacement.ll	r5-321-11	green	r5-pkt-0065	PASS	

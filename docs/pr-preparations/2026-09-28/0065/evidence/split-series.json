@@ -1,7 +1,7 @@
 {
  "destination": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
- "head": "db92a67164bbb3bdb9c91efbaa572784fdcca0db",
- "final_tree": "04a530515ead8353a2539292b9f97b232bf1f2b2",
+ "head": "24b7c4e8a3a8f6d3621753caa60c0c40234018b9",
+ "final_tree": "09cce81595186b3d8836ce260d2f57606b8d9fb4",
  "all_intermediate_trees_match": true,
  "original_candidate": "75926742e3e13e26a17ef6e7837efb869caec0dc",
  "tree_delta_vs_original_candidate": [
@@ -38,6 +38,7 @@
   "A\tllvm/test/CodeGen/MOS/a16-load-store.ll",
   "A\tllvm/test/CodeGen/MOS/a16-small-add.ll",
   "A\tllvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir",
+  "A\tllvm/test/CodeGen/MOS/frame-index-displacement.ll",
   "A\tllvm/test/CodeGen/MOS/native-spill-copy.mir",
   "A\tllvm/test/CodeGen/MOS/native-width-default-pressure.ll",
   "A\tllvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll",
@@ -49,7 +50,7 @@
   "A\tllvm/test/MC/MOS/brk-signature.s",
   "A\tllvm/test/MC/MOS/index-width-mapping-65816.s"
  ],
- "mos_suites": "PASS=158 UNSUPPORTED=1",
+ "mos_suites": "PASS=159 UNSUPPORTED=1",
  "llc_sha256": "cd9c9cc7997bc5d82c12f89d37d6b2fc7dda232480f272a54cc95ea10f6724fe",
  "series": [
   {
@@ -134,67 +135,67 @@
   },
   {
    "patch": "patches-split/0011-MOS-Select-native-16-bit-compares-and-fused-branches.patch",
-   "commit": "939f9f5fdd0d974aae4999e8d49a1d626398d7a7",
+   "commit": "7ef7cfc86eb3cfb9ad7e6df7aa8a56607b097dc2",
    "subject": "[MOS] Select native 16-bit compares and fused branches",
-   "tree": "a077fd172c1e8051822dff0e78c3a25c7ca77208",
+   "tree": "3d6baf5660a67e5ba87d671d03aadc7eb0521c16",
    "matches_commit_tree": true,
-   "sha256": "8694d05ca4a802ceed1ae824dcdb486fad30d0c72e00280a39c6dea281fb1768"
+   "sha256": "757b5417ff243d1a58ab27b6a181f34e824f3c52c73cda660c8b0495766105d3"
   },
   {
    "patch": "patches-split/0012-MOS-Keep-byte-indexes-byte-wide-in-absolute-indexed-.patch",
-   "commit": "fc7a64f9d59e43c59bbf4fd13fc09af85569d2f2",
+   "commit": "de6252e3f8679315892377e30471476fece56553",
    "subject": "[MOS] Keep byte indexes byte-wide in absolute indexed addressing",
-   "tree": "c7a73ec58ada01be84d594fc1e1a8228ef7903c0",
+   "tree": "18cb0b89578e362d01db5a7e47bc3fe57921af21",
    "matches_commit_tree": true,
-   "sha256": "e54ee3780a9b450889bd3aaa34ae7b085db56f75eecbc8f95f7ad247ab265fdb"
+   "sha256": "5d16fdb475a5da712ed9ee6e17e1916cb29e553ee99e4725a1b22c11b5ff8697"
   },
   {
    "patch": "patches-split/0013-MOS-Require-a-no-wrap-proof-before-folding-near-inde.patch",
-   "commit": "c65a498d87d9e4d90f811699780ec5f461c40b64",
+   "commit": "bb92d09bc1f4519b0f50ef10abc3c3cfdbe881bf",
    "subject": "[MOS] Require a no-wrap proof before folding near indexes on the 65816",
-   "tree": "17a029e8b81d1e9ec74b025728428999ad419393",
+   "tree": "b87259b569a9f76c5b92a211b61ef9f6fc68559a",
    "matches_commit_tree": true,
-   "sha256": "1119f5db28e6564d3e03d6d3f60231ae43afcbaabaaa41243cefbdf1a8f10223"
+   "sha256": "305fe2047296c6e6c6209dee493367610e2f47e98992c01f7767596944378b4e"
   },
   {
    "patch": "patches-split/0014-MOS-Select-16-bit-index-registers-under-mos-xy16.patch",
-   "commit": "3097add174bd835363553452f99d0530745fbb1f",
+   "commit": "fe09b1b43fc7bbd5b513406e64bbe889ce072803",
    "subject": "[MOS] Select 16-bit index registers under +mos-xy16",
-   "tree": "4d14b77eb946cb285255c8f6a4481bed35667efe",
+   "tree": "185174c1bbff76cb2e8e20b86479548ae3fea411",
    "matches_commit_tree": true,
-   "sha256": "4c740c9e8f4b6243265248ba10f28eb438b1b5d5e63e6d0ed11fc46dfb87d02c"
+   "sha256": "049f7c790538b1e994cdce949556b8594ab4c6de5fade9a1f32c3167753abaf7"
   },
   {
    "patch": "patches-split/0015-MOS-Keep-small-8-bit-adds-relocatable-under-mos-a16.patch",
-   "commit": "6c3e03e3ea093b8e30ecfbb2c2078008df585ad0",
+   "commit": "fca866fa6f759b040fa026b834ba59a24e3a8e20",
    "subject": "[MOS] Keep small 8-bit adds relocatable under +mos-a16",
-   "tree": "e82912920de249d1c43961268dbc2a221a44e21a",
+   "tree": "f4cae004411da69d9dd3da77ba40e1ead1d0f44f",
    "matches_commit_tree": true,
-   "sha256": "00a9957a186e143a9badc8db4faf07503cd6a73d770fc8b5c825a1027a0a1de2"
+   "sha256": "b761cb63b7edb5224ae0c6e53f488c66a77bee2c324aabcc2d253b6874be7f71"
   },
   {
    "patch": "patches-split/0016-MOS-Preserve-interrupted-M-X-state-in-65816-interrup.patch",
-   "commit": "2140dc93cb73cd97491143d30caa0ca39733b7d4",
+   "commit": "2387a7c83de466a2d0d45cf02e845cb1d8753369",
    "subject": "[MOS] Preserve interrupted M/X state in 65816 interrupt handlers",
-   "tree": "335fab672f7f35e9a73d5c64498ca93ee3aec5f9",
+   "tree": "036f3906a1978bf74c2c2bd3381f75f5362e3852",
    "matches_commit_tree": true,
-   "sha256": "60e9f9480ac570a649bc698dafa097c50db6ccc25ec516526a553b2c8c5b3b98"
+   "sha256": "f567741ff9583da69373992ed0827228db27c8cf73a809bf3d55bab63cc58fd1"
   },
   {
    "patch": "patches-split/0017-Share-near-byte-stores-with-an-ABI-unit-increment.patch",
-   "commit": "022db5850955174f455f8559512044a64b2ee372",
+   "commit": "2b54bf3af5e61d0a7e98f2e5eb6a118eb0870440",
    "subject": "Share near byte stores with an ABI unit increment",
-   "tree": "793cfe513cdbe6ca83376cee90490aef9356a679",
+   "tree": "0ce747b67865c87ad29416419d8ce4a8e1a2f6fe",
    "matches_commit_tree": true,
-   "sha256": "dc145591d43ed29fe5aca0e43c07b2da2e2326badd12e0dcfebb067eb9eebb05"
+   "sha256": "3c427cb13b14f9c2f48fd3470ae1b4fad9852f44af118a9d3f47365742fd7a8a"
   },
   {
    "patch": "patches-split/0018-Keep-profitable-near-stores-in-byte-registers.patch",
-   "commit": "db92a67164bbb3bdb9c91efbaa572784fdcca0db",
+   "commit": "24b7c4e8a3a8f6d3621753caa60c0c40234018b9",
    "subject": "Keep profitable near stores in byte registers",
-   "tree": "04a530515ead8353a2539292b9f97b232bf1f2b2",
+   "tree": "09cce81595186b3d8836ce260d2f57606b8d9fb4",
    "matches_commit_tree": true,
-   "sha256": "7b0ceaa956bfd8d52b9e4afc85ea2cc32a4d662206b96e97a14d1ba3315d1588"
+   "sha256": "d520020c313d3549101a6a58e582be8c4031fdfcca7279495c33498572c66ce9"
   }
  ]
 }

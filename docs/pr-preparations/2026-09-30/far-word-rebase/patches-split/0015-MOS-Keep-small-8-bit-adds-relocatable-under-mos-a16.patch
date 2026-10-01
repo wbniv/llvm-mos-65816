@@ -1,4 +1,4 @@
-From 6c3e03e3ea093b8e30ecfbb2c2078008df585ad0 Mon Sep 17 00:00:00 2001
+From fca866fa6f759b040fa026b834ba59a24e3a8e20 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 15/36] [MOS] Keep small 8-bit adds relocatable under +mos-a16

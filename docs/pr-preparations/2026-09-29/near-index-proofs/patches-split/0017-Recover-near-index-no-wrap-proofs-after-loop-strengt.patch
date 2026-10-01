@@ -1,4 +1,4 @@
-From 7d6560bd0254d81113517e8b8bacb27bb2801c7f Mon Sep 17 00:00:00 2001
+From 6ddecd0bc6fff44dbed8d2dc905d3731ccfbcd46 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Tue, 29 Sep 2026 19:44:55 +0700
 Subject: [PATCH 17/17] Recover near-index no-wrap proofs after loop strength

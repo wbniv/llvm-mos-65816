@@ -482,3 +482,17 @@ The five criteria from the decision are checked in order: the HuC6280 effect sep
 4. Round trips: split 27 of 27 patches, final tree `dcbb521f6fa6`; far-word 36 patches, final tree `87b0a138ccfe`. PASS.
 5. Replay objects 58 of 58 identical; sensitivity 262 of 262. PASS.
 6. HuC6280 split probe: #321‑11 without the rule passes lit (149, 1 unsupported) and miscompiles `examples_65816_a16frameidx`. Outcome: not clean; kept in #321‑11.
+
+## Fifth round: a lit test for #321‑11's frame-index rule
+
+Added 2026‑10‑01 at the coordinator's request, closing the round-four gap. `llvm/test/CodeGen/MOS/frame-index-displacement.ll` goes into #321‑11, the commit whose code it exercises, and every later commit and packet top is rebuilt with the file added (`git commit-tree` on a temporary index; no other path changes). It has two halves:
+
+- a +mos-a16 stack array compared element by element (reduced from `examples_65816_a16frameidx`), checking `.Lcheck_sstk`, `+2`, `+4`, `+6`;
+- the record's HuC6280 32-byte block copy, checking destinations `.Lfill_sstk` and `+16`.
+
+### Fifth-round verification
+
+1. Red/green: the test fails on #321‑10 ("CMP: expected string not found") and on #321‑11 with the rule reverted (both halves fail there), and passes on #321‑11 and all 27 later commits and packet tops ([table](../pr-preparations/2026-09-30/split-320-321/evidence/r5/red-green.tsv)). PASS.
+2. Per commit, from #321‑11 on (28 builds): all pass with one more test each; every `llc` is byte-identical to the previous round's build of the same code, so default-mode output is unchanged by construction ([stages](../pr-preparations/2026-09-30/split-320-321/evidence/r5/stages.tsv)). PASS.
+3. Round trips: split 27 patches, final tree `e55eaca37612`; far-word 36, `cf5525839c2c`; near-index 17, `926d229a9945`; 0065 18, `09cce8159518`. PASS.
+4. Trees: only `llvm/test/CodeGen/MOS/frame-index-displacement.ll` added; nothing outside `llvm/test/` changes. PASS.

@@ -1,4 +1,4 @@
-From e6c8abdfb85c2430655a04a6c87a3fed5eb450e6 Mon Sep 17 00:00:00 2001
+From 7c02d55143f59a60b0d757afc49ce406157b97d1 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Mon, 28 Sep 2026 19:05:07 +0700
 Subject: [PATCH 34/36] Fold bounded native far word loads in speed-optimized

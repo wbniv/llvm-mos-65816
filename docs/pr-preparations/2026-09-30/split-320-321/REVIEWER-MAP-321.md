@@ -1,6 +1,6 @@
 # Reviewer map: #321 native widths as a 16‑commit series
 
-This series replaces the monolithic patch `340c8ee25d5c` ("Extract opt-in native widths and near-memory prerequisites", 38 files, +5,391). It starts at llvm-mos `06bc967d2668` and ends at the tree of `340c8ee25d5c` plus the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application) (reference commit `0a9dad44a2d9`, tree `778746df6e90`), plus twelve test files the split adds under `llvm/test/` (no other file differs). Patches: [`patches-321/`](patches-321/). Series branch: `split-320-321-r3` in `build/split-320-321/source` (commits `e8441515e009`..`2140dc93cb73`); the third round (2026‑10‑01) rebuilt every commit with review findings N3 and N4 fixed (clang-format of each commit's own C++ lines, history tags removed), which changes only comments and whitespace plus one sorted `#include` ([check](evidence/r3/321-token-equal.txt)). The earlier commits `45bc97d89c6a`..`aa868b952570` stay on branch `split-320-321`.
+This series replaces the monolithic patch `340c8ee25d5c` ("Extract opt-in native widths and near-memory prerequisites", 38 files, +5,391). It starts at llvm-mos `06bc967d2668` and ends at the tree of `340c8ee25d5c` plus the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application) (reference commit `0a9dad44a2d9`, tree `778746df6e90`), plus twelve test files the split adds under `llvm/test/` (no other file differs). Patches: [`patches-321/`](patches-321/). Series branch: `split-320-321-r3` in `build/split-320-321/source` (commits `e8441515e009`..`2387a7c83de4`; round five added frame-index-displacement.ll to #321‑11, which changed the hashes from #321‑11 on and no tree outside `llvm/test/`); the third round (2026‑10‑01) rebuilt every commit with review findings N3 and N4 fixed (clang-format of each commit's own C++ lines, history tags removed), which changes only comments and whitespace plus one sorted `#include` ([check](evidence/r3/321-token-equal.txt)). The earlier commits `45bc97d89c6a`..`aa868b952570` stay on branch `split-320-321`.
 
 Attribution: split by Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort. The extraction credit of the monolithic patch (OpenAI Codex CLI 0.158.0, model gpt-6-astra, xhigh reasoning effort, session `01a0e75a-a9ed-7372-9bac-b19b732a46a2`) is kept in every commit message.
 
@@ -163,15 +163,15 @@ Each entry lists the purpose, the key hunks, the tests and what a reviewer shoul
 - **Tests.** a16-byte-store.ll, a16-indirect-byte-store.ll (store policy of commit 8 with native producers present).
 - **Findings.** N3 and N4 fixed in the third round: 0 clang-format lines and 0 history tags (before: N3 188, N4 8).
 
-### 11. Select native 16-bit compares and fused branches (`939f9f5fdd0d`; before the third round `9b471aa8df06`)
+### 11. Select native 16-bit compares and fused branches (`7ef7cfc86eb3`; before the third round `9b471aa8df06`)
 
 - **Purpose.** Native UGE/ULT via one 16-bit G_SBC; SLT via sign flip; profitable native EQ; fused CmpBr16 pseudos and their expansion; opcode-keyed frame-index displacement; byte sign fill for 16-bit ASHR by bytes.
 - **Key hunks.** `MOSInstrPseudos.td` (CmpBrImag16 … CmpBrImagAbs16); `MOSInstrInfo.cpp` (`getBranchDestBlock`, `analyzeBranch`, `expandPostRAPseudo`, `expandCmpBr16`); `MOSRegisterInfo.cpp` (`eliminateFrameIndex`); `MOSLegalizerInfo.cpp` (`legalizeICmp`, G_ASHR fill); `MOSInstructionSelector.cpp` (CmpNZ16 matchers, `selectBrCondImm`, `foldableIndirLoad16`, `selectSbc16`).
-- **Default effect.** moshuc6280 only, found by the third round's all-CPU check. The opcode-keyed frame-index displacement also changes the HuC6280 `HuCMemcpy` pseudo, whose destination frame index is followed by the block length: upstream used that length as the destination offset (a silent miscompile, [record](../../../defects/mos-huc-blockmove-frameindex-offset.json)), and this commit uses the operand's own offset. Two moshuc6280 inputs of the fixed set change; the other 13 CPUs are identical. The 2026‑06‑19 plan that introduced the change said CmpBrAbsImm16 was the only affected instruction. The HuC6280 part cannot be offered on its own cleanly: it is the same rule this commit needs for CmpBrAbsImm16, and without it the a16frameidx corpus input miscompiles (round four, [probe](evidence/r4/huc-split-probe.txt)). No lit test here covers the rule.
-- **Tests.** a16-immediate-width.ll (also covers commit 2's printing).
+- **Default effect.** moshuc6280 only, found by the third round's all-CPU check. The opcode-keyed frame-index displacement also changes the HuC6280 `HuCMemcpy` pseudo, whose destination frame index is followed by the block length: upstream used that length as the destination offset (a silent miscompile, [record](../../../defects/mos-huc-blockmove-frameindex-offset.json)), and this commit uses the operand's own offset. Two moshuc6280 inputs of the fixed set change; the other 13 CPUs are identical. The 2026‑06‑19 plan that introduced the change said CmpBrAbsImm16 was the only affected instruction. The HuC6280 part cannot be offered on its own cleanly: it is the same rule this commit needs for CmpBrAbsImm16, and without it the a16frameidx corpus input miscompiles (round four, [probe](evidence/r4/huc-split-probe.txt)). Since round five, frame-index-displacement.ll pins the rule: it fails on #321‑10 and on #321‑11 with the rule reverted, and passes from #321‑11 on ([red/green](evidence/r5/red-green.tsv)).
+- **Tests.** a16-immediate-width.ll (also covers commit 2's printing); frame-index-displacement.ll (round five): native compares on a stack array under +mos-a16 read `sstk`, `+2`, `+4`, `+6` (the old rule gave `+4`, `+3`, `+2`, `+1`), and a HuC6280 32-byte constant copy goes to offsets 0 and 16.
 - **Findings.** N3 and N4 fixed in the third round: 0 clang-format lines and 0 history tags (before: N3 125, N4 14).
 
-### 12. Keep byte indexes byte-wide in absolute indexed addressing (`fc7a64f9d59e`; before the third round `497db2760440`)
+### 12. Keep byte indexes byte-wide in absolute indexed addressing (`de6252e3f867`; before the third round `497db2760440`)
 
 - **Purpose.** s8 index used directly; a byte-sized s16 index is truncated and its other users get an explicit `merge(lo, 0)`, with observer notification for CSE.
 - **Key hunks.** `MOSLegalizerInfo.cpp` (`tryAbsoluteIndexedAddressing`).
@@ -180,7 +180,7 @@ Each entry lists the purpose, the key hunks, the tests and what a reviewer shoul
 - **Tests.** zp-byte-index.ll, legalizer-indexed-offset-observer.mir; legalizer.mir updated.
 - **Findings.** N3 and N4 fixed in the third round: 0 clang-format lines and 0 history tags (before: N3 4, N4 0).
 
-### 13. Require a no-wrap proof before folding near indexes on the 65816 (`c65a498d87d9`; before the third round `ef1fdd877206`)
+### 13. Require a no-wrap proof before folding near indexes on the 65816 (`bb92d09bc1f4`; before the third round `ef1fdd877206`)
 
 - **Purpose.** `canFoldNearIndex`: on the 65816 an indexed access carries into DBR, so a near G_PTR_ADD folds only with nuw, nusw with a non-negative offset, or a known-bits bound.
 - **Key hunks.** `MOSLegalizerInfo.cpp` (`canFoldNearIndex`; calls in `tryIndexedAddressing16`, `tryAbsoluteIndexedAddressing`, `selectIndirectAddressing`).
@@ -188,21 +188,21 @@ Each entry lists the purpose, the key hunks, the tests and what a reviewer shoul
 - **Tests.** near-index-nowrap.ll (added): on mos6502 and mosw65816, a plain add (folded only on mos6502), nuw and inbounds non-negative adds (folded on both), a global base (folded only on mos6502) and a constant base bounded by known bits (folded on both).
 - **Findings.** N3 and N4 fixed in the third round: 0 clang-format lines and 0 history tags (before: N3 0, N4 0).
 
-### 14. Select 16-bit index registers under +mos-xy16 (`3097add174bd`; before the third round `a6718b6f6560`)
+### 14. Select 16-bit index registers under +mos-xy16 (`fe09b1b43fc7`; before the third round `a6718b6f6560`)
 
 - **Purpose.** s16 offsets as 16-bit X/Y indexes (B2), Xc16 classification of loads whose users can take X (B1), `selectXY16`, fused `ldy zp; lda/sta (zp),y` pseudos emitted by the assembly printer.
 - **Key hunks.** `MOSInstrGISel.td` (G_*_IDX16); `MOSInstrLogical.td` (LDIndirYIdxFused …); `MOSAsmPrinter.cpp` (`emitInstruction`); `MOSLegalizerInfo.cpp` (`allUsesAreXY16Compatible`, B1/B2 hunks); `MOSInstructionSelector.cpp` (`isXc16Reg`, `isYc16Reg`, `selectXY16`, dispatch).
 - **Tests.** xy16-near-indir-y.ll.
 - **Findings.** N3 and N4 fixed in the third round: 0 clang-format lines and 0 history tags (before: N3 134, N4 7).
 
-### 15. Keep small 8-bit adds relocatable under +mos-a16 (`6c3e03e3ea09`; before the third round `8db2e8118a70`)
+### 15. Keep small 8-bit adds relocatable under +mos-a16 (`fca866fa6f75`; before the third round `8db2e8118a70`)
 
 - **Purpose.** ±2 on an s8 under `+mos-a16` becomes two INC/DEC on Anyi8, avoiding an A-pinned counter that deadlocks allocation around Ac16 transits.
 - **Key hunks.** `MOSInstructionSelector.cpp` (`selectAddSub`).
 - **Tests.** a16-small-add.ll (added): +2 and -2 become `inx; inx` and `dex; dex` under +mos-a16, +3 keeps `adc`, and the default mode keeps `adc` for all three. The allocation failure that motivates the change needs a larger function and is not reproduced by this test.
 - **Findings.** N3 and N4 fixed in the third round: 0 clang-format lines and 0 history tags (before: N3 22, N4 1).
 
-### 16. Preserve interrupted M/X state in 65816 interrupt handlers (`2140dc93cb73`; before the third round `aa868b952570`)
+### 16. Preserve interrupted M/X state in 65816 interrupt handlers (`2387a7c83de4`; before the third round `aa868b952570`)
 
 - **Purpose.** 65816 interrupt prologue/epilogue saves A/X/Y at 16 bits plus DBR and D, establishes M8/X8, D=0, DBR=0; RTI restores P.
 - **Key hunks.** `MOSFrameLowering.cpp` (`emitPrologue`, `emitEpilogue`).

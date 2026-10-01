@@ -1,4 +1,4 @@
-From 939f9f5fdd0d974aae4999e8d49a1d626398d7a7 Mon Sep 17 00:00:00 2001
+From 7ef7cfc86eb3cfb9ad7e6df7aa8a56607b097dc2 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 11/16] [MOS] Select native 16-bit compares and fused branches
@@ -9,9 +9,9 @@ Supporting changes: analyzeBranch accepts compare-branches with two memory opera
 
 Default-mode effect: on moshuc6280 only. The frame-index change also applies to the HuC6280 HuCMemcpy pseudo, whose destination frame index is followed by the block length: upstream used that length as the destination offset, so a block move into a stack object wrote to the wrong place (for example both halves of a 32-byte copy to offset 16; record mos-huc-blockmove-frameindex-offset). The destination now uses its own operand offset. In the fixed input set two moshuc6280 inputs change (examples_snes_cardioid and examples_snes_mvscrl); the other 13 MOS CPUs are identical.
 
-Tests: a16-immediate-width.ll checks `adc #mos16(66)`, `eor #mos16(255)`, the unmarked `adc #43981`, and `cmp #mos16(5)` followed by genuine 8-bit immediates after `sep #32`.
+Tests: a16-immediate-width.ll checks `adc #mos16(66)`, `eor #mos16(255)`, the unmarked `adc #43981`, and `cmp #mos16(5)` followed by genuine 8-bit immediates after `sep #32`. frame-index-displacement.ll pins the frame-index rule: under +mos-a16 a stack array compared element by element reads s[i] at frame + 2*i (with the old rule the compare values were added instead), and on moshuc6280 a 32-byte constant copied to a local array goes to offsets 0 and 16 (with the old rule both block moves wrote offset 16).
 
-Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-immediate-width.ll`.
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-immediate-width.ll llvm/test/CodeGen/MOS/frame-index-displacement.ll`.
 
 Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
 
@@ -25,8 +25,10 @@ Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
  llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 177 +++++++++++-
  llvm/lib/Target/MOS/MOSRegisterInfo.cpp       |  21 +-
  llvm/test/CodeGen/MOS/a16-immediate-width.ll  |  65 +++++
- 7 files changed, 638 insertions(+), 17 deletions(-)
+ .../CodeGen/MOS/frame-index-displacement.ll   |  71 +++++
+ 8 files changed, 709 insertions(+), 17 deletions(-)
  create mode 100644 llvm/test/CodeGen/MOS/a16-immediate-width.ll
+ create mode 100644 llvm/test/CodeGen/MOS/frame-index-displacement.ll
 
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 index 6258c557ff93..517e9e640478 100644
@@ -861,6 +863,83 @@ index 000000000000..6edf13521a41
 +  %r = zext i1 %c to i8
 +  ret i8 %r
 +}
+diff --git a/llvm/test/CodeGen/MOS/frame-index-displacement.ll b/llvm/test/CodeGen/MOS/frame-index-displacement.ll
+new file mode 100644
+index 000000000000..ee4917da79ad
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/frame-index-displacement.ll
+@@ -0,0 +1,71 @@
++; RUN: split-file %s %t
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %t/compare.ll -o - | FileCheck %s --check-prefix=CMP
++; RUN: llc -mtriple=mos -mcpu=moshuc6280 -O2 -verify-machineinstrs %t/blockmove.ll -o - | FileCheck %s --check-prefix=HUC
++
++; eliminateFrameIndex takes a frame index's displacement from the operand's own
++; offset, except for the stack pseudos that carry it in a separate immediate.
++; Two instructions have an unrelated immediate right after a frame index:
++; CmpBrAbsImm16 (the compare value) and HuCMemcpy (the block length). Taking
++; that immediate as the displacement reads the wrong stack slot.
++
++; A stack array compared element by element under +mos-a16: each load-compare-
++; branch folds into CmpBrAbsImm16 and must read s[i] at frame + 2*i.
++; CMP-LABEL: check:
++; CMP:      lda .Lcheck_sstk{{$}}
++; CMP-NEXT: cmp #mos16(4)
++; CMP:      lda .Lcheck_sstk+2{{$}}
++; CMP-NEXT: cmp #mos16(3)
++; CMP:      lda .Lcheck_sstk+4{{$}}
++; CMP-NEXT: cmp #mos16(2)
++; CMP:      lda .Lcheck_sstk+6{{$}}
++; CMP-NEXT: cmp #mos16(1)
++
++; A 32-byte constant copied into a local array on HuC6280: two 16-byte TII
++; block moves, to the array's offsets 0 and 16.
++; HUC-LABEL: fill:
++; HUC:      tii .L__const.fill.line,.Lfill_sstk,#16
++; HUC-NEXT: tii .L__const.fill.line+16,.Lfill_sstk+16,#16
++
++;--- compare.ll
++declare void @fill6(ptr)
++
++define i16 @check() norecurse {
++entry:
++  %s = alloca [6 x i16], align 1
++  call void @fill6(ptr %s)
++  %v0 = load i16, ptr %s, align 1
++  %c0 = icmp eq i16 %v0, 4
++  br i1 %c0, label %b1, label %fail
++b1:
++  %p1 = getelementptr inbounds i16, ptr %s, i16 1
++  %v1 = load i16, ptr %p1, align 1
++  %c1 = icmp eq i16 %v1, 3
++  br i1 %c1, label %b2, label %fail
++b2:
++  %p2 = getelementptr inbounds i16, ptr %s, i16 2
++  %v2 = load i16, ptr %p2, align 1
++  %c2 = icmp eq i16 %v2, 2
++  br i1 %c2, label %b3, label %fail
++b3:
++  %p3 = getelementptr inbounds i16, ptr %s, i16 3
++  %v3 = load i16, ptr %p3, align 1
++  %c3 = icmp eq i16 %v3, 1
++  br i1 %c3, label %ok, label %fail
++ok:
++  ret i16 17185
++fail:
++  ret i16 0
++}
++
++;--- blockmove.ll
++@__const.fill.line = private unnamed_addr constant [32 x i8] c"0123456789abcdefghijklmnopqrstuv", align 1
++declare void @use(ptr)
++
++define void @fill() norecurse {
++  %line = alloca [32 x i8], align 1
++  call void @llvm.memcpy.p0.p0.i16(ptr align 1 %line, ptr align 1 @__const.fill.line, i16 32, i1 false)
++  call void @use(ptr %line)
++  ret void
++}
++
++declare void @llvm.memcpy.p0.p0.i16(ptr noalias writeonly, ptr noalias readonly, i16, i1 immarg)
 -- 
 2.53.0
 

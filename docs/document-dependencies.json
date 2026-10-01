@@ -86,14 +86,14 @@
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
           "docs/defects/mos-far-access-non-65816.json": "552b6483adfedf17890efc86ef069432227360cc96ee1188e8abda15206d0b3f",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "07f335500f42673c0eca96ed83e4fd40db8e5cd500971efcb72fbf6bc74a2087",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "8f53dcac3d5ebf1a9782c0322ce26b4346244d6c2ea4e03e4f2148288bb01224",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "5c6940877e86b81992f2c0e3c109ce3fdf3192f417d4ecd2cdf5c66b8f1db00b",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "2723962e3606e07e617c4ebcfde823d3505d9168d4d87cf397d1b9e2a9439cd8",
           "docs/defects/mos-far-memop-length-truncation.json": "91f4fe1cc38b07aae2f03652fd45de84fd39bd23a2a90a80fd902c2949ade72d",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "bc62029675d6c745522a7f2dd823787379dd57877591b659d93f2dfb83695669",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
-          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "b8a79eb94eb3ff21937c03ef59ebe63b2da7556022756917c413eef17461d6e3",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "701adc983c0e2576dd2f27ab91501d841429cc2874d9d0a7da747e0508b0c563",
           "docs/defects/mos-imag32-reserved-pair-units.json": "77c4e9eae0f1b77813cc9be6ac34a5e9a8ea290f0a7c4b3e9c1495f25c178ab4",
           "docs/defects/mos-late-opt-nongpr-ldimm.json": "e2b9fba49bc40de689a68ff6c135fd5372f6a675de9fbf89ed62b237afc5090c",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "80663f5d8e17cf3203aba58c8dfa8e86a98cc3f45c4f1e6caee514ed44b8853a",
@@ -120,7 +120,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "91cd70ef3be8c79e5d4c8ae8317995240c7564212c49eb6bf0b5f685f4aa3e66"
+          "docs/upstream-dashboard.json": "5c9934874864adf8037f332f9fe04ae93e1fd59d009117feb89328d283c62352"
         }
       }
     },
@@ -143,11 +143,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "ec9ee742a7bd38619272faefbe4b06d85b6372b8a7fc8a34fe4b9c6313dd35a5",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "91cd70ef3be8c79e5d4c8ae8317995240c7564212c49eb6bf0b5f685f4aa3e66",
+          "docs/upstream-dashboard.json": "5c9934874864adf8037f332f9fe04ae93e1fd59d009117feb89328d283c62352",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "2c63a3b667dd26f2495db441530db78b864fd99639f0a23a98ac6e4f6bf7e0ae"
+          "docs/upstream-dashboard-graph.json": "529d63c09f2c2c2727aa70870c180c154bcfeed9115ce2df32e491c032922eda"
         }
       }
     },
@@ -315,14 +315,14 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "e389aadcd8cb0d7e9c9dbdaac4e47e7ae43c6f1e67150524ae353e2648994ce6",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "9fcfad8f8abc6816c193e6a9df23a8a28cda022d0167ce7ab7488578ef2266e9",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
-          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "b7dac5fc4e1eef0548a3267245e50e1aec1c03e7cecfd86f2d11de3c315911d0",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "126b8f5d6256ab20b079953a11ca9e4d399c73904b78d437ce860ceaf9cc7531",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
           "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
@@ -369,10 +369,10 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
         },
-        "reviewed_at": "2026-10-01T13:07:11.771169+00:00",
-        "note": "NOT reviewed or edited by this agent (the coordinator maintains TODO.md). Round four changed the summaries of mos-late-opt-nongpr-ldimm (#584 sequenced, not carried), mos-huc-blockmove-frameindex-offset (split not clean; stays in #321-11) and the resolution of mos-far-fold-dangling-dbg-sites (round-four hashes).",
+        "reviewed_at": "2026-10-01T14:52:30.371508+00:00",
+        "note": "NOT reviewed or edited by this agent (the coordinator maintains TODO.md). Round five touched the summaries of mos-huc-blockmove-frameindex-offset (now has a lit test in #321-11) and the resolution of mos-far-fold-dangling-dbg-sites (round-five hashes), and the 0065 README.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -416,14 +416,14 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "e389aadcd8cb0d7e9c9dbdaac4e47e7ae43c6f1e67150524ae353e2648994ce6",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "9fcfad8f8abc6816c193e6a9df23a8a28cda022d0167ce7ab7488578ef2266e9",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
-          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "b7dac5fc4e1eef0548a3267245e50e1aec1c03e7cecfd86f2d11de3c315911d0",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "126b8f5d6256ab20b079953a11ca9e4d399c73904b78d437ce860ceaf9cc7531",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
           "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
@@ -462,10 +462,10 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
         },
-        "reviewed_at": "2026-10-01T13:03:53.795926+00:00",
-        "note": "Reviewed for round four: #584 is sequenced (files first, not carried by the series) and the HuC6280 fix stays in #321-11; both lines updated, matching the changed defect-record summaries.",
+        "reviewed_at": "2026-10-01T14:50:51.961305+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -509,14 +509,14 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
-          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "e389aadcd8cb0d7e9c9dbdaac4e47e7ae43c6f1e67150524ae353e2648994ce6",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "9fcfad8f8abc6816c193e6a9df23a8a28cda022d0167ce7ab7488578ef2266e9",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
-          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "b7dac5fc4e1eef0548a3267245e50e1aec1c03e7cecfd86f2d11de3c315911d0",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "126b8f5d6256ab20b079953a11ca9e4d399c73904b78d437ce860ceaf9cc7531",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
           "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
@@ -555,10 +555,10 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
         },
-        "reviewed_at": "2026-10-01T13:03:53.808609+00:00",
-        "note": "Reviewed for round four: #584 is sequenced (files first, not carried by the series) and the HuC6280 fix stays in #321-11; both lines updated, matching the changed defect-record summaries.",
+        "reviewed_at": "2026-10-01T14:50:51.969762+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -720,10 +720,10 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
         },
-        "reviewed_at": "2026-10-01T07:31:26.135735+00:00",
-        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "reviewed_at": "2026-10-01T14:50:52.924103+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -1004,11 +1004,11 @@
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-10-01T07:31:32.508173+00:00",
-        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "reviewed_at": "2026-10-01T14:50:57.008281+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -1492,11 +1492,11 @@
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-10-01T07:31:34.075857+00:00",
-        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "reviewed_at": "2026-10-01T14:50:58.007225+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -1521,10 +1521,10 @@
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
         },
-        "reviewed_at": "2026-10-01T07:31:34.327379+00:00",
-        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "reviewed_at": "2026-10-01T14:50:58.125648+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -1734,12 +1734,12 @@
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5"
         },
-        "reviewed_at": "2026-10-01T07:29:21.318213+00:00",
-        "note": "Reviewed against the third-round records (late-opt #584, HuC6280 block move, SPC700 hint, far-fold closure) and the 0065 replay onto the rebuilt #321; pending-work and contribution status gained a third-round line and #584 row text; the curation nextStep for #320/#321 was stale and is updated; the 0065 README gained a third-round paragraph.",
+        "reviewed_at": "2026-10-01T14:50:58.808692+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -2499,7 +2499,8 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-identity.json": "24f2aea2481100a84a88b6edfc1d10880afd9a58e217ba8776313902c6ef95e2",
           "docs/pr-preparations/2026-09-28/0065/evidence/series.json": "4e73fa3210ef23f059256a82b3487b5c24d46b9c8468b5f0b30de8648ca70c62",
           "docs/pr-preparations/2026-09-28/0065/evidence/split-series-before-r3.json": "e88e4ede03d765510ffd49ad3e8d7a8557c96231fab7021e908eaf42c7037e47",
-          "docs/pr-preparations/2026-09-28/0065/evidence/split-series.json": "ae2666bebd847af93fa2aa64f0f0e27105078281bff6a5f2c7d8b5bd761e2b13",
+          "docs/pr-preparations/2026-09-28/0065/evidence/split-series-r3.json": "ae2666bebd847af93fa2aa64f0f0e27105078281bff6a5f2c7d8b5bd761e2b13",
+          "docs/pr-preparations/2026-09-28/0065/evidence/split-series.json": "8562c694b30902518518918c537aff2466c0a555ffac587d203c204d833ebbd2",
           "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
@@ -2518,8 +2519,8 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSRegisterInfo.td.txt": "a96ed543ff671dfb59a66d55756681fddc48342c5ea987a09d12d7c02e4e76c9",
           "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSTargetMachine.cpp.txt": "a10b1fe04db6fb3f33f502e62e1f653543ac1e5e9188c824e1234e0e5b4ce3ba"
         },
-        "reviewed_at": "2026-10-01T07:29:24.366965+00:00",
-        "note": "Reviewed against the third-round records (late-opt #584, HuC6280 block move, SPC700 hint, far-fold closure) and the 0065 replay onto the rebuilt #321; pending-work and contribution status gained a third-round line and #584 row text; the curation nextStep for #320/#321 was stale and is updated; the 0065 README gained a third-round paragraph.",
+        "reviewed_at": "2026-10-01T14:51:00.188127+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -2533,13 +2534,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
           "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4"
         },
-        "reviewed_at": "2026-10-01T07:31:35.014732+00:00",
-        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "reviewed_at": "2026-10-01T14:51:00.546249+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },
@@ -2550,10 +2551,10 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/0065/README.md": "607e73050a45ce4d43f80fbeaf1844841b54b2085309dbd22ceb183e2a202440"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
         },
-        "reviewed_at": "2026-10-01T07:31:35.014802+00:00",
-        "note": "Reviewed: the only source change from this work is the 0065 README's third-round paragraph (0065 replayed onto the N3/N4-rebuilt #321, same code). These documents cite 0065 or the split by link and dated status lines only; nothing they state changes, so no edit.",
+        "reviewed_at": "2026-10-01T14:51:00.546311+00:00",
+        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
         "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
       }
     },

@@ -1,4 +1,4 @@
-From df2318f4252a44dda603c7a38b5c274ccc10c45d Mon Sep 17 00:00:00 2001
+From 7176948f3544158724668f294a480d3f8b4960cb Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
 Subject: [PATCH 7/9] [MOS] Legalize and select far pointer values and memory
