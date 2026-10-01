@@ -1,0 +1,330 @@
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.h b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+index 78fe70d..c984940 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.h
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+@@ -45,6 +45,13 @@ class MOSRegisterInfo : public MOSGenRegisterInfo {
+ 
+   bool hasNativePressureSets() const;
+ 
++  // Without native widths, one appended pressure set models the accumulator;
++  // see getNumRegPressureSets. Fixed at construction, like
++  // AppendNativePressureSets. Lists as for the native sets.
++  const bool AppendAccumulatorPressureSet;
++  SmallVector<SmallVector<int, 8>, 0> AccumClassPSets;
++  SmallVector<SmallVector<int, 8>, 0> AccumUnitPSets;
++
+ public:
+   MOSRegisterInfo(const MOSSubtarget &STI, CodeGenOptLevel OptLevel);
+ 
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index 51de823..e1a2521 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -64,7 +64,8 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
+                          /*PC=*/0, /*HwMode=*/0),
+       STI(STI), Imag8SymbolNames(new std::string[getNumRegs()]),
+       Reserved(getNumRegs()),
+-      AppendNativePressureSets(OptLevel != CodeGenOptLevel::Aggressive) {
++      AppendNativePressureSets(OptLevel != CodeGenOptLevel::Aggressive),
++      AppendAccumulatorPressureSet(true) {
+   for (unsigned Reg : seq(0u, getNumRegs())) {
+     // Pointers are referred to by their low byte in the addressing modes that
+     // use them.
+@@ -144,6 +145,28 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
+   for (auto &L : NativeUnitPSets)
+     if (!L.empty())
+       L.push_back(-1);
++
++  // The accumulator set: the units of A16 count toward it, and so does each
++  // class whose registers all lie within A16 (Ac and Ac16).
++  AccumClassPSets.resize(getNumRegClasses());
++  AccumUnitPSets.resize(getNumRegUnits());
++  if (AppendAccumulatorPressureSet) {
++    for (MCRegUnit Unit : regunits(MOS::A16)) {
++      auto &L = AccumUnitPSets[static_cast<unsigned>(Unit)];
++      L = Generated(MOSGenRegisterInfo::getRegUnitPressureSets(Unit));
++      L.append({NumGenerated, -1});
++    }
++    for (unsigned ID = 0; ID < getNumRegClasses(); ++ID) {
++      const TargetRegisterClass *RC = getRegClass(ID);
++      if (!RC->getNumRegs() || !all_of(*RC, [&](MCPhysReg Reg) {
++            return isSubRegisterEq(MOS::A16, Reg);
++          }))
++        continue;
++      auto &L = AccumClassPSets[ID];
++      L = Generated(MOSGenRegisterInfo::getRegClassPressureSets(RC));
++      L.append({NumGenerated, -1});
++    }
++  }
+ }
+ 
+ // Register pressure under native widths.
+@@ -158,19 +181,32 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
+ // that contains it count toward the same set, so the heuristics see that an
+ // 8-bit value live across a 16-bit one competes for the same physical
+ // register. That saves code size but costs cycles, so -O3 leaves it out.
++//
++// Without native widths, one set is appended instead: the accumulator, with
++// a limit of 1, because the 8-bit accumulator holds one value. The generated
++// sets count A only in GPR_LSB, together with X, Y and the flags, so without
++// it the pressure heuristics cannot see that a second live accumulator value
++// has to be copied out. MachineLICM then hoists values into A across loops,
++// and the scheduler lets accumulator values overlap. The MOS scheduler's
++// computed-carry model (MOSSchedStrategy) is tuned together with this set:
++// keeping accumulator pressure low interleaves multi-byte arithmetic, and
++// the carry model keeps the computed carries of those chains from
++// overlapping.
+ bool MOSRegisterInfo::hasNativePressureSets() const { return STI.hasAccum16(); }
+ 
+ unsigned MOSRegisterInfo::getNumRegPressureSets() const {
+   unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
+-  return hasNativePressureSets() && AppendNativePressureSets
+-             ? N + std::size(NativePressureRegs)
+-             : N;
++  if (!hasNativePressureSets())
++    return AppendAccumulatorPressureSet ? N + 1 : N;
++  return AppendNativePressureSets ? N + std::size(NativePressureRegs) : N;
+ }
+ 
+ const char *MOSRegisterInfo::getRegPressureSetName(unsigned Idx) const {
+   unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
+   if (Idx < N)
+     return MOSGenRegisterInfo::getRegPressureSetName(Idx);
++  if (!hasNativePressureSets())
++    return "Accumulator";
+   return getName(NativePressureRegs[Idx - N]);
+ }
+ 
+@@ -179,6 +215,8 @@ unsigned MOSRegisterInfo::getRegPressureSetLimit(const MachineFunction &MF,
+   unsigned N = MOSGenRegisterInfo::getNumRegPressureSets();
+   if (Idx < N)
+     return MOSGenRegisterInfo::getRegPressureSetLimit(MF, Idx);
++  if (!hasNativePressureSets())
++    return 1;
+   auto Units = regunits(NativePressureRegs[Idx - N]);
+   return std::distance(Units.begin(), Units.end());
+ }
+@@ -189,6 +227,10 @@ MOSRegisterInfo::getRegClassPressureSets(const TargetRegisterClass *RC) const {
+     const auto &L = NativeClassPSets[RC->getID()];
+     if (!L.empty())
+       return L.data();
++  } else {
++    const auto &L = AccumClassPSets[RC->getID()];
++    if (!L.empty())
++      return L.data();
+   }
+   return MOSGenRegisterInfo::getRegClassPressureSets(RC);
+ }
+@@ -198,6 +240,10 @@ const int *MOSRegisterInfo::getRegUnitPressureSets(MCRegUnit RegUnit) const {
+     const auto &L = NativeUnitPSets[static_cast<unsigned>(RegUnit)];
+     if (!L.empty())
+       return L.data();
++  } else {
++    const auto &L = AccumUnitPSets[static_cast<unsigned>(RegUnit)];
++    if (!L.empty())
++      return L.data();
+   }
+   return MOSGenRegisterInfo::getRegUnitPressureSets(RegUnit);
+ }
+diff --git a/llvm/test/CodeGen/MOS/accumulator-pressure-set.ll b/llvm/test/CodeGen/MOS/accumulator-pressure-set.ll
+new file mode 100644
+index 0000000..4e372a4
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/accumulator-pressure-set.ll
+@@ -0,0 +1,76 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs < %s | FileCheck %s
++
++; Without native widths, MOS appends a pressure set for the accumulator with a
++; limit of 1. The generated sets count A only in GPR_LSB, with X, Y and the
++; flags. Without the accumulator set, MachineLICM hoists the round constants of
++; this TEA loop across it and the scheduler lets accumulator values overlap:
++; 4 or 5 more stack spills and a saved carry (bcs/bcc). With the set, the
++; scheduler keeps accumulator values apart, and the computed-carry model keeps
++; the carries of the resulting chains from overlapping, so no carry is saved.
++; (The TEA encipher loop of examples/65816/tea.h, as clang -Os emits it.)
++
++; CHECK-LABEL: tea:
++; CHECK-NOT:     {{bcc|bcs}}
++; CHECK-COUNT-9: Folded Spill
++; CHECK-NOT:     Folded Spill
++; CHECK-NOT:     {{bcc|bcs}}
++; CHECK:         rts
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++@corpus_result = global i16 0, align 1
++
++define i16 @tea() #0 {
++  br label %1
++
++1:
++  %2 = phi i16 [ 0, %0 ], [ %36, %31 ]
++  %3 = phi i16 [ 0, %0 ], [ %35, %31 ]
++  %4 = zext nneg i16 %2 to i32
++  %5 = or disjoint i16 %2, 8
++  %6 = zext nneg i16 %5 to i32
++  br label %7
++
++7:
++  %8 = phi i8 [ 0, %1 ], [ %29, %7 ]
++  %9 = phi i32 [ 0, %1 ], [ %12, %7 ]
++  %10 = phi i32 [ %6, %1 ], [ %28, %7 ]
++  %11 = phi i32 [ %4, %1 ], [ %20, %7 ]
++  %12 = add i32 %9, -1640531527
++  %13 = shl i32 %10, 4
++  %14 = add i32 %13, 19088743
++  %15 = add i32 %12, %10
++  %16 = lshr i32 %10, 5
++  %17 = add nuw nsw i32 %16, -1985229329
++  %18 = xor i32 %14, %15
++  %19 = xor i32 %18, %17
++  %20 = add i32 %19, %11
++  %21 = shl i32 %20, 4
++  %22 = add i32 %21, -19088744
++  %23 = add i32 %20, %12
++  %24 = xor i32 %22, %23
++  %25 = lshr i32 %20, 5
++  %26 = add nuw nsw i32 %25, 1985229328
++  %27 = xor i32 %24, %26
++  %28 = add i32 %27, %10
++  %29 = add nuw nsw i8 %8, 1
++  %30 = icmp eq i8 %29, 32
++  br i1 %30, label %31, label %7
++
++31:
++  %32 = tail call i16 @llvm.fshl.i16(i16 %3, i16 %3, i16 1)
++  %33 = xor i32 %28, %20
++  %34 = trunc i32 %33 to i16
++  %35 = xor i16 %32, %34
++  %36 = add nuw nsw i16 %2, 1
++  %37 = icmp eq i16 %36, 8
++  br i1 %37, label %38, label %1
++
++38:
++  ret i16 %35
++}
++
++declare i16 @llvm.fshl.i16(i16, i16, i16)
++
++attributes #0 = { nounwind optsize }
+diff --git a/llvm/test/CodeGen/MOS/char-stats.ll b/llvm/test/CodeGen/MOS/char-stats.ll
+index 23d85c8..3017df4 100644
+--- a/llvm/test/CodeGen/MOS/char-stats.ll
++++ b/llvm/test/CodeGen/MOS/char-stats.ll
+@@ -52,15 +52,16 @@ define void @char_stats() local_unnamed_addr #0 {
+ ; NMOS-NEXT:    ; in Loop: Header=BB0_2 Depth=1
+ ; NMOS-NEXT:    asl
+ ; NMOS-NEXT:    sta __rc2
+-; NMOS-NEXT:    lda __rc22
+-; NMOS-NEXT:    rol
+-; NMOS-NEXT:    sta __rc3
++; NMOS-NEXT:    ldx __rc22
++; NMOS-NEXT:    stx __rc3
++; NMOS-NEXT:    rol __rc3
+ ; NMOS-NEXT:    clc
+ ; NMOS-NEXT:    lda __rc0
++; NMOS-NEXT:    ldx __rc1
+ ; NMOS-NEXT:    clc
+ ; NMOS-NEXT:    adc __rc2
+ ; NMOS-NEXT:    sta __rc2
+-; NMOS-NEXT:    lda __rc1
++; NMOS-NEXT:    txa
+ ; NMOS-NEXT:    adc __rc3
+ ; NMOS-NEXT:    sta __rc3
+ ; NMOS-NEXT:    ldy #0
+@@ -134,15 +135,15 @@ define void @char_stats() local_unnamed_addr #0 {
+ ; CMOS-NEXT:    ; in Loop: Header=BB0_2 Depth=1
+ ; CMOS-NEXT:    asl
+ ; CMOS-NEXT:    sta __rc2
+-; CMOS-NEXT:    lda #0
+-; CMOS-NEXT:    rol
+-; CMOS-NEXT:    sta __rc3
++; CMOS-NEXT:    stz __rc3
++; CMOS-NEXT:    rol __rc3
+ ; CMOS-NEXT:    clc
+ ; CMOS-NEXT:    lda __rc0
++; CMOS-NEXT:    ldx __rc1
+ ; CMOS-NEXT:    clc
+ ; CMOS-NEXT:    adc __rc2
+ ; CMOS-NEXT:    sta __rc2
+-; CMOS-NEXT:    lda __rc1
++; CMOS-NEXT:    txa
+ ; CMOS-NEXT:    adc __rc3
+ ; CMOS-NEXT:    sta __rc3
+ ; CMOS-NEXT:    lda (__rc2)
+diff --git a/llvm/test/CodeGen/MOS/native-width-default-pressure.ll b/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
+index 832ed7b..742dd7f 100644
+--- a/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
++++ b/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
+@@ -5,7 +5,9 @@
+ ; The opt-in 65816 native-width registers must not change register pressure,
+ ; and so code, for subtargets that don't enable them. Pressure sets derived
+ ; from Ac16, Xc16 and Yc16 would move the low-byte subtraction of this compare
+-; in both modes. The expected output is the one without those registers.
++; in both modes. The expected output is the one without those registers,
++; with the accumulator pressure set that 8-bit mode appends (see
++; accumulator-pressure-set.ll).
+ 
+ target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+ 
+@@ -14,21 +16,23 @@ define i16 @scmp_i16_i32(i32 %a, i32 %b) {
+ ; MOS6502:       ; %bb.0:
+ ; MOS6502-NEXT:    sta __rc9
+ ; MOS6502-NEXT:    stx __rc8
++; MOS6502-NEXT:    lda __rc5
+ ; MOS6502-NEXT:    ldy __rc7
++; MOS6502-NEXT:    ldx __rc9
+ ; MOS6502-NEXT:    pha
+ ; MOS6502-NEXT:    lda __rc4
+ ; MOS6502-NEXT:    sta __rc11
+ ; MOS6502-NEXT:    pla
+-; MOS6502-NEXT:    cmp __rc4
+-; MOS6502-NEXT:    txa
+-; MOS6502-NEXT:    ldx __rc5
+-; MOS6502-NEXT:    stx __rc10
+-; MOS6502-NEXT:    sbc __rc5
++; MOS6502-NEXT:    cpx __rc4
++; MOS6502-NEXT:    sta __rc10
++; MOS6502-NEXT:    sta __rc4
++; MOS6502-NEXT:    lda __rc8
++; MOS6502-NEXT:    sbc __rc4
+ ; MOS6502-NEXT:    lda __rc2
+ ; MOS6502-NEXT:    sbc __rc6
+-; MOS6502-NEXT:    lda __rc3
+ ; MOS6502-NEXT:    sty __rc5
+ ; MOS6502-NEXT:    sty __rc4
++; MOS6502-NEXT:    lda __rc3
+ ; MOS6502-NEXT:    sbc __rc4
+ ; MOS6502-NEXT:    bvc .LBB0_2
+ ; MOS6502-NEXT:  ; %bb.1:
+@@ -68,21 +72,23 @@ define i16 @scmp_i16_i32(i32 %a, i32 %b) {
+ ; W65816:       ; %bb.0:
+ ; W65816-NEXT:    sta __rc9
+ ; W65816-NEXT:    stx __rc8
++; W65816-NEXT:    lda __rc5
+ ; W65816-NEXT:    ldy __rc7
++; W65816-NEXT:    ldx __rc9
+ ; W65816-NEXT:    pha
+ ; W65816-NEXT:    lda __rc4
+ ; W65816-NEXT:    sta __rc11
+ ; W65816-NEXT:    pla
+-; W65816-NEXT:    cmp __rc4
+-; W65816-NEXT:    txa
+-; W65816-NEXT:    ldx __rc5
+-; W65816-NEXT:    stx __rc10
+-; W65816-NEXT:    sbc __rc5
++; W65816-NEXT:    cpx __rc4
++; W65816-NEXT:    sta __rc10
++; W65816-NEXT:    sta __rc4
++; W65816-NEXT:    lda __rc8
++; W65816-NEXT:    sbc __rc4
+ ; W65816-NEXT:    lda __rc2
+ ; W65816-NEXT:    sbc __rc6
+-; W65816-NEXT:    lda __rc3
+ ; W65816-NEXT:    sty __rc5
+ ; W65816-NEXT:    sty __rc4
++; W65816-NEXT:    lda __rc3
+ ; W65816-NEXT:    sbc __rc4
+ ; W65816-NEXT:    bvc .LBB0_2
+ ; W65816-NEXT:  ; %bb.1:

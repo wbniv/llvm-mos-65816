@@ -1,0 +1,19 @@
+# Fresh-bootstrap replay: git archive of the pin 8be0546128a5 into build/bootstrap-proof, 'git init -q' there (its own repo),
+# then the apply block of this commit's dev/toolchain.sh (59 apply_patch invocations, each 'git -C build/bootstrap-proof apply').
+applied 59 patch invocations, failures=0
+last: apply_patch 0070-mos-far-word-index-policy; apply_patch 0071-mos-accumulator-pressure-set
+$ git -C build/bootstrap-proof rev-parse --show-toplevel   -> build/bootstrap-proof (own repo)
+$ grep -c AppendAccumulatorPressureSet llvm/lib/Target/MOS/MOSRegisterInfo.cpp -> 3; grep -c 'GeneratePressureSet = 0' MOSRegisterInfo.td -> 1
+$ rsync -rlcn --delete --exclude=/.git bootstrap-proof/ vendor/llvm-mos/   (worktree vendor = built candidate source; MOS.cmake trimmed as toolchain.sh does)
+(no differences)
+
+# Shared vendor (main checkout) against origin's stack (incl. 0068), before the landing edit:
+*deleting   docs/transcripts/2026-09-30-f79adc39-72b4-4dc5-abc1-849c14c5ce96.md
+>fcsT...... llvm/test/CodeGen/MOS/asm-printer.mir
+>fcsT...... llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll
+# The 8 landing files (MOSRegisterInfo.{cpp,h,td}, MOSSubtarget.cpp, char-stats.ll, native-width-default-pressure.ll, native-width-pressure-opt-level.ll, accumulator-pressure-set.ll) equalled origin's stack (or were absent) before the copy.
+# Shared vendor against the new stack (worktree vendor copy), after the landing edit:
+*deleting   docs/transcripts/2026-09-30-f79adc39-72b4-4dc5-abc1-849c14c5ce96.md
+>fcsT...... llvm/test/CodeGen/MOS/asm-printer.mir
+>fcsT...... llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll
+# i.e. only the same pre-existing foreign items (two test edits from 2026-08-04 and 2026-09-23, one untracked transcript), left untouched.

@@ -275,6 +275,10 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0068-mos-null-output-streamer
   apply_patch 0069-mos-far-loop-range
   apply_patch 0070-mos-far-word-index-policy
+  # An explicit accumulator pressure set for 8-bit mode (limit 1, every level).
+  # The computed-carry scheduling of 0064/0067 relies on it; see
+  # docs/plans/2026-10-01-carry-pressure-contract.md.
+  apply_patch 0071-mos-accumulator-pressure-set
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and

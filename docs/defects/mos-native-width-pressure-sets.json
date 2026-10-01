@@ -456,6 +456,19 @@
    },
    "exit_code": 0,
    "observed": "-O2, memb1 vs t4 over mvscrl + packrec: +mos-a16 +71,196 clocks (+0.04%; loop -0.06%, setup +0.15%); +mos-a16,+mos-xy16 +74,008 (+0.04%). -O3 packrec +0.08%. mvscrl -O3 link-fail (ROM bank overflow) under every variant. All passing rows deterministic."
+  },
+  {
+   "date": "2026-10-01",
+   "kind": "downstream-adoption",
+   "report": "docs/plans/2026-10-01-carry-pressure-contract.md#landing",
+   "installed_toolchain": {
+    "llc": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+    "clang-23": "e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9",
+    "lld": "0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1",
+    "location": "build/llvm-mos/bin/llc and build/llvm-mos-install/bin/{clang-23,lld} of the main checkout, rebuilt 2026-10-01T03:06Z; bit-identical to the measured candidate frozen in build/carry-press-ir/cand/"
+   },
+   "observation": "0002 regenerated from the live tree; every line it adds over origin's 0002 is the split design (MOSRegisterInfo.cpp +125, .h +25, .td +6, MOSSubtarget.cpp +1) plus the downstream copies of native-width-default-pressure.ll and native-width-pressure-opt-level.ll. Native modes match the split design's measured downstream behaviour: +0.05% to +0.13% bytes at -Os/-Oz/-O2 and +0.42% at -O3 against the previous downstream (user decision 2026-10-01: accepted, no renumbering).",
+   "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d."
   }
  ],
  "candidate_change": {
@@ -1375,7 +1388,7 @@
   "cause": "With the flag alone the native classes have no pressure sets, so 16-bit vregs cost nothing to MachineLICM, MachineSink and the machine scheduler (all three contribute; all three disabled gives identical output). Restoring native-class pressure removes the native growth."
  },
  "resolution": {
-  "change": "Split #321-1: let GeneratePressureSet = 0 around Ac16/Xc16/Yc16 in MOSRegisterInfo.td. Split #321-8: MOSRegisterInfo(const MOSSubtarget &, CodeGenOptLevel) (MOSSubtarget passes TM.getOptLevel()) builds per-class and per-unit pressure-set lists and overrides getNumRegPressureSets, getRegPressureSetName, getRegPressureSetLimit, getLargestRegClassForRegPressureSet, getRegClassPressureSets and getRegUnitPressureSets; under +mos-a16 the native classes charge their low byte's generated sets and, unless the level is Aggressive, sets A16/X16/Y16 (limit 2) are appended. Diffs: docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/change/. Downstream 0002 is deliberately not changed (user decision, 2026-10-01): applying the candidate (docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/) grows default code by 13,427 B over 262 SNES sources at -Os, because downstream computed-carry scheduling (0064/0067) depends on the Ac16/Xc16/Yc16-derived sets. The recorded baseline and this fix are the split series; downstream converges through the carry-scheduling retune tracked on docs/defects/mos-carry-scheduling-pressure.json.",
+  "change": "Split #321-1: let GeneratePressureSet = 0 around Ac16/Xc16/Yc16 in MOSRegisterInfo.td. Split #321-8: MOSRegisterInfo(const MOSSubtarget &, CodeGenOptLevel) (MOSSubtarget passes TM.getOptLevel()) builds per-class and per-unit pressure-set lists and overrides getNumRegPressureSets, getRegPressureSetName, getRegPressureSetLimit, getLargestRegClassForRegPressureSet, getRegClassPressureSets and getRegUnitPressureSets; under +mos-a16 the native classes charge their low byte's generated sets and, unless the level is Aggressive, sets A16/X16/Y16 (limit 2) are appended. Diffs: docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/change/. Downstream 0002 is deliberately not changed (user decision, 2026-10-01): applying the candidate (docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/) grows default code by 13,427 B over 262 SNES sources at -Os, because downstream computed-carry scheduling (0064/0067) depends on the Ac16/Xc16/Yc16-derived sets. The recorded baseline and this fix are the split series; downstream converges through the carry-scheduling retune tracked on docs/defects/mos-carry-scheduling-pressure.json. Update 2026-10-01: downstream 0002 now carries the split design (the same hooks without getLargestRegClassForRegPressureSet, which the downstream TRI lacks), together with the standalone 0071 accumulator pressure set for 8-bit mode that the downstream computed-carry scheduling relies on (docs/plans/2026-10-01-carry-pressure-contract.md).",
   "causal_explanation": "TableGen derives pressure sets from every register class; the opt-in classes Ac16/Xc16/Yc16 added sets and removed MOSAsmParamRegClass, and MachineLICM, MachineSink and the scheduler read those tables in every mode. With GeneratePressureSet = 0 the generated tables are upstream's again (tables/ in final/), so default heuristics see exactly upstream's sets; native-mode pressure is restored only for +mos-a16 through the hooks, which return the generated tables otherwise.",
   "trigger_check": "The unchanged regression runner (tools/default-identity.sh) over the unchanged fixed input set compares upstream 06bc967d2668 with the final #321-1 llc, in mos6502 and plain mosw65816 at -O2, asm and object; the same command on the preserved baseline llc still exits 1 with the recorded signature (final/runs/baseline-rerun.log).",
   "regression": {

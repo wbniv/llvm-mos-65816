@@ -85,6 +85,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0068-mos-null-output-streamer.patch"
   "$PATCHES/0069-mos-far-loop-range.patch"
   "$PATCHES/0070-mos-far-word-index-policy.patch"
+  "$PATCHES/0071-mos-accumulator-pressure-set.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/carry-pressure-schedule.mir"
@@ -120,6 +121,8 @@ TESTRELS=(
   "llvm/test/CodeGen/MOS/far-memop-length.ll"         # mos-far-memop-length-truncation (B2)
   "llvm/test/CodeGen/MOS/far-access-non-65816.ll"     # mos-far-access-non-65816 (B3)
   "llvm/test/CodeGen/MOS/far-index-fold-debug.ll"     # mos-far-index-fold-dangling-dbg (B4)
+  "llvm/test/CodeGen/MOS/native-width-default-pressure.ll"     # native-width pressure sets; 0071 updates it
+  "llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll"   # native-width pressure sets (-O3 gate)
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }

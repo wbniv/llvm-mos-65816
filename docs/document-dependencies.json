@@ -82,7 +82,7 @@
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
           "docs/defects/mos-bank-relax-section-offset.json": "12bd09bd688b5d1453eb10947d4481ba4900482e46133d6f7cca1677cd250353",
-          "docs/defects/mos-carry-scheduling-pressure.json": "39ac0340599f72e0494bc27b203453bc83ffea980aa296023babf70c61bfe303",
+          "docs/defects/mos-carry-scheduling-pressure.json": "f92f8325aee8203ed7bb76773efa7d3473107ff69e6f6aef98f37a3efe9fe64a",
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
           "docs/defects/mos-far-access-non-65816.json": "552b6483adfedf17890efc86ef069432227360cc96ee1188e8abda15206d0b3f",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "07f335500f42673c0eca96ed83e4fd40db8e5cd500971efcb72fbf6bc74a2087",
@@ -96,7 +96,7 @@
           "docs/defects/mos-imag32-reserved-pair-units.json": "77c4e9eae0f1b77813cc9be6ac34a5e9a8ea290f0a7c4b3e9c1495f25c178ab4",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "80663f5d8e17cf3203aba58c8dfa8e86a98cc3f45c4f1e6caee514ed44b8853a",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
-          "docs/defects/mos-native-width-pressure-sets.json": "9cbeec7386091f060937d224db03df1170c793618f754a033e6578b1017a20f1",
+          "docs/defects/mos-native-width-pressure-sets.json": "dcb44c4de5caf03bf4791f32c30d41c3fdeb5d7643117d030ee96be8118de119",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
           "docs/defects/mos-near-nowrap-option-clash.json": "f02673b6a5a6895a2ec4edd8d312ad02cb8813c4e42a411719b353c858ce33b1",
@@ -117,7 +117,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "dda2324ddfa2d98d668caf36e1138b5aa78fb192cf767f679bfacdc696ec3bea"
+          "docs/upstream-dashboard.json": "faa2e951c39e260529e29c40975cf8e66af134f309eaa342ba6c6a406292a0eb"
         }
       }
     },
@@ -140,11 +140,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "88010a7fca6babe47b84767690e8f9efba1d045d1d725d2809eae9a59b406bde",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "dda2324ddfa2d98d668caf36e1138b5aa78fb192cf767f679bfacdc696ec3bea",
+          "docs/upstream-dashboard.json": "faa2e951c39e260529e29c40975cf8e66af134f309eaa342ba6c6a406292a0eb",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "07ebc4dd643d0236d6d3d8bcea7ee4d0db9b331b877d346b33188fe34b3265f9"
+          "docs/upstream-dashboard-graph.json": "47e0d09ab754851b5f29d5f107acf8a8cbff2cefe2be349acbadaeadd4189b65"
         }
       }
     },
@@ -322,7 +322,7 @@
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
+          "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -348,7 +348,7 @@
           "docs/plans/2026-09-26-live-upstream-dashboard.md": "d3219df087ecd4c0bb640995f168d5c5d1c0b8e352f765544d228be269c95b5c",
           "docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md": "0513d179f35506c510c9acf01c4aac10a75eaf4db416364ef425a4555651f2dc",
           "docs/plans/2026-07-27-138-lzss-gallery-palette-range-audit.md": "3a3fe88713c6eb1aa41b0a818186c37df84782832c81168c214b9c83ceff053c",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "50541a1841cf02e9bcc65bcf2ff3aee7942f91fdf1bae811375c80ca4f3e5514",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
@@ -365,9 +365,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T21:50:37.026601+00:00",
-        "note": "Reviewed against the round-two records (mos-imag32-reserved-pair-units, mos-far-fold-dangling-dbg-sites, mos-legalizer-fold-dangling-dbg-upstream): the 0069/0070 items now describe round two and the pending #594 answers; the implementer's placeholder receipt is superseded.",
-        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-10-01T04:02:40.743171+00:00",
+        "note": "Sources changed by the 2026-10-01 carry-pressure landing (0002 split pressure-set design, standalone 0071, record landing runs). TODO.md itself was not edited here: the coordinator owns it and is updating the carry item, whose text still predates the landing.",
+        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
     {
@@ -420,7 +420,7 @@
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
+          "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -441,7 +441,7 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "50541a1841cf02e9bcc65bcf2ff3aee7942f91fdf1bae811375c80ca4f3e5514",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
@@ -455,9 +455,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T21:35:49.436818+00:00",
-        "note": "Far-word status updated for the second round of the #320 carry (#594 carried, new records mos-imag32-reserved-pair-units, mos-far-fold-dangling-dbg-sites, mos-legalizer-fold-dangling-dbg-upstream).",
-        "attribution": "Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort"
+        "reviewed_at": "2026-10-01T03:59:30.574117+00:00",
+        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
+        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
     {
@@ -510,7 +510,7 @@
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
+          "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -531,7 +531,7 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "50541a1841cf02e9bcc65bcf2ff3aee7942f91fdf1bae811375c80ca4f3e5514",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
@@ -545,9 +545,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T21:33:09.645285+00:00",
-        "note": "Second round of the #320 carry adds mos-imag32-reserved-pair-units (fixed in the series), mos-far-fold-dangling-dbg-sites and mos-legalizer-fold-dangling-dbg-upstream (confirmed); the tracker's far-word status and the new llvm-mos-sdk far-runtime companion entry describe them. Nothing is posted.",
-        "attribution": "Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort"
+        "reviewed_at": "2026-10-01T03:59:30.581232+00:00",
+        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
+        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
     {
@@ -695,7 +695,7 @@
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
           "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "50541a1841cf02e9bcc65bcf2ff3aee7942f91fdf1bae811375c80ca4f3e5514",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
@@ -710,8 +710,8 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T20:55:58.405750+00:00",
-        "note": "Checked the 0064/0067 status, publication and measurement statements against the 2026-10-01 pressure-contract follow-up (a dated pointer in docs/plans/2026-09-26-mos-carry-scheduling.md, the TODO item text and an additional run on the canonical carry record). No status, number or publication claim changes: the follow-up adds a root cause and an unlanded candidate (docs/plans/2026-10-01-carry-pressure-contract.md). The dated aggregate-savings and timing figures remain correct as measurements with the old generated pressure sets.",
+        "reviewed_at": "2026-10-01T04:05:23.883945+00:00",
+        "note": "The carry-scheduling plan's dated pointer now records the 2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. agent-handoff gained the matching stack and toolchain line; its 0064 status and dated measurement statements are unchanged and still correct as dated evidence. The 0064 status, publication and measurement statements of the other two documents are unaffected: 0064/0067 are unchanged.",
         "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
@@ -751,7 +751,7 @@
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "36337397c1d7b44b6f377307e0249a7c1949824b1c32e6f7bd5ac327e530c043",
-          "patches/llvm-mos/0002-321-accum16.patch": "de47c8b26831903b05c4e6eca49fa57dbbd0141d8187946cda0660f6b2a2ca20",
+          "patches/llvm-mos/0002-321-accum16.patch": "eb7dfcc486fcad7cbb11d06ef6558693b1784477361ccedf6ef05e45808cc356",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
           "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
@@ -759,7 +759,7 @@
           "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
           "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
           "dev/measure-carry-scheduling.py": "92544eb196fdf7c98d304c0ef2dcf6a7d6b6560b257192c31f267451b81eedfb",
-          "docs/defects/mos-carry-scheduling-pressure.json": "39ac0340599f72e0494bc27b203453bc83ffea980aa296023babf70c61bfe303",
+          "docs/defects/mos-carry-scheduling-pressure.json": "f92f8325aee8203ed7bb76773efa7d3473107ff69e6f6aef98f37a3efe9fe64a",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json": "478c4353eaa1090671e09bea9e80acb8866dcc5b95d64394e87d376b491ded7a",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
@@ -780,8 +780,8 @@
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
         },
-        "reviewed_at": "2026-09-30T20:56:01.645810+00:00",
-        "note": "Checked the 0064/0067 status, publication and measurement statements against the 2026-10-01 pressure-contract follow-up (a dated pointer in docs/plans/2026-09-26-mos-carry-scheduling.md, the TODO item text and an additional run on the canonical carry record). No status, number or publication claim changes: the follow-up adds a root cause and an unlanded candidate (docs/plans/2026-10-01-carry-pressure-contract.md). The dated aggregate-savings and timing figures remain correct as measurements with the old generated pressure sets.",
+        "reviewed_at": "2026-10-01T04:01:03.659034+00:00",
+        "note": "2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. The plan's dated pointer now says it landed; 0064/0067 are unchanged, and the timing report's measurements remain correct as dated evidence on the preserved builds with the old generated sets.",
         "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
@@ -1505,14 +1505,14 @@
           "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "50541a1841cf02e9bcc65bcf2ff3aee7942f91fdf1bae811375c80ca4f3e5514",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T20:55:57.787999+00:00",
-        "note": "Checked the 0064/0067 status, publication and measurement statements against the 2026-10-01 pressure-contract follow-up (a dated pointer in docs/plans/2026-09-26-mos-carry-scheduling.md, the TODO item text and an additional run on the canonical carry record). No status, number or publication claim changes: the follow-up adds a root cause and an unlanded candidate (docs/plans/2026-10-01-carry-pressure-contract.md). The dated aggregate-savings and timing figures remain correct as measurements with the old generated pressure sets.",
+        "reviewed_at": "2026-10-01T04:05:24.224720+00:00",
+        "note": "The carry-scheduling plan's dated pointer now records the 2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. agent-handoff gained the matching stack and toolchain line; its 0064 status and dated measurement statements are unchanged and still correct as dated evidence. The 0064 status, publication and measurement statements of the other two documents are unaffected: 0064/0067 are unchanged.",
         "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
@@ -1561,13 +1561,13 @@
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "patches/llvm-mos/0002-321-accum16.patch": "de47c8b26831903b05c4e6eca49fa57dbbd0141d8187946cda0660f6b2a2ca20",
+          "patches/llvm-mos/0002-321-accum16.patch": "eb7dfcc486fcad7cbb11d06ef6558693b1784477361ccedf6ef05e45808cc356",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e"
         },
-        "reviewed_at": "2026-09-30T09:39:44.918742+00:00",
-        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
-        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
+        "reviewed_at": "2026-10-01T03:59:31.021019+00:00",
+        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
+        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
     {
@@ -1797,7 +1797,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-carry-scheduling-pressure.json": "39ac0340599f72e0494bc27b203453bc83ffea980aa296023babf70c61bfe303",
+          "docs/defects/mos-carry-scheduling-pressure.json": "f92f8325aee8203ed7bb76773efa7d3473107ff69e6f6aef98f37a3efe9fe64a",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/receipt.json": "e5f3753b19812a30882c341ab0b179ec122a3f48ade98e49a3dd504bccd95f19",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/results.json": "d4716cbbbdb98edda548b1d7b0a5f3a7e17c28bfecbbc89091cd7b5b4a315280",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/interpreter-results.json": "8a37cc4d8c4d64c56f43e6465732ba538717bbeee38ec5eab0c7e5db9ea6dbdd",
@@ -1806,8 +1806,8 @@
           "dev/measure-carry-cycles.py": "13a50d5677ae9d4b3f476ee4aac4d3c2551d2b60f9911aa79a6ac23079a8a2fd",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549"
         },
-        "reviewed_at": "2026-09-30T20:56:02.442104+00:00",
-        "note": "Checked the 0064/0067 status, publication and measurement statements against the 2026-10-01 pressure-contract follow-up (a dated pointer in docs/plans/2026-09-26-mos-carry-scheduling.md, the TODO item text and an additional run on the canonical carry record). No status, number or publication claim changes: the follow-up adds a root cause and an unlanded candidate (docs/plans/2026-10-01-carry-pressure-contract.md). The dated aggregate-savings and timing figures remain correct as measurements with the old generated pressure sets.",
+        "reviewed_at": "2026-10-01T04:01:04.344863+00:00",
+        "note": "2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. The plan's dated pointer now says it landed; 0064/0067 are unchanged, and the timing report's measurements remain correct as dated evidence on the preserved builds with the old generated sets.",
         "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
@@ -1822,14 +1822,14 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "50541a1841cf02e9bcc65bcf2ff3aee7942f91fdf1bae811375c80ca4f3e5514",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
         },
-        "reviewed_at": "2026-09-30T20:55:57.788210+00:00",
-        "note": "Checked the 0064/0067 status, publication and measurement statements against the 2026-10-01 pressure-contract follow-up (a dated pointer in docs/plans/2026-09-26-mos-carry-scheduling.md, the TODO item text and an additional run on the canonical carry record). No status, number or publication claim changes: the follow-up adds a root cause and an unlanded candidate (docs/plans/2026-10-01-carry-pressure-contract.md). The dated aggregate-savings and timing figures remain correct as measurements with the old generated pressure sets.",
+        "reviewed_at": "2026-10-01T04:05:24.224993+00:00",
+        "note": "The carry-scheduling plan's dated pointer now records the 2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. agent-handoff gained the matching stack and toolchain line; its 0064 status and dated measurement statements are unchanged and still correct as dated evidence. The 0064 status, publication and measurement statements of the other two documents are unaffected: 0064/0067 are unchanged.",
         "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
@@ -1962,14 +1962,14 @@
       "receipt": {
         "sources": {
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
-          "patches/llvm-mos/0002-321-accum16.patch": "de47c8b26831903b05c4e6eca49fa57dbbd0141d8187946cda0660f6b2a2ca20",
+          "patches/llvm-mos/0002-321-accum16.patch": "eb7dfcc486fcad7cbb11d06ef6558693b1784477361ccedf6ef05e45808cc356",
           "dev/check-near-index-proofs.py": "8f514c4c8625bb8fdc08447deb44dd027a32090c37dc4176399eab0f427d498e",
           "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
           "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f"
         },
-        "reviewed_at": "2026-09-30T09:39:39.937560+00:00",
-        "note": "Far-prerequisite defects B1-B4 fixed downstream in 0002 and closed as fixed: TODO items removed, the T4 far-word items and both upstream trackers note the fix; the other documents do not describe these defects or the changed 0002 code and need no change.",
-        "attribution": "Claude Code 2.1.283 t3-opus-med subagent, model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort"
+        "reviewed_at": "2026-10-01T03:59:31.692884+00:00",
+        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
+        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
     {
@@ -2200,16 +2200,16 @@
           "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
           "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
           "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
-          "dev/toolchain.sh": "b6cf0d9997f94cdc81249803a408f71b154fb663c50b825080d3e234b655cf30",
-          "dev/regen-patch.sh": "01f69caba7fbe1de942aa52b6f46319ba01a2571ce01f69dead768497b45fcbb",
+          "dev/toolchain.sh": "1f6a77dc569755ca1df4855d014f2c50f1e070b13ec18f45fd609a53bd58f57c",
+          "dev/regen-patch.sh": "54f07f5243010e00a136c6ba23a654f831d2b904b0e1c068def11f7a8f3e32a2",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-09-30T21:11:42.789655+00:00",
-        "note": "dev/toolchain.sh now also applies 0068 (MOS null output streamer) in the fresh-bootstrap list; the investigation's 0069/0070 integration and measurements are unaffected.",
-        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-10-01T03:59:33.227170+00:00",
+        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
+        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
       }
     },
     {

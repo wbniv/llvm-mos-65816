@@ -1,0 +1,22 @@
+# Shared toolchain rebuild, main checkout: flock -w 14400 build/.heavy-build.lock env BUILD_JOBS=6 dev/run.sh toolchain
+# before:
+254624ba26462f49  build/llvm-mos-install/bin/clang-23
+c89b04cb2fb93cd3  build/llvm-mos-install/bin/lld
+f1fa50a225c36607  build/llvm-mos/bin/llc
+2026-10-01T02:49:13Z
+[63/72] Linking CXX executable bin/lld
+[64/72] Linking CXX executable bin/clang-23
+[1/2] Linking CXX executable bin/llc
+==> done in 5m 42s: clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)
+TOOLCHAIN-rc=0
+2026-10-01T03:06:50Z
+# after:
+e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9  build/llvm-mos-install/bin/clang-23
+0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1  build/llvm-mos-install/bin/lld
+6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19  build/llvm-mos/bin/llc
+fba3e55229c58c9c2e0e7c730a47d6827d311d514c13ee5142b4afe367bc632a  build/llvm-mos/bin/llvm-objdump
+# measured candidate (worktree build, frozen in build/carry-press-ir/cand/):
+e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9  build/carry-press-ir/cand/clang-23
+0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1  build/carry-press-ir/cand/lld
+6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19  build/carry-press-ir/cand/llc
+fba3e55229c58c9c2e0e7c730a47d6827d311d514c13ee5142b4afe367bc632a  build/carry-press-ir/cand/llvm-objdump

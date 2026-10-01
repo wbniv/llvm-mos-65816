@@ -1861,7 +1861,7 @@
     },
     {
       "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/README.md",
-      "sha256": "6e4e1b9f71d3afa143b2ab09eff463c4c56cd2ee1e02d22ea448993003cf253c"
+      "sha256": "0959645357e67996a4985de5eceb8edf5c7b856f199fb191b9bb5b5c0710d06d"
     },
     {
       "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/candidate-accumulator-pressure-set.patch",
@@ -1954,6 +1954,50 @@
     {
       "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/verify-summary.txt",
       "sha256": "f56e39048a3513637eb20d61cee89bbf2c0dfc50ee0e3d6deccc2bb0228249b1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/.history/README.md",
+      "sha256": "8e91ec454e491e4b72171b1a98a52977c0a0a0bb2a764415970d4f532af5d601"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/0002-delta-proof.txt",
+      "sha256": "f797c3bd1909ca17e76ed7e832c99ced8191c0665cc46f41fb6dbb9ea4c823ac"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/bootstrap-and-shared-vendor.txt",
+      "sha256": "fe597847c6ca9fa41c392d1ee17b7340661c65952eab11c32ffd94c9717d7b36"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/clocks-installed-identity.json",
+      "sha256": "18f534ccbf930d21e017e5e843b4f3a33faac3e6dc5dd9085dbf66651908fd06"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/clocks-installed.tsv",
+      "sha256": "76da99c2a61475cd17aa0980d46ca3afaf780f826599736a9a07856690771b71"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/corpus.log",
+      "sha256": "80960937eb8083e462b7d5824bf9e087e4fc0c7f493910eea811acc236378656"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/installed-sizes.tar.gz",
+      "sha256": "72fcc29b5d7934652dd247d703ee64db6824be3e74bd4f362fbc26939a5124ef"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/installed-summary.txt",
+      "sha256": "90e07ba9c0a5df2a2dadeb56a2187f1c0e4708ad48b9d7bfbefa470c13fca1a9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/lit-shared.txt",
+      "sha256": "8b96d187bd8da580dc989ce3c79065224f45d5f65b0fb6e437c9e0aa2085afdf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/shared-toolchain.txt",
+      "sha256": "6191506e721a7cd8ceea7399046e193f31f96247e48ddf4954c8c383748495fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-01-carry-pressure-contract/landing/farblit.log",
+      "sha256": "a1bfa57afc411c25357769fbdc340235e6a38fbd1c3d00610db4ec824e25005a"
     }
   ],
   "baseline": {
@@ -2009,6 +2053,12 @@
       "status": "Investigation; default selection remains open",
       "selector": "dev/select-carry-object.py",
       "scope": "139-case pre-RA screen; 3592 existing-object comparisons; 41 timed/linked configurations plus five conditional-model checks; six compilation-overhead cases. Not an integrated backend change."
+    },
+    "companion_patch": {
+      "change": "patches/llvm-mos/0071-mos-accumulator-pressure-set.patch",
+      "landed": "2026-10-01",
+      "mechanism": "MOSRegisterInfo appends an explicit accumulator pressure set in 8-bit mode (limit 1, every optimization level). The carry model's benefit depends on the generic pressure heuristics seeing the accumulator; this set is that signal, replacing the incidental Ac16-derived set that 0002 no longer generates.",
+      "report": "docs/plans/2026-10-01-carry-pressure-contract.md"
     }
   },
   "additional_runs": [
@@ -2050,6 +2100,20 @@
       "observation": "0064/0067 read no pressure set: the carry model counts live computed Cc vregs from DAG edges, first in MOSSchedStrategy::tryCandidate. What the old 14 generated sets supplied was an accumulator dimension (Ac16 set, limit 2, set 0; Ac counts toward it). With it, carry scheduling saved 39,209 B at -Os (default mode, 262 inputs), mostly by repairing that set's side effect in the scheduler (with MachineLICM and MachineSink off, the old sets are 38,066 B worse than upstream's without carry scheduling and 1,279 B better with it). The set's own gain came through MachineLICM (with MachineLICM off the set change costs 1,800 B instead of 13,427 B). Under upstream's 6 sets carry scheduling saves 492 B. An appended A16 set alone reproduces the old default-mode MachineLICM/MachineSink behaviour (same size for every input with scheduler pressure tracking off). Native residue: set numbering (appended after the generated sets) and the split X16/Y16 sets account for 1,263 of 1,638 B (carry off); 375 B remain unisolated.",
       "candidate": "An explicit accumulator pressure set appended in 8-bit mode with limit 1, at every level, beside 0064/0067 (unchanged). Against the current downstream, default mode: -0.65% (-Os), -0.45% (-Oz), -0.74% (-O2), -0.46% (-O3) bytes; clocks -0.20% at -O3 and +0.16% at -O2 (fenwick_sim +749,216). Native modes equal the upstream design: +0.05% to +0.13% bytes at -Os/-Oz/-O2, +0.42% at -O3. lit 192 pass/4 unsupported; verifier sweep adds no failure; corpus-a16 83/83 on MAME and bsnes-jg with the SDK rebuilt by the candidate.",
       "scope": "Investigation and unlanded candidate. 0002, vendor/ and the posted 0064 PR are unchanged. The native bar (not worse than the current downstream) is not met and is escalated. Status stays workaround: the generic TableGen fine-grained pressure-set contract is not corrected.",
+      "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d."
+    },
+    {
+      "date": "2026-10-01",
+      "kind": "landed-downstream",
+      "report": "docs/plans/2026-10-01-carry-pressure-contract.md#landing",
+      "installed_toolchain": {
+        "llc": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+        "clang-23": "e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9",
+        "lld": "0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1",
+        "location": "build/llvm-mos/bin/llc and build/llvm-mos-install/bin/{clang-23,lld} of the main checkout, rebuilt 2026-10-01T03:06Z; bit-identical to the measured candidate frozen in build/carry-press-ir/cand/"
+      },
+      "observation": "User-approved landing: 0002 carries the #320/#321 split's native-width pressure-set design (without getLargestRegClassForRegPressureSet, absent from the downstream TRI) and the new standalone 0071 adds the accumulator set. 0064/0067 are unchanged. The installed toolchain is bit-identical to the measured candidate, so the recorded sizes, clocks, lit, verifier sweep and corpus-a16 results apply to it; the installed-build gates are in the plan's landing section.",
+      "scope": "Status stays workaround: the generic TableGen fine-grained pressure-set contract is still uncorrected; 0071 makes the scheduler's dependence on an accumulator signal explicit instead.",
       "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d."
     }
   ]

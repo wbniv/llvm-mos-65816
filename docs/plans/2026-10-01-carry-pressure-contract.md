@@ -1,6 +1,6 @@
 # Carry scheduling's pressure contract under the native-width pressure sets
 
-Status: investigated, candidate measured, **not landed** (2026‑10‑01). The downstream `0002` and `vendor/` are unchanged. The design, the measurements and the choice left to the user are below. TODO item: "Resolve the carry-scheduling pressure contract and profitability choice" ([canonical record](../defects/mos-carry-scheduling-pressure.json)). It follows the escalated downstream step of the [native-width pressure-set plan](2026-09-30-native-register-pressure-sets.md#application) (step 6).
+Status: **landed downstream** (2026‑10‑01), after the user approved the recommendations: native option (a), accepting the upstream design's native residue without renumbering, and the accumulator set kept at every level, accepting the `-O2` clock cost. `0002` now carries the #320/#321 split's native-width pressure-set design, and the new standalone patch **`0071-mos-accumulator-pressure-set`** adds the accumulator set. The installed toolchain is bit-identical to the measured candidate. See [Landing](#landing). Earlier the same day: investigated and measured, then escalated. TODO item: "Resolve the carry-scheduling pressure contract and profitability choice" ([canonical record](../defects/mos-carry-scheduling-pressure.json)). It follows the escalated downstream step of the [native-width pressure-set plan](2026-09-30-native-register-pressure-sets.md#application) (step 6).
 
 Attribution: Claude Code 2.1.285, model Claude Opus 5.5 (`claude-opus-5-5`), `high` reasoning effort; session `310aee67-a99e-4b78-ba48-c560322fe80d`, agent `a0bbc91b2d36f234d`.
 
@@ -116,6 +116,8 @@ At `-O2` default, `fenwick_sim` alone is +749,216 clocks (+4.5%, +28 B, one more
 
 ## Decision needed
 
+**Decided 2026‑10‑01 (user, through the coordinator):** native option (a), so the native residue is accepted and the split's native sets are not renumbered; and decision 2, keeping the accumulator set at every level including `-O2`. See [Landing](#landing).
+
 ESCALATE: the native half of the bar cannot be met without changing the upstream-bound #321 design, which is the user's call.
 
 1. **Native size.** The candidate leaves native modes as the upstream design has them: +0.05% to +0.13% bytes at `-Os`/`-Oz`/`-O2` and +0.42% at `-O3` against the current downstream. The accumulator-set idea does not apply there, because native mode already has an accumulator set. The measured options, all changes to the #321 design and so to the split series:
@@ -129,6 +131,139 @@ ESCALATE: the native half of the bar cannot be met without changing the upstream
 **Separate finding: MachineLICM at `-Os`.** Disabling MachineLICM shrinks default code by 2.2% (−50,927 B) and `+mos-a16` code by 3.3% (−81,109 B) against the current downstream. With the candidate it still saves 49,391 B more (−64,508 B default against the current downstream). Its hoists at `-Os` cost bytes on MOS even with the accumulator set. This is a candidate for its own item: gate MachineLICM, or its high-pressure test, at `optsize`/`minsize`, measured for clocks at `-O2`/`-O3`. It was not pursued here.
 
 **Separate observation.** A limit of 1 on the *native* `A16` set (an exploration option only, never a candidate) makes llc fail with "ran out of registers during register allocation" in `dpend_step` (`corpus_dpend_sim`, `double-pendulum`, `+mos-a16`, `-Os`). It is reachable only through that hidden option, so it is recorded here and not filed. It shows that register allocation still has a schedule-dependent exhaustion path.
+
+
+## Landing
+
+Approved 2026‑10‑01. The landing contract:
+
+- `0002` carries the split design verbatim, without `getLargestRegClassForRegPressureSet`, which the downstream TRI lacks.
+- The accumulator set is a new standalone patch after `0002`, registered in `dev/toolchain.sh` and in `dev/regen-patch.sh`.
+- A fresh bootstrap is proven.
+- The shared `vendor/` gains only these files, and the shared toolchain is rebuilt.
+- Records are updated.
+
+Evidence: [`landing/`](../defects/evidence/2026-10-01-carry-pressure-contract/landing/).
+
+- **Patch:** [`patches/llvm-mos/0071-mos-accumulator-pressure-set.patch`](../../patches/llvm-mos/0071-mos-accumulator-pressure-set.patch). It is the measured candidate patch byte for byte.
+- **Bootstrap:** `dev/toolchain.sh` applies it after `0070`.
+- **`dev/regen-patch.sh`:**
+    - `STANDALONE_MOSDIR` lists it after `0070`, so every regen reverses it out of `0002`.
+    - `TESTRELS` gains `native-width-default-pressure.ll` and `native-width-pressure-opt-level.ll`. They belong to `0002`, and `0071` updates the first.
+- **Shared tree:** before the edit, the shared `vendor/llvm-mos` matched origin's stack (with `0068`) except for three pre-existing foreign items, and all eight landing files matched or were absent. The eight files were copied in and nothing else changed. The foreign items were left untouched:
+    - a 2026‑08‑04 extra case in `asm-printer.mir`;
+    - a 2026‑09‑23 comment edit in `spill-hoist-scratch-vreg.ll`;
+    - an untracked transcript.
+- **Installed toolchain:** changed at 2026‑10‑01T03:06Z.
+    - Now: `llc` `6f303945beb17ab3…`, `clang-23` `e532fbee9b788713…`, `lld` `0d74dddcab805faf…`.
+    - Before: `f1fa50a2…`, `254624ba…`, `c89b04cb…`.
+    - The new binaries are bit-identical to the measured candidate, so every measurement above applies to the installed toolchain.
+
+### Landing verification
+
+L1. `0002` round-trips, and every line it changes against origin's `0002` is the split design or its tests.
+
+    ```text
+    $ dev/regen-patch.sh            # worktree vendor copy = origin stack + split design + 0071
+    RESULT: PASS — 0002 round-trips (MOS dir + focused tests == live vendor)
+    llvm/lib/Target/MOS/MOSRegisterInfo.cpp: +125 -0; not in split design 0; split design missing 0
+    llvm/lib/Target/MOS/MOSRegisterInfo.h: +25 -0; not in split design 0; split design missing 0
+    llvm/lib/Target/MOS/MOSRegisterInfo.td: +6 -0; not in split design 0; split design missing 0
+    llvm/lib/Target/MOS/MOSSubtarget.cpp: +1 -0; not in split design 0; split design missing 0
+    llvm/test/CodeGen/MOS/native-width-default-pressure.ll: new file, 124 lines (byte-identical to the 2026-09-30 downstream split-design test)
+    llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll: new file, 30 lines (byte-identical to the 2026-09-30 downstream split-design test)
+    RESULT: every changed line is the split design or its tests; no foreign hunk
+    ```
+
+    PASS.
+
+L2. A fresh bootstrap applies the whole stack and reproduces the built source.
+
+    ```text
+    $ git archive 8be0546128a5 | tar -x -C build/bootstrap-proof; git -C build/bootstrap-proof init -q
+    $ (apply block of dev/toolchain.sh, each patch via git -C build/bootstrap-proof apply)
+    applied 59 patch invocations, failures=0          # last: 0070, 0071
+    $ rsync -rlcn --delete --exclude=/.git build/bootstrap-proof/ vendor/llvm-mos/
+    (no differences)
+    ```
+
+    PASS.
+
+L3. The shared toolchain rebuilds, and the installed tools are recorded.
+
+    ```text
+    $ flock -w 14400 build/.heavy-build.lock env BUILD_JOBS=6 dev/run.sh toolchain     # main checkout
+    ==> done in 5m 42s ... TOOLCHAIN-rc=0
+    e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9  build/llvm-mos-install/bin/clang-23
+    0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1  build/llvm-mos-install/bin/lld
+    6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19  build/llvm-mos/bin/llc
+    # = build/carry-press-ir/cand/{clang-23,lld,llc}, the measured candidate
+    ```
+
+    PASS.
+
+L4. Lit on the shared build passes: the MOS suites and the focused set.
+
+    ```text
+    $ llvm-lit -s -j3 CodeGen/MOS MC/MOS         # shared vendor tests, shared build/llvm-mos
+    -- Testing: 196 tests, 3 workers --
+      Unsupported:   4 (2.04%)
+      Passed     : 192 (97.96%)
+    lit-rc=0
+    $ llvm-lit -s -j3 <TESTRELS> accumulator-pressure-set.ll char-stats.ll
+    -- Testing: 37 tests, 3 workers --
+      Unsupported:  3 (8.11%)
+      Passed     : 34 (91.89%)
+    lit-rc=0
+    ```
+
+    PASS.
+
+L5. With the installed `llc`, the size tables and the verifier sweep match the candidate.
+
+    ```text
+    $ JOBS=2 size-matrix.sh installed build/carry-press-ir configs.txt "Os Oz O2 O3" "default a16 a16xy16"   # llc = build/llvm-mos/bin/llc
+    installed == measured candidate per input (sizes and failures): 12 of 12 level/mode tables
+    == Os default: 262 inputs; base 2315097 B   installed 2299980 B   -15117 (-0.65%)
+    == Oz default: 262 inputs; base 2065125 B   installed 2055783 B    -9342 (-0.45%)
+    == O2 default: 262 inputs; base 2785895 B   installed 2765306 B   -20589 (-0.74%)
+    == O3 default: 262 inputs; base 3378949 B   installed 3363356 B   -15593 (-0.46%)
+    == Os a16 +3003 (+0.12%) · a16xy16 +3070 (+0.13%)   Oz +1014 / +1081 (+0.05%)
+    == O2 a16 +3517 / a16xy16 +3467 (+0.12%)            O3 +15025 / +15150 (+0.42%)
+    $ JOBS=2 size-matrix.sh installed ... configs-verify.txt     # -verify-machineinstrs
+    installed verifier failures (-verify-machineinstrs) == candidate verifier failures: 12 of 12
+    verifier-only failure: O3 a16xy16 truchet.c (repeat sighting of mos-xy16-preserve-x-p-save, also on f1fa50a2)
+    $ sha256sum build/llvm-mos/bin/llc      # after the runs
+    6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+    ```
+
+    PASS: the tables match [Measurements](#measurements) exactly, and the verifier finds nothing new.
+
+L6. Clocks with the installed `llc` match the candidate.
+
+    ```text
+    $ runtime-clocks.py clocks-installed --level O2 --level O3 --modes default,a16,a16xy16 --variant installed=build/llvm-mos/bin/llc
+    102 PASS, all reused from the cache (same object hash as the measured candidate)
+    installed vs measured candidate: identical object and clocks 102 of 102
+    O2 default 351733834 · O2 a16 352134414 · O2 a16xy16 348943686 · O3 default 309515692 · O3 a16 316560490 · O3 a16xy16 314165310
+    ```
+
+    PASS: the same totals as [Measurements](#measurements).
+
+L7. SDK rebuild, `corpus` and `corpus-a16`.
+
+    ```text
+    # Worktree, with the bit-identical toolchain; SDK and all 296 programs rebuilt from a fresh SDK build tree:
+    ==> FAILED (3): ascast ascast_sim lzss-gallery          # the known failures only
+    $ dev/run.sh corpus
+    ==> corpus: 84/84 passed                                  # MAME
+    $ dev/run.sh corpus-a16                                    # step 6 above, same binaries and SDK
+    ==> corpus-a16: 83/83 passed, 0 xfail                     # host == default == +mos-a16 == +mos-xy16, MAME + bsnes-jg
+    $ dev/run.sh farblit                                       # 0069/0070 gate, worktree, same binaries
+    RESULT: PASS — Farblit access shapes verified; host == A16 == A16+XY16 on both emulators: 0x1E56EE65, pressure 0xD695
+    ```
+
+    PASS. These ran in the worktree, not the shared `build/`. The shared SDK (`build/install`) was **not** rebuilt. Its libraries were built by the previous compiler, and a `dev/run.sh build` there would not rebuild them: its toolchain stamp is unchanged, and ninja does not track the compiler binary. Wiping the shared SDK build under the agents now using it is the coordinator's call.
 
 ## Verification
 

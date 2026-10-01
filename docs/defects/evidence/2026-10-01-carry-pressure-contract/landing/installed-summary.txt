@@ -1,0 +1,30 @@
+# Installed llc (build/llvm-mos/bin/llc 6f303945beb17ab3, checked again after the runs) over build/carry-press-ir, against current-downstream base f1fa50a2 (matrix/base.*.tsv)
+# JOBS=2, ulimit -c 0 -v 2000000, timeout 300 per llc
+== Os default: 262 inputs; base 2315097 B; llc failures base=15, installed=15
+   installed    2299980 B   -15117 (-0.65%)  larger  36 smaller 202
+== Os a16: 276 inputs; base 2441232 B; llc failures base=1, installed=1
+   installed    2444235 B    +3003 (+0.12%)  larger 148 smaller  13
+== Os a16xy16: 276 inputs; base 2431285 B; llc failures base=1, installed=1
+   installed    2434355 B    +3070 (+0.13%)  larger 143 smaller  12
+== Oz default: 262 inputs; base 2065125 B; llc failures base=15, installed=15
+   installed    2055783 B    -9342 (-0.45%)  larger  36 smaller 200
+== Oz a16: 274 inputs; base 2177933 B; llc failures base=3, installed=3
+   installed    2178947 B    +1014 (+0.05%)  larger  46 smaller  17
+== Oz a16xy16: 274 inputs; base 2172436 B; llc failures base=3, installed=3
+   installed    2173517 B    +1081 (+0.05%)  larger  42 smaller  17
+== O2 default: 262 inputs; base 2785895 B; llc failures base=15, installed=15
+   installed    2765306 B   -20589 (-0.74%)  larger  44 smaller 187
+== O2 a16: 274 inputs; base 2843519 B; llc failures base=3, installed=3
+   installed    2847036 B    +3517 (+0.12%)  larger 143 smaller  22
+== O2 a16xy16: 273 inputs; base 2809815 B; llc failures base=4, installed=4
+   installed    2813282 B    +3467 (+0.12%)  larger 136 smaller  24
+== O3 default: 262 inputs; base 3378949 B; llc failures base=15, installed=15
+   installed    3363356 B   -15593 (-0.46%)  larger  49 smaller 179
+== O3 a16: 275 inputs; base 3615453 B; llc failures base=2, installed=0
+   installed    3630478 B   +15025 (+0.42%)  larger 148 smaller  75
+== O3 a16xy16: 274 inputs; base 3566435 B; llc failures base=3, installed=1
+   installed    3581585 B   +15150 (+0.42%)  larger 139 smaller  82
+
+installed == measured candidate per input (sizes and failures): 12 of 12 level/mode tables
+installed verifier failures (-verify-machineinstrs) == candidate verifier failures: 12 of 12
+verifier-only failure: O3 a16xy16 truchet.c (mos-xy16-preserve-x-p-save repeat sighting, present on f1fa50a2 too)

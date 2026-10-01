@@ -1,0 +1,10 @@
+# llvm-lit -s -j3 over CodeGen/MOS and MC/MOS of the shared vendor, shared build/llvm-mos (llc 6f303945)
+-- Testing: 196 tests, 3 workers --
+  Unsupported:   4 (2.04%)
+  Passed     : 192 (97.96%)
+lit-rc=0
+# focused: the TESTRELS list of dev/regen-patch.sh + accumulator-pressure-set.ll + char-stats.ll, -j3
+-- Testing: 37 tests, 3 workers --
+  Unsupported:  3 (8.11%)
+  Passed     : 34 (91.89%)
+lit-rc=0

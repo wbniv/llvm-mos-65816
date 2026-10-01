@@ -1,0 +1,224 @@
+# dev/run.sh corpus in the worktree: toolchain bit-identical to the installed one (llc 6f303945, clang-23 e532fbee, lld 0d74dddc); SDK rebuilt with it (worktree build/install).
+    ok  SPC700 IPL present and verified (sha1 97e352553e94242ae823547cd853eecda55c20f0, 64 B)
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 3.70kB 0.1s done
+#1 DONE 0.2s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:26.04
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B 0.1s done
+#3 DONE 0.1s
+
+#4 [1/8] FROM docker.io/library/ubuntu:26.04@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78
+#4 resolve docker.io/library/ubuntu:26.04@sha256:da6fc2be547864451aa253836dd926da33623312df4a9a243e35dc877c378a78 0.1s done
+#4 DONE 0.1s
+
+#5 [2/8] RUN apt-get update && apt-get install -y --no-install-recommends       build-essential cmake ninja-build python3 python3-pip python3-pil       git curl ca-certificates xz-utils xxd     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [5/8] RUN apt-get update && apt-get install -y --no-install-recommends       clang lld ccache zlib1g-dev     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [6/8] RUN apt-get update && apt-get install -y --no-install-recommends       pkg-config libsamplerate0-dev     && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [7/8] RUN apt-get update && apt-get install -y --no-install-recommends       xvfb     && rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [3/8] RUN curl -fsSL https://github.com/llvm-mos/llvm-mos/releases/download/llvm-mos-linux-main/llvm-mos-linux-main.tar.xz       | tar -xJ -C /opt     && /opt/llvm-mos/bin/mos-clang --version
+#9 CACHED
+
+#10 [4/8] RUN apt-get update && apt-get install -y --no-install-recommends       mame     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [8/8] WORKDIR /work
+#11 CACHED
+
+#12 exporting to image
+#12 exporting layers 0.0s done
+#12 exporting manifest sha256:b919b23dbc7b2767be12983a9acd1a8fa187fc8af65ba9534099637f33b200a7 done
+#12 exporting config sha256:c3f50065918d16a696cb7f222b5ba7fdd073aba4ac5a86476cf5e229c8e01147 done
+#12 exporting attestation manifest sha256:6113bc7d2b5921f2dccedc8368840fa0dccb7a12edbf7d14508854d56215f8e9 0.1s done
+#12 exporting manifest list sha256:9228e9f07f867f4eb4a6b84b1c5a27443b7d2c04ff96f537078411f7b3619bbd
+#12 exporting manifest list sha256:9228e9f07f867f4eb4a6b84b1c5a27443b7d2c04ff96f537078411f7b3619bbd 0.1s done
+#12 naming to docker.io/library/llvm-mos-65816-dev:latest done
+#12 unpacking to docker.io/library/llvm-mos-65816-dev:latest 0.0s done
+#12 DONE 0.4s
+==> MAME version: 0.285 (unknown)
+==> corpus: build expected.tsv with /work/build/llvm-mos-install/bin/mos-clang
+  hello              built
+  arith              built
+  control            built
+  arrays             built
+  structs            built
+  funcs              built
+  globals            built
+  invaders_sim       built
+  spiro_sim          built
+  spiro_ctrl_sim     built
+  pi_sim             built
+  ca1d_sim           built
+  rdiff_sim          built
+  nbody_sim          built
+  factorial_sim      built
+  newton_sim         built
+  cordic_sim         built
+  maze_sim           built
+  doom-fire_sim      built
+  life_sim           built
+  epicycles_sim      built
+  julia_sim          built
+  harmonograph_sim   built
+  raycaster_sim      built
+  burning-ship_sim   built
+  mandel-float_sim   built
+  avalanche_sim      built
+  boids_sim          built
+  turtle-vm_sim      built
+  lsystem_sim        built
+  truchet_sim        built
+  wire3d_sim         built
+  wire3d_ctrl_sim    built
+  fn_plot_sim        built
+  cardioid_sim       built
+  tea_sim            built
+  hilbert_sim        built
+  vaprintf_sim       built
+  bhut_sim           built
+  mandel-double_sim  built
+  bitcensus_sim      built
+  bitshuffle_sim     built
+  gf256_sim          built
+  rotozoom_sim       built
+  medfilt_sim        built
+  domcol_sim         built
+  cosmzoom_sim       built
+  multibase_sim      built
+  dhmix_sim          built
+  percol_sim         built
+  fenwick_sim        built
+  radix_sim          built
+  hull_sim           built
+  editdist_sim       built
+  huffman_sim        built
+  perlin_sim         built
+  gouraud_sim        built
+  dither_sim         built
+  msquares_sim       built
+  grid3d_sim         built
+  setjmp_sim         built
+  nmitally_sim       built
+  backtrack_sim      built
+  csrjmp_sim         built
+  retryjmp_sim       built
+  jt256_sim          built
+  vlastack_sim       built
+  borrowov_sim       built
+  bigbyval_sim       built
+  dblbridge_sim      built
+  bsearchviz_sim     built
+  strcmprace_sim     built
+  packrec_sim        built
+e | 47 remaining | 51s | fft_sim
+  vlanest_sim        built
+  jtedge_sim         built
+  jtsparse_sim       built
+  byvaledge_sim      built
+  ovmatrix_sim       built
+  vawidth_sim        built
+  sretrec_sim        built
+  arityfan_sim       built
+  extload_sim        built
+==> corpus: run expected.tsv (MAME settle=1000, backstop=20s)
+  hello      PASS  sentinel=0x42  liveness: main runs (the smoke ROM)
+  arith      PASS  corpus_result=0xA9E9  8/16/32-bit integer ALU
+  control    PASS  corpus_result=0x1DFB  loops / if / switch
+  arrays     PASS  corpus_result=0x03E1  arrays + .rodata lookup table
+  structs    PASS  corpus_result=0x0340  struct layout + pointer deref
+  funcs      PASS  corpus_result=0x011E  calls + recursion (soft stack)
+  globals    PASS  corpus_result=0xAB55  crt0 .data copy + .bss clear
+  invaders_sim PASS  corpus_result=0x9D57  Space Invaders deterministic attract sim, 600 frames (shared invaders_logic.h)
+  spiro_sim  PASS  corpus_result=0x32D4  spirograph (R,r,d) hypo/epi/rose/lissajous curve-point hash, 32 pts x 4 modes (shared spiro.h)
+  spiro_ctrl_sim PASS  corpus_result=0x6A26  spirograph interactive controller + HUD-format math over a scripted pad sequence (shared spirograph.h)
+  pi_sim     PASS  corpus_result=0x7711  π spigot (PI_GATE_DIGITS=1, PI_ELEMS=676, a[0]=0) + MC (PI_GATE_THROWS=256) gate CRC (shared pi_spigot.h)
+  ca1d_sim   PASS  corpus_result=0xAB2C  1-D CA: 32 Rule-90 + 32 Rule-110 gens from single-cell seed; CRC-16 of all output rows (shared ca1d.h)
+  rdiff_sim  PASS  corpus_result=0x5555  Gray-Scott cumulative gate_crc (16-bit fixed-point, scale 4096; GS_GATE_W=8, GS_GATE_H=8, GS_GATE_STEPS=8; DU=655/DV=328/F=150/K=254)
+  nbody_sim  PASS  corpus_result=0xCC65  N-body (N=3, GRAV_K=64, GRAV_SOFT=16, DT_SHIFT=4) Symplectic Euler, 32 steps, rotate-XOR CRC
+  factorial_sim PASS  corpus_result=0x772F  Bignum factorial 50! in base-10000 uint16 array; carry-mul + __mulsi3 + __udivmodsi4 (shared factorial.h)
+  newton_sim PASS  corpus_result=0x4D8B  Newton's-method fractal z³−1, 8×8 grid in [−1.2,1.2]², 20-iter cap; complex division + multiply (shared newton.h)
+  cordic_sim PASS  corpus_result=0x4D41  CORDIC rotator full-circle sweep (GATE_N=96): rotation cordic16_sincos + vectoring cordic16_atan2, shift-add only → zero mul/div libcalls (shared cordic.h)
+  maze_sim   PASS  corpus_result=0x0749  Maze recursive-division generate + A* indexed-heap solve (16x15) gate CRC: walls + path + heap counters (shared maze.h)
+  doom-fire_sim PASS  corpus_result=0x3C59  Doom-fire heat field: 16x16 grid, 30 steps; per-cell xorshift16 PRNG + flat-index array sweep (multiply-free), rotate-XOR CRC of full grid each step (shared doom-fire.h)
+  life_sim   PASS  corpus_result=0xDDF1  Conway's Game of Life B3/S23: Gosper gun on 64x48 bitpacked grid, 32 gens; SWAR bit-parallel neighbour sums (and/eor/ora + asl/lsr, multiply-free), CRC-16 of all output rows (shared life.h)
+  epicycles_sim PASS  corpus_result=0x4F6C  Fourier epicycles: sum of 8 rotating vectors (DFT of a star) traces the outline; 4 __mulsi3/harmonic + 32-bit accumulate, no divide (shared epicycles.h)
+  julia_sim  PASS  corpus_result=0x3490  Julia set z^2+c escape-time: 4 keyframe c's (0.7885*e^itheta orbit, 90 deg steps) over a 6x6 grid, maxiter 8; 3 __mulsi3/iter Q5.10 complex multiply (shared julia.h)
+ 100s | trapguard_sim
+  raycaster_sim PASS  corpus_result=0xB200  Raycaster maze DDA grid-cast: 64-column fan from a fixed camera, 16x16 map; 3 __udivsi3/column (deltaDist reciprocals + screen_h/dist), Q8.8 fixed-point + sin LUT (shared raycaster.h)
+  burning-ship_sim PASS  corpus_result=0x6F2D  Burning Ship fractal (|Re|,|Im| fold): 16x16 window over the ship, maxiter 24; 3 __mulsi3/iter (zx2,zy2,|zx*zy|) Q12 + 2 abs folds, escape-time hash, no divide (shared burning_ship.h)
+  mandel-float_sim PASS  corpus_result=0x4169  Soft-float Mandelbrot escape-time (IEEE-754 single precision): 2 zoom windows on a 6x6 grid (maxiter 12) + 24-step bit-exact orbit witness; every op is a soft-float libcall (__mulsf3/__addsf3/__subsf3/__divsf3/__gtsf2/__floatsisf), bit-for-bit host==target (shared mandel-float.h)
+  avalanche_sim PASS  corpus_result=0x27EA  64-bit Avalanche: 256 chained splitmix64 (2 __muldi3 + shifts incl. >>32 + variable 1ULL<<i) folded with 64-bit xor/add and a runtime __udivdi3 into a CRC16; exercises the 64-bit integer libcall family bit-exact host==target (shared avalanche.h)
+  boids_sim  PASS  corpus_result=0xA8AB  Boids struct-by-value steering: 8-bird flock, 12 steps; vec2 take/return-by-value kernel (v2_add/v2_sub/v2_scale + separation/alignment/cohesion, noinline) exercises the aggregate-return ABI; __mulsi3 + __divsi3 fixed-point, far-pointer-free, rotate-XOR CRC of pos/vel (shared boids.h)
+  turtle-vm_sim PASS  corpus_result=0x4007  Bytecode-VM turtle dispatch: stack-machine interpreter (dense switch -> JMP (abs,X) jump table + function-pointer ALU opcode table via __call_indir) runs a 180-step turtle program, rotate-XOR CRC of the path; near fnptrs + bank-0 data, far-pointer-free; exercises indirect/computed control flow bit-exact host==target (shared turtle_vm.h)
+  lsystem_sim PASS  corpus_result=0x8073  L-system string rewriting: axiom rewritten 6 generations IN PLACE in a grown char buffer (memmove tail-shift + memcpy production + strlen), then a turtle interprets it with a [ ]/ bracket push-pop stack into a fractal plant, rotate-XOR CRC of the path; bank-0 buffers, far-pointer-free; exercises string libcalls + save/restore stack bit-exact host==target (shared lsystem.h)
+  truchet_sim PASS  corpus_result=0xB3E6  Truchet packed-bitfield maze: 16x14 grid of uint16 bitfield cells (orient/style/hue/phase/mark/energy), 24 wave steps, folds EXTRACTED field values; exercises bitfield insert/extract codegen (and/ora/shift, no libcalls), bit-exact host==target (shared truchet.h)
+  wire3d_sim PASS  corpus_result=0xE737  3-D wireframe projected-vertex gate: 3x3 rotation matrix (Q8.8, __mulsi3) + per-vertex perspective divide (__divsi3) of each of 30 verts (tetra/cube/octa/icosa) projected once across 4 fixed non-trivial orientations; rotate-XOR hash of (sx,sy); near, far-pointer-free; sized for the 60-frame corpus settle window; matrix-mul + divide hot path bit-exact host==target (shared wire3d.h)
+  wire3d_ctrl_sim PASS  corpus_result=0xE3CD  3-D wireframe interactive controller + HUD-format math over a scripted pad sequence: solid/palette/trail edge controls + spin-rate/dolly level controls + auto-spin angle wrap + decimal HUD format; CRC16-CCITT; bit-exact host==target (shared wireframe.h)
+  fn_plot_sim PASS  corpus_result=0x2EBE  fn-plot recursive-descent parser + soft-float evaluator: 64 x-samples of x*x-0.5 in [-2,2), CRC of IEEE float bit-patterns; exercises fn_eval_expr→fn_eval_term→fn_eval_factor recursion + __mulsf3/__subsf3/__addsf3/__divsf3/__fixsfsi; bit-exact host==target (shared fn_plot.h)
+  cardioid_sim PASS  corpus_result=0x523B  Cardioid times-table modulo gate: k*(i+65536) % N for k=2..8 x i=0..199, rotate-XOR CRC of j; exercises __mulsi3 (genuinely 32-bit product via +65536 offset) + __umodsi3, bit-exact host==target (shared cardioid.h)
+  tea_sim    PASS  corpus_result=0xDF0E  TEA cipher gate: 8 plaintexts x 32 rounds with fixed 128-bit key; fold v[0]^v[1] via rotate-XOR; exercises 32-bit <<4/>>5 constant shifts + 32-bit add/XOR chains, multiply-free; rep/sep=22 under +mos-a16; inline ASL+ROL expansion (no __ashlsi3 at -Os); bit-exact host==target (shared tea.h)
+  hilbert_sim PASS  corpus_result=0x5999  Hilbert order-4 d2xy+xy2d round-trip gate: all 256 points, fold rt+(rt<<2)+x+(y<<8); variable-count 32-bit shifts __ashlsi3(rx,k)+__lshrsi3(x,k) (k=0..3 loop var); rep/sep=23, __mulsi3=0; bit-exact host==target (shared hilbert.h)
+  fft_sim    PASS  corpus_result=0x6D7A  32-point DIT FFT gate: sawtooth signal, 5 stages × 16 butterflies × 4× __mulsi3 (butterfly twiddle complex multiply); bit-reversal permutation; rep/sep=63; bit-exact host==target (shared fft.h)
+  vaprintf_sim PASS  corpus_result=0xE1F3  Variadic va_arg gate: 4× mini_sprintf calls, 9× va_arg(unsigned int/int); formats '123+456', '-7/3', 'beef cafe', '999 -1 abcd'; folds output chars; bit-exact host==target (shared vaprintf.h)
+  bhut_sim   PASS  corpus_result=0xEF0B  Barnes-Hut quadtree N-body gate: 8 particles, 6 steps; recursive bh_insert/bh_force walk pooled-node tree via runtime child[] indices (pointer-chasing) + gravity kernel __mulsi3(5)/__divsi3(4); rep/sep=160, bh_force self-recursion; bit-exact host==target (shared bhut.h)
+  mandel-double_sim PASS  corpus_result=0x0EDF  Double-precision soft-float Mandelbrot: a 5x5 double escape buffer + a 5x5 float twin (whole-set window, maxiter 6) + a 12-step bit-exact double orbit witness (raw 64-bit |z|^2 bits) + a double<->float conversion witness; exercises the 64-bit soft-float library (__muldf3/__adddf3/__subdf3/__gtdf2/__floatsidf) plus __truncdfsf2/__extendsfdf2, bit-exact host==target (shared mandel-double.h)
+  bitcensus_sim PASS  corpus_result=0x9516  Bit-population intrinsic family gate: popcount/clz/ctz/parity of coords; the ll builtins inline-lower to SWAR (G_CTPOP/CTLZ/CTTZ .lower @308), __*di2 helpers never called; bit-exact host==target (shared bitcensus.h)
+  bitshuffle_sim PASS  corpus_result=0x2A4A  bswap/bit-reverse intrinsic gate: __builtin_bswap32 + __builtin_bitreverse (G_BITREVERSE .lower @186), bit-reversal permutation (an involution); both inline-lower; bit-exact host==target (shared bitshuffle.h)
+  gf256_sim  PASS  corpus_result=0xC028  GF(2^8) carryless-multiply gate: log/antilog tables + XOR (gf_mul), no adc carry chain, 0 mul/div libcalls; cross-checked vs a slow bit-by-bit carryless multiply; bit-exact host==target (shared gf256.h)
+  rotozoom_sim PASS  corpus_result=0x391B  widening multiply-high gate: (coord*scale)>>16 via G_SMULH .lower @300 degrading to __muldi3/__mulsi3 on the soft-multiply target; Q16.16 affine sampler; bit-exact host==target (shared rotozoom.h)
+  medfilt_sim PASS  corpus_result=0x87FE  branchless min/max/abs network gate: 19-comparator median-of-9 via G_UMIN/UMAX .lower @272 + G_ABS @281; cross-checked vs insertion-sort median; bit-exact host==target (shared medfilt.h)
+  domcol_sim PASS  corpus_result=0xF3FD  NaN/unordered float-compare gate: (z^2-1)/(z^2+c) domain colouring, isnan(x)=(x!=x)->__unordsf2, folds the COLOUR INDEX not NaN bits, a guaranteed pole per iter; one-op-per-statement soft-float; bit-exact host==target (shared domcol.h)
+  cosmzoom_sim PASS  corpus_result=0x502F  64-bit int<->float conversion gate: uint64 scale -> float (__floatundisf) round-trip (__fixunssfdi) + signed __floatdisf/__fixsfdi; scale<10^18; correctly-rounded, bit-exact host==target (shared cosmzoom.h)
+  multibase_sim PASS  corpus_result=0x371A  div_t/lldiv_t struct-return-by-value gate: div()/lldiv() aggregate-return ABI over the custom G_SDIVREM @229; DEC/DOZ/HEX/SEX split; bit-exact host==target (shared multibase.h)
+  dhmix_sim  PASS  corpus_result=0x69AA  64-bit modular-exponentiation gate: __umoddi3 as the hot op in square-and-multiply (Diffie-Hellman); the slice that caught the s64 unmerge/anyext legalizer crash (fixed, patch 0017); bit-exact host==target (shared dhmix.h)
+  percol_sim PASS  corpus_result=0x025B  union-find path-compression gate: disjoint-set find walks parent ptrs to root then re-points the whole path flat; bond percolation; bit-exact host==target (shared percol.h)
+  fenwick_sim PASS  corpus_result=0x3454  Fenwick/BIT i&-i low-bit-isolation gate: update i+=i&-i, query i-=i&-i (width-safe (uint16)(i&(uint16)(0u-i))); prefix sums; bit-exact host==target (shared fenwick.h)
+emaining | 229s | corpus/harmonograph_sim.c | PASS 22 FAIL 0
+  hull_sim   PASS  corpus_result=0x84E3  convex-hull orientation gate: gift-wrap picks vertices from the sign of the int32 cross product (cast int16 diffs -> __mulsi3); cross-checks hull validity; bit-exact host==target (shared hull.h)
+  editdist_sim PASS  corpus_result=0xFB59  2-D DP table gate: Levenshtein D[i][j]=min(sub,del,ins) doubly-indexed table + backtrack (min-of-3 cmp); cross-checks symmetry edit(A,B)==edit(B,A); bit-exact host==target (shared editdist.h)
+  huffman_sim PASS  corpus_result=0xE8E4  Huffman bit-stream decode gate: MSB-first bit reader + pointer-linked tree descent (HF_KID0/KID1/SYM); cross-checks decode==original; bit-exact host==target (shared huffman.h)
+  perlin_sim PASS  corpus_result=0xA72D  Perlin gradient-noise gate: Fisher-Yates permutation + inline Hermite fade 6t^5-15t^4+10t^3 (Q0.8, __mulsi3-heavy) + 4-way gradient dot + lerp; bit-exact host==target (shared perlin.h)
+  gouraud_sim PASS  corpus_result=0xC5E9  barycentric edge-function raster gate: 3 int32 cross-product edge fns (__mulsi3) + per-pixel barycentric divide (__divsi3); trips the a16/xy16 -verify rc-undef XFAIL (code bit-exact correct); host==target (shared gouraud.h)
+  dither_sim PASS  corpus_result=0x80C4  Floyd-Steinberg signed error-diffusion gate: two-row error buffer, residual split (e*k)>>4 arithmetic shift, quantiser 3 compares + 4-level LUT, no division; bit-exact host==target (shared dither.h)
+  msquares_sim PASS  corpus_result=0x86A7  marching-squares gate: 4-bit corner-sign case -> 16-entry MS_SEG edge LUT + edge-crossing interpolation divide (__divsi3); trips the a16/xy16 -verify rc-undef XFAIL (code correct); host==target (shared msquares.h)
+  grid3d_sim PASS  corpus_result=0xFCDE  multi-dimensional array indexing gate: true uint8 grid[6][6][6] accessed grid[z][y][x] (compiler emits z*36+y*6+x), Moore-26 3-D life CA; bit-exact host==target (shared grid3d.h)
+  setjmp_sim PASS  corpus_result=0x2007  setjmp/longjmp non-local return on the 65816 native 16-bit stack (regression guard for the 6502-only common setjmp.S; #35)
+  nmitally_sim PASS  corpus_result=0xBCE6  #123 VBlank Interrupt Tally arithmetic gate (ORACLE form, no interrupts): 240 fenced ticks of xorshift16 + 16-bit multiply-add + 16x16->32 __mulsi3 accumulate, folded 4 rotations/tick; the interrupt-CC half is asserted separately by dev/nmitally.sh
+  backtrack_sim PASS  corpus_result=0x7336  #116 setjmp/longjmp multi-frame unwind gate (Round 6 Cluster G flagship): 8-queens with one setjmp choice point per recursion level; every dead end longjmps straight to the deepest still-viable ancestor, discarding a VARYING number of jsr frames in one jump (page-1 S reconstruct x soft-SP x __rc18..__rc31 CSR restore); folds 8 solution grids, visit/backtrack counters, summed unwind depth and the event trace (shared backtrack.h)
+  csrjmp_sim PASS  corpus_result=0xADD8  #117 setjmp/longjmp callee-saved-restore gate (Round 6 Cluster G): 14 coefficient bytes — the exact width of jmp_buf csrs[14] (__rc18..__rc31) — held in locals across a setjmp while a noinline worker occupies and rewrites every callee-saved slot, then longjmps past the epilogue that would restore them; an off-by-one in the restore offsets corrupts exactly one coefficient. Folds the post-longjmp vector of 6 passes plus the harmonograph curve (__mulsi3 32-bit chain) each one renders (shared csrjmp.h)
+  retryjmp_sim PASS  corpus_result=0x3388  #118 setjmp/longjmp RE-ENTRY gate (Round 6 Cluster G): ONE setjmp site re-armed and re-entered 24 times, each attempt jumping back from a different call depth over a different soft-stack high-water mark (noinline recursive rj_work with six 16-bit locals live across the recursive call). Folds the whole retry-outcome sequence — per attempt the fault code, the deepest frame reached and the work result — plus the total call count. The slice that found the +mos-xy16 A16-clobber miscompile fixed 2026-09-15 (docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md); shared retryjmp.h
+  jt256_sim  PASS  corpus_result=0xB8CC  #142 >128-successor jump-table gate (Round 8 Cluster A): ISA-256, a bytecode machine whose 256-way opcode dispatch is double legalizeBrJt's `Table.MBBs.size() <= 128` limit, so the `JMP (abs,X)` arm is structurally unreachable and the SPLIT low/high byte-table + G_BRINDIRECT arm (with its own MO_HI_JT relocation) must fire — the arm all five jump tables in demos #1-#141 avoid. Folds the register file, accumulator, all 256 bytes of VM memory, the plotted phase-portrait trace and the 256-bit opcode-coverage bitmap (shared jt256.h)
+  vlastack_sim PASS  corpus_result=0xD77B  #143 G_DYN_STACKALLOC gate (Round 8 Cluster A): an RLE scanline decoder whose per-row scratch array is a VLA sized by the run count read out of the compressed stream and declared in the loop body, so the soft SP is adjusted and restored once per row with a different delta. Zero demos #1-#141 form G_DYN_STACKALLOC — #68 polyfill's VLA const-folds to a fixed alloca, covering only G_STACKSAVE/RESTORE. Folds the decoded image, every row's run count and the prefix sums computed THROUGH the dynamic array (shared vlastack.h)
+  borrowov_sim PASS  corpus_result=0x81FB  #144 G_USUBO/G_SSUBO gate (Round 8 Cluster A): a reservoir cascade whose every transfer is a checked subtract via __builtin_sub_overflow at uint16 (borrow out), int16 and int32 (signed, opposite-sign operands — the pairing an add can never overflow on), with a detected underflow rejecting the transfer. __builtin_sub_overflow appears ZERO times across demos #1-#141; only the add (#44) and mul (#76/#101) forms. Folds accept/reject counts, the event trace and the final level vectors (shared borrowov.h)
+  bigbyval_sim PASS  corpus_result=0xBD6B  #145 >32-bit BY-VALUE ARGUMENT gate (Round 8 Cluster A): classifyArgumentType (clang Targets/MOS.cpp:64) sends any aggregate over 32 bits indirect with ByVal=false at :71, so the callee gets a pointer to caller-owned storage and by-value semantics rest on a call-site copy. A 144-bit BvMat and a 64-bit BvVert travel through six stages that each MUTATE their own parameter; the driver re-reads its original after every call. #91 matcascade covered only the RETURN half. Folds every stage output, every transformed vertex and every re-read (shared bigbyval.h)
+  dblbridge_sim PASS  corpus_result=0xF829  #146 G_FPEXT S32->S64 / G_FPTRUNC S64->S32 gate (Round 8 Cluster B): the same chaotic map (r = 125/32, exact in binary32) iterated two ways over identical binary32 state — once wholly at float, once PROMOTED to double for the step and DEMOTED back each iteration — so the lanes differ only in where the rounding happens and the step at which they separate is the measured output. ZERO corpus slices across demos #1-#141 link __extendsfdf2 or __truncdfsf2; #57 mandel-double uses double throughout but only forms __floatunsidf. Correctly-rounded IEEE only (+ - * and the two conversions), no libm; folds the uint32 bit pattern of every state of both lanes plus each orbit's divergence step and disagreement count (shared dblbridge.h)
+  bsearchviz_sim PASS  corpus_result=0x7FF5  #147 bsearch callback-ABI gate (Round 8 Cluster B): a strictly increasing 64-key table probed with 48 fixed queries containing both hits and deliberate misses, where each call returns a void* INTO the array (or NULL) that the caller must difference back into an index — a wrong conversion yields a plausible in-range index, not a crash. bsearch is used ZERO times across demos #1-#141; qsort (15x) is the only comparator-callback libc linked, and its comparator drives a swap rather than an interval bisection. Folds the keys, queries, found indices and miss sentinels; the probe trace is deliberately NOT folded (bisection order is unspecified and host/target libcs differ) — dev/bsearchviz.sh compares its signature across the three target modes instead (shared bsearchviz.h)
+  strcmprace_sim PASS  corpus_result=0xF0BA  #148 memcmp/strcmp/strncmp gate (Round 8 Cluster B): 24 fixed-width string lanes with deliberate shared prefixes and one byte-for-byte duplicate, merged under lexicographic order by strcmp, then every adjacent pair re-compared by a 3-byte-bounded strncmp and a full-width memcmp that runs past each terminator into deterministic filler — so all three functions produce all three signs and genuinely disagree. All three symbols are used ZERO times tree-wide across #1-#141. Folds the SIGN of every comparison normalised to -1/0/+1 (never the magnitude, which C leaves implementation-defined), each comparison's resolving byte position and the final ordering. Measured negative: MOS never inline-expands memcmp at any constant size (shared strcmprace.h)
+  packrec_sim PASS  corpus_result=0x4676  #149 packed-record LAYOUT INVARIANT gate (Round 8 Cluster B): a packed binary telemetry stream with two record shapes of coprime odd sizes (7 and 10 bytes) selected by a tag byte, parsed through a computed record pointer so every wide member is read from an offset the compiler cannot fold to a known alignment. REFRAMED honestly — on MOS every scalar already has ABI alignment 1, so an unpacked struct has no padding to remove and __attribute__((packed)) is a LAYOUT NO-OP (Round 8's second negative result; measured sizeof 10/7 packed vs 12/12 on the host). What this guards is the padding-free-layout invariant itself, asserted by the header's _Static_assert block and pinned by zero demos across #1-#141, on which every binary-format parse built with this toolchain depends. Folds every parsed field, every record start offset and the per-shape counts (shared packrec.h)
+  trapguard_sim PASS  corpus_result=0x2C2D  #150 G_TRAP gate (Round 8 Cluster B): a dense (state, event) machine with 20 legal pairs enumerated as case labels and 4 impossible ones falling to default: __builtin_trap(), which MOSLegalizerInfo.cpp:448 .custom()/legalizeTrap lowers to an RTLIB::ABORT libcall (jsr abort). The generator consults a per-state legality mask so an impossible pair never occurs, but tg_step is noinline and parameterised so the compiler cannot prove the default dead. __builtin_trap / __builtin_unreachable are used ZERO times across #1-#141, and __builtin_unreachable alone emits nothing at all. HONEST FRAMING: a trap terminates, so it can never be taken in a gate run — this is a PRESENCE-AND-INERTNESS probe, weaker than #142-#145. Folds only the reachable state trace, per-state visit counts and per-pair transition counts (shared trapguard.h)
+  vlanest_sim PASS  corpus_result=0x153B  #151 NESTED soft-SP unwind gate (Round 8 Cluster C): two VLAs in nested block scopes with independent runtime lengths, both re-entered once per loop iteration so the outer G_STACKSAVE/G_STACKRESTORE bracket survives AS a bracket around the inner one — measured, the obvious shapes (function-scope VLA + inner block; explicit outer block entered once) collapse to a single bracket because the outer restore coincides with the function's return. The inner length is derived from the OUTER allocation's contents, and the outer array is re-read after every inner block closes plus once more per row, because an overshooting unwind corrupts the outer array silently: no crash, no verifier complaint, the inner result still right. #143 vlastack covers ONE bracket at ONE depth; this is the depth axis. Folds the per-row reduction, every outer re-read, every inner allocation length and the row checksums — never a pointer value (shared vlanest.h)
+  jtedge_sim PASS  corpus_result=0xC199  #152 JUMP-TABLE BOUNDARY gate (Round 8 Cluster C): three noinline dispatchers over the same sixteen handler families with 127, 128 and 129 distinct successors, so both arms of legalizeBrJt and the exact `Table.MBBs.size() <= 128` test (MOSLegalizerInfo.cpp:3334) are compiled side by side in one program. All three are fed the SAME opcode stream, restricted to 0..126 so every opcode is in range for all three, over three independent copies of the same VM state — a boundary off-by-one that mis-indexed either arm by one slot lands in a neighbouring handler and moves exactly one of the three. #142 jt256 sits at 256, deep past the boundary. MEASURED: the boundary is exact and inclusive at 128 (127/128 emit `jmp (.LJTI,x)`, 129 emits `ldy .LJTI,x` + `lda .LJTI+256,x` + `jmp (__rc)`), and the split arm's tables are emitted at a fixed 256-byte stride regardless of entry count. Folds all three final VM states, all three traces and a three-way agreement flag (shared jtedge.h)
+  jtsparse_sim PASS  corpus_result=0xA131  #153 SPARSE-SWITCH COMPARE-TREE gate (Round 8 Cluster C): the third switch-lowering strategy. A switch whose case values are too sparse to tabulate never reaches legalizeBrJt at all — it is lowered to a binary-search compare tree, structurally distinct from both jump-table arms (#142 jt256, #152 jtedge) and never deliberately forced by any prior demo. Two noinline dispatchers carry the SAME sixteen handler bodies — one at dense indices 0..15 (jump table), one at sparse keys 0..55555 (compare tree) — and every logical operation runs through both over independent copies of the same VM state, so strategy 3 is differentially checked against strategy 1 inside one program. Both default arms are deliberately exercised. Folds both final VM states, both traces, the miss counts and an agreement flag (shared jtsparse.h)
+  byvaledge_sim PASS  corpus_result=0x4FAB  #154 >32-bit BY-VALUE ABI BOUNDARY gate (Round 8 Cluster C): classifyArgumentType (clang Targets/MOS.cpp) sends an aggregate indirect with ByVal=false when getTypeSize(Ty) > 32 and direct otherwise, so a 4-byte record and a 5-byte record sit on opposite sides of a one-byte difference and are compiled adjacently here. Three shapes travel through stages that each MUTATE their own parameter, and the driver re-reads its own original after every call — the only way a missing call-site copy is observable, since it corrupts the CALLER silently and leaves the callee's result correct. #145 bigbyval is 144 bits, far past the threshold; #26 boids is 32 bits, at it, with no indirect sibling in the same ROM. MEASURED CORRECTION: getTypeSize is in BITS and a MOS record is always whole bytes, so there is no 33-bit size class — a record declaring 33 bits of bitfield is sizeof 5 (40 bits) and takes the indirect path. This demo also found an OPEN upstream regalloc defect (see docs/investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md). Folds every stage output, every caller re-read and a violation counter that must be 0; sizeof is deliberately NOT folded (5/5 on MOS, 8/6 on the host) (shared byvaledge.h)
+  ovmatrix_sim PASS  corpus_result=0xD4D0  #155 OVERFLOW-BUILTIN MATRIX gate (Round 8 Cluster C): all three builtins at all three widths with both signednesses — {add, sub, mul} x {16, 32, 64} x {unsigned, signed} = 18 cells — in ONE noinline kernel, every operand from runtime state and every result live across the others, so G_UADDO/G_SADDO, G_USUBO/G_SSUBO and G_UMULO/G_SMULO are selected and register-allocated next to each other under real pressure. #44, #76, #101 and #144 each test one family, at one or two widths, in a loop of its own; none tests the interaction. MEASURED: a probe with one CONSTANT operand per builtin folded cells away outright and lost G_SSUBO entirely, so both operands are runtime and the gate asserts every one of the 18 cells fired BOTH outcomes. __builtin_*_overflow is fully defined (infinite precision then wrapped into the result type), so host and target agree bit-for-bit at every width. Folds each cell's accumulated result and its overflow/clean counts plus all six final lanes (shared ovmatrix.h)
+  vawidth_sim PASS  corpus_result=0x3D17  #156 va_arg width sweep: promoted 8-bit, native 16-bit, 32-bit, 64-bit and pointer slots are consumed in order and folded without depending on host pointer representation (shared vawidth.h)
+  sretrec_sim PASS  corpus_result=0x01AB  #157 recursive sret: a 64-bit record is returned through twelve live recursive frames and every depth result is folded (shared sretrec.h)
+  arityfan_sim PASS  corpus_result=0xA09E  #158 indirect-call arity fan: a runtime-selected table calls four correctly typed function pointers with one through four arguments (shared arityfan.h)
+/radix_sim.c | PASS 52 FAIL 0
+progress sn  extload_sim PASS  corpus_result=0xF97F  #159 extending-load matrix: signed and unsigned source widths extend to every wider 16/32/64-bit destination through volatile memory reads (shared extload.h)
+==> corpus: 84/84 passed
+apshot: CORPUS run [###################-]  98% 83/84 complete | 1 remaining | 520s | corpus/extload_sim.c | PASS 83 FAIL 0
+CORPUS-rc=0

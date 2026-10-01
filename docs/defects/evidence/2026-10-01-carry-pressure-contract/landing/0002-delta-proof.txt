@@ -1,0 +1,12 @@
+# Regenerated 0002 (dev/regen-patch.sh from the worktree vendor copy = origin stack + split design + 0071) against origin's 0002.
+# Added (+) lines per file, multiset difference; 'split' = docs/defects/evidence/2026-09-30-native-width-pressure-sets/final/downstream/vendor-candidate.diff,
+# which is the split's #321-1/#321-8 pressure-set code minus getLargestRegClassForRegPressureSet (checked line by line against patches-321/0001 and 0008).
+$ dev/regen-patch.sh
+RESULT: PASS — 0002 round-trips (MOS dir + focused tests == live vendor)
+llvm/lib/Target/MOS/MOSRegisterInfo.cpp: +125 -0; not in split design 0; split design missing 0
+llvm/lib/Target/MOS/MOSRegisterInfo.h: +25 -0; not in split design 0; split design missing 0
+llvm/lib/Target/MOS/MOSRegisterInfo.td: +6 -0; not in split design 0; split design missing 0
+llvm/lib/Target/MOS/MOSSubtarget.cpp: +1 -0; not in split design 0; split design missing 0
+llvm/test/CodeGen/MOS/native-width-default-pressure.ll: new file, 124 lines (byte-identical to the 2026-09-30 downstream split-design test)
+llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll: new file, 30 lines (byte-identical to the 2026-09-30 downstream split-design test)
+RESULT: every changed line is the split design or its tests; no foreign hunk
