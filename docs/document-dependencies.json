@@ -2632,10 +2632,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "3d873437057239c188797274e0200d7c199f3a97918db189ef8cdda7033b8302"
+          "TODO.md": "d0739098cd17d2714f42c825bed5bd552e89e91aa78080e36a13c48d8771fd20"
         },
-        "reviewed_at": "2026-09-30T22:15:49.050044+00:00",
-        "note": "The 0069/0070 items record the third review (fileable once mlund answers) and the round-three fixes in progress; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-10-01T02:34:02.414446+00:00",
+        "note": "TODO records the user's approved recommendations: carry-scheduling landing, the soft-stack item split into probe check (T2), dither buffer move (T2) and the queued MOSNonReentrant main change (T4), and a #415 stack note; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
