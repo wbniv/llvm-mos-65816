@@ -2645,10 +2645,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "5bb59044f53d1cf48d92254e88c0159082618927348808d9775eb32366733640"
+          "TODO.md": "94da83aeefbcbfe48f16ce10a1c6712d2e8bb0a5f5e1e40c35e24f50bfd9a735"
         },
-        "reviewed_at": "2026-10-01T07:46:29.997800+00:00",
-        "note": "The 0069/0070 items record round three, and two upstream defects are in the Inbox; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-10-01T08:00:24.053243+00:00",
+        "note": "The finished soft-stack probe item left TODO (85901a6c), and the link-reserve item now carries the sweep's margins; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
