@@ -2646,10 +2646,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "03d3985c3344e6b68087f1d9cee3baba6a2be50a167132ec47d23243a280da6a"
+          "TODO.md": "daf5d12bcbd700b2fc50a000da1b11adbaeeadcb1438485534cec255a13d9162"
         },
-        "reviewed_at": "2026-10-01T15:22:43.082416+00:00",
-        "note": "The finished SDK-rebuild and soft-stack-reserve items left TODO; carry-scheduling profitability and the 0069/0070 final check are in progress; three new Inbox entries await the user's ranking. The publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-10-01T23:18:12.527150+00:00",
+        "note": "The 0069/0070 items record review 4 (no blockers) and the round-six reviewability fixes in progress; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
