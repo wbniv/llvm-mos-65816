@@ -2646,10 +2646,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "2ab1f0330248d625ca1de71375a66637f49d611a2313b4f4b3037d7a1a2f5ae9"
+          "TODO.md": "67f31b2e3730a748f7dbb635c7535c4b8457fc40102bc9a70eaf0388cfc7ef8a"
         },
-        "reviewed_at": "2026-10-01T23:34:21.238420+00:00",
-        "note": "TODO ranks and dispatches the demo build failures (T4) and the stale installed llc (T1) from the Inbox; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-10-01T23:59:39.572401+00:00",
+        "note": "The finished install-llc item left TODO (11ccd690); the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
