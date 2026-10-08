@@ -12,7 +12,13 @@ HERE="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(dirname "$HERE")"; IMAGE=llvm-mos
 usage() { sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; }
 [ $# -eq 0 ] && { usage; exit 0; }
 case "$1" in -h|--help) usage; exit 0;; esac
+source "$HERE/docker-user.sh"
+container_identity="$(docker_container_identity)"
 if [ "$1" = "--fix-owner" ]; then
+  if [ "$container_identity" = "0:0" ] && [ "$(id -u)" != 0 ]; then
+    echo "Rootless Docker cannot repair files owned by host root; use an explicit administrator operation." >&2
+    exit 1
+  fi
   mapfile -t bad < <(find "$ROOT/build" -user root 2>/dev/null)
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) root-owned files under build/: ${#bad[@]}"
   [ ${#bad[@]} -eq 0 ] && exit 0
@@ -31,5 +37,5 @@ done
 [ $# -gt 0 ] || { echo "no command given after --" >&2; exit 2; }
 # Core dumps are off: batch runs expect compiler aborts, and the host stores
 # every dump in root-owned /var/lib/systemd/coredump.
-exec docker run --rm "${mounts[@]}" --user "$(id -u):$(id -g)" --ulimit core=0 \
+exec docker run --rm "${mounts[@]}" --user "$container_identity" --ulimit core=0 \
   -e HOME=/work/build -w /work "$IMAGE" "$@"

@@ -5,6 +5,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(dirname "$HERE")"
+source "$HERE/docker-user.sh"
 IMAGE="${MOS_DEV_IMAGE:-llvm-mos-65816-dev}"
 DEV_DOCKERFILE="${MOS_DEV_DOCKERFILE:-Dockerfile}"
 TARGET="${1:-build}"
@@ -678,9 +679,10 @@ if [ -n "$(find "$ROOT/build" -user root -print -quit 2>/dev/null)" ]; then
   echo "==> build/ has root-owned files (a container run without --user); repairing"
   "$HERE/container.sh" --fix-owner
 fi
+container_identity="$(docker_container_identity)"
 docker run --rm \
   -v "$ROOT":/work \
-  --user "$(id -u):$(id -g)" \
+  --user "$container_identity" \
   --ulimit core=0 \
   -e HOME=/work/build \
   ${SMOKE_WANT:+-e SMOKE_WANT} \
