@@ -1,0 +1,54 @@
+fatal error: error in backend: Can't create a MachineFunction using a Module with a Target-incompatible DataLayout attached
+  Target DataLayout: e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8
+  Module DataLayout: e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8
+
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and dumped files.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-baseline/clang -target mos -mcpu=mosw65816 -ffreestanding -Os -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-10-10-pin-packed-layout/arith.i -o /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-baseline.o
+1.	<eof> parser at end of file
+2.	Code generation
+3.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/examples/snes/corpus/arith.c'.
+4.	Running pass 'Analysis containing CSE Info' on function '@main'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  clang     0x000060def00af38b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  clang     0x000060def00aea3c llvm::sys::CleanupOnSignal(unsigned long) + 348
+2  clang     0x000060def0019907
+3  clang     0x000060def001989f llvm::CrashRecoveryContext::HandleExit(int) + 47
+4  clang     0x000060def00a9d17 llvm::sys::Process::Exit(int, bool) + 39
+5  clang     0x000060deef0a9af6
+6  clang     0x000060def0021b26 llvm::report_fatal_error(llvm::Twine const&, bool) + 262
+7  clang     0x000060deef5335a1
+8  clang     0x000060deef572e3e llvm::MachineModuleInfo::getOrCreateMachineFunction(llvm::Function&) + 446
+9  clang     0x000060deef53fc1c llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 124
+10 clang     0x000060deefb2ee01 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1089
+11 clang     0x000060deefb35aa2 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+12 clang     0x000060deefb2f9c4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1716
+13 clang     0x000060def19674d3 llvm::runCodeGenPipeline(llvm::TargetMachine&, llvm::Module&, llvm::raw_pwrite_stream&, std::unique_ptr<llvm::ToolOutputFile, std::default_delete<llvm::ToolOutputFile>>&, llvm::CodeGenFileType, bool, bool, bool, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>) + 2211
+14 clang     0x000060def082502a
+15 clang     0x000060def0822ce3 clang::emitBackendOutput(clang::CompilerInstance&, clang::CodeGenOptions&, llvm::Module*, clang::BackendAction, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>, std::unique_ptr<llvm::raw_pwrite_stream, std::default_delete<llvm::raw_pwrite_stream>>, clang::BackendConsumer*) + 5571
+16 clang     0x000060def083d1e3 clang::BackendConsumer::HandleTranslationUnit(clang::ASTContext&) + 1459
+17 clang     0x000060def2509539 clang::ParseAST(clang::Sema&, bool, bool) + 569
+18 clang     0x000060def0de91e6 clang::FrontendAction::Execute() + 38
+19 clang     0x000060def0d5a739 clang::CompilerInstance::ExecuteAction(clang::FrontendAction&) + 1321
+20 clang     0x000060def0ea64bc clang::ExecuteCompilerInvocation(clang::CompilerInstance*) + 556
+21 clang     0x000060deef0a9379 cc1_main(llvm::ArrayRef<char const*>, char const*, void*) + 7193
+22 clang     0x000060deef0a56b7
+23 clang     0x000060deef0a76c8
+24 clang     0x000060def0b738d9
+25 clang     0x000060def001983a llvm::CrashRecoveryContext::RunSafely(llvm::function_ref<void ()>) + 154
+26 clang     0x000060def0b72eed clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const + 301
+27 clang     0x000060def0b2e18e clang::driver::Compilation::ExecuteCommand(clang::driver::Command const&, clang::driver::Command const*&, bool) const + 590
+28 clang     0x000060def0b2f0cc clang::driver::Compilation::ExecuteJobs(clang::driver::JobList const&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&, bool) const + 3372
+29 clang     0x000060def0b52a98 clang::driver::Driver::ExecuteCompilation(clang::driver::Compilation&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&) + 328
+30 clang     0x000060deef0a4d19 clang_main(int, char**, llvm::ToolContext const&) + 5993
+31 clang     0x000060deef0b4646 main + 102
+32 libc.so.6 0x00007248e322a601
+33 libc.so.6 0x00007248e322a718 __libc_start_main + 136
+34 clang     0x000060deef0a31a5 _start + 37
+clang: error: clang frontend command failed with exit code 70 (use -v to see invocation)
+clang version 24.0.0git (/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/clang f24948c7d1a4b9f162d4d0192ccceecab1e441ff)
+Target: mos
+Thread model: posix
+InstalledDir: /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-baseline
+Build config: +assertions
+clang: note: diagnostic msg: Error generating preprocessed source(s) - no preprocessable inputs.

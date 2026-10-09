@@ -1,8 +1,14 @@
 # Upstream contribution status — PR progress and submission queue
 
-**#594 coordination comment, October 1 (drafted; posting PARKED by the user until every pending item on the compiler-work page clears, together with the #584 follow-up comment):** the far-word packet's #320‑1 collides with [llvm-mos#594](https://github.com/llvm-mos/llvm-mos/pull/594) (mlund's `Imag32` foundation). The user chose to build on #594 rather than compete with it. The [drafted comment](pr-preparations/2026-10-01/594-comment.md) proposes landing #594 as-is and adopting its numbering, gating RL allocation on mlund's planned SDK contiguity contract with the SNES platform declaring it (a 65816-only gate as fallback), and agreeing on one far address space with mlund's MEGA65 plans. Post with `gh pr comment 594 --repo llvm-mos/llvm-mos --body-file docs/pr-preparations/2026-10-01/594-comment-body.md` after re-reading #594 live. The carried #320 commits are under their second independent review.
+**Live status, October 9:** compiler #578 merged September 25, #586 September 29, and #584/#588/#589 October 5. Of our 14 compiler PRs, 12 are merged, #604 is open and #609 is withdrawn. SDK #450 remains open with changes requested October 5: mysterymath accepts the code in principle but asks for the regression in `llvm-test-suite`, checking for an existing disabled test first. #320/#321/#594 have no new replies; #594 and SDK #415 remain open. [GitHub receipt](upstream-status/2026-10-09.json).
 
-**#320/#321 split, third round (October 1):** the [third independent review](pr-preparations/2026-09-30/far-word-rebase/independent-review-3.md)'s N17–N22 and the older N1–N9 items are addressed ([plan](plans/2026-10-01-far-prerequisite-split-carry.md#third-round-n17n22-and-the-older-open-items)). The SPC700 fix hidden in #320‑2 is our open #584; after round four the series does not carry it, and #584 files first. Default-mode checks now cover all 14 MOS CPUs and found two more upstream defects, both unposted: a [HuC6280 block-move miscompile](defects/mos-huc-blockmove-frameindex-offset.json) that #321‑11 fixes as a side effect (not separable: it is the rule #321‑11 needs for its own compares), and an [SPC700 allocator assertion](defects/mos-spc700-hint-outside-order.json). Filing still waits on mlund's #594 answers.
+**Pin rebase and patch retirement, October 9:** the bootstrap pin is now `f24948c7d1a4b9f162d4d0192ccceecab1e441ff`, immediately after #589 merged. Merged fixes and their upstream tests come from this revision; they are removed from `0001`/`0002`. Standalone 0003, 0010, 0016, 0019, 0021, 0022, 0024 and 0025 are retired, and upstream vector scalarization makes backport 0049 redundant. Clang 0035 is superseded by LLVM [#221477](https://github.com/llvm/llvm-project/pull/221477), merged September 16; both local artifacts are retired. The remaining stack is rebased; [validation and retained prior aggregates](pr-preparations/2026-10-09/pin-rebase/README.md) distinguish bootstrap checks from compiler testing. Historical standalone artifacts remain available in Git at `dfeb5c9b`. #584's merge prerequisite is satisfied; its parked follow-up is superseded. The #594 coordination hold remains. Earlier patch-retention statements below are dated evidence for their recorded revisions.
+
+OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
+**#594 coordination comment, October 1 (drafted; posting PARKED by the user until every pending item on the compiler-work page clears, with the #584 follow-up now superseded by its October 5 merge):** the far-word packet's #320‑1 collides with [llvm-mos#594](https://github.com/llvm-mos/llvm-mos/pull/594) (mlund's `Imag32` foundation). The user chose to build on #594 rather than compete with it. The [drafted comment](pr-preparations/2026-10-01/594-comment.md) proposes landing #594 as-is and adopting its numbering, gating RL allocation on mlund's planned SDK contiguity contract with the SNES platform declaring it (a 65816-only gate as fallback), and agreeing on one far address space with mlund's MEGA65 plans. Post with `gh pr comment 594 --repo llvm-mos/llvm-mos --body-file docs/pr-preparations/2026-10-01/594-comment-body.md` after re-reading #594 live. The carried #320 commits are under their second independent review.
+
+**#320/#321 split, third round (October 1; publication status updated October 9):** the [third independent review](pr-preparations/2026-09-30/far-word-rebase/independent-review-3.md)'s N17–N22 and the older N1–N9 items are addressed ([plan](plans/2026-10-01-far-prerequisite-split-carry.md#third-round-n17n22-and-the-older-open-items)). The SPC700 fix hidden in #320‑2 is our #584, merged October 5; after round four the series does not carry it; #584 merged October 5, satisfying that prerequisite. Default-mode checks now cover all 14 MOS CPUs and found two more upstream defects, both unposted: a [HuC6280 block-move miscompile](defects/mos-huc-blockmove-frameindex-offset.json) that #321‑11 fixes as a side effect (not separable: it is the rule #321‑11 needs for its own compares), and an [SPC700 allocator assertion](defects/mos-spc700-hint-outside-order.json). Filing still waits on mlund's #594 answers.
 
 **Far-word rebase, September 30:** the 0069/0070 series is [rebased onto `06bc967d2668`](pr-preparations/2026-09-30/far-word-rebase/README.md) with unchanged patch bodies. The suites, the 228-case sensitivity check and all 58 MAME/bsnes configurations reproduce the September 28 bytes and clocks. The [independent review](pr-preparations/2026-09-30/far-word-rebase/independent-review.md) upholds 0069, 0070 and patches 9–11 but blocks filing. The far prerequisite has four defects that also reproduce downstream: [far-pointer argument exhaustion](defects/mos-far-pointer-arg-exhaustion.json), [far memory lengths above 65535](defects/mos-far-memop-length-truncation.json), [far accesses on non-65816 CPUs](defects/mos-far-access-non-65816.json) and [undef debug values after the far index fold](defects/mos-far-index-fold-dangling-dbg.json). It also has two extraction gaps (a trunc pattern and far-quad DWARF) and an `Imag32` collision with open #594 that needs a maintainer decision. All four are now fixed downstream in `0002`, with same-input red/green closures and a >64 KiB runtime gate ([plan](plans/2026-09-30-far-prerequisite-defects.md)). On October 1 the repairs, the trunc-pattern gap and the #320 formatting and comment cleanups were [carried into the #320 split commits](plans/2026-10-01-far-prerequisite-split-carry.md). The [second independent review](pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md) upheld that carry and found two more blockers (B8, B9). A second round rebuilt #320 on #594, as the user decided on October 1: #594 is carried unchanged, with a fix for a #594 defect that aborts calls with stack arguments; RL is allocated on the 65816 only; quad spills are moved into #320; and every far fold drops dead debug locations. The packet awaits a focused third independent review. The RL DWARF numbering is escalated, and the SDK companion below is queued; nothing is posted.
 
@@ -48,7 +54,7 @@ opening its upstream PR.
 
 The [live upstream dashboard](https://wald3n.com/open-source#compiler-upstream)
 shows current GitHub PR state alongside a separately dated, reviewed local-work
-manifest. The GitHub counts below are a 2026-09-25 snapshot; use the dashboard
+manifest. The GitHub counts below are an October 9 live check; use the dashboard
 for newer remote state and this tracker for submission evidence and history.
 
 **Current local posting preparation:** the
@@ -76,16 +82,7 @@ routing and passes with it, including all 4096 physical WRAM bytes. This updates
 stale discovery status and adds regression coverage; the compiler/ABI and far
 runtime remain feature-series work, with no new independent PR claimed.
 
-**GitHub status last verified:** 2026-09-25, live `gh pr view` / `gh issue view` / `gh pr checks` of
-every PR and issue referenced in this document. Scope: PRs/issues authored by `wbniv` in
-`llvm-mos/llvm-mos`, plus authored PRs in `llvm-mos/llvm-mos-sdk`.
-**13 compiler PRs: 7 merged (#562, #563, #577, #579, #587, #590, #591), 6 open (#578, #584, #586,
-#588, #589, #604). Both authored issues (#561 and #576) are closed.** (#549, #575 and #585 are other
-authors' PRs and were listed here by mistake until 2026‑09‑24; verified with `gh pr view`.) No PR or
-issue state changed between the 2026-09-23 and 2026-09-25 checks; CI rollups, review decisions, and
-comment counts on the six open PRs are unchanged.
-**SDK: one authored PR, #450, open.** No state change since the September 20 posting (reconfirmed
-2026-09-25: 0 comments, 0 reviews, `reviewDecision` empty).
+**GitHub status last verified:** 2026-10-09, live GitHub queries. **14 authored compiler PRs: 12 merged, one open (#604), one withdrawn (#609).** Both authored compiler issues (#561 and #576) remain closed in the retained September 25 evidence; they were not rechecked in this PR refresh. **SDK: #450 open, changes requested October 5.** Current PR details and the five newly recorded merges are below; earlier dated snapshots remain historical evidence.
 
 **Prepared submissions (posting is user-triggered; review evidence is linked below):**
 [0029](upstream-twoaddr-physreg-reschedule-pr.md) register exhaustion ·
@@ -95,7 +92,6 @@ comment counts on the six open PRs are unchanged.
 [0032](upstream-register-named-symbols-pr.md) register-named symbols ·
 [0033](upstream-spill-hoist-scratch-vregs-pr.md) spill hoisting (generic LLVM + driver flag removal) ·
 [0034](upstream-prefetch-legalize-pr.md) drop `G_PREFETCH` ·
-[0035](upstream-clang-prefetch-int16-pr.md) clang prefetch operands as `i32` (for llvm/llvm-project) ·
 [0037](pr-preparations/2026-09-26/0037-pr-body.md) GlobalISel indirect inline-asm outputs, the `+g` idiom (for llvm/llvm-project) ·
 [0038](pr-preparations/2026-09-26/0038-pr-body.md) `llvm.returnaddress` / `llvm.frameaddress` legalized ·
 [0040](pr-preparations/2026-09-26/0040-pr-body.md) `coalesceStackAccess` must not erase a
@@ -275,16 +271,11 @@ in `mos-validation.md`.
 
 | Open PR | Current head | Review / next step | Latest GitHub CI (Ubuntu / Windows / macOS) |
 |---|---|---|---|
-| [#578 — Recompute loop liveness after copy forwarding](https://github.com/llvm-mos/llvm-mos/pull/578) | `b4749221bf37` | Root-cause revision published; reply posted September 14. Await maintainer review. | Pass / **fail** / pass |
-| [#584 — Fix non-GPR immediate loads in mos-late-opt](https://github.com/llvm-mos/llvm-mos/pull/584) | `7f4c37de6219` | Simplified guard published in the September revision bundle. Await maintainer review. Still needed on current `main` `06bc967d2668`: 31 of 90 measured inputs crash at `mosspc700 -O2`, and #584 fixes exactly those ([record](defects/mos-late-opt-nongpr-ldimm.json)). Files before the #320/#321 split, which does not carry it (user decision 2026‑10‑01). A follow-up comment with that measurement is [prepared, not posted](pr-preparations/2026-10-01/584-comment.md). | Pass / cancelled / pass |
-| [#586 — Accept an optional BRK signature operand](https://github.com/llvm-mos/llvm-mos/pull/586) | `a2f81a87b01c` | Requested disassembly and round-trip tests published. Await maintainer review. | Pass / cancelled / pass |
-| [#588 — Add the COP mnemonic with a mandatory signature operand](https://github.com/llvm-mos/llvm-mos/pull/588) | `34f31af3c7d4` | September 15 follow-ups test reserved signatures `$80`–`$ff` and a byte-level boundary round trip. Await maintainer review. | Cancelled / **fail** / pass |
-| [#589 — Mark CmpZero as a terminator](https://github.com/llvm-mos/llvm-mos/pull/589) | `9aead7afaa4a` | Requested terminator change published; GitHub still reports **CHANGES_REQUESTED** from August 30. Await re-review. | Pass / **fail** / pass |
-| [#604 — Correct MVN/MVP bank order and symbolic fixups](https://github.com/llvm-mos/llvm-mos/pull/604) | `ae3108c31890` | Published September 20; awaiting initial review. | Pass / **fail** / pass |
+| [#604 — Correct MVN/MVP bank order and symbolic fixups](https://github.com/llvm-mos/llvm-mos/pull/604) | `ae3108c31890` | No comments or reviews as of October 9; await initial review. | Pass / **fail** / pass |
 
 | Open SDK PR | Current head | Review / next step | GitHub CI |
 |---|---|---|---|
-| [#450 — Make longjmp(env, 0) return one from setjmp](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) | `0f8ad11589f5` | Published September 20; no comments or reviews yet. Await initial review. | No checks reported |
+| [#450 — Make longjmp(env, 0) return one from setjmp](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) | `0f8ad11589f5` | **Changes requested October 5:** inspect existing `llvm-test-suite` coverage; enable or add the regression there and remove the SDK test when revising the PR. Code looks fine to mysterymath. **Revision prepared locally October 9, not posted:** one-commit `setjmp.S`-only branch plus a `llvm-test-suite` test that fails on the unfixed SDK and passes on the fixed one at `-O0`, `-O2`, `-O3`, `-Os` and `-Oz` ([validation and user-triggered post commands](pr-preparations/2026-10-09/validation.md)). | No checks reported |
 
 CI is the latest check rollup returned for each PR on the verification date, not a new local test run.
 **Windows CI infrastructure blocker (Will, 2026-09-20):** upstream has not updated its
@@ -320,12 +311,18 @@ this refresh — no review activity yet.
 | [#587](https://github.com/llvm-mos/llvm-mos/pull/587) | Preserve Motorola integer defaults | 2026-08-30 |
 | [#591](https://github.com/llvm-mos/llvm-mos/pull/591) | Out-of-range branch fixup diagnostics | 2026-08-30 |
 | [#590](https://github.com/llvm-mos/llvm-mos/pull/590) | Deterministic zero-page allocation | 2026-09-14 |
+| [#578](https://github.com/llvm-mos/llvm-mos/pull/578) | [MOS] Recompute loop liveness after copy forwarding | 2026-09-25 |
+| [#584](https://github.com/llvm-mos/llvm-mos/pull/584) | [MOS] Fix non-GPR immediate loads in mos-late-opt | 2026-10-05 |
+| [#586](https://github.com/llvm-mos/llvm-mos/pull/586) | [MOS] Accept an optional BRK signature operand | 2026-09-29 |
+| [#588](https://github.com/llvm-mos/llvm-mos/pull/588) | [MOS] Add the COP mnemonic with a mandatory signature operand | 2026-10-05 |
+| [#589](https://github.com/llvm-mos/llvm-mos/pull/589) | [MOS] Mark CmpZero as a terminator | 2026-10-05 |
 
 The #320/#321 feature series remains separate from these PRs; #321 is an issue, not an existing
-native-width PR. The submission queue below records drafts and dependencies. Merge status alone
-does not authorize dropping a fork patch: first ensure the selected vendor revision contains the fix.
+native-width PR. The submission queue below records drafts and dependencies. The October 9 pin supplies these merged repairs directly; their duplicate aggregate hunks and standalone carries are retired.
 
 ## Historical updates
+
+The entries below preserve earlier publication and patch identities. Their review/open labels and standalone paths are dated evidence; use the October 9 status and aggregate-patch disposition above for current work.
 
 **Historical update:** 2026-08-28 (**PR #577 maintainer review addressed:** rebased onto current upstream
 `main` at `e1686c59f0bd`, removed the redundant `.lower()` commentary, reduced the lit-test preamble

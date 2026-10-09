@@ -4,7 +4,7 @@
 
 ## Status
 
-There is no upstream pull request for `patches/llvm-mos/0002-321-accum16.patch`. GitHub #321 is the tracking issue. The open PRs #577, #578, #579, and #584 are independent focused changes; `0002` must not be folded into any of them.
+There is no upstream pull request for `patches/llvm-mos/0002-321-accum16.patch`. GitHub #321 is the tracking issue. PRs #577, #578, #579, and #584 are merged independent focused changes (status checked October 9 for #578/#584); `0002` must not be folded into any of them.
 
 For now, keep developing and regenerating the complete native-width implementation as holistic patch `0002`. The interrupt-width fix and its LLVM regression belong there. Do not update GitHub or wald3n.com until the user explicitly chooses to post the draft PR.
 

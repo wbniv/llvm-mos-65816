@@ -1,0 +1,20 @@
+{
+  "search_terms": [
+    "Target-incompatible DataLayout",
+    "p3:24:8",
+    "MOSDataLayout",
+    "Triple::mos",
+    "computeDataLayout"
+  ],
+  "related_records": [],
+  "findings": [
+    "No canonical DataLayout mismatch record exists.",
+    "0006 and the June 21 packed-storage plans require p3:24:8 in both descriptions.",
+    "Old vendor HEAD 8be0546 MOSTargetMachine.cpp has its own packed layout; its centralized TargetDataLayout.cpp only contains p2.",
+    "The new pin uses the centralized layout in MachineFunction creation and Clang ABI verification. The in-progress rebase dropped the old backend declaration without porting its p3 field."
+  ],
+  "history": [
+    "ebfc95e4: packed-24 Increment B establishes the paired descriptions."
+  ],
+  "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+}

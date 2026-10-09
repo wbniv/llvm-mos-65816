@@ -1,69 +1,3 @@
-diff --git a/clang/lib/Basic/Targets/MOS.cpp b/clang/lib/Basic/Targets/MOS.cpp
-index 3a729fc34537..8efd4309f152 100644
---- a/clang/lib/Basic/Targets/MOS.cpp
-+++ b/clang/lib/Basic/Targets/MOS.cpp
-@@ -19,9 +19,11 @@ using namespace clang::targets;
- MOSTargetInfo::MOSTargetInfo(const llvm::Triple &Triple, const TargetOptions &)
-     : TargetInfo(Triple) {
-   // Must match the backend's MOSDataLayout (MOSTargetMachine.cpp). p2:32:8 =
--  // addrspace 2 "far" (32-bit ptr; low 24 bits emitted as 65816 absolute-long). #320.
-+  // addrspace 2 "far" (32-bit ptr; low 24 bits emitted as 65816 absolute-long).
-+  // p3:24:8 = addrspace 3 "packed far" (3-byte storage form of a far pointer;
-+  // memory-only — converts to/from p2 at load/store). #320.
-   static const char Layout[] =
--      "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
-+      "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
-   resetDataLayout(Layout);
- 
-   PointerWidth = 16;
-@@ -208,6 +210,8 @@ uint64_t MOSTargetInfo::getPointerWidthV(LangAS AddrSpace) const {
-     return 8;
-   case 2: // Far: a 24-bit address held in a 32-bit pointer (datalayout p2:32:8).
-     return 32; // #320 — match the IR width so sizeof(far*) == 4.
-+  case 3: // Packed far: 24-bit (3-byte) storage form of a far pointer (datalayout p3:24:8).
-+    return 24; // #320 — sizeof(__packed_far *) == 3.
-   default:
-     return 16;
-   }
-diff --git a/llvm/include/llvm/CodeGen/AsmPrinter.h b/llvm/include/llvm/CodeGen/AsmPrinter.h
-index e7c8a4b76aa6..fdb46c06c7e8 100644
---- a/llvm/include/llvm/CodeGen/AsmPrinter.h
-+++ b/llvm/include/llvm/CodeGen/AsmPrinter.h
-@@ -583,6 +583,17 @@ public:
-                                       const Constant *BaseCV = nullptr,
-                                       uint64_t Offset = 0);
- 
-+  /// Hook for emitting a scalar constant whose size has no standard data fixup
-+  /// (e.g. a 3-byte / 24-bit pointer). The generic path emits such a constant via
-+  /// OutStreamer->emitValue(ME, Size), but MCFixup::getDataKindForSize only covers
-+  /// 1/2/4/8 bytes, so a target with an odd-sized relocated pointer needs to emit
-+  /// the bytes itself. Return true if handled; false to fall back to emitValue.
-+  /// (MOS uses this for its 3-byte packed far pointer, addrspace 3 / #320.)
-+  virtual bool emitNonStandardSizedConstant(const Constant *CV,
-+                                            const MCExpr *ME, uint64_t Size) {
-+    return false;
-+  }
-+
-   /// Print a general LLVM constant to the .s file.
-   /// On AIX, when an alias refers to a sub-element of a global variable, the
-   /// label of that alias needs to be emitted before the corresponding element.
-diff --git a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
-index 2225c24fcd7b..f4fd3e9e8ee9 100644
---- a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
-+++ b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
-@@ -4588,7 +4588,11 @@ static void emitGlobalConstantImpl(const DataLayout &DL, const Constant *CV,
-   if (AP.getObjFileLowering().supportIndirectSymViaGOTPCRel())
-     handleIndirectSymViaGOTPCRel(AP, &ME, BaseCV, Offset);
- 
--  AP.OutStreamer->emitValue(ME, Size);
-+  // Give the target a chance to emit a constant whose size has no standard data
-+  // fixup (e.g. MOS's 3-byte / 24-bit packed far pointer, #320). getDataKindForSize
-+  // only covers 1/2/4/8, so emitValue(ME, 3) would otherwise mis-relocate.
-+  if (!AP.emitNonStandardSizedConstant(CV, ME, Size))
-+    AP.OutStreamer->emitValue(ME, Size);
- }
- 
- /// EmitGlobalConstant - Print a general LLVM constant to the .s file.
 diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
 index dd5b16b807b5..b63f86fc50c8 100644
 --- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
@@ -385,3 +319,83 @@ index e12e5762211b..a1319c6e23ef 100644
  
  /// Processes a CPU name.
  static StringRef getCPU(StringRef CPU) {
+diff --git a/clang/lib/Basic/Targets/MOS.cpp b/clang/lib/Basic/Targets/MOS.cpp
+index eda1ec61c9eb..26abe93a8554 100644
+--- a/clang/lib/Basic/Targets/MOS.cpp
++++ b/clang/lib/Basic/Targets/MOS.cpp
+@@ -19,9 +19,11 @@ using namespace clang::targets;
+ MOSTargetInfo::MOSTargetInfo(const llvm::Triple &Triple, const TargetOptions &)
+     : TargetInfo(Triple) {
+   // Must match the backend's MOSDataLayout (MOSTargetMachine.cpp). p2:32:8 =
+-  // addrspace 2 "far" (32-bit ptr; low 24 bits emitted as 65816 absolute-long). #320.
++  // addrspace 2 "far" (32-bit ptr; low 24 bits emitted as 65816 absolute-long).
++  // p3:24:8 = addrspace 3 "packed far" (3-byte storage form of a far pointer;
++  // memory-only — converts to/from p2 at load/store). #320.
+   static const char Layout[] =
+-      "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
++      "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
+   resetDataLayout(Layout);
+
+   PointerWidth = 16;
+@@ -208,6 +210,8 @@ uint64_t MOSTargetInfo::getPointerWidthV(LangAS AddrSpace) const {
+     return 8;
+   case 2: // Far: a 24-bit address held in a 32-bit pointer (datalayout p2:32:8).
+     return 32; // #320 — match the IR width so sizeof(far*) == 4.
++  case 3: // Packed far: 24-bit (3-byte) storage form of a far pointer (datalayout p3:24:8).
++    return 24; // #320 — sizeof(__packed_far *) == 3.
+   default:
+     return 16;
+   }
+diff --git a/llvm/include/llvm/CodeGen/AsmPrinter.h b/llvm/include/llvm/CodeGen/AsmPrinter.h
+index 83c3f86befa7..5e123572e5bf 100644
+--- a/llvm/include/llvm/CodeGen/AsmPrinter.h
++++ b/llvm/include/llvm/CodeGen/AsmPrinter.h
+@@ -588,6 +588,17 @@ public:
+                                       const Constant *BaseCV = nullptr,
+                                       uint64_t Offset = 0);
+
++  /// Hook for emitting a scalar constant whose size has no standard data fixup
++  /// (e.g. a 3-byte / 24-bit pointer). The generic path emits such a constant via
++  /// OutStreamer->emitValue(ME, Size), but MCFixup::getDataKindForSize only covers
++  /// 1/2/4/8 bytes, so a target with an odd-sized relocated pointer needs to emit
++  /// the bytes itself. Return true if handled; false to fall back to emitValue.
++  /// (MOS uses this for its 3-byte packed far pointer, addrspace 3 / #320.)
++  virtual bool emitNonStandardSizedConstant(const Constant *CV,
++                                            const MCExpr *ME, uint64_t Size) {
++    return false;
++  }
++
+   /// Print a general LLVM constant to the .s file.
+   /// On AIX, when an alias refers to a sub-element of a global variable, the
+   /// label of that alias needs to be emitted before the corresponding element.
+diff --git a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+index 37de384df866..7da883273abe 100644
+--- a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
++++ b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+@@ -4651,7 +4651,11 @@ static void emitGlobalConstantImpl(const DataLayout &DL, const Constant *CV,
+   if (AP.getObjFileLowering().supportIndirectSymViaGOTPCRel())
+     handleIndirectSymViaGOTPCRel(AP, &ME, BaseCV, Offset);
+
+-  AP.OutStreamer->emitValue(ME, Size);
++  // Give the target a chance to emit a constant whose size has no standard data
++  // fixup (e.g. MOS's 3-byte / 24-bit packed far pointer, #320). getDataKindForSize
++  // only covers 1/2/4/8, so emitValue(ME, 3) would otherwise mis-relocate.
++  if (!AP.emitNonStandardSizedConstant(CV, ME, Size))
++    AP.OutStreamer->emitValue(ME, Size);
+ }
+
+ /// EmitGlobalConstant - Print a general LLVM constant to the .s file.
+diff --git a/llvm/lib/TargetParser/TargetDataLayout.cpp b/llvm/lib/TargetParser/TargetDataLayout.cpp
+index c125d99b..c63578e2 100644
+--- a/llvm/lib/TargetParser/TargetDataLayout.cpp
++++ b/llvm/lib/TargetParser/TargetDataLayout.cpp
+@@ -630,7 +630,8 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {
+   case Triple::mos:
+     // Far pointers use 32-bit containers for 24-bit addresses.
+     // Match Clang's MOS target description.
+-    return "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
++    // Packed far pointers in address space 3 occupy 24 bits in storage.
++    return "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
+   case Triple::msp430:
+     return "e-m:e-p:16:16-i32:16-i64:16-f32:16-f64:16-a:8-n8:16-S16";
+   case Triple::ppc:

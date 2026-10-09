@@ -1,5 +1,10 @@
 # Simulated upstream PR — Preserve near addresses and full Y indices on 65816
 
+**October 9 pin qualification:** the internal compiler stack is [rebased onto upstream `f24948c7d1a4`](../2026-10-09/pin-rebase/README.md), removing merged repairs and adapting the remaining overlays. The measurements, compiler identities, closure evidence and extracted submission results below retain their recorded revisions. They do not certify the new pin. Native-width/far implementation remains carried locally; the new build has its own validation record.
+
+Pin qualification: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
+
 **Internal preparation; held for the native-width compiler series.** Implementation is published downstream in [e370e031](https://github.com/wbniv/llvm-mos-65816/commit/e370e03153109aee2bef7b48b5917d870dec3744). This packet has author review; independent review and exact-destination extraction remain pending. PR #609 concerns computed-carry scheduling and was withdrawn at Will's request.
 
 ## Proposed PR body

@@ -7,7 +7,8 @@
   "report": "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
   "reproducer_origin": "original",
   "attribution": [
-    "Reconciliation, repair and validation: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84."
+    "Reconciliation, repair and validation: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84.",
+    "October 10 downstream backport and matching-input revalidation: OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919."
   ],
   "prior_work": {
     "disposition": "new_defect",
@@ -98,6 +99,30 @@
     {
       "path": "docs/defects/evidence/2026-09-28-native-index-copy-cost/repair.diff",
       "sha256": "6d4c372a8a1790e68c4e1fe5040689783306ab0f5d387a16a37e934d2f9bf9f0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-native-copy/far-global-long-x.ll",
+      "sha256": "ff42cc372c63897cffd491c5e9ab06b8439e1faa59364474dd86fadc74b4a017"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-native-copy/far-native-word.ll",
+      "sha256": "2480ca994cabeff20ebda3b444e7e6a3cfaf0ada27ea1517ed72313b02eaca10"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-native-copy/far-global-long-x.ll.baseline.log",
+      "sha256": "cbdab5e49e97578e237d4c1513240537f6511b2e7652d71df9131e96dd411d71"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-native-copy/far-native-word.ll.baseline.log",
+      "sha256": "c4509ea1bb1d184ce6d2ea57c4e3001b202de2f1fb2d8ee719ab391ee9dfc98f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-native-copy/baseline-identity.json",
+      "sha256": "1f9b3e5cd12fce042582c7984015b3aca66172d10abf5becb74fae8f26f66f76"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-native-copy/candidate-identity.json",
+      "sha256": "66ad479504716637462760ea6b8e410d6fc663182eb3304995660f43a93e1eea"
     }
   ],
   "resolution": {
@@ -141,5 +166,63 @@
   },
   "unknowns": [
     "No complete downstream rebuild or installation was performed for this upstream preparation. Context-dependent mode-switch cost is not represented by the per-copy estimate."
+  ],
+  "additional_runs": [
+    {
+      "label": "October 10 pin rebase backport of the existing extracted repair: far-global-long-x.ll",
+      "command": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-10-10-pin-native-copy/far-global-long-x.ll -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [
+          "+mos-a16",
+          "+mos-xy16"
+        ],
+        "optimization": "O2 (llc default)",
+        "lto": false,
+        "verify_machineinstrs": true,
+        "input_kind": "original LLVM IR regression, no frontend translation"
+      },
+      "toolchain_location": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin/llc",
+      "toolchain_sha256": "de015012065803384372f026ab91b739203a26c3a6c01e95d7b3ebd02369b307",
+      "input": {
+        "path": "docs/defects/evidence/2026-10-10-pin-native-copy/far-global-long-x.ll",
+        "sha256": "ff42cc372c63897cffd491c5e9ab06b8439e1faa59364474dd86fadc74b4a017"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-10-10-pin-native-copy/far-global-long-x.ll.candidate.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_code": 0,
+      "observed": "passes after carrying existing equal-width copy-cost arms into 0002"
+    },
+    {
+      "label": "October 10 pin rebase backport of the existing extracted repair: far-native-word.ll",
+      "command": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-10-10-pin-native-copy/far-native-word.ll -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [
+          "+mos-a16",
+          "+mos-xy16"
+        ],
+        "optimization": "O2 (llc default)",
+        "lto": false,
+        "verify_machineinstrs": true,
+        "input_kind": "original LLVM IR regression, no frontend translation"
+      },
+      "toolchain_location": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin/llc",
+      "toolchain_sha256": "de015012065803384372f026ab91b739203a26c3a6c01e95d7b3ebd02369b307",
+      "input": {
+        "path": "docs/defects/evidence/2026-10-10-pin-native-copy/far-native-word.ll",
+        "sha256": "2480ca994cabeff20ebda3b444e7e6a3cfaf0ada27ea1517ed72313b02eaca10"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-10-10-pin-native-copy/far-native-word.ll.candidate.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_code": 0,
+      "observed": "passes after carrying existing equal-width copy-cost arms into 0002"
+    }
   ]
 }

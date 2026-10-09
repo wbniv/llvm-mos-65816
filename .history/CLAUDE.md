@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-30](https://github.com/wbniv/llvm-mos-65816/commit/49f6b5aa) | Record the pressure-set decisions and the opt-level gating rule |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/27b7e242) | Keep pending PR prose on single source lines |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/d8f798c8) | Finish pending fix preparation and retain validation evidence |
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/c858c675) | Require prior-work audits and revalidate the existing far-memset repair |
@@ -13,6 +14,11 @@
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/00833780) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
+49f6b5aa	author	Will Norris
+49f6b5aa	added	7
+49f6b5aa	deleted	1
+49f6b5aa	files	1
+49f6b5aa	body	The user accepted totals as the native-size bar for the pressure-set design (-78 B +mos-a16, -162 B +mos-a16,+mos-xy16). Placement: the TableGen flag in #321 commit 1, and the MOSRegisterInfo hooks with the first commit that selects Ac16. Before application, a T4 dispatch measures -Os/-Oz size and -O2 cycles, including a per-function gate through getRegPressureSetLimit(MF).\n\nMake the user's standing question a governing lesson in CLAUDE.md: for every codegen change, ask whether the optimization level can gate it, and measure each level on its own objective.\n\nAdd two ranked T4 items (ranks set by the user): gating MachineLICM by optimization level under native widths, and repairing multi-argument calls under the opt-in split/AXY far-pointer conventions.\n\nDecisions recorded by Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5); reasoning effort not recorded in session metadata.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
 27b7e242	author	Will Norris
 27b7e242	added	1
 27b7e242	deleted	0

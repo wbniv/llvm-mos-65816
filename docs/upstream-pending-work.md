@@ -1,6 +1,10 @@
 # Pending upstream work and dependencies
 
-**#320/#321 split, third round (October 1):** the third review's N17–N22 and the older N1–N9 items are addressed ([plan](plans/2026-10-01-far-prerequisite-split-carry.md#third-round-n17n22-and-the-older-open-items), [far-word packet](pr-preparations/2026-09-30/far-word-rebase/README.md)). #584 files first; the series does not carry it (round four). Two new upstream defects from the all-CPU default-mode gate are recorded, not posted: [HuC6280 block moves](defects/mos-huc-blockmove-frameindex-offset.json) and [an SPC700 allocator assertion](defects/mos-spc700-hint-outside-order.json).
+**October 9 upstream refresh:** #578, #586, #584, #588 and #589 are merged; #584's prerequisite for the #320/#321 series is satisfied and its follow-up comment is superseded. Compiler #604 remains open without review. SDK #450 has changes requested: move regression coverage to `llvm-test-suite`, checking existing coverage first. #594 has no replies and its coordination hold remains. The compiler pin is advanced to `f24948c7d1a4`, and merged carries are removed from the aggregates and standalone stack; see the [current tracker](upstream-contribution-status.md#current-pr-progress) and [GitHub receipt](upstream-status/2026-10-09.json).
+
+OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
+**#320/#321 split, third round (October 1):** the third review's N17–N22 and the older N1–N9 items are addressed ([plan](plans/2026-10-01-far-prerequisite-split-carry.md#third-round-n17n22-and-the-older-open-items), [far-word packet](pr-preparations/2026-09-30/far-word-rebase/README.md)). #584 merged October 5; the series does not carry it (round four). Two new upstream defects from the all-CPU default-mode gate are recorded, not posted: [HuC6280 block moves](defects/mos-huc-blockmove-frameindex-offset.json) and [an SPC700 allocator assertion](defects/mos-spc700-hint-outside-order.json).
 
 **Far-word rebase, September 30:** the 0069/0070 series is [rebased onto `06bc967d2668`](pr-preparations/2026-09-30/far-word-rebase/README.md) with unchanged patch bodies. The suites, the 228-case sensitivity check and all 58 MAME/bsnes configurations reproduce the September 28 bytes and clocks. The [independent review](pr-preparations/2026-09-30/far-word-rebase/independent-review.md) upholds 0069, 0070 and patches 9–11 but blocks filing. The far prerequisite has four defects that also reproduce downstream: [far-pointer argument exhaustion](defects/mos-far-pointer-arg-exhaustion.json), [far memory lengths above 65535](defects/mos-far-memop-length-truncation.json), [far accesses on non-65816 CPUs](defects/mos-far-access-non-65816.json) and [undef debug values after the far index fold](defects/mos-far-index-fold-dangling-dbg.json). It also has two extraction gaps (a trunc pattern and far-quad DWARF) and an `Imag32` collision with open #594 that needs a maintainer decision. All four are now fixed downstream in `0002`, with same-input red/green closures and a >64 KiB runtime gate ([plan](plans/2026-09-30-far-prerequisite-defects.md)). On October 1 the repairs and the trunc-pattern gap were [carried into the #320 split](plans/2026-10-01-far-prerequisite-split-carry.md). After the [second independent review](pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md), a second round rebuilt #320 on #594 as the user decided: #594 is carried unchanged, with a fix for a #594 defect that aborts calls with stack arguments; RL is allocated on the 65816 only; quad spills are in #320; and every far fold drops dead debug locations. The packet awaits a focused third review. The RL DWARF numbering is escalated, and an llvm-mos-sdk companion for the far runtime entries is queued.
 
@@ -189,7 +193,7 @@ remain in the linked records.
    defect; its standalone suites and all-CPU legalization checks pass.
    [0035's audit](pr-preparations/2026-09-23/0035-review-audit.md) confirms the
    casts also fix wider arguments on x86-64; the committed test now covers
-   `long`, `long long` and the two-argument form. Ready to post.
+   `long`, `long long` and the two-argument form. October 9 reconciliation: LLVM [#221477](https://github.com/llvm/llvm-project/pull/221477) merged September 16 and supplies this cast in the new pin; 0035 is superseded and both local artifacts are retired. Prepare only 0034 for submission.
 8. [Zero-page indexed globals](upstream-zero-page-indexed-globals-pr.md): patch
    0036 makes opcode selection recognize zero-page sections and checks the address
    operand for indexed stores. Standalone suites: 132 pass / one unsupported;
@@ -222,7 +226,7 @@ rank in `TODO.md`:
 | 2 | done | 10 | `asm("" : "+g"(x))`: "unable to translate instruction: call" | **fixed 2026-09-23**: generic `InlineAsmLowering` never stored indirect register outputs (`"=*imr,0"`) through their pointer; [0037](upstream-gisel-inline-asm-indirect-output-pr.md) (for llvm/llvm-project); [validation](pr-preparations/2026-09-23/0037-validation.md) |
 | 3 | done | 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | **fixed 2026-09-23**: frame address = incoming soft stack pointer (fixed frame object), return address read from the hard stack by a late-expanded pseudo with a CFG dataflow for the depth; [0038](upstream-return-frame-address-pr.md); [validation](pr-preparations/2026-09-23/0038-validation.md) |
 | 4 | done | 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` in `20030222-1.c`, `pr52286.c`) | **fixed 2026-09-24**: generic `InlineAsmLowering` assumed every register operand fits in one register — MOS needs four for a `long`, and the tied form asserted while the plain input and the output were rejected outright. All three now split/merge least significant piece first, as SelectionDAG's `RegsForValue` does; [0041](upstream-gisel-inline-asm-multi-register-pr.md) (for llvm/llvm-project); [validation](pr-preparations/2026-09-24/0041-validation.md) |
-| 5 | done | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | **fixed 2026-09-25**: `0049` backports generic vector prerequisites at this pin; `0050` scalarizes floating arithmetic. All 36 targeted C-derived IR configurations pass, including the separately repaired O0 a16/xy16 scavenger abort (`0054`). [Evidence](plans/2026-09-25-mos-correctness-queue.md), [float defect](defects/mos-float-vector-legalization.json), [scavenger defect](defects/mos-vector-o0-status-scavenge.json). |
+| 5 | done | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | **fixed 2026-09-25**: the new upstream pin supplies the generic vector prerequisites (0049 retired); `0050` scalarizes floating arithmetic. All 36 targeted C-derived IR configurations pass, including the separately repaired O0 a16/xy16 scavenger abort (`0054`). [Evidence](plans/2026-09-25-mos-correctness-queue.md), [float defect](defects/mos-float-vector-legalization.json), [scavenger defect](defects/mos-vector-o0-status-scavenge.json). |
 | — | — | 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
 
 Orders 1 through 5 are implemented. The September 25 targeted recheck also
@@ -326,7 +330,7 @@ failure with the stock upstream frontend and backend.
 | Spill-hoisting scratch vregs (`0033`) | [Audited](pr-preparations/2026-09-23/0033-review-audit.md); rollback statistic corrected and revalidated; [response](pr-preparations/2026-09-23/0033-validation.md); ready to post |
 | Register-named assembly symbols (`0032`) | [Review audited](pr-preparations/2026-09-23/0032-review-audit.md); no code defect found; standalone suites pass; full-corpus assembler failures fall from 821 to zero across 4,091 emitted files; compatible local patch installed; check current upstream, prepare branch, and publish |
 | MOS prefetch legalization (`0034`) | [Audit complete](pr-preparations/2026-09-23/0034-review-audit.md), no code defect found; 130 standalone suite passes and 28 all-CPU legalization checks; prepare submission to llvm-mos |
-| Clang prefetch operand types (`0035`) | [Casts confirmed](pr-preparations/2026-09-23/0035-review-audit.md), including wider options on x86-64; committed test now covers `long`/`long long`/two-argument forms; submit to llvm/llvm-project |
+| Clang prefetch operand types (`0035`) | Superseded by merged [LLVM #221477](https://github.com/llvm/llvm-project/pull/221477); supplied by pin `f24948c7d1a4`, local carries retired |
 | GlobalISel indirect inline-asm outputs (`0037`) | `"=*r"` defs stored through their pointer; dated corpus/MOS evidence retained. [Exact-current LLVM packet](pr-preparations/2026-09-26/llvm-validation.md) independently reviewed and validated: four focused RUNs, 168 filtered AArch64/X86 passes / three existing XFAILs. Ready to post |
 | Zero-page indexed globals (`0036`) | [Fix prepared](upstream-zero-page-indexed-globals-pr.md), standalone suites and C round trips pass, installed locally; [review audited](pr-preparations/2026-09-23/0036-review-audit.md); submission preparation remains |
 | Explicit constant address width | Ready to post as `0039`: exact-current assertion build, full MOS suites and stock-6502 emulator red/green pass. The [original diagnosis](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect) and [dated validation](plans/2026-09-25-mos-correctness-queue.md) are retained |
@@ -344,13 +348,7 @@ The ABI notes are discussion contributions, separate from publishing the compile
 series. The far calling-convention evidence follows the #320 design discussion.
 Older notes need a current-content review before publication.
 
-**Already posted, from the September 25 recorded snapshot:** six compiler PRs
-(#578, #584, #586, #588, #589, #604) and SDK #450. The contribution tracker records
-no new merges or reviews; #589 still carries `CHANGES_REQUESTED` despite the
-published revision. #604 has Ubuntu/macOS passes and a Windows failure, whose
-unrelated baseline test mismatch was checked September 25. SDK #450 reports no
-checks. See the [dated status snapshot](upstream-contribution-status.md#current-pr-progress)
-for the full table and the scope of each CI diagnosis.
+**Current posted work (October 9):** compiler #604 remains open with no reviews or comments; Ubuntu/macOS CI pass and Windows fails. The September 25 diagnosis below is retained as dated evidence. SDK #450 is open with changes requested October 5 for test placement. The other five compiler fixes in the former open queue are merged. See the [current tracker](upstream-contribution-status.md#current-pr-progress).
 
 ## Recommended order
 
@@ -365,8 +363,7 @@ for the full table and the scope of each CI diagnosis.
 3. Prepare the #320/#321 presentation before publishing `0028`; use the selected,
    reviewed and validated refactor. The alternative remains comparison history,
    not an outstanding implementation-choice gate.
-4. Follow review/CI of the six posted compiler fixes and SDK #450; request re-review
-   of the published #589 revision when following up with maintainers.
+4. Follow review/CI of compiler #604. Address SDK #450's test-placement request in a reviewed revision: check existing llvm-test-suite coverage before adding or enabling the regression there.
 5. In parallel, make **SNES platform reconciliation with SDK #415** the platform
    priority. Prepare a coherent contribution including the runtime requirements of
    whichever CPU mode it enables.
@@ -416,13 +413,13 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 
 | Work | Fix / implementation exists? | Posting state | Next work | Must wait for SNES? |
 |---|---|---|---|---|
-| #578 MOSCopyOpt loop liveness | Yes; root-cause revision published | **Awaiting review/merge** | Maintainer review of revised fix | No |
-| #584 non-GPR immediate loads | Yes; simplified revision published; still needed on `main` `06bc967d2668` (31 `mosspc700 -O2` crashes in the measured set, [record](defects/mos-late-opt-nongpr-ldimm.json)); follow-up comment [prepared](pr-preparations/2026-10-01/584-comment.md); files before the #320/#321 split, which does not carry it | **Awaiting review/merge** | Maintainer review | No |
-| #586 BRK signature operand | Yes; requested tests published | **Awaiting review/merge** | Maintainer review | No |
-| #588 COP mnemonic | Yes; reserved-range tests published | **Awaiting review/merge** | Maintainer review; completed Ubuntu CI run | No |
-| #589 CmpZero terminator | Yes; requested revision published | **Awaiting re-review/merge** | Clear outstanding change request | No |
+| #578 | Published repair merged September 25 | **Merged upstream** | Supplied by new upstream pin; local carry removed | No |
+| #584 | Published repair merged October 5 | **Merged upstream** | Supplied by new upstream pin; local carry removed | No |
+| #586 | Published repair merged September 29 | **Merged upstream** | Supplied by new upstream pin; local carry removed | No |
+| #588 | Published repair merged October 5 | **Merged upstream** | Supplied by new upstream pin; local COP carry removed | No |
+| #589 | Published repair merged October 5 | **Merged upstream** | Supplied by new upstream pin; local carry removed | No |
 | MVN/MVP bank order (`0020`) | Complete fix validated, including symbolic relocations | **Posted: [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604)** | Maintainer review / CI follow-up | No |
-| Common SDK `longjmp(env, 0)` | **Fix tested**, 20/20 simulator cases | **Posted: [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450)** | Maintainer review / CI follow-up | **No; plain 6502 bug** |
+| Common SDK `longjmp(env, 0)` | **Fix tested**, 20/20 simulator cases | **Posted: [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450)** | Address October 5 request: enable or add regression in llvm-test-suite; remove SDK test in the reviewed revision | **No; plain 6502 bug** |
 | Reentrant attribute contract | Source behavior confirmed; no agreed semantic fix | **Unposted question/report** | Decide whether attribute only cancels `-fnonreentrant` or must force reentrant allocation; then fix/docs + tests | No |
 | Undef register-lane verifier failure | Existing refactor selected; generic X86 MIR and companion tests independently reviewed and validated on current LLVM | **Held until #320/#321 are ready to open** | Use the selected packet once the user-presentation hold clears; two focused RUNs and 102 filtered X86 passes / one existing XFAIL | No technical SDK dependency; user presentation hold retained |
 | Scavenger live-P (`0011`) | Fix, draft, stock-6502 producer and upstream-runnable test | **Ready to post** | [Reachability record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md) | No SDK dependency; otherwise include with native compiler feature |
@@ -433,7 +430,7 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | Register-named assembly symbols (`0032`) | Fix validated and review audited; full-corpus assembly failures repaired | **Fix PR prepared, unposted** | Prepare branch and publish | No |
 | Spill-hoisting scratch vregs (`0033`) | Crash fix confirmed; rollback accounting corrected and revalidated | **Fix PR prepared, unposted** | Prepare branch and publish | No |
 | MOS prefetch legalization (`0034`) | Standalone suites and all-CPU legalization checks pass; no code defect found | **Audited, unposted** | Prepare submission to llvm-mos | No |
-| Clang prefetch operand types (`0035`) | Casts fix narrower and wider integer options; committed test covers both | **Fix PR prepared, unposted** | Submit to llvm/llvm-project | No |
+| Clang prefetch operand types (`0035`) | The new pin supplies LLVM #221477, merged September 16 | **Superseded upstream** | Local carries retired; retain dated regression evidence | No |
 | GlobalISel indirect inline-asm outputs (`0037`) | Standalone generic/AArch64 extraction independently reviewed; four focused RUNs and 168 filtered AArch64/X86 passes / three existing XFAILs | **Ready to post; unposted** | Use the [exact-current LLVM packet](pr-preparations/2026-09-26/llvm-validation.md) when posting is requested | No |
 | Zero-page indexed globals (`0036`) | Compact opcodes selected consistently; 132 suite passes and 45 upstream C round trips | **Review audited, unposted** | Check upstream applicability, prepare branch | No |
 | Explicit constant address width (`0039`) | Isolated assertion build, full MOS suites and stock-6502 emulator differential pass | **Ready to post; unposted** | Use the [exact packet](pr-preparations/2026-09-26/README.md) when posting is requested | No |
@@ -488,8 +485,8 @@ flowchart TD
     MC[MVN/MVP complete fix] --> MCT[Validated: five checks; 130 suite tests pass]
     MCT --> MCP[Compiler PR 604 posted] --> MCM[Review and merge]
     Z[Common SDK longjmp zero fix] --> ZT[Integrated SDK regression: 20 pass]
-    ZT --> ZP[SDK PR 450 posted] --> ZM[Review and merge]
-    OPEN[Compiler PRs 578 / 584 / 586 / 588 / 589] --> REVIEW[Review / CI follow-up] --> MERGED[Merge]
+    ZT --> ZP[SDK PR 450 posted] --> ZM[Move regression to llvm-test-suite] --> ZR[Re-review and merge]
+    OPEN[Compiler PRs 578 / 584 / 586 / 588 / 589 merged] --> MERGED[Merge]
     COALESCE0015[0015 recovered witness: root repaired by 0028] --> UNDEF
     UNDEF[Undef-lane fix 0028 validated] --> HOLD[Wait until 320 and 321 are ready to open]
     HOLD --> FINAL[Use selected and validated submission]
@@ -501,7 +498,7 @@ flowchart TD
     SYM[Register-named symbols 0032: reviewed and audited, full-corpus round trip] --> SYMPR[Publish fix PR] --> MERGED
     HOIST[Spill-hoist guard 0033: audited, accounting revised and revalidated] --> HOISTPR[Publish fix PR, drops driver flag] --> MERGED
     PREFETCH[Prefetch fixes validated: MOS 0034 and Clang 0035] --> PREFETCHMOS[Submit 0034 to llvm-mos] --> MERGED
-    PREFETCH --> PREFETCHCLANG[Submit 0035 to llvm/llvm-project] --> MERGED
+    PREFETCH --> PREFETCHCLANG[0035 superseded: LLVM 221477 merged] --> MERGED
     ASMG[GlobalISel indirect asm outputs 0037: MOS and AArch64 tests, corpus differential] --> ASMGREVIEW[Exact-current LLVM extraction reviewed and validated] --> ASMGPR[Submit to llvm/llvm-project when requested] --> MERGED
     ZPIDX[Zero-page indexed globals 0036: suites and round trips pass] --> ZPREVIEW[Review audited; submission preparation] --> ZPPR[Publish fix PR] --> MERGED
     RETFRAME[Return and frame address 0038: ready locally] --> PREP[Reviewed and validated exact-current submissions]
@@ -632,6 +629,6 @@ run the 20 cases through `test-sim`/CTest: baseline 16 pass / four zero failures
 fixed 20 pass. The compiler remains the local installed MOS compiler.
 [Commands and evidence](pr-preparations/2026-09-20/sdk-longjmp-validation.md).
 
-**Publication update:** [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) is open, head `0f8ad11589f5`;
-the submitted description and commit match the reviewed bundle. Earlier no-publication
+**Publication update (October 9):** [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) is open, head `0f8ad11589f5`;
+changes were requested October 5 for test placement in llvm-test-suite. The posted head is unchanged; the submitted description and commit remain the reviewed bundle. Earlier no-publication
 statements describe the research stage. MVN/MVP is now also published as [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604), head `ae3108c31890`.

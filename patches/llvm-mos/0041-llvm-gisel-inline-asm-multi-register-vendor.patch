@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
-index 83650387d..b912c87ba 100644
+index d370eeab5728..3c72a03493d1 100644
 --- a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 +++ b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
-@@ -222,6 +222,107 @@ static bool buildAnyextOrCopy(Register Dst, Register Src,
+@@ -236,6 +236,107 @@ static bool buildAnyextOrCopy(Register Dst, Register Src,
    return true;
  }
 
@@ -110,7 +110,7 @@ index 83650387d..b912c87ba 100644
  bool InlineAsmLowering::lowerInlineAsm(
      MachineIRBuilder &MIRBuilder, const CallBase &Call,
      std::function<ArrayRef<Register>(const Value &Val)> GetOrCreateVRegs)
-@@ -403,25 +504,11 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -420,25 +521,11 @@ bool InlineAsmLowering::lowerInlineAsm(
          for (unsigned i = 0; i < DefIdx; ++i)
            InstFlagIdx += getNumOpRegs(*Inst, InstFlagIdx) + 1;
          unsigned NumOpRegs = getNumOpRegs(*Inst, InstFlagIdx);
@@ -139,7 +139,7 @@ index 83650387d..b912c87ba 100644
 
          const InlineAsm::Flag MatchedOperandFlag(Inst->getOperand(InstFlagIdx).getImm());
          if (MatchedOperandFlag.isMemKind()) {
-@@ -434,7 +521,7 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -451,7 +538,7 @@ bool InlineAsmLowering::lowerInlineAsm(
            return false;
          }
 
@@ -148,9 +148,9 @@ index 83650387d..b912c87ba 100644
          unsigned DefRegIdx = InstFlagIdx + 1;
          Register Def = Inst->getOperand(DefRegIdx).getReg();
 
-@@ -453,18 +540,30 @@ bool InlineAsmLowering::lowerInlineAsm(
-                                             ? MRI->getRegClass(Def)
-                                             : TRI->getMinimalPhysRegClass(Def);
+@@ -470,18 +557,30 @@ bool InlineAsmLowering::lowerInlineAsm(
+             Def.isVirtual() ? MRI->getRegClass(Def) : OpInfo.RegClass;
+         assert(RC && "Expected a register class for matching constraint");
 
 -        // Materialize `In` in a new vreg that has a register class that matches
 -        // the register class of `Def`.
@@ -187,15 +187,11 @@ index 83650387d..b912c87ba 100644
          break;
        }
 
-@@ -569,13 +668,9 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -587,9 +686,9 @@ bool InlineAsmLowering::lowerInlineAsm(
 
        unsigned NumRegs = OpInfo.Regs.size();
        ArrayRef<Register> SourceRegs = GetOrCreateVRegs(*OpInfo.CallOperandVal);
--      assert(NumRegs == SourceRegs.size() &&
--             "Expected the number of input registers to match the number of "
--             "source registers");
--
--      if (NumRegs > 1) {
+-      if (NumRegs != 1 || SourceRegs.size() != 1) {
 -        LLVM_DEBUG(dbgs() << "Input operands with multiple input registers are "
 -                             "not supported yet\n");
 +      if (SourceRegs.size() != 1) {
@@ -204,7 +200,7 @@ index 83650387d..b912c87ba 100644
          return false;
        }
 
-@@ -586,9 +681,16 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -600,9 +699,16 @@ bool InlineAsmLowering::lowerInlineAsm(
          Flag.setRegClass(RC->getID());
        }
        Inst.addImm(Flag);
@@ -223,7 +219,7 @@ index 83650387d..b912c87ba 100644
        break;
      }
 
-@@ -650,21 +752,26 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -665,19 +771,26 @@ bool InlineAsmLowering::lowerInlineAsm(
      switch (OpInfo.ConstraintType) {
      case TargetLowering::C_Register:
      case TargetLowering::C_RegisterClass: {
@@ -248,24 +244,23 @@ index 83650387d..b912c87ba 100644
        if (ResTy.isScalar() && ResTy.getSizeInBits() < SrcSize) {
          // First copy the non-typed virtual register into a generic virtual
          // register
--        Register Tmp1Reg =
--            MRI->createGenericVirtualRegister(LLT::scalar(SrcSize));
--        MIRBuilder.buildCopy(Tmp1Reg, SrcReg);
+-        auto Copy = MIRBuilder.buildCopy(LLT::integer(SrcSize), SrcReg);
 +        Register Tmp1Reg = SrcReg;
 +        if (!MRI->getType(SrcReg).isValid()) {
 +          Tmp1Reg = MRI->createGenericVirtualRegister(LLT::scalar(SrcSize));
 +          MIRBuilder.buildCopy(Tmp1Reg, SrcReg);
 +        }
          // Need to truncate the result of the register
-         MIRBuilder.buildTrunc(ResRegs[i], Tmp1Reg);
+-        MIRBuilder.buildTrunc(ResRegs[i], Copy);
++        MIRBuilder.buildTrunc(ResRegs[i], Tmp1Reg);
        } else if (ResTy.isScalar() && ResTy.getSizeInBits() > SrcSize) {
 diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll
 new file mode 100644
-index 000000000..5da63b13d
+index 000000000000..5da63b13d1f5
 --- /dev/null
 +++ b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll
 @@ -0,0 +1,70 @@
-+; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -stop-after=irtranslator < %s | FileCheck %s
++; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -stop-after=ir-translator < %s | FileCheck %s
 +; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 < %s | FileCheck %s --check-prefix=ASM
 +
 +; AArch64 selects GPR32common for "r" whenever the type is not 64-bit, so an
@@ -336,7 +331,7 @@ index 000000000..5da63b13d
 +  ret void
 +}
 diff --git a/llvm/test/CodeGen/AArch64/build-pair-isel.ll b/llvm/test/CodeGen/AArch64/build-pair-isel.ll
-index cd68bde0f..cc95d2bfb 100644
+index cd68bde0f8da..cc95d2bfbd4d 100644
 --- a/llvm/test/CodeGen/AArch64/build-pair-isel.ll
 +++ b/llvm/test/CodeGen/AArch64/build-pair-isel.ll
 @@ -1,23 +1,40 @@
@@ -396,11 +391,11 @@ index cd68bde0f..cc95d2bfb 100644
    ret void
 diff --git a/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll b/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll
 new file mode 100644
-index 000000000..879899865
+index 000000000000..879899865631
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll
 @@ -0,0 +1,77 @@
-+; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -stop-after=irtranslator < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -stop-after=ir-translator < %s | FileCheck %s
 +; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
 +; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
 +

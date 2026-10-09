@@ -1,5 +1,7 @@
 # Local posting preparation — September 26, 2026
 
+**October 9 reconciliation:** Clang prefetch packet 0035 is superseded by merged [LLVM #221477](https://github.com/llvm/llvm-project/pull/221477); do not submit it. The new compiler pin supplies its implementation and the existing-upstream 0049 backport. The packet bases, counts and test results below remain dated evidence; the [bootstrap rebase](../2026-10-09/pin-rebase/README.md) does not extend them to the new compiler or update these extracted submission patches. Update: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
 **Current publication status:** PR #609 was withdrawn at the user's request at `2026-09-27T01:38:15Z`. Earlier review and validation results remain dated evidence. [Withdrawal record](0064-submission.json). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
 
 The original seventeen-packet preparation pass posted, pushed, and deployed

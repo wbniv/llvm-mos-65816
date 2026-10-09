@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "canonical_source": "docs/snes-compiler-contributions.json",
-  "records_sha256": "b2656b172251208d697249cf8d51f0ab617e0ed06664a02bfd059d52a2e52f2e",
+  "records_sha256": "185e96d9e494171e3ba85b7397d0473353484ab07da6a08a39aee094216d95b7",
   "records": [
     {
       "slug": "blossom",
@@ -113,12 +113,12 @@
         {
           "label": "PR #586",
           "url": "https://github.com/llvm-mos/llvm-mos/pull/586",
-          "status": "open"
+          "status": "merged"
         },
         {
           "label": "PR #588",
           "url": "https://github.com/llvm-mos/llvm-mos/pull/588",
-          "status": "open"
+          "status": "merged"
         }
       ],
       "pr_simulations": [
@@ -132,7 +132,7 @@
           "pr": {
             "label": "PR #586",
             "url": "https://github.com/llvm-mos/llvm-mos/pull/586",
-            "status": "open"
+            "status": "merged"
           },
           "pr_simulation": "docs/upstream-brk-signature-operand-pr.md"
         },
@@ -142,7 +142,7 @@
           "pr": {
             "label": "PR #588",
             "url": "https://github.com/llvm-mos/llvm-mos/pull/588",
-            "status": "open"
+            "status": "merged"
           },
           "pr_simulation": "docs/upstream-cop-brk-signature-pr.md"
         }
@@ -158,7 +158,7 @@
         {
           "label": "PR #584",
           "url": "https://github.com/llvm-mos/llvm-mos/pull/584",
-          "status": "open"
+          "status": "merged"
         },
         {
           "label": "PR #590",
@@ -178,7 +178,7 @@
           "pr": {
             "label": "PR #584",
             "url": "https://github.com/llvm-mos/llvm-mos/pull/584",
-            "status": "open"
+            "status": "merged"
           },
           "pr_simulation": "docs/upstream-late-opt-nongpr-ldimm-pr.md"
         },

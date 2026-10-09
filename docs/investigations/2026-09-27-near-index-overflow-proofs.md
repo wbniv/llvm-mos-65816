@@ -1,5 +1,10 @@
 # Recover near-index overflow proofs
 
+**October 9 pin qualification:** the internal compiler stack is [rebased onto upstream `f24948c7d1a4`](../pr-preparations/2026-10-09/pin-rebase/README.md), removing merged repairs and adapting the remaining overlays. The measurements, compiler identities, closure evidence and extracted submission results below retain their recorded revisions. They do not certify the new pin. Native-width/far implementation remains carried locally; the new build has its own validation record.
+
+Pin qualification: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
+
 The near-index proof recovery is implemented locally in `0002`. Loop Strength Reduction (LSR) was rebuilding near addresses without their overflow flags. A MOS loop pass now records sound unsigned no-wrap proofs immediately afterward. The [canonical optimization record](../defects/mos-near-index-overflow-proofs.json) retains the failing baseline, passing candidate and exact input.
 
 Implementation and validation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e315-89ed-7e70-b7dc-fcc2940366d9`. The interrupted earlier plan and its recorded Claude attribution are preserved verbatim in [dated evidence](../defects/evidence/2026-09-27-near-proofs/interrupted-plan.md.txt). That attempt left a plan and measurement script, with no compiler implementation or completed measurements.

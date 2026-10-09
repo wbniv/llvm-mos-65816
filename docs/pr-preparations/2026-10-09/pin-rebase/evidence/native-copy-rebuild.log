@@ -1,0 +1,2 @@
+clang++: [0;1;35mwarning: [0m[1m'-fuse-ld=' taking a path is deprecated; use '--ld-path=' instead [-Wfuse-ld-path][0m
+clang++: [0;1;35mwarning: [0m[1m'-fuse-ld=' taking a path is deprecated; use '--ld-path=' instead [-Wfuse-ld-path][0m

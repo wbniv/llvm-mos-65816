@@ -1,20 +1,20 @@
 diff --git a/clang/include/clang/AST/TypeBase.h b/clang/include/clang/AST/TypeBase.h
-index a64bbb99b13d..a9f2f14e7660 100644
+index 6373794bb69f..d0de78e880ac 100644
 --- a/clang/include/clang/AST/TypeBase.h
 +++ b/clang/include/clang/AST/TypeBase.h
-@@ -2026,7 +2026,7 @@ protected:
+@@ -2039,7 +2039,7 @@ protected:
      /// Extra information which affects how the function is called, like
      /// regparm and the calling convention.
      LLVM_PREFERRED_TYPE(CallingConv)
 -    unsigned ExtInfo : 14;
 +    unsigned ExtInfo : 15; // #320: widened from 14 for the FarMask (bit 14) flag.
- 
+
      /// The number of parameters this function has, not counting '...'.
      /// According to [implimits] 8 bits should be enough here but this is
-@@ -4668,8 +4668,8 @@ public:
+@@ -4727,8 +4727,8 @@ public:
      // adjust the Bits field below, and if you add bits, you'll need to adjust
      // Type::FunctionTypeBitfields::ExtInfo as well.
- 
+
 -    // |  CC  |noreturn|produces|nocallersavedregs|regparm|nocfcheck|cmsenscall|
 -    // |0 .. 5|   6    |    7   |       8         |9 .. 11|    12   |    13    |
 +    // |  CC  |noreturn|produces|nocallersavedregs|regparm|nocfcheck|cmsenscall|far|
@@ -22,15 +22,15 @@ index a64bbb99b13d..a9f2f14e7660 100644
      //
      // regparm is either 0 (no regparm attribute) or the regparm value+1.
      enum { CallConvMask = 0x3F };
-@@ -4679,6 +4679,7 @@ public:
+@@ -4738,6 +4738,7 @@ public:
      enum { RegParmMask = 0xe00, RegParmOffset = 9 };
      enum { NoCfCheckMask = 0x1000 };
      enum { CmseNSCallMask = 0x2000 };
 +    enum { FarMask = 0x4000 }; // #320 WDC 65816 far function pointer
      uint16_t Bits = CC_C;
- 
+
      ExtInfo(unsigned Bits) : Bits(static_cast<uint16_t>(Bits)) {}
-@@ -4688,14 +4689,15 @@ public:
+@@ -4747,14 +4748,15 @@ public:
      // have all the elements (when reading an AST file for example).
      ExtInfo(bool noReturn, bool hasRegParm, unsigned regParm, CallingConv cc,
              bool producesResult, bool noCallerSavedRegs, bool NoCfCheck,
@@ -46,9 +46,9 @@ index a64bbb99b13d..a9f2f14e7660 100644
 +             (cmseNSCall ? CmseNSCallMask : 0) |
 +             (Far ? FarMask : 0);
      }
- 
+
      // Constructor with all defaults. Use when for example creating a
-@@ -4709,6 +4711,7 @@ public:
+@@ -4768,6 +4770,7 @@ public:
      bool getNoReturn() const { return Bits & NoReturnMask; }
      bool getProducesResult() const { return Bits & ProducesResultMask; }
      bool getCmseNSCall() const { return Bits & CmseNSCallMask; }
@@ -56,10 +56,10 @@ index a64bbb99b13d..a9f2f14e7660 100644
      bool getNoCallerSavedRegs() const { return Bits & NoCallerSavedRegsMask; }
      bool getNoCfCheck() const { return Bits & NoCfCheckMask; }
      bool getHasRegParm() const { return ((Bits & RegParmMask) >> RegParmOffset) != 0; }
-@@ -4753,6 +4756,13 @@ public:
+@@ -4812,6 +4815,13 @@ public:
          return ExtInfo(Bits & ~CmseNSCallMask);
      }
- 
+
 +    ExtInfo withFar(bool Far) const {
 +      if (Far)
 +        return ExtInfo(Bits | FarMask);
@@ -70,19 +70,19 @@ index a64bbb99b13d..a9f2f14e7660 100644
      ExtInfo withNoCallerSavedRegs(bool noCallerSavedRegs) const {
        if (noCallerSavedRegs)
          return ExtInfo(Bits | NoCallerSavedRegsMask);
-@@ -4905,6 +4915,7 @@ public:
+@@ -4964,6 +4974,7 @@ public:
    bool getCFIUncheckedCalleeAttr() const;
- 
+
    bool getCmseNSCallAttr() const { return getExtInfo().getCmseNSCall(); }
 +  bool getFarAttr() const { return getExtInfo().getFar(); }
    CallingConv getCallConv() const { return getExtInfo().getCC(); }
    ExtInfo getExtInfo() const { return ExtInfo(FunctionTypeBits.ExtInfo); }
- 
+
 diff --git a/clang/include/clang/AST/TypeProperties.td b/clang/include/clang/AST/TypeProperties.td
-index 0f3722b36774..d10326eefdde 100644
+index 1a2a3fda0dcf..94991c614854 100644
 --- a/clang/include/clang/AST/TypeProperties.td
 +++ b/clang/include/clang/AST/TypeProperties.td
-@@ -298,6 +298,9 @@ let Class = FunctionType in {
+@@ -307,6 +307,9 @@ let Class = FunctionType in {
    def : Property<"cmseNSCall", Bool> {
      let Read = [{ node->getExtInfo().getCmseNSCall() }];
    }
@@ -90,9 +90,9 @@ index 0f3722b36774..d10326eefdde 100644
 +    let Read = [{ node->getExtInfo().getFar() }];
 +  }
  }
- 
+
  let Class = FunctionNoProtoType in {
-@@ -305,7 +308,7 @@ let Class = FunctionNoProtoType in {
+@@ -314,7 +317,7 @@ let Class = FunctionNoProtoType in {
      auto extInfo = FunctionType::ExtInfo(noReturn, hasRegParm, regParm,
                                           callingConvention, producesResult,
                                           noCallerSavedRegs, noCfCheck,
@@ -101,7 +101,7 @@ index 0f3722b36774..d10326eefdde 100644
      return ctx.getFunctionNoProtoType(returnType, extInfo);
    }]>;
  }
-@@ -351,7 +354,7 @@ let Class = FunctionProtoType in {
+@@ -360,7 +363,7 @@ let Class = FunctionProtoType in {
      auto extInfo = FunctionType::ExtInfo(noReturn, hasRegParm, regParm,
                                           callingConvention, producesResult,
                                           noCallerSavedRegs, noCfCheck,
@@ -111,10 +111,10 @@ index 0f3722b36774..d10326eefdde 100644
      epi.ExtInfo = extInfo;
      epi.Variadic = variadic;
 diff --git a/clang/include/clang/Basic/Attr.td b/clang/include/clang/Basic/Attr.td
-index c82ab3919dcd..f1e067f8189b 100644
+index ece00b6df917..7219eee938a6 100644
 --- a/clang/include/clang/Basic/Attr.td
 +++ b/clang/include/clang/Basic/Attr.td
-@@ -2248,7 +2248,11 @@ def MipsLongCall : InheritableAttr, TargetSpecificAttr<TargetAnyMips> {
+@@ -2291,7 +2291,11 @@ def MipsLongCall : InheritableAttr, TargetSpecificAttr<TargetAnyMips> {
    let Spellings = [GCC<"long_call">, GCC<"far">];
    let Subjects = SubjectList<[Function]>;
    let Documentation = [MipsLongCallStyleDocs];
@@ -125,12 +125,12 @@ index c82ab3919dcd..f1e067f8189b 100644
 +  // per-target dispatch lives in SemaDeclAttr.cpp's handleLongCallAttr.
 +  let ParseKind = "LongCall";
  }
- 
+
  def MipsShortCall : InheritableAttr, TargetSpecificAttr<TargetAnyMips> {
-@@ -2288,6 +2292,24 @@ def MOSNoISR : InheritableAttr, TargetSpecificAttr<TargetMOS> {
+@@ -2331,6 +2335,24 @@ def MOSNoISR : InheritableAttr, TargetSpecificAttr<TargetMOS> {
    let Documentation = [Undocumented];
  }
- 
+
 +// #320 far function pointers (WDC 65816). A `far` (== `long_call`) function is
 +// called through the 24-bit far-indirect sequence: clang stashes the function's
 +// full 24-bit address into the runtime slot __mos_far_target and JSLs the bank-0
@@ -153,10 +153,10 @@ index c82ab3919dcd..f1e067f8189b 100644
    let Spellings = [GCC<"reentrant">];
    let Subjects = SubjectList<[Function]>;
 diff --git a/clang/lib/AST/ASTContext.cpp b/clang/lib/AST/ASTContext.cpp
-index 5588b1829eb5..afb696539030 100644
+index 851c91e07699..2004166587bd 100644
 --- a/clang/lib/AST/ASTContext.cpp
 +++ b/clang/lib/AST/ASTContext.cpp
-@@ -2392,11 +2392,21 @@ TypeInfo ASTContext::getTypeInfoImpl(const Type *T) const {
+@@ -2506,11 +2506,21 @@ TypeInfo ASTContext::getTypeInfoImpl(const Type *T) const {
      Width = Target->getPointerWidth(AS);
      Align = Target->getPointerAlign(AS);
      break;
@@ -180,20 +180,20 @@ index 5588b1829eb5..afb696539030 100644
    case Type::MemberPointer: {
      const auto *MPT = cast<MemberPointerType>(T);
      CXXABI::MemberPointerInfo MPI = ABI->getMemberPointerInfo(MPT);
-@@ -11550,6 +11560,8 @@ QualType ASTContext::mergeFunctionTypes(QualType lhs, QualType rhs,
+@@ -11717,6 +11727,8 @@ QualType ASTContext::mergeFunctionTypes(QualType lhs, QualType rhs,
      return {};
    if (lbaseInfo.getNoCfCheck() != rbaseInfo.getNoCfCheck())
      return {};
 +  if (lbaseInfo.getFar() != rbaseInfo.getFar()) // #320 far function pointer
 +    return {};
- 
+
    // When merging declarations, it's common for supplemental information like
    // attributes to only be present in one of the declarations, and we generally
 diff --git a/clang/lib/AST/TypePrinter.cpp b/clang/lib/AST/TypePrinter.cpp
-index 80f5b90ba35c..73552b74a172 100644
+index 13929f6fe080..2b05246ec2a3 100644
 --- a/clang/lib/AST/TypePrinter.cpp
 +++ b/clang/lib/AST/TypePrinter.cpp
-@@ -1203,6 +1203,8 @@ void TypePrinter::printFunctionAfter(const FunctionType::ExtInfo &Info,
+@@ -1226,6 +1226,8 @@ void TypePrinter::printFunctionAfter(const FunctionType::ExtInfo &Info,
      OS << " __attribute__((noreturn))";
    if (Info.getCmseNSCall())
      OS << " __attribute__((cmse_nonsecure_call))";
@@ -203,11 +203,11 @@ index 80f5b90ba35c..73552b74a172 100644
      OS << " __attribute__((ns_returns_retained))";
    if (Info.getRegParm())
 diff --git a/clang/lib/Basic/Targets/MOS.cpp b/clang/lib/Basic/Targets/MOS.cpp
-index dfe99d8f2a2a..3a729fc34537 100644
+index 773415b1c24b..eda1ec61c9eb 100644
 --- a/clang/lib/Basic/Targets/MOS.cpp
 +++ b/clang/lib/Basic/Targets/MOS.cpp
 @@ -18,8 +18,10 @@ using namespace clang::targets;
- 
+
  MOSTargetInfo::MOSTargetInfo(const llvm::Triple &Triple, const TargetOptions &)
      : TargetInfo(Triple) {
 +  // Must match the backend's MOSDataLayout (MOSTargetMachine.cpp). p2:32:8 =
@@ -216,7 +216,7 @@ index dfe99d8f2a2a..3a729fc34537 100644
 -      "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
 +      "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
    resetDataLayout(Layout);
- 
+
    PointerWidth = 16;
 @@ -204,6 +206,8 @@ uint64_t MOSTargetInfo::getPointerWidthV(LangAS AddrSpace) const {
    switch (toTargetAddressSpace(AddrSpace)) {
@@ -228,13 +228,13 @@ index dfe99d8f2a2a..3a729fc34537 100644
      return 16;
    }
 diff --git a/clang/lib/CodeGen/CGExpr.cpp b/clang/lib/CodeGen/CGExpr.cpp
-index 64adc4770808..77b50510827c 100644
+index 76bd781a709b..a8b54784f445 100644
 --- a/clang/lib/CodeGen/CGExpr.cpp
 +++ b/clang/lib/CodeGen/CGExpr.cpp
-@@ -4965,9 +4965,29 @@ LValue CodeGenFunction::EmitArraySubscriptExpr(const ArraySubscriptExpr *E,
+@@ -5211,9 +5211,29 @@ LValue CodeGenFunction::EmitArraySubscriptExpr(const ArraySubscriptExpr *E,
      if (SanOpts.has(SanitizerKind::ArrayBounds))
        EmitBoundsCheck(E, E->getBase(), Idx, IdxTy, Accessed);
- 
+
 -    // Extend or truncate the index type to 32 or 64-bits.
 -    if (Promote && Idx->getType() != IntPtrTy)
 -      Idx = Builder.CreateIntCast(Idx, IntPtrTy, IdxSigned, "idxprom");
@@ -261,13 +261,13 @@ index 64adc4770808..77b50510827c 100644
 +      if (Idx->getType() != PromoteTy)
 +        Idx = Builder.CreateIntCast(Idx, PromoteTy, IdxSigned, "idxprom");
 +    }
- 
+
      return Idx;
    };
-@@ -6866,6 +6886,60 @@ LValue CodeGenFunction::EmitStmtExprLValue(const StmtExpr *E) {
+@@ -7129,6 +7149,60 @@ LValue CodeGenFunction::EmitStmtExprLValue(const StmtExpr *E) {
                          AlignmentSource::Decl);
  }
- 
+
 +// #320(a) MOS far function pointers. Return the distinct-named addrspace(2) data
 +// alias of a far function symbol: `.set __mos_far_<Sym>, <Sym>` + an external AS2
 +// i8 global. Referencing the function through a DISTINCT-named AS2 data symbol
@@ -325,10 +325,10 @@ index 64adc4770808..77b50510827c 100644
  RValue CodeGenFunction::EmitCall(QualType CalleeType,
                                   const CGCallee &OrigCallee, const CallExpr *E,
                                   ReturnValueSlot ReturnValue,
-@@ -7102,6 +7176,29 @@ RValue CodeGenFunction::EmitCall(QualType CalleeType,
+@@ -7365,6 +7439,29 @@ RValue CodeGenFunction::EmitCall(QualType CalleeType,
      }
    }
- 
+
 +  // #320(a) MOS far function pointers: a call whose target carries the
 +  // `far`/`long_call` attribute is dispatched through the 24-bit far-indirect
 +  // trampoline (stash the target into @__mos_far_target, then call the bank-0
@@ -356,10 +356,10 @@ index 64adc4770808..77b50510827c 100644
    RValue Call = EmitCall(FnInfo, Callee, ReturnValue, Args, &LocalCallOrInvoke,
                           E == MustTailCall, E->getExprLoc());
 diff --git a/clang/lib/CodeGen/CGExprScalar.cpp b/clang/lib/CodeGen/CGExprScalar.cpp
-index a8dcf2299298..5619ea81a0b2 100644
+index 7ecaa149f7b3..31c923a1ce32 100644
 --- a/clang/lib/CodeGen/CGExprScalar.cpp
 +++ b/clang/lib/CodeGen/CGExprScalar.cpp
-@@ -2897,6 +2897,18 @@ Value *ScalarExprEmitter::VisitCastExpr(CastExpr *CE) {
+@@ -2918,6 +2918,18 @@ Value *ScalarExprEmitter::VisitCastExpr(CastExpr *CE) {
      return CGF.getAsNaturalPointerTo(CGF.EmitArrayToPointerDecay(E),
                                       CE->getType()->getPointeeType());
    case CK_FunctionToPointerDecay:
@@ -376,16 +376,16 @@ index a8dcf2299298..5619ea81a0b2 100644
 +          return CGF.CGM.getMOSFarDataAlias(
 +              CGF.CGM.getMangledName(GlobalDecl(FD)));
      return EmitLValue(E).getPointer(CGF);
- 
+
    case CK_NullToPointer:
 diff --git a/clang/lib/CodeGen/CodeGenModule.h b/clang/lib/CodeGen/CodeGenModule.h
-index dc296919aa32..24a2194f6a9d 100644
+index 28e9bcf9e866..af0ef3b2dac7 100644
 --- a/clang/lib/CodeGen/CodeGenModule.h
 +++ b/clang/lib/CodeGen/CodeGenModule.h
-@@ -1074,6 +1074,11 @@ public:
+@@ -1131,6 +1131,11 @@ public:
    llvm::Constant *getFunctionPointer(llvm::Constant *Pointer,
                                       QualType FunctionType);
- 
+
 +  /// #320: return the distinct-named addrspace(2) data alias of a far function
 +  /// symbol (`.set __mos_far_<Sym>, <Sym>` + an external AS2 i8 global), used to
 +  /// materialize the function's full 24-bit (far) address as a p2 value.
@@ -393,14 +393,14 @@ index dc296919aa32..24a2194f6a9d 100644
 +
    llvm::Constant *getMemberFunctionPointer(const FunctionDecl *FD,
                                             llvm::Type *Ty = nullptr);
- 
+
 diff --git a/clang/lib/CodeGen/CodeGenTypes.cpp b/clang/lib/CodeGen/CodeGenTypes.cpp
-index e76b1e8608d3..091cbd1dbff6 100644
+index daed8559cc62..833f362a24f4 100644
 --- a/clang/lib/CodeGen/CodeGenTypes.cpp
 +++ b/clang/lib/CodeGen/CodeGenTypes.cpp
-@@ -647,6 +647,14 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
-     const PointerType *PTy = cast<PointerType>(Ty);
-     QualType ETy = PTy->getPointeeType();
+@@ -643,6 +643,14 @@ llvm::Type *CodeGenTypes::ConvertType(QualType T) {
+       break;
+     }
      unsigned AS = getTargetAddressSpace(ETy);
 +    // #320: a far function pointer (the MOS `far` attribute set the far bit on
 +    // the pointee function type) holds a 24-bit address; lower it to the far
@@ -414,13 +414,13 @@ index e76b1e8608d3..091cbd1dbff6 100644
      break;
    }
 diff --git a/clang/lib/Sema/SemaDeclAttr.cpp b/clang/lib/Sema/SemaDeclAttr.cpp
-index 93e1fcb55f47..be40b13cc83d 100644
+index 367bf99b8526..e55f8b7559d7 100644
 --- a/clang/lib/Sema/SemaDeclAttr.cpp
 +++ b/clang/lib/Sema/SemaDeclAttr.cpp
-@@ -6557,6 +6557,19 @@ static void handleInterruptAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
+@@ -6742,6 +6742,19 @@ static void handleInterruptAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
    }
  }
- 
+
 +static void handleLongCallAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
 +  // far / long_call is owned by both MOS and MIPS (a shared GNU spelling, like
 +  // `interrupt`), so it parses to a single AT_LongCall kind; dispatch on the
@@ -437,7 +437,7 @@ index 93e1fcb55f47..be40b13cc83d 100644
  static void handleLayoutVersion(Sema &S, Decl *D, const ParsedAttr &AL) {
    uint32_t Version;
    Expr *VersionExpr = AL.getArgAsExpr(0);
-@@ -7553,6 +7566,9 @@ ProcessDeclAttribute(Sema &S, Scope *scope, Decl *D, const ParsedAttr &AL,
+@@ -7740,6 +7753,9 @@ ProcessDeclAttribute(Sema &S, Decl *D, const ParsedAttr &AL,
    case ParsedAttr::AT_Interrupt:
      handleInterruptAttr(S, D, AL);
      break;
@@ -448,10 +448,10 @@ index 93e1fcb55f47..be40b13cc83d 100644
      S.ARM().handleInterruptSaveFPAttr(D, AL);
      break;
 diff --git a/clang/lib/Sema/SemaType.cpp b/clang/lib/Sema/SemaType.cpp
-index 3dc8ceb70f3c..5ba1fe01d356 100644
+index 037583575d19..20d68f432f2f 100644
 --- a/clang/lib/Sema/SemaType.cpp
 +++ b/clang/lib/Sema/SemaType.cpp
-@@ -157,6 +157,7 @@ static void diagnoseBadTypeAttribute(Sema &S, const ParsedAttr &attr,
+@@ -156,6 +156,7 @@ static void diagnoseBadTypeAttribute(Sema &S, const ParsedAttr &attr,
    case ParsedAttr::AT_CFIUncheckedCallee:                                      \
    case ParsedAttr::AT_CFISalt:                                                 \
    case ParsedAttr::AT_CmseNSCall:                                              \
@@ -459,10 +459,10 @@ index 3dc8ceb70f3c..5ba1fe01d356 100644
    case ParsedAttr::AT_ArmStreaming:                                            \
    case ParsedAttr::AT_ArmStreamingCompatible:                                  \
    case ParsedAttr::AT_ArmPreserves:                                            \
-@@ -8086,6 +8087,27 @@ static bool handleFunctionTypeAttr(TypeProcessingState &state, ParsedAttr &attr,
+@@ -8144,6 +8145,27 @@ static bool handleFunctionTypeAttr(TypeProcessingState &state, ParsedAttr &attr,
      return true;
    }
- 
+
 +  if (attr.getKind() == ParsedAttr::AT_LongCall) {
 +    // #320: the MOS `far`/`long_call` attribute on a function(-pointer) type
 +    // marks it a far function pointer — calls through it use the 24-bit
@@ -494,7 +494,7 @@ index bfa9303e3fc9..f5462d3247a9 100644
 @@ -273,8 +273,13 @@ bool MOSCallLowering::lowerReturn(MachineIRBuilder &MIRBuilder,
        *MF.getSubtarget().getFrameLowering());
    const Function &F = MF.getFunction();
- 
+
 -  auto Return =
 -      MIRBuilder.buildInstrNoInsert(TFI.isISR(MF) ? MOS::RTI : MOS::RTS);
 +  // #320 Inc 4: a .far_* function (placed in another bank, entered via JSL) must
@@ -504,12 +504,12 @@ index bfa9303e3fc9..f5462d3247a9 100644
 +  bool IsFar = STI.hasW65816() && F.getSection().starts_with(".far_");
 +  auto Return = MIRBuilder.buildInstrNoInsert(
 +      TFI.isISR(MF) ? MOS::RTI : (IsFar ? MOS::RTL : MOS::RTS));
- 
+
    if (Val) {
      MachineRegisterInfo &MRI = MF.getRegInfo();
 @@ -376,6 +381,41 @@ bool MOSCallLowering::lowerCall(MachineIRBuilder &MIRBuilder,
    const TargetRegisterInfo &TRI = *STI.getRegisterInfo();
- 
+
    bool IsIndirect = Info.Callee.isReg();
 +
 +  // #320 far-call banking (W65816-only; default 6502 codegen untouched).
@@ -563,12 +563,12 @@ index bfa9303e3fc9..f5462d3247a9 100644
 +    MIRBuilder.buildCopy(MOS::RS9, AddrReg);
 +    Info.Callee.ChangeToES("__call_near_from_far");
    }
- 
+
    // Generate the setup call frame pseudo instruction. This will record the size
 @@ -407,15 +456,27 @@ bool MOSCallLowering::lowerCall(MachineIRBuilder &MIRBuilder,
    // additional code.
    auto CallSeqStart = MIRBuilder.buildInstr(MOS::ADJCALLSTACKDOWN);
- 
+
 -  auto Call = MIRBuilder.buildInstrNoInsert(MOS::JSR)
 +  // #320 Inc 4: a direct call to a .far_* function (placed in another bank by the
 +  // linker) uses JSL (24-bit long call, $22) so the program bank follows; the callee
@@ -581,7 +581,7 @@ index bfa9303e3fc9..f5462d3247a9 100644
 +  auto Call = MIRBuilder.buildInstrNoInsert(IsFar ? MOS::JSL : MOS::JSR)
                    .add(Info.Callee)
                    .addRegMask(TRI.getCallPreservedMask(MF, Info.CallConv));
- 
+
 -  // Indirect calls store the callee in RS9.
 +  // Indirect calls and the far->near thunk read the callee in RS9. (The far indirect
 +  // thunk __call_indir_far reads its target from the `__mos_far_target` memory slot,
@@ -593,7 +593,7 @@ index bfa9303e3fc9..f5462d3247a9 100644
 +  } else if (IsFarNearThunk) {
 +    Call.addUse(MOS::RS9, RegState::Implicit);
    }
- 
+
    SmallVector<ArgInfo, 8> OutArgs;
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
 index 70e8bb0d45b3..29032a1e32ea 100644
@@ -602,7 +602,7 @@ index 70e8bb0d45b3..29032a1e32ea 100644
 @@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
    let mayLoad = true;
  }
- 
+
 +// #320: Generalized 8-bit load using 65816 absolute-long (24-bit) addressing,
 +// for far (addrspace 2) pointers. The address argument is a global value or a
 +// 24-bit immediate. Selects to LDA AbsoluteLong (accumulator only). Additionally
@@ -620,7 +620,7 @@ index 70e8bb0d45b3..29032a1e32ea 100644
 @@ -114,6 +125,35 @@ def G_STORE_ABS : MOSGenericInstruction {
    let mayStore = true;
  }
- 
+
 +// #320: Generalized 8-bit store using 65816 absolute-long (24-bit) addressing,
 +// for far (addrspace 2) pointers. The address argument is a global value or a
 +// 24-bit immediate. Selects to STA AbsoluteLong (accumulator only). Additionally
@@ -654,10 +654,10 @@ index 70e8bb0d45b3..29032a1e32ea 100644
  // argument isn't a pointer; it's either a global value or a 16-bit immediate.
  // The index argument is an 8-bit scalar. Additionally expects a
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 42a94c356e67..6850ed4ab963 100644
+index e031627a6437..25e0114928ab 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-@@ -664,6 +664,13 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
+@@ -669,6 +669,13 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
        copyPhysRegImpl(Builder, DestReg,
                        getRegWithVal(Builder, SrcReg, MOS::GPRRegClass));
      }
@@ -676,16 +676,16 @@ index a19b69cd054f..d8377bc8b441 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.h
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
 @@ -152,7 +152,11 @@ private:
- 
+
  namespace MOS {
- 
+
 -enum AddressSpace { AS_Memory, AS_ZeroPage, NumAddrSpaces };
 +// AS_Memory  (0): 16-bit absolute pointer (6502 default; data-bank-relative on 65816).
 +// AS_ZeroPage(1): 8-bit direct-page pointer.
 +// AS_Far     (2): 32-bit "far" pointer — 65816 24-bit address in the low 3 bytes,
 +//                 top byte unused (LLVM wants power-of-two pointer sizes). #320 Increment 1.
 +enum AddressSpace { AS_Memory, AS_ZeroPage, AS_Far, NumAddrSpaces };
- 
+
  enum TargetIndex {
    TI_STATIC_STACK,
 @@ -164,6 +168,13 @@ enum TOF {
@@ -700,7 +700,7 @@ index a19b69cd054f..d8377bc8b441 100644
 +  MO_ADDR24_SEG_HI,
 +  MO_ADDR24_BANK,
  };
- 
+
  } // namespace MOS
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
 index 6b8158ca0cac..715766180b8c 100644
@@ -709,7 +709,7 @@ index 6b8158ca0cac..715766180b8c 100644
 @@ -323,6 +323,17 @@ def JSR : MOSLogicalInstr, PseudoInstExpansion<(JSR_Absolute addr16:$tgt)> {
    let isCall = true;
  }
- 
+
 +// #320 Inc 4 far calls: a far (24-bit) call to a function in another bank. Mirrors
 +// JSR but expands to JSL_AbsoluteLong (opcode $22, pushes a 3-byte PBR:PC return
 +// address), so the target relocates as R_MOS_ADDR24 (the callee's $01xxxx address).
@@ -723,11 +723,11 @@ index 6b8158ca0cac..715766180b8c 100644
 +
  def TailJMP : MOSLogicalInstr, PseudoInstExpansion<(JMP_Absolute addr16:$tgt)> {
    dag InOperandList = (ins label:$tgt);
- 
+
 @@ -332,6 +343,24 @@ def TailJMP : MOSLogicalInstr, PseudoInstExpansion<(JMP_Absolute addr16:$tgt)> {
    let isReturn = true;
  }
- 
+
 +// #320 far tail call: the far analogue of TailJMP. Emitted by
 +// MOSLateOptimization::tailJMP only for a `JSL <far global>; RTL` block tail —
 +// folds a far->far tail call into a single direct 24-bit long jump
@@ -750,20 +750,20 @@ index 6b8158ca0cac..715766180b8c 100644
    let isBarrier = true;
    let isReturn = true;
 @@ -340,6 +369,10 @@ class MOSReturn<Instruction Opcode> : MOSLogicalInstr, PseudoInstExpansion<(Opco
- 
+
  def RTS : MOSReturn<RTS_Implied>;
  def RTI : MOSReturn<RTI_Implied>;
 +// #320 Inc 4 far calls: return-from-long-subroutine (RTL, $6B, pops the 3-byte
 +// PBR:PC return address a JSL pushed). Emitted by MOSCallLowering::lowerReturn only
 +// when the current function is .far_* on W65816 — pairs with the caller's JSL.
 +def RTL : MOSReturn<RTL_Implied>;
- 
+
  //===---------------------------------------------------------------------===//
  // Immediate Load Instructions
 @@ -537,6 +570,13 @@ def LDIndirIdx : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)>
    dag InOperandList = (ins Imag16:$addr, Yc:$offset);
  }
- 
+
 +// #320: LDA long ($xxxxxx) — far (24-bit absolute) load, accumulator only.
 +def LDAbsLong : MOSLoad, PseudoInstExpansion<(LDA_AbsoluteLong addr24:$src)> {
 +  let Predicates = [HasW65816];
@@ -777,7 +777,7 @@ index 6b8158ca0cac..715766180b8c 100644
 @@ -564,6 +604,12 @@ def STIndirIdx : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)
    dag InOperandList = (ins Ac:$src, Imag16:$addr, Yc:$offset);
  }
- 
+
 +// #320: STA long ($xxxxxx) — far (24-bit absolute) store, accumulator only.
 +def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
 +  let Predicates = [HasW65816];
@@ -790,7 +790,7 @@ index 6b8158ca0cac..715766180b8c 100644
 @@ -579,6 +625,21 @@ let Predicates = [Has65C02] in {
    }
  }
- 
+
 +// #320 far runtime: LDA [dp] — runtime far-pointer indirect-long load. The ZP
 +// address operand is an Imag32 quad holding the 24-bit far address (lo,hi,bank
 +// in its first 3 bytes, byte 3 = pad); `lda [dp]` reads bytes dp..dp+2. The
@@ -836,7 +836,7 @@ index d4936aabfadd..9712a96e9e44 100644
 +    return MOS::Imag32RegClass;
    }
  }
- 
+
 @@ -253,6 +263,13 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
    case MOS::G_LOAD_ABS_IDX:
    case MOS::G_LOAD_INDIR:
@@ -854,7 +854,7 @@ index d4936aabfadd..9712a96e9e44 100644
 @@ -1291,12 +1308,85 @@ MOSInstructionSelector::selectFrameIndexLoHi(MachineInstr &MI) {
    return {LoAddr.getReg(0), HiAddr.getReg(0)};
  }
- 
+
 +// #320 far runtime: is this address-of operand a far (addrspace 2) symbol whose
 +// address is a 24-bit value (Imag32/p2), not a 16-bit near pointer? Two cases:
 +//   * a far-addrspace (AS_Far) global — far DATA, declared address_space(2).
@@ -918,7 +918,7 @@ index d4936aabfadd..9712a96e9e44 100644
    MachineOperand Op = MI.getOperand(1);
    if (Op.isCImm())
      Op.ChangeToImmediate(Op.getCImm()->getSExtValue());
- 
+
 +  // #320 far runtime: the address of a far symbol is a 24-bit value held in an
 +  // Imag32 (p2). Compose it from the segment word + (bank, 0) word.
 +  if (isFarSymbol(Op)) {
@@ -951,7 +951,7 @@ index d4936aabfadd..9712a96e9e44 100644
 @@ -1680,6 +1774,27 @@ bool MOSInstructionSelector::selectMergeValues(MachineInstr &MI) {
      return true;
    }
- 
+
 +  // #320 far runtime: a 2x s16 -> 32-bit merge composes the two 16-bit halves of
 +  // a runtime far pointer into a contiguous Imag32 ZP quad (16-bit subreg word
 +  // indices). Only far pointers reach selection as a unified 32-bit value, so
@@ -999,7 +999,7 @@ index d4936aabfadd..9712a96e9e44 100644
    constrainGenericOp(*LoCopy);
    constrainGenericOp(*HiCopy);
 @@ -1926,6 +2050,18 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
- 
+
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
 +  // #320 far runtime: pin the runtime far pointer operand of the indirect-long
@@ -1044,12 +1044,12 @@ index d4936aabfadd..9712a96e9e44 100644
      Opcode = MOS::STAbsIdx;
      break;
 diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-index fbedd8d46b95..3325a123f441 100644
+index 3c665ce94fd0..18c98da393a0 100644
 --- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 +++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 @@ -23,12 +23,14 @@
  #include "MOSSubtarget.h"
- 
+
  #include "llvm/ADT/SmallSet.h"
 +#include "llvm/ADT/StringRef.h"
  #include "llvm/CodeGen/GlobalISel/MachineIRBuilder.h"
@@ -1059,10 +1059,10 @@ index fbedd8d46b95..3325a123f441 100644
  #include "llvm/CodeGen/TargetInstrInfo.h"
  #include "llvm/CodeGen/TargetSubtargetInfo.h"
 +#include "llvm/IR/GlobalValue.h"
- 
+
  #define DEBUG_TYPE "mos-late-opt"
- 
-@@ -402,15 +404,61 @@ bool MOSLateOptimization::tailJMP(MachineBasicBlock &MBB) const {
+
+@@ -407,15 +409,61 @@ bool MOSLateOptimization::tailJMP(MachineBasicBlock &MBB) const {
    if (MBB.size() < 2)
      return false;
    auto It = std::prev(MBB.end());
@@ -1129,9 +1129,9 @@ index fbedd8d46b95..3325a123f441 100644
 +  It->setDesc(TII.get(MOS::TailJML));
    return true;
  }
- 
+
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 8ba6b0b13f54..6356fa58723c 100644
+index 5769520d6f93..6646ff90b73c 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -67,6 +67,10 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -1142,22 +1142,22 @@ index 8ba6b0b13f54..6356fa58723c 100644
 +  // 65816 long address; LLVM requires power-of-two pointer sizes). Legal only
 +  // where it appears; far load/store select to absolute-long addressing.
 +  LLT PF = LLT::pointer(2, 32);
- 
-   // Constants
- 
-@@ -83,7 +87,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+
+   // There are no vector registers, but the optimizer freely forms vector
+   // operations over the vector types SROA invents for aggregates. Any
+@@ -89,7 +93,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
        .unsupported();
- 
+
    getActionDefinitionsBuilder({G_GLOBAL_VALUE, G_FRAME_INDEX, G_BLOCK_ADDR})
 -      .legalFor({P, PZ})
 +      .legalFor({P, PZ, PF})
        .unsupported();
- 
+
    // Integer Extension and Truncation
-@@ -107,16 +111,21 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
- 
+@@ -116,16 +120,21 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+
    // Type Conversions
- 
+
 +  // #320 far runtime: a 32-bit far pointer (PF) round-trips to/from an s32
 +  // (the cast that creates a runtime far pointer, and the integer view used by
 +  // far-pointer arithmetic). Selected as a COPY, same as the near forms.
@@ -1177,12 +1177,12 @@ index 8ba6b0b13f54..6356fa58723c 100644
 -      .customForCartesianProduct({P, PZ})
 +      .customForCartesianProduct({P, PZ, PF})
        .unsupported();
- 
-   // Scalar Operations
-@@ -206,8 +215,10 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+
+   // Bitcasts only appear once vector types are involved; a scalar-to-scalar
+@@ -245,8 +254,10 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
        .maxScalar(0, S8)
        .unsupported();
- 
+
 +  // #320 far runtime: {PF,S32} adds an integer offset to a 32-bit far pointer;
 +  // the 32-bit add carries through the bank byte across a 64 KB boundary.
    getActionDefinitionsBuilder(G_PTR_ADD)
@@ -1191,31 +1191,27 @@ index 8ba6b0b13f54..6356fa58723c 100644
        .scalarSameSizeAs(1, 0)
        .unsupported();
    getActionDefinitionsBuilder(G_PTRMASK)
-@@ -322,8 +333,8 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
-   getActionDefinitionsBuilder({G_LOAD, G_STORE})
+@@ -372,7 +383,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
        // Convert to int to load/store; that way the operation can be narrowed to
        // 8 bits. Once 8-bit, select an addressing mode to replace the generic
--      // G_LOAD and G_STORE.
+       // G_LOAD and G_STORE.
 -      .customForCartesianProduct({S8, PZ, P}, {PZ, P})
-+      // G_LOAD and G_STORE. PF (far) pointers select to absolute-long. (#320)
 +      .customForCartesianProduct({S8, PZ, P}, {PZ, P, PF})
-       .widenScalarToNextMultipleOf(0, 8)
-       .maxScalar(0, S8)
-       .unsupported();
-@@ -1465,7 +1476,11 @@ bool MOSLegalizerInfo::legalizePtrAdd(LegalizerHelper &Helper,
-     return true;
-   }
- 
--  if (ConstOffset && ConstOffset->Value.abs().isOne()) {
-+  // #320 far runtime: a 32-bit far pointer (PF) has no G_INC/G_DEC form; let it
-+  // fall through to the generic ptrtoint/add/inttoptr lowering below (the 32-bit
-+  // add carries through the bank byte). Only near pointers take the ±1 fast path.
-+  if (ConstOffset && ConstOffset->Value.abs().isOne() &&
-+      MRI.getType(Base).getScalarSizeInBits() != 32) {
-     Builder.buildInstr(ConstOffset->Value.isOne() ? MOS::G_INC : MOS::G_DEC,
-                        {Result}, {Base});
-     MI.eraseFromParent();
-@@ -1511,11 +1526,14 @@ bool MOSLegalizerInfo::legalizeAddrSpaceCast(LegalizerHelper &Helper,
+       // There are no vector registers, so break vector accesses apart into one
+       // access per element and let the scalar rules below handle each.
+       .scalarize(0)
+@@ -1531,7 +1542,9 @@ bool MOSLegalizerInfo::legalizePtrAdd(LegalizerHelper &Helper,
+   // this to 4 cost 3% in a tile-conversion loop.
+   const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+   unsigned MaxIncDec = STI.has65CE02() ? 2 : 1;
+-  if (ConstOffset && !ConstOffset->Value.isZero() &&
++  // Far pointer arithmetic preserves bank carry through integer lowering.
++  if (MRI.getType(Base).getScalarSizeInBits() != 32 &&
++      ConstOffset && !ConstOffset->Value.isZero() &&
+       ConstOffset->Value.abs().ule(MaxIncDec)) {
+     int64_t N = ConstOffset->Value.getSExtValue();
+     unsigned Opc = N > 0 ? MOS::G_INC : MOS::G_DEC;
+@@ -1587,11 +1600,14 @@ bool MOSLegalizerInfo::legalizeAddrSpaceCast(LegalizerHelper &Helper,
      // larger -> smaller address space: truncate
      Tmp = Builder.buildTrunc(DestTypeS, Tmp);
    } else if (DestTypeS.getSizeInBits() > SrcTypeS.getSizeInBits()) {
@@ -1234,7 +1230,7 @@ index 8ba6b0b13f54..6356fa58723c 100644
        // Dest = (Src | ZeroPageOffset)
        Tmp = Builder.buildOr(
            DestTypeS, Tmp,
-@@ -1685,6 +1703,14 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
+@@ -1761,6 +1777,14 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
        return true;
      return selectIndirectAddressing(Helper, MRI, MI);
    }
@@ -1249,10 +1245,10 @@ index 8ba6b0b13f54..6356fa58723c 100644
    default:
      llvm_unreachable("unknown pointer size");
    }
-@@ -1750,6 +1776,53 @@ bool MOSLegalizerInfo::tryAbsoluteAddressing(LegalizerHelper &Helper,
+@@ -1826,6 +1850,53 @@ bool MOSLegalizerInfo::tryAbsoluteAddressing(LegalizerHelper &Helper,
    return false;
  }
- 
+
 +// #320: select 65816 absolute-long addressing for a 32-bit far pointer whose
 +// address is a compile-time constant or (far) global. Replaces the generic
 +// G_LOAD/G_STORE with G_LOAD_FAR_ABS/G_STORE_FAR_ABS carrying the 24-bit
@@ -1328,7 +1324,7 @@ index 75fc2ea7bded..c236b9d322b5 100644
 @@ -862,7 +862,10 @@ bool MOSMCInstLower::lowerOperand(const MachineOperand &MO, MCOperand &MCOp) {
        break;
      }
- 
+
 -    if (MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg)) {
 +    if (MOS::Imag32RegClass.contains(Reg) || MOS::Imag16RegClass.contains(Reg) ||
 +        MOS::Imag8RegClass.contains(Reg)) {
@@ -1360,7 +1356,7 @@ index 75fc2ea7bded..c236b9d322b5 100644
      // Jump tables are partitioned in two arrays: first all the low bytes,
      // then all the high bytes. This index referes to the high byte array, so
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index baf6de604cb7..8e9b57fc9669 100644
+index e6fccc3a3740..97d22841526a 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -52,6 +52,10 @@ MOSRegisterInfo::MOSRegisterInfo()
@@ -1391,8 +1387,8 @@ index baf6de604cb7..8e9b57fc9669 100644
 +  }
    return Reserved;
  }
- 
-@@ -744,11 +759,22 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+
+@@ -742,11 +757,22 @@ bool MOSRegisterInfo::getRegAllocationHints(
        }
        if (Other.getSubReg())
          OtherReg = TRI.getSubReg(OtherReg, Other.getSubReg());
@@ -1415,7 +1411,7 @@ index baf6de604cb7..8e9b57fc9669 100644
          MOSInstrCost Cost = copyCost(SelfReg, OtherReg, STI);
          if (Cost.value(CostMode) > WorstCost.value(CostMode))
            WorstCost = Cost;
-@@ -757,6 +783,8 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+@@ -755,6 +781,8 @@ bool MOSRegisterInfo::getRegAllocationHints(
          Register SelfReg = R;
          if (Self.getSubReg())
            SelfReg = TRI.getSubReg(SelfReg, Self.getSubReg());
@@ -1424,7 +1420,7 @@ index baf6de604cb7..8e9b57fc9669 100644
          MOSInstrCost Cost = copyCost(SelfReg, OtherReg, STI);
          if (Cost.value(CostMode) < WorstCost.value(CostMode))
            RegScores[R] += (WorstCost - Cost);
-@@ -995,6 +1023,13 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+@@ -993,6 +1021,13 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
    if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
      return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
    }
@@ -1439,13 +1435,13 @@ index baf6de604cb7..8e9b57fc9669 100644
      Register SrcReg8 =
          getMatchingSuperReg(SrcReg, MOS::sublsb, &MOS::Anyi8RegClass);
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index 94e229944885..fe863f0a98bb 100644
+index 5d4b239d1f3d..661942027939 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-@@ -20,6 +20,12 @@ def sublo : MOSSubRegIndex<8>;
+@@ -27,6 +27,12 @@ def sublo : MOSSubRegIndex<8>;
  // High byte of a 16-bit imaginary pointer register.
  def subhi : MOSSubRegIndex<8, 8>;
- 
+
 +// #320 far runtime: 16-bit-word subregister indices for the 32-bit imaginary
 +// far-pointer register Imag32 (a quad = pair of 16-bit RS words = 4 contiguous
 +// zero-page __rc bytes). The low word reuses sublo/subhi for its two bytes.
@@ -1454,11 +1450,11 @@ index 94e229944885..fe863f0a98bb 100644
 +
  // Carry bit of the 8-bit processor status register.
  def subcarry : MOSSubRegIndex<1>;
- 
-@@ -147,6 +153,29 @@ foreach I = 0...!add(MaxImag16Regs, -1) in {
+
+@@ -179,6 +185,29 @@ foreach I = 0...!add(MaxImag16Regs, -1) in {
         !cast<Register>("RC"#!add(!shl(I,1),1))]>;
  }
- 
+
 +// #320 far runtime: 32-bit imaginary registers (consecutive pairs of 16-bit RS
 +// words = 4 contiguous zero-page __rc bytes), the ZP home of a runtime far
 +// (addrspace 2) pointer dereferenced via `lda [dp]` / `sta [dp]`. Each RL#K is a
@@ -1468,7 +1464,7 @@ index 94e229944885..fe863f0a98bb 100644
 +// stack pointer, RL4 ⊃ RS8 the scavenger) or fall beyond the imaginary window
 +// are made unallocatable implicitly through their shared __rc register units —
 +// no explicit RL reservation (which would wrongly reserve the sibling RS too).
-+class MOSImagReg32<bits<16> num, string name, list<Register> subregs>
++class MOSImagReg32<bits<32> num, string name, list<Register> subregs>
 +    : MOSReg<num, name> {
 +  let SubRegs = subregs;
 +  let SubRegIndices = [sublo16, subhi16];
@@ -1485,19 +1481,19 @@ index 94e229944885..fe863f0a98bb 100644
  //===----------------------------------------------------------------------===//
  //  Register classes
  //===----------------------------------------------------------------------===//
-@@ -160,6 +189,8 @@ class MOSReg1Class<dag RegList>: MOSRegClass<[i1], 8, RegList> {
+@@ -192,6 +221,8 @@ class MOSReg1Class<dag RegList>: MOSRegClass<[i1], 8, RegList> {
  }
  class MOSReg8Class<dag RegList>: MOSRegClass<[i8], 8, RegList>;
  class MOSReg16Class<dag RegList>: MOSRegClass<[i16], 8, RegList>;
 +// #320 far runtime: 32-bit register class (the far-pointer ZP quad Imag32).
 +class MOSReg32Class<dag RegList>: MOSRegClass<[i32], 8, RegList>;
- 
+
  // Single register classes.
  let isPressureFineGrained = true in {
-@@ -180,6 +211,10 @@ let isPressureFineGrained = true in {
+@@ -212,6 +243,10 @@ let isPressureFineGrained = true in {
  def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
  def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
- 
+
 +// #320 far runtime: the 32-bit far-pointer ZP class (4 contiguous __rc bytes).
 +// The runtime far pointer dereferenced by `lda [dp]`/`sta [dp]` lives here.
 +def Imag32 : MOSReg32Class<(sequence "RL%u", 0, !add(MaxImag32Regs, -1))>;
@@ -1505,34 +1501,17 @@ index 94e229944885..fe863f0a98bb 100644
  // Instruction-specific register classes.
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
  let isPressureFineGrained = true in {
-diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index 3bb679dac9c3..ceb0afe8a654 100644
---- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-+++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-@@ -72,8 +72,11 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
-   initializeMOSZeroPageAllocPass(PR);
- }
- 
-+// p2:32:8 — addrspace 2 ("far"): 32-bit pointer (only the low 24 bits are emitted as
-+// 65816 absolute-long; LLVM requires a power-of-two pointer size, so 32 not 24). Inert
-+// for 6502 — nothing creates addrspace-2 pointers unless built for the 65816. #320.
- static const char *MOSDataLayout =
--    "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
-+    "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
- 
- /// Processes a CPU name.
- static StringRef getCPU(StringRef CPU) {
 diff --git a/llvm/lib/TargetParser/TargetDataLayout.cpp b/llvm/lib/TargetParser/TargetDataLayout.cpp
-index 8837d2f91887..1d9acf78cfb2 100644
+index 362bbf7d8034..1e43a5c83b4c 100644
 --- a/llvm/lib/TargetParser/TargetDataLayout.cpp
 +++ b/llvm/lib/TargetParser/TargetDataLayout.cpp
-@@ -579,7 +579,9 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {
+@@ -628,7 +628,9 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {
    case Triple::mips64el:
      return computeMipsDataLayout(*this, ABIName);
    case Triple::mos:
 -    return "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
-+    // p2:32:8 = addrspace 2 "far" (32-bit ptr, low 24 bits → 65816 absolute-long). #320.
-+    // Must stay identical to MOSTargetMachine.cpp and clang Targets/MOS.cpp.
++    // Far pointers use 32-bit containers for 24-bit addresses.
++    // Match Clang's MOS target description.
 +    return "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
    case Triple::msp430:
      return "e-m:e-p:16:16-i32:16-i64:16-f32:16-f64:16-a:8-n8:16-S16";

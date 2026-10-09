@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-10-09",
+  "repository": "llvm/llvm-project",
+  "number": 221477,
+  "html_url": "https://github.com/llvm/llvm-project/pull/221477",
+  "author": "zlfn",
+  "state": "closed",
+  "merged_at": "2026-09-16T16:20:23Z",
+  "merge_commit_sha": "e141b669757bd795015b22e02f28f19d4b4759a3",
+  "source_revision": "f24948c7d1a4b9f162d4d0192ccceecab1e441ff",
+  "source_path": "clang/lib/CodeGen/CGBuiltin.cpp",
+  "test_path": "clang/test/CodeGen/builtin-prefetch-arg-type.c",
+  "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+}

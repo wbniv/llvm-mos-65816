@@ -1,0 +1,33 @@
+Unexpected physical register copy.
+UNREACHABLE executed at /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:1667!
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-10-10-pin-native-copy/far-native-word.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-10-10-pin-native-copy/far-native-word.ll'.
+2.	Running pass 'Greedy Register Allocator' on function '@far_scaled_word'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005c29b77a599b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00005c29b77a63ec
+2  libc.so.6 0x0000766452445cb0
+3  libc.so.6 0x00007664524a61ac pthread_kill + 284
+4  libc.so.6 0x0000766452445b7e gsignal + 30
+5  libc.so.6 0x00007664524288ec abort + 39
+6  llc       0x00005c29b76f5e85
+7  llc       0x00005c29b84739e8
+8  llc       0x00005c29b8471b20
+9  llc       0x00005c29b82e670a
+10 llc       0x00005c29b8317cc6
+11 llc       0x00005c29b83185e7
+12 llc       0x00005c29b82e5747 llvm::RegAllocBase::allocatePhysRegs() + 695
+13 llc       0x00005c29b830aa51
+14 llc       0x00005c29b831cfc1
+15 llc       0x00005c29b7dcc8c8 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 504
+16 llc       0x00005c29b7a82f81 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1089
+17 llc       0x00005c29b7a89c22 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+18 llc       0x00005c29b7a83b44 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1716
+19 llc       0x00005c29b77ad927
+20 llc       0x00005c29b77aa4c1 llcMain + 1729
+21 llc       0x00005c29b76f542f main + 63
+22 libc.so.6 0x000076645242a601
+23 libc.so.6 0x000076645242a718 __libc_start_main + 136
+24 llc       0x00005c29b76f5325 _start + 37

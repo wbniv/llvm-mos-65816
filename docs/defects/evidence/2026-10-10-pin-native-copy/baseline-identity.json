@@ -1,0 +1,7 @@
+{
+  "pin": "f24948c7d1a4b9f162d4d0192ccceecab1e441ff",
+  "binary_sha256": "01f16ef000ea254740ac01958fa0e9f7253b6db0f0a8d09f40ef737e45b55c07",
+  "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n",
+  "preserved_binary": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-baseline/llc-native-copy",
+  "reconciliation": "Canonical mos-native-index-copy-cost already identifies this defect and retains repair.diff. The recorded extracted fix is absent from this downstream aggregate; backport it without opening a second record."
+}

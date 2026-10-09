@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
-index 2e5563708..83650387d 100644
+index 53eeca95b40b..d370eeab5728 100644
 --- a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 +++ b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 @@ -14,7 +14,9 @@
@@ -12,18 +12,17 @@ index 2e5563708..83650387d 100644
  #include "llvm/CodeGen/MachineOperand.h"
  #include "llvm/CodeGen/MachineRegisterInfo.h"
  #include "llvm/CodeGen/TargetLowering.h"
-@@ -36,6 +38,10 @@ public:
-   /// contains the set of assigned registers corresponding to the operand.
-   SmallVector<Register, 1> Regs;
+@@ -49,6 +51,9 @@ public:
 
+   /// The register class selected for this operand's constraint.
+   const TargetRegisterClass *RegClass = nullptr;
 +  /// For an indirect operand (=*r, *r), the type of the value the pointer
 +  /// argument refers to (the elementtype attribute).
 +  llvm::Type *IndirectTy = nullptr;
-+
+
    explicit GISelAsmOperandInfo(const TargetLowering::AsmOperandInfo &Info)
        : TargetLowering::AsmOperandInfo(Info) {}
- };
-@@ -258,6 +264,7 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -273,6 +278,7 @@ bool InlineAsmLowering::lowerInlineAsm(
        if (OpInfo.isIndirect) {
          OpTy = Call.getParamElementType(ArgNo);
          assert(OpTy && "Indirect operand must have elementtype attribute");
@@ -31,7 +30,7 @@ index 2e5563708..83650387d 100644
        }
 
        // FIXME: Support aggregate input operands
-@@ -310,6 +317,9 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -325,6 +331,9 @@ bool InlineAsmLowering::lowerInlineAsm(
 
    // Collects the output operands for later processing
    GISelAsmOperandInfoVector OutputOperands;
@@ -41,7 +40,7 @@ index 2e5563708..83650387d 100644
 
    for (auto &OpInfo : ConstraintOperands) {
      GISelAsmOperandInfo &RefOpInfo =
-@@ -377,7 +387,10 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -395,7 +404,10 @@ bool InlineAsmLowering::lowerInlineAsm(
          }
 
          // Remember this output operand for later processing
@@ -53,7 +52,7 @@ index 2e5563708..83650387d 100644
        }
 
        break;
-@@ -619,15 +632,8 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -635,15 +647,8 @@ bool InlineAsmLowering::lowerInlineAsm(
 
    // Finally, copy the output operands into the output registers
    ArrayRef<Register> ResRegs = GetOrCreateVRegs(Call);
@@ -71,7 +70,7 @@ index 2e5563708..83650387d 100644
    if (ResRegs.size() != OutputOperands.size()) {
      LLVM_DEBUG(dbgs() << "Expected the number of output registers to match the "
                           "number of destination registers (ResRegs="
-@@ -691,6 +697,40 @@ bool InlineAsmLowering::lowerInlineAsm(
+@@ -705,6 +710,40 @@ bool InlineAsmLowering::lowerInlineAsm(
      }
    }
 
@@ -114,11 +113,11 @@ index 2e5563708..83650387d 100644
 
 diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll
 new file mode 100644
-index 000000000..9523e2544
+index 000000000000..9523e25444d5
 --- /dev/null
 +++ b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll
 @@ -0,0 +1,34 @@
-+; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -stop-after=irtranslator < %s | FileCheck %s
++; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -stop-after=ir-translator < %s | FileCheck %s
 +; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 < %s | FileCheck %s --check-prefix=ASM
 +
 +; An indirect register output ("=*r", what Clang emits for "+g") is stored
@@ -154,11 +153,11 @@ index 000000000..9523e2544
 +}
 diff --git a/llvm/test/CodeGen/MOS/inline-asm-indirect-output.ll b/llvm/test/CodeGen/MOS/inline-asm-indirect-output.ll
 new file mode 100644
-index 000000000..09bfa1fc2
+index 000000000000..09bfa1fc26af
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/inline-asm-indirect-output.ll
 @@ -0,0 +1,34 @@
-+; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -stop-after=irtranslator < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -stop-after=ir-translator < %s | FileCheck %s
 +; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
 +; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
 +

@@ -1,10 +1,28 @@
 | Date | Change |
 |------|--------|
+| [2026-09-30](https://github.com/wbniv/llvm-mos-65816/commit/6dc0b153) | Rebase and review the far-word series; record four far defects |
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/f4453fc5) | Publish reviewed 0065 upstream preparation and dashboard status |
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/ff3cc764) | Validate standalone MOS null-output upstream extraction |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/4d7136cb) | perf(mos): complete broader near-store profitability |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/e370e031) | Fix near decoder Y lifetime and bank wrapping |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/d8f798c8) | Finish pending fix preparation and retain validation evidence |
 
 <!--history-meta v1
+6dc0b153	author	Will Norris
+6dc0b153	added	2
+6dc0b153	deleted	0
+6dc0b153	files	1
+6dc0b153	body	Rebase the 14-patch 0069/0070 series from 26d7c2c1eebf onto llvm-mos/llvm-mos main 06bc967d2668. Every patch body is unchanged and every intermediate tree round-trips. On the rebased trees, the MOS CodeGen/MC suites, the 228-case opcode sensitivity check and the 58-configuration frozen-IR replay on MAME and bsnes reproduce September 28 exactly: object and ROM hashes, main bytes and master clocks.\n\nThe independent review upholds 0069, 0070 and patches 9-11 but blocks filing on the far prerequisite. Four of its findings reproduce on the downstream release toolchain (llc 9031686c) and get confirmed canonical records:\n- far-pointer argument exhaustion;\n- far memory lengths above 65535 (silent);\n- far accesses on non-65816 CPUs (silent);\n- an undef DBG_VALUE after the far index fold.\n\nTwo findings are extraction gaps (an omitted trunc pattern and far-quad DWARF), and one is an Imag32 collision with open #594. Add suite provenance for the review's evidence finding. Also add the #320/#321 split plan, and update TODO, trackers, dashboard curation and the generated views.\n\nRebase, validation, downstream replay and records: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96. Independent review: Claude Code 2.1.283 t4-opus-high subagent, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+f4453fc5	author	Will Norris
+f4453fc5	added	3
+f4453fc5	deleted	1
+f4453fc5	files	1
+f4453fc5	body	Publish the exact-destination compiler extraction, matching-input validation, loaded-pointer fallback evidence, and separate independent 0065 review. Remove the completed T4 action and mark preparation complete while retaining the native feature posting hold and merge prerequisites. Preserve the local completion record and previously published compiler work.\n\nPreparation and publication assistance: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Independent review: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e79c-b9af-7ed3-acf5-19074d8d761a. Earlier implementation credits are preserved in their records.
+ff3cc764	author	Will Norris
+ff3cc764	added	6
+ff3cc764	deleted	0
+ff3cc764	files	1
+ff3cc764	body	Reconcile llvm-mos main 26d7c2c1eebf and validate patch 0068 without feature-series prerequisites. Retain 21 null-output SIGSEGV-to-success cases, 24 byte-identical ordinary outputs, and MOS suite results of 133 passes with one unsupported. Add an MC directive regression to the extracted patch. Preserve the original causal baseline and downstream candidate.\n\nRefresh current tracking, PR preview and dashboard exports. Independent review and upstream submission remain pending.\n\nValidation and documentation: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9. Original diagnosis and repair attribution remains in the canonical record; its exact tool version, model and effort are unknown.
 4d7136cb	author	Will Norris
 4d7136cb	added	2
 4d7136cb	deleted	0

@@ -96,18 +96,18 @@ index 0000000..f9b7702
 @@ -0,0 +1,165 @@
 +; RUN: split-file %s %t
 +; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs %t/ok.ll -o - | FileCheck %s
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_a.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-A
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-X
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_y.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-Y
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_R.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-R
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_d.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-D
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_in.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-IN
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_a.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-A
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-X
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_y.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-Y
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_rc.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-RC
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_rs.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-RS
-+; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_cc.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-CC
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/wide_a.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-A
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/wide_x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-X
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/wide_y.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-Y
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/wide_R.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-R
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/wide_d.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-D
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/wide_in.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-IN
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/named_a.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-A
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/named_x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-X
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/named_y.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-Y
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/named_rc.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-RC
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/named_rs.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-RS
++; RUN: not llc -mtriple=mos -mcpu=mos6502 %t/named_cc.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-CC
 +
 +; "a", "x", "y" name one of the 8-bit data registers and "R"/"d" name a class of
 +; them. None of those registers pair into a wider value, so an operand that does
@@ -177,35 +177,35 @@ index 0000000..f9b7702
 +
 +;--- wide_a.ll
 +define i16 @wide_a() {
-+; REJECT-A: LLVM ERROR: unable to translate instruction: call{{.*}}wide_a
++; REJECT-A: error: could not allocate output register for constraint 'a'
 +  %v = call i16 asm "", "=a"()
 +  ret i16 %v
 +}
 +
 +;--- wide_x.ll
 +define i16 @wide_x() {
-+; REJECT-X: LLVM ERROR: unable to translate instruction: call{{.*}}wide_x
++; REJECT-X: error: could not allocate output register for constraint 'x'
 +  %v = call i16 asm "", "=x"()
 +  ret i16 %v
 +}
 +
 +;--- wide_y.ll
 +define i16 @wide_y() {
-+; REJECT-Y: LLVM ERROR: unable to translate instruction: call{{.*}}wide_y
++; REJECT-Y: error: could not allocate output register for constraint 'y'
 +  %v = call i16 asm "", "=y"()
 +  ret i16 %v
 +}
 +
 +;--- wide_R.ll
 +define i16 @wide_R() {
-+; REJECT-R: LLVM ERROR: unable to translate instruction: call{{.*}}wide_R
++; REJECT-R: error: could not allocate output register for constraint 'R'
 +  %v = call i16 asm "", "=R"()
 +  ret i16 %v
 +}
 +
 +;--- wide_d.ll
 +define i16 @wide_d() {
-+; REJECT-D: LLVM ERROR: unable to translate instruction: call{{.*}}wide_d
++; REJECT-D: error: could not allocate output register for constraint 'd'
 +  %v = call i16 asm "", "=d"()
 +  ret i16 %v
 +}
@@ -213,49 +213,49 @@ index 0000000..f9b7702
 +;--- wide_in.ll
 +; The input direction is rejected for the same reason as the output direction.
 +define void @wide_in(i16 %x) {
-+; REJECT-IN: LLVM ERROR: unable to translate instruction: call{{.*}}wide_in
++; REJECT-IN: error: could not allocate input reg for constraint 'a'
 +  call void asm "", "a"(i16 %x)
 +  ret void
 +}
 +
 +;--- named_a.ll
 +define i16 @named_a() {
-+; REJECT-NAMED-A: LLVM ERROR: unable to translate instruction: call{{.*}}named_a
++; REJECT-NAMED-A: error: could not allocate output register for constraint '{a}'
 +  %v = call i16 asm "", "={a}"()
 +  ret i16 %v
 +}
 +
 +;--- named_x.ll
 +define i16 @named_x() {
-+; REJECT-NAMED-X: LLVM ERROR: unable to translate instruction: call{{.*}}named_x
++; REJECT-NAMED-X: error: could not allocate output register for constraint '{x}'
 +  %v = call i16 asm "", "={x}"()
 +  ret i16 %v
 +}
 +
 +;--- named_y.ll
 +define i16 @named_y() {
-+; REJECT-NAMED-Y: LLVM ERROR: unable to translate instruction: call{{.*}}named_y
++; REJECT-NAMED-Y: error: could not allocate output register for constraint '{y}'
 +  %v = call i16 asm "", "={y}"()
 +  ret i16 %v
 +}
 +
 +;--- named_rc.ll
 +define i16 @named_rc() {
-+; REJECT-NAMED-RC: LLVM ERROR: unable to translate instruction: call{{.*}}named_rc
++; REJECT-NAMED-RC: error: could not allocate output register for constraint '{rc0}'
 +  %v = call i16 asm "", "={rc0}"()
 +  ret i16 %v
 +}
 +
 +;--- named_rs.ll
 +define i32 @named_rs() {
-+; REJECT-NAMED-RS: LLVM ERROR: unable to translate instruction: call{{.*}}named_rs
++; REJECT-NAMED-RS: error: could not allocate output register for constraint '{rs0}'
 +  %v = call i32 asm "", "={rs0}"()
 +  ret i32 %v
 +}
 +
 +;--- named_cc.ll
 +define i16 @named_cc() {
-+; REJECT-NAMED-CC: LLVM ERROR: unable to translate instruction: call{{.*}}named_cc
++; REJECT-NAMED-CC: error: could not allocate output register for constraint '{cc}'
 +  %v = call i16 asm "", "={cc}"()
 +  ret i16 %v
 +}

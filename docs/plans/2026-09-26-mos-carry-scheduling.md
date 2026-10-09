@@ -1,5 +1,10 @@
 # MOS carry-chain scheduling: diagnosis, optimization, and acceptance plan
 
+**October 9 pin qualification:** the internal compiler stack is [rebased onto upstream `f24948c7d1a4`](../pr-preparations/2026-10-09/pin-rebase/README.md), removing merged repairs and adapting the remaining overlays. The measurements, compiler identities, closure evidence and extracted submission results below retain their recorded revisions. They do not certify the new pin. Native-width/far implementation remains carried locally; the new build has its own validation record.
+
+Pin qualification: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
+
 **Pressure-contract follow-up (2026‑10‑01):** 0064's downstream gains rested on the old generated tables' accumulator set (`Ac16`, limit 2), and most of that set's value was in MachineLICM rather than in the scheduler. Under upstream's 6 sets, carry scheduling alone saves 492 B. A [candidate explicit accumulator pressure set](2026-10-01-carry-pressure-contract.md) for 8-bit mode (limit 1, every level), with the upstream native-width design, makes default code 0.45–0.74% smaller than the current downstream at every level. Native modes keep the upstream design's residue. **Landed the same day** on the user's approval: `0002` carries the split design, and the new standalone `0071` adds the accumulator set beside 0064/0067.
 
 **Later September 28 optimization follow-up:** [0069 is integrated and installed](../investigations/2026-09-28-farblit-range-integration.md); `cp8` uses Y8 in both modes. The current gate passes eight emulator assertions and 16 sensitivity tests. The earlier 15-test results below remain dated evidence. Attribution: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e61c-c24c-7053-aa56-a4a4e43f12ab`.

@@ -1,5 +1,10 @@
 # [clang] Emit __builtin_prefetch's rw and locality operands as i32
 
+**October 9 disposition: superseded upstream.** LLVM [#221477](https://github.com/llvm/llvm-project/pull/221477) merged September 16 as `e141b669757bd795015b22e02f28f19d4b4759a3`. The new fork pin includes its `i32` casts and regression coverage. Both 0035 patch artifacts are retired. The draft below and [September validation](pr-preparations/2026-09-23/0034-0035-validation.md) retain the historical proposal and build evidence; do not submit this duplicate repair. The [October 9 record](pr-preparations/2026-10-09/pin-rebase/README.md) retains the downstream test input.
+
+Reconciliation: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
+
 `llvm.prefetch` takes `i32` for its rw, locality and cache-type operands. `__builtin_prefetch` passes the rw and locality arguments through `EmitScalarOrConstFoldImmArg`, which preserves the promoted integer expression type. For plain integer literals on targets whose `int` is 16 bits (MSP430, AVR, MOS), an explicit-argument call has an incompatible signature:
 
 ```llvm

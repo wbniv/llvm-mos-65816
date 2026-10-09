@@ -1,0 +1,64 @@
+0001-320-far-addrspace
+/home/will/llvm-mos-65816/patches/llvm-mos/0002-321-accum16.patch:8809: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+0002-321-accum16
+0042-mos-scavenger-p-undef-a16-test
+0018-320-imag32-spill
+0020-mos-65816-block-move-bank-order
+0006-320-packed24
+0028-llvm-virtregrewriter-undef-lane-identity-copy-vendor
+0029-llvm-twoaddr-physreg-reschedule
+0033-llvm-spill-hoist-no-new-vregs
+0037-llvm-gisel-inline-asm-indirect-output-vendor
+0040-llvm-inline-spiller-coalesce-scratch-vregs
+0041-llvm-gisel-inline-asm-multi-register-vendor
+0023-mos-trunc-selection-regclasses
+0030-mos-copy-phys-reg-liveness
+0031-mos-copy-phys-reg-reuse-dst
+0032-mos-quote-register-named-symbols-vendor
+0034-mos-legalize-prefetch
+0039-mos-asm-modifier-width
+0036-mos-zero-page-indexed-globals
+Context reduced to (2/2) to apply fragment at 29
+Context reduced to (1/1) to apply fragment at 91
+Context reduced to (1/1) to apply fragment at 47
+Context reduced to (2/2) to apply fragment at 82
+0038-mos-return-frame-address
+0043-mos-inline-asm-physreg-width
+0044-mos-asm-print-long-address
+0045-mos-asm-print-a16-immediate
+0046-mos-fixupkinds-addrasciz-row
+0047-mos-mc-addr-asciz-symbolic-crash
+0048-mos-far-codegen-lit-tests
+/home/will/llvm-mos-65816/patches/llvm-mos/0050-mos-float-vector-arithmetic.patch:133: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+0050-mos-float-vector-arithmetic
+0051-mos-zp-byte-index
+0052-mos-bank-relax-section-offset
+0011-mos-scavenger-live-p-save
+0064-mos-computed-carry-scheduling
+0013-320-far-memops
+0053-mos-lit-expectations
+0054-llvm-scavenger-save-range
+0055-mos-native-wide-anyext-vendor
+0056-llvm-gisel-inline-asm-register-bounds-vendor
+0057-llvm-selectiondag-inline-asm-register-bounds
+0058-aarch64-inline-asm-unknown-type
+0059-llvm-selectiondag-vector-asm-parts
+0060-llvm-reduce-parallel-mir
+0061-mos-far-global-long-x
+0062-mos-native-far-word
+0063-mos-near-shared-store
+0065-mos-near-store-profitability
+0066-mos-far-extload-worklist
+0067-mos-competing-carry-gate
+0068-mos-null-output-streamer
+0069-mos-far-loop-range
+/home/will/llvm-mos-65816/patches/llvm-mos/0070-mos-far-word-index-policy.patch:738: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+0070-mos-far-word-index-policy
+0071-mos-accumulator-pressure-set
+Mismatches: []

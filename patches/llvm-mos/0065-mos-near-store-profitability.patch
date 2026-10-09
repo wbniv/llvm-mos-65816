@@ -1,7 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 9ce5e11fa460..8a9c9ff98de5 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -898,12 +898,13 @@
+@@ -959,12 +959,13 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
    const LLT Ty = MRI.getType(Dst);
    if (STI.hasAccum16() && Ty == LLT::scalar(16)) {
@@ -19,7 +20,7 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
                          Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
                          Def->getParent() == MI.getParent() &&
                          MRI.getType(Def->getOperand(1).getReg()) == S8;
-@@ -917,6 +918,7 @@
+@@ -978,6 +979,7 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
                       isABIByte(Def->getOperand(2).getReg(), MOS::X);
      }
      unsigned Stores = 0;
@@ -27,7 +28,7 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
      if (ByteSequence) {
        for (MachineInstr &Use : MRI.use_nodbg_instructions(Src)) {
          if (&Use == &MI || Use.getOpcode() == TargetOpcode::G_UNMERGE_VALUES)
-@@ -928,22 +930,66 @@
+@@ -989,22 +991,66 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
            break;
          }
          const auto &Store = cast<GStore>(Use);
@@ -36,7 +37,7 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
 +        if (Store.isAtomic()) {
            ByteSequence = false;
            break;
-+        }
+         }
 +        if (!matchAbsoluteAddressing(MRI, Store.getPointerReg())) {
 +          const MachineInstr *PtrDef =
 +              getDefIgnoringCopies(Store.getPointerReg(), MRI);
@@ -47,7 +48,7 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
 +            break;
 +          }
 +          IndirectStore = true;
-         }
++        }
          ++Stores;
        }
        if (Stores == 0)
@@ -96,8 +97,8 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
 +    }
    }
 
-   auto RHSConst =
-@@ -2267,7 +2313,7 @@
+   assert(MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB);
+@@ -2348,7 +2394,7 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
            return false;
          auto Step = getIConstantVRegValWithLookThrough(
              Use.getOperand(2).getReg(), MRI);
@@ -106,7 +107,7 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
        }
        case MOS::G_STORE16_ABS:
          return none_of(Use.memoperands(), [](const MachineMemOperand *MMO) {
-@@ -2284,10 +2330,11 @@
+@@ -2365,10 +2411,11 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
      });
    };
 
@@ -122,7 +123,7 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
    auto isByteIndirectStore = [&]() {
      // Atomic stores must remain a single memory operation.
      if (IsLoad || MI.isAtomic())
-@@ -2298,24 +2345,71 @@
+@@ -2379,24 +2426,71 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
        return false;
      Register Value = cast<GStore>(MI).getValueReg();
      const MachineInstr *Def = MRI.getVRegDef(Value);
@@ -205,6 +206,7 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
      });
 diff --git a/llvm/test/CodeGen/MOS/a16-near-store-profit.ll b/llvm/test/CodeGen/MOS/a16-near-store-profit.ll
 new file mode 100644
+index 000000000000..bc8d9aa4ef13
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/a16-near-store-profit.ll
 @@ -0,0 +1,187 @@

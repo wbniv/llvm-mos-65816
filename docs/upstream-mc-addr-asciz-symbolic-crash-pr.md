@@ -1,5 +1,7 @@
 # [MOS] Preserve symbolic .mos_addr_asciz directives in text output
 
+**October 9 bootstrap rebase:** the retained 0047 carry uses `MCContext::getAsmInfo()` by reference on pin `f24948c7d1a4`. The September 26 standalone submission packet and its compiler results below remain dated evidence; refresh its destination applicability before posting. The [pin validation record](pr-preparations/2026-10-09/pin-rebase/README.md) records the integrated build separately. Rebase: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
 **Current posting artifact (September 26):** use the
 [0047 copy-ready body](pr-preparations/2026-09-26/0047-pr-body.md) and
 [exact-current validation](pr-preparations/2026-09-26/mos-validation.md).

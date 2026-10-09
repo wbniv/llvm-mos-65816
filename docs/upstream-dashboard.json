@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "reviewedAt": "2026-09-30",
-  "sourceHash": "27767fff2561f3f2299701c6b33f36e9a6f45b585212fd290f78a507ccc0244c",
+  "reviewedAt": "2026-10-09",
+  "sourceHash": "b3ba56b9c281df7ae5ea2e852f44c514968b0e4ff27f3d0332a5881f667137b9",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -304,16 +304,16 @@
       "id": "defect:mos-late-opt-nongpr-ldimm",
       "kind": "defect",
       "title": "mos-late-opt dereferences a null tracker on an SPC700 LDImm into an imaginary register",
-      "summary": "MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On current upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The fix is our own open upstream PR #584 (restrict the immediate-load folding to GPR destinations), carried downstream as patch 0003. It is not carried in the #320/#321 split series: the third round briefly carried it as its own commit, and on 2026-10-01 the user decided to sequence it instead (#584 files first). Until #584 lands, mosspc700 crashes in MOS Late Optimizations identically before and after the series. Upstream is not fixed until #584 merges, so the status stays confirmed.",
+      "summary": "Historical baseline on upstream 06bc967d2668: MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On the recorded upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The tested repair is our upstream PR #584 (restrict the immediate-load folding to GPR destinations), supplied by the October 9 compiler pin f24948c7d1a4 after retiring standalone 0003 and its duplicate aggregate hunk. The initial July-base consolidation retained it in 0002 before the pin advanced; that intermediate result is dated evidence. It is not carried in the #320/#321 split series: the third round briefly carried it as its own commit, and on 2026-10-01 the user decided to sequence it instead (#584 files first). On that pre-merge base, mosspc700 crashes in MOS Late Optimizations identically before and after the series. PR #584 merged October 5 (ce37cddc0c141c52af6fdff6ab6ff5d81e4bf999). The confirmed status describes the immutable captured baseline; this publication refresh does not claim a compiler rebuild or new runtime verification.",
       "localStatus": "qualified",
-      "publicationStatus": "unknown",
+      "publicationStatus": "merged",
+      "nextStep": "PR #584 merged October 5; its compiler-series prerequisite is satisfied. The compiler pin is advanced to f24948c7d1a4; the standalone and aggregate carries are removed.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-late-opt-nongpr-ldimm.json"
       ],
       "evidenceNote": "",
       "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -470,6 +470,23 @@
       ],
       "evidenceNote": "",
       "dependsOn": [],
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-packed-layout-pin-rebase",
+      "kind": "defect",
+      "title": "Packed pointer layout omitted from the centralized target description during the pin rebase",
+      "summary": "The local compiler-pin rebase omitted packed-pointer layout p3:24:8 from the centralized target description. Porting the existing 0006 backend declaration to TargetParser repairs the paired Clang/backend layout contract. The retained preprocessed C input fails on the preserved intermediate rebase compiler and passes on the identified candidate; this is local integration work, not an upstream defect discovery.",
+      "localStatus": "fixed",
+      "publicationStatus": "not-applicable",
+      "dependsOn": [],
+      "nextStep": "Local pin rebase integration repaired by porting 0006 to the centralized layout. No upstream report needed.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-packed-layout-pin-rebase.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-09/pin-rebase/README.md"
+      ],
+      "evidenceNote": "",
       "upstreamUrl": null,
       "demoUrls": []
     },
@@ -1012,16 +1029,16 @@
       "id": "sub:0035",
       "kind": "submission",
       "title": "0035 Clang prefetch operand widths",
-      "summary": "Clang emits i32 prefetch options on 16-bit-int targets and guards wider options.",
-      "localStatus": "ready",
-      "publicationStatus": "unposted",
-      "nextStep": "Submit to llvm/llvm-project.",
+      "summary": "Superseded by LLVM #221477, merged September 16 and included in compiler pin f24948c7d1a4. Both local 0035 artifacts are retired.",
+      "localStatus": "fixed",
+      "publicationStatus": "not-applicable",
+      "nextStep": "Retain historical evidence; no duplicate Clang submission.",
+      "upstreamUrl": "https://github.com/llvm/llvm-project/pull/221477",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-clang-prefetch-int16-pr.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
-      "upstreamUrl": null,
       "demoUrls": []
     },
     {
@@ -1254,7 +1271,7 @@
       "localStatus": "fixed",
       "publicationStatus": "posted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos-sdk/pull/450",
-      "nextStep": "Follow maintainer review and CI.",
+      "nextStep": "Address October 5 changes requested: check existing llvm-test-suite coverage, enable or add the regression there, and remove the SDK test in a reviewed revision.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md"
       ],
@@ -1282,7 +1299,7 @@
       "id": "sub:0049",
       "kind": "submission",
       "title": "0049 vector prerequisite backport",
-      "summary": "Existing upstream vector infrastructure backported for the downstream pin.",
+      "summary": "Existing upstream vector infrastructure is supplied by the new downstream pin f24948c7d1a4; backport 0049 is retired.",
       "localStatus": "fixed",
       "publicationStatus": "not-applicable",
       "dependsOn": [],

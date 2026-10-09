@@ -71,9 +71,9 @@ new file mode 100644
 index 000000000000..6616391f5966
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/twoaddr-reschedule-physreg.mir
-@@ -0,0 +1,76 @@
-+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=livevars,twoaddressinstruction -verify-machineinstrs -o - %s | FileCheck %s
-+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=liveintervals,twoaddressinstruction -verify-machineinstrs -o - %s | FileCheck %s
+@@ -0,0 +1,79 @@
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=livevars,twoaddressinstruction -verify-machineinstrs -o - %s | FileCheck %s --check-prefixes=CHECK,LV
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=liveintervals,twoaddressinstruction -verify-machineinstrs -o - %s | FileCheck %s --check-prefixes=CHECK,LI
 +# RUN: llc -mtriple=mos -mcpu=mos6502 -start-before=twoaddressinstruction -verify-machineinstrs -o /dev/null %s
 +
 +# The call argument must not occupy A while the folded arithmetic needs A.
@@ -109,9 +109,12 @@ index 000000000000..6616391f5966
 +    liveins: $a, $rs1, $y
 +
 +    ; CHECK-LABEL: name: available_accumulator
-+    ; CHECK: $x = COPY
-+    ; CHECK: EORIndirIdx
-+    ; CHECK: STAbs
++    ; LV: EORIndirIdx
++    ; LV: STAbs
++    ; LV: $x = COPY
++    ; LI: $x = COPY
++    ; LI: EORIndirIdx
++    ; LI: STAbs
 +    ; CHECK: JSR
 +    %0:ac = COPY $a
 +    %1:imag16 = COPY $rs1

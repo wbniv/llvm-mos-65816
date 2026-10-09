@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "40e7e37feae60009078c121bbe1a4fc87920a849ef19c8ac58975ed4887a5de8",
+          "docs/upstream-dashboard-curation.json": "c553d0d60ff34e93cb30f2363f2752148681fbadefbbdb510c60fa2122c3e447",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -95,15 +95,16 @@
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-huc-blockmove-frameindex-offset.json": "701adc983c0e2576dd2f27ab91501d841429cc2874d9d0a7da747e0508b0c563",
           "docs/defects/mos-imag32-reserved-pair-units.json": "77c4e9eae0f1b77813cc9be6ac34a5e9a8ea290f0a7c4b3e9c1495f25c178ab4",
-          "docs/defects/mos-late-opt-nongpr-ldimm.json": "e2b9fba49bc40de689a68ff6c135fd5372f6a675de9fbf89ed62b237afc5090c",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "8874dea616f76c7264d694f38faad1180abe6115fe55e3ba99e2aa7600621ca7",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "80663f5d8e17cf3203aba58c8dfa8e86a98cc3f45c4f1e6caee514ed44b8853a",
-          "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
+          "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
           "docs/defects/mos-native-width-pressure-sets.json": "dcb44c4de5caf03bf4791f32c30d41c3fdeb5d7643117d030ee96be8118de119",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
           "docs/defects/mos-near-nowrap-option-clash.json": "f02673b6a5a6895a2ec4edd8d312ad02cb8813c4e42a411719b353c858ce33b1",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
+          "docs/defects/mos-packed-layout-pin-rebase.json": "3483e6afa8380faf6cb52f006fd006eeea3121a85a52325198ac242337d94f51",
           "docs/defects/mos-spc700-hint-outside-order.json": "230a9fc7bfebdcfd2a82e51a456bac310e382fd89ab2b3642a3b0c01735ff19d",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
@@ -120,7 +121,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "225696502d9270f2aad6c9a14020b9e5c330c91b8ac0311b154d597993f25aa7"
+          "docs/upstream-dashboard.json": "4f5e36d252558e650e05aef223a3c59be06875d2dcf78cf823f11f67560d12f7"
         }
       }
     },
@@ -141,13 +142,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "ec9ee742a7bd38619272faefbe4b06d85b6372b8a7fc8a34fe4b9c6313dd35a5",
+          "docs/upstream-pending-work.md": "920032cb4c4f367c66236f3d58e203924eb5072f50e3c01b57213c2fd3e8e83b",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "225696502d9270f2aad6c9a14020b9e5c330c91b8ac0311b154d597993f25aa7",
+          "docs/upstream-dashboard.json": "4f5e36d252558e650e05aef223a3c59be06875d2dcf78cf823f11f67560d12f7",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "0dfdb8f569b05e554448c72046af9f7b4c4aa792ec8c84d05b984e783dc99de8"
+          "docs/upstream-dashboard-graph.json": "2c0091450e4396ec7f0efeb6f5da2c86a9847e01a0c3b9b83d1bb691fad7ace3"
         }
       }
     },
@@ -189,11 +190,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/snes-compiler-contributions.json": "9d5223f297b73aa6a88171588f22bbb033ef433e6e2b9240d88288457dc95862",
+          "docs/snes-compiler-contributions.json": "da821a8dba30d57db650d3942a920c3e1adf1fd400430b022baed09b371a520d",
           "dev/export-snes-compiler-bug-public.py": "f7fe74ee3046ac0b45a07c84035500ab6cf627349ecbb0187ecdabb0fe9e565c"
         },
         "outputs": {
-          "docs/snes-demo-compiler-bug-public.json": "d4481f6f2d8d4cbfe50c705d725d31c07ea06a30ec836dea1e58f6fc55e6d63c"
+          "docs/snes-demo-compiler-bug-public.json": "1ca5281fb9547f59213aacc15a37c47ff86624fe631a81e791381c65e05758f4"
         }
       }
     },
@@ -301,7 +302,11 @@
         "docs/investigations/2026-09-28-far-word-policy.md",
         "docs/pr-preparations/2026-09-28/far-word-index/README.md",
         "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
-        "docs/pr-preparations/2026-09-28/0065/README.md"
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "docs/upstream-status/2026-10-09.json",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
       ],
       "receipt": {
         "sources": {
@@ -324,7 +329,7 @@
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-huc-blockmove-frameindex-offset.json": "126b8f5d6256ab20b079953a11ca9e4d399c73904b78d437ce860ceaf9cc7531",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
-          "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "7b9267cb7a64b1da8a2a3b398c20142ab1dc19d1ec3456da075730f49dc88aed",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -333,6 +338,7 @@
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
+          "docs/defects/mos-packed-layout-pin-rebase.json": "512a27cd8de9eb2bf4b683aaa08c71ba25a8111c90c264aeaf39089fa319c182",
           "docs/defects/mos-spc700-hint-outside-order.json": "0f402d6d0d46359556941e8a02d65753a29d5ff4ab91043d018198f41ea3f35c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -350,30 +356,34 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
-          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
+          "docs/pr-preparations/2026-09-26/README.md": "91c2ccb804247cd027e9c13b82a83219fba19b8ae16c08db436bd94ad7d8d03a",
           "docs/plans/2026-09-26-live-upstream-dashboard.md": "d3219df087ecd4c0bb640995f168d5c5d1c0b8e352f765544d228be269c95b5c",
           "docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md": "0513d179f35506c510c9acf01c4aac10a75eaf4db416364ef425a4555651f2dc",
           "docs/plans/2026-07-27-138-lzss-gallery-palette-range-audit.md": "3a3fe88713c6eb1aa41b0a818186c37df84782832c81168c214b9c83ceff053c",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "2ceb221c9eaed92a1158ab8c3035231573e0d95af67654b968a5569c9a65c829",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/plans/2026-09-27-0064-competing-carry-gate.md": "c1aabd8329cde2cbbd9bed51afe3938f87a773e66ebc68a62ee6473dd7cd27eb",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
           "docs/plans/2026-09-28-farblit-payoff.md": "a29f2fa74aa769dbd2d987983bead2344cc3f9413020462036b6bc69c5723ace",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/plans/2026-09-28-farblit-range-integration.md": "a82f8e761715ded36c11f3843ede0a9cae6cf49ce9a6bc4c0f2b14d80e42d98a",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-01T14:52:30.371508+00:00",
-        "note": "NOT reviewed or edited by this agent (the coordinator maintains TODO.md). Round five touched the summaries of mos-huc-blockmove-frameindex-offset (now has a lit test in #321-11) and the resolution of mos-far-fold-dangling-dbg-sites (round-five hashes), and the 0065 README.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T23:03:25.342565+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -404,7 +414,12 @@
         "docs/investigations/2026-09-28-far-word-policy.md",
         "docs/pr-preparations/2026-09-28/far-word-index/README.md",
         "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
-        "docs/pr-preparations/2026-09-28/0065/README.md"
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "docs/upstream-status/2026-10-09.json",
+        "docs/upstream-status/patch-retirement-2026-10-09.json",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
       ],
       "receipt": {
         "sources": {
@@ -425,7 +440,7 @@
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-huc-blockmove-frameindex-offset.json": "126b8f5d6256ab20b079953a11ca9e4d399c73904b78d437ce860ceaf9cc7531",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
-          "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "7b9267cb7a64b1da8a2a3b398c20142ab1dc19d1ec3456da075730f49dc88aed",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -434,6 +449,7 @@
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
+          "docs/defects/mos-packed-layout-pin-rebase.json": "512a27cd8de9eb2bf4b683aaa08c71ba25a8111c90c264aeaf39089fa319c182",
           "docs/defects/mos-spc700-hint-outside-order.json": "0f402d6d0d46359556941e8a02d65753a29d5ff4ab91043d018198f41ea3f35c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -449,24 +465,29 @@
           "docs/defects/snes-soft-stack-static-data-collision.json": "675a45b8fc43e4b13400e543d8a2c70f8cc9d2c3e7eece96bd1f28f51aae49fa",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
+          "docs/pr-preparations/2026-09-26/README.md": "91c2ccb804247cd027e9c13b82a83219fba19b8ae16c08db436bd94ad7d8d03a",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "2ceb221c9eaed92a1158ab8c3035231573e0d95af67654b968a5569c9a65c829",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
+          "docs/upstream-status/patch-retirement-2026-10-09.json": "0f2bb5c1d79956b52c04214a53dc77563d430f9b41b683b2a2a8b9b393bae9c5",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-01T14:50:51.961305+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T23:03:25.572846+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -497,7 +518,12 @@
         "docs/investigations/2026-09-28-far-word-policy.md",
         "docs/pr-preparations/2026-09-28/far-word-index/README.md",
         "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
-        "docs/pr-preparations/2026-09-28/0065/README.md"
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "docs/upstream-status/2026-10-09.json",
+        "docs/upstream-status/patch-retirement-2026-10-09.json",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
       ],
       "receipt": {
         "sources": {
@@ -518,7 +544,7 @@
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-huc-blockmove-frameindex-offset.json": "126b8f5d6256ab20b079953a11ca9e4d399c73904b78d437ce860ceaf9cc7531",
           "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
-          "docs/defects/mos-late-opt-nongpr-ldimm.json": "5d131f320f63daf2b13122ddaeb17871eb3016f40f75d84ae84c6a989112092d",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "7b9267cb7a64b1da8a2a3b398c20142ab1dc19d1ec3456da075730f49dc88aed",
           "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "cb7a85843a9c3d66a26c41f918e30ba5cff50cb19976f39236df4b686f1f3914",
@@ -527,6 +553,7 @@
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
+          "docs/defects/mos-packed-layout-pin-rebase.json": "512a27cd8de9eb2bf4b683aaa08c71ba25a8111c90c264aeaf39089fa319c182",
           "docs/defects/mos-spc700-hint-outside-order.json": "0f402d6d0d46359556941e8a02d65753a29d5ff4ab91043d018198f41ea3f35c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -542,24 +569,29 @@
           "docs/defects/snes-soft-stack-static-data-collision.json": "675a45b8fc43e4b13400e543d8a2c70f8cc9d2c3e7eece96bd1f28f51aae49fa",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
+          "docs/pr-preparations/2026-09-26/README.md": "91c2ccb804247cd027e9c13b82a83219fba19b8ae16c08db436bd94ad7d8d03a",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "2ceb221c9eaed92a1158ab8c3035231573e0d95af67654b968a5569c9a65c829",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
+          "docs/upstream-status/patch-retirement-2026-10-09.json": "0f2bb5c1d79956b52c04214a53dc77563d430f9b41b683b2a2a8b9b393bae9c5",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-01T14:50:51.969762+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T23:03:25.580288+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -615,9 +647,9 @@
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/howto-document-dependencies.md": "b0f704d2c1d2669e9a38c71574ca09d00604f8c8fcb1cf3b3404a6af06518198"
         },
-        "reviewed_at": "2026-09-28T00:09:50.666140+00:00",
-        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
+        "reviewed_at": "2026-10-09T12:21:52.393380+00:00",
+        "note": "Reviewed live October 9 PR receipt and historical baseline qualification. #578/#586/#584/#588/#589 are merged; #604 unchanged; SDK #450 needs llvm-test-suite regression coverage; #594 hold retained. The 171-file bootstrap equivalence preserves fixes in pinned aggregates after standalone retirement. Historical/compiler evidence and posted PR bodies remain unchanged; website publication requires the separate publication workflow. Scratch reconstructions are excluded from repository inputs.",
+        "attribution": "OpenAI Codex 0.162.0, model gpt-6.1-sol, medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -642,16 +674,20 @@
       "document": "CLAUDE.md",
       "sources": [
         "AGENTS.md",
-        "docs/howto-defect-evidence.md"
+        "docs/howto-defect-evidence.md",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md"
       ],
       "receipt": {
         "sources": {
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
-          "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1"
+          "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549"
         },
-        "reviewed_at": "2026-09-27T08:07:44.411828+00:00",
-        "note": "Reviewed carry-related claims against 0067 and the retained gate evidence. The gate recovers the 32 original growth cases and the 30 measured SNES timing costs, but default promotion is rejected: 6.81 percent aggregate-saving loss and four growth configurations without fewer carry materializations. Always remains default; the original generic defect remains a workaround, and no independent review or new upstream submission is claimed. Current-stack compile-time samples overlap, and the 512-vector 6502 kernel timing includes its common driver. The XY16 VLA mismatch reproduces on the preserved baseline and every policy; its cause remains unisolated. Earlier build-pair timings, baseline hashes, attribution and the withdrawn posted PR body remain unchanged. The near-store completion and build instructions are unaffected; registry references remain descriptions of retained hook output. Reviewed the new causal explanation of constant, provisional frame and boundary carries and the rejected refinements, including the limitations of static restore counts.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-10-09T23:03:25.691625+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -697,7 +733,9 @@
         "docs/investigations/2026-09-28-far-word-policy.md",
         "docs/pr-preparations/2026-09-28/far-word-index/README.md",
         "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
-        "docs/pr-preparations/2026-09-28/0065/README.md"
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md"
       ],
       "receipt": {
         "sources": {
@@ -706,25 +744,27 @@
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
-          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
+          "docs/pr-preparations/2026-09-26/README.md": "91c2ccb804247cd027e9c13b82a83219fba19b8ae16c08db436bd94ad7d8d03a",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "2ceb221c9eaed92a1158ab8c3035231573e0d95af67654b968a5569c9a65c829",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549"
         },
-        "reviewed_at": "2026-10-01T14:50:52.924103+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T23:03:26.295878+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -758,15 +798,18 @@
         "docs/investigations/2026-09-27-near-y-decoder.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
-        "docs/investigations/2026-09-28-farblit-range-integration.md"
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
       ],
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "36337397c1d7b44b6f377307e0249a7c1949824b1c32e6f7bd5ac327e530c043",
-          "patches/llvm-mos/0002-321-accum16.patch": "eb7dfcc486fcad7cbb11d06ef6558693b1784477361ccedf6ef05e45808cc356",
+          "patches/llvm-mos/0002-321-accum16.patch": "55deed868e2adf9f1b267ad05fb9576804633acc55d4c69d164079a55fe41148",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
-          "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "8cab3c582d6b66f7fad83a74d90f34ce3762a08e76530838b93459a3435a0271",
           "examples/65816/farindex.c": "a30e67ce9c63b898b10eb891ecab30ebc36f455f55dd046be15f9da9caa6cd6d",
           "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
           "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
@@ -790,11 +833,14 @@
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-01T04:01:03.659034+00:00",
-        "note": "2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. The plan's dated pointer now says it landed; 0064/0067 are unchanged, and the timing report's measurements remain correct as dated evidence on the preserved builds with the old generated sets.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-09T23:03:29.590795+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -859,11 +905,11 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "01de7d900d2fcd8dfc94effbd8b681dfaf0289e966f33b655b009fcd93caf4db",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "c8a007978ff4a8ab41af034e2a0d5b88ee7f7a5809905146ed1930ca8d477933",
           "docs/defects/mos-near-index-bank-wrap.json": "176d486b67e3a1636603078ec71aa5900a5bd492cc44f80cd771a586a96cf74a",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa"
         },
-        "reviewed_at": "2026-09-29T22:43:25.738038+00:00",
-        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:20:27.836902+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -907,11 +953,11 @@
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa"
         },
-        "reviewed_at": "2026-09-29T22:43:27.025777+00:00",
-        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:20:36.743820+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -971,7 +1017,10 @@
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
         "docs/pr-preparations/2026-09-27/0068-validation.md",
         "docs/pr-preparations/2026-09-28/0065/README.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json"
       ],
       "receipt": {
         "sources": {
@@ -1001,15 +1050,18 @@
           "docs/pr-preparations/2026-09-26/0060-pr-body.md": "b33197276fec8fcbf7b8b4c060fef908dda5ffb8843d027eb4185650249b6630",
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
-          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907"
         },
-        "reviewed_at": "2026-10-01T14:50:57.008281+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T23:03:32.911001+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1489,15 +1541,15 @@
           "docs/pr-preparations/2026-09-26/reducer-feature-review.md": "8cba47ddd695d7f001646dbb3b9ecbc0b48155a0831320b4e10d7a534fc6eef9",
           "docs/pr-preparations/2026-09-26/0028-review.md": "5f7f18fd7ac754e97f2d505da0343fe11fadbd55b5fd9f543b2e80df56da4d18",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
-          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce"
         },
-        "reviewed_at": "2026-10-01T14:50:58.007225+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T23:03:33.695376+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1510,22 +1562,28 @@
         "docs/investigations/2026-09-27-near-y-decoder.md",
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
         "docs/pr-preparations/2026-09-27/0068-validation.md",
-        "docs/pr-preparations/2026-09-28/0065/README.md"
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json"
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
+          "docs/pr-preparations/2026-09-26/README.md": "91c2ccb804247cd027e9c13b82a83219fba19b8ae16c08db436bd94ad7d8d03a",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "2ceb221c9eaed92a1158ab8c3035231573e0d95af67654b968a5569c9a65c829",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
-          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
+          "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907"
         },
-        "reviewed_at": "2026-10-01T14:50:58.125648+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T23:03:33.833247+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1550,14 +1608,14 @@
           "examples/65816/near-index-wrap.c": "a80d4d8340228d6399af9d23d755a1d46c38ec2d4a0734d98a52538a52ce0055",
           "dev/near-y-decode.sh": "c965eba687c474e2d7908e1a3d850bdc5e14e8a86b590e00967a4e7b43ac7f01",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
           "docs/upstream-late-opt-nongpr-ldimm-pr.md": "21daa88239609e10c3e047eaecefa7b064b8365363b707beff121c85acf10620",
           "docs/upstream-zp-alloc-deterministic-pr.md": "d17cc42b2f454700c831fde9d9ed66fcb3375e18b0172006aa471a129ce0c1d8",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e"
         },
-        "reviewed_at": "2026-09-29T22:37:46.361864+00:00",
-        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:21:16.159225+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1567,19 +1625,25 @@
         "docs/defects/mos-near-index-bank-wrap.json",
         "patches/llvm-mos/0002-321-accum16.patch",
         "docs/pr-preparations/2026-09-26/0064-submission.json",
-        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
       ],
       "receipt": {
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "patches/llvm-mos/0002-321-accum16.patch": "eb7dfcc486fcad7cbb11d06ef6558693b1784477361ccedf6ef05e45808cc356",
+          "patches/llvm-mos/0002-321-accum16.patch": "55deed868e2adf9f1b267ad05fb9576804633acc55d4c69d164079a55fe41148",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-01T03:59:31.021019+00:00",
-        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-09T23:03:34.100081+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1594,12 +1658,12 @@
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853"
         },
-        "reviewed_at": "2026-09-29T14:14:45.144403+00:00",
-        "note": "Reviewed: the new records are census-replay and extraction findings in unposted downstream code, not SNES demo failures; the published demo pages and bug map are unchanged.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:21:16.159363+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1616,12 +1680,12 @@
           "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
           "dev/render-snes-demo-compiler-bug-map.py": "2211c5e97b9718ef49e8bb6a7c3670c9202b34abf98f2d789b4cef134a87eab9",
           "dev/export-snes-compiler-bug-public.py": "f7fe74ee3046ac0b45a07c84035500ab6cf627349ecbb0187ecdabb0fe9e565c",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
-          "docs/snes-compiler-contributions.json": "9d5223f297b73aa6a88171588f22bbb033ef433e6e2b9240d88288457dc95862"
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
+          "docs/snes-compiler-contributions.json": "da821a8dba30d57db650d3942a920c3e1adf1fd400430b022baed09b371a520d"
         },
-        "reviewed_at": "2026-09-29T14:14:45.507004+00:00",
-        "note": "Reviewed: the new records are census-replay and extraction findings in unposted downstream code, not SNES demo failures; the published demo pages and bug map are unchanged.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T23:03:34.598728+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1644,18 +1708,21 @@
         "docs/pr-preparations/2026-09-28/0065/evidence/series.json",
         "docs/pr-preparations/2026-09-28/0065/evidence/independent-review.json",
         "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json",
-        "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json"
+        "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
       ],
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-near-s16-store-residency.md": "f29e75eb33bf497832c6c542ef8bd756d2312b9716ca4380eb8252e0814413cf",
           "docs/plans/2026-09-25-near-indirect-s16-store-residency.md": "f6158a7e95b464bd35528dda5dfd00fece702eb40f5b1daaf1c84bdfb7b7ee9c",
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
-          "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "8cab3c582d6b66f7fad83a74d90f34ce3762a08e76530838b93459a3435a0271",
           "dev/near-store/indirect.c": "6b32b412f588b332be11341971cc7a490088b28385f105586efb7c1484f5611c",
           "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
-          "patches/llvm-mos/0065-mos-near-store-profitability.patch": "000678601f84da4ba74e98542d69e33a629e0331518f1522d22e5380c9650e17",
+          "patches/llvm-mos/0065-mos-near-store-profitability.patch": "7f6d9a7c9e9698ae886671acda27c3e8da24e0d3da0163248a8945c3a36ea7b9",
           "dev/near-store/broad.c": "97e3330bc1ca16cdc71a64762b8724ed375f6cb174c7e34e89f2a93f473d4bc6",
           "dev/measure-near-store-shapes.py": "f56de2773806058396a731db03fb9e31a7adcb02755a91a60a2128d3359fad75",
           "dev/check-near-store-profitability.py": "fa875476dd4e4848adae11ab64dc408ac1335198b167e0e990375289b8230cb4",
@@ -1665,11 +1732,14 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/series.json": "4e73fa3210ef23f059256a82b3487b5c24d46b9c8468b5f0b30de8648ca70c62",
           "docs/pr-preparations/2026-09-28/0065/evidence/independent-review.json": "450cc488aa8f8dac0e4daa05f6a0eb8c001bf3202850fa5e801366d724b5678a",
           "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
-          "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4"
+          "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-09-28T12:06:36.452560+00:00",
-        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
-        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
+        "reviewed_at": "2026-10-09T23:03:36.432393+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1721,12 +1791,13 @@
         },
         "docs/pr-preparations/2026-09-28/0065/README.md",
         "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
-        "docs/defects/mos-native-index-copy-cost.json"
+        "docs/defects/mos-native-index-copy-cost.json",
+        "docs/upstream-status/2026-10-09.json"
       ],
       "receipt": {
         "sources": {
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
@@ -1735,12 +1806,13 @@
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
-          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e",
-          "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5"
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce",
+          "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981"
         },
-        "reviewed_at": "2026-10-01T14:50:58.808692+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T23:03:36.909038+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1787,12 +1859,12 @@
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-09-29T22:43:24.765730+00:00",
-        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:21:37.161726+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1834,15 +1906,15 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "fb85ff62221b7cd57f6c4e2ba6e662fb6e7ddd9fe62d89988c7bd5f3a1606f20",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "2ceb221c9eaed92a1158ab8c3035231573e0d95af67654b968a5569c9a65c829",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa"
         },
-        "reviewed_at": "2026-10-01T04:05:24.224993+00:00",
-        "note": "The carry-scheduling plan's dated pointer now records the 2026-10-01 landing of 0071 (accumulator pressure set) with the split pressure-set design in 0002. agent-handoff gained the matching stack and toolchain line; its 0064 status and dated measurement statements are unchanged and still correct as dated evidence. The 0064 status, publication and measurement statements of the other two documents are unaffected: 0064/0067 are unchanged.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-09T14:21:37.162019+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1969,19 +2041,25 @@
         "patches/llvm-mos/0002-321-accum16.patch",
         "dev/check-near-index-proofs.py",
         "dev/measure-near-index-proofs.py",
-        "docs/defects/evidence/2026-09-27-near-proofs/census.json"
+        "docs/defects/evidence/2026-09-27-near-proofs/census.json",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
       ],
       "receipt": {
         "sources": {
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
-          "patches/llvm-mos/0002-321-accum16.patch": "eb7dfcc486fcad7cbb11d06ef6558693b1784477361ccedf6ef05e45808cc356",
+          "patches/llvm-mos/0002-321-accum16.patch": "55deed868e2adf9f1b267ad05fb9576804633acc55d4c69d164079a55fe41148",
           "dev/check-near-index-proofs.py": "8f514c4c8625bb8fdc08447deb44dd027a32090c37dc4176399eab0f427d498e",
           "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
-          "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f"
+          "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-01T03:59:31.692884+00:00",
-        "note": "2026-10-01 landing: 0002 gained only the #320/#321 split's native-width pressure-set design (MOSRegisterInfo hooks with the -O3 gate, GeneratePressureSet = 0, MOSSubtarget passing the level) and its two tests; the new standalone 0071 adds the 8-bit accumulator pressure set; dev/toolchain.sh and dev/regen-patch.sh register 0071; the carry and native-width records gained landing runs. Checked this document's status, publication and dependency statements: none is about the pressure sets, and the measurements it cites are dated results on earlier compilers, not re-measured here. On the landed toolchain the Farblit gate, corpus (84/84) and corpus-a16 (83/83) pass.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-10-09T23:03:37.304841+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1990,18 +2068,20 @@
         "docs/snes-demo-compiler-bug-pages.json",
         "docs/defects/mos-near-index-overflow-proofs.json",
         "docs/defects/mos-null-output-streamer-crash.json",
-        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
+        "docs/upstream-status/2026-10-09.json"
       ],
       "receipt": {
         "sources": {
           "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c"
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981"
         },
-        "reviewed_at": "2026-09-29T14:11:45.390821+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:21:37.162239+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2095,12 +2175,12 @@
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-09-29T22:43:26.263480+00:00",
-        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:21:37.162491+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2153,12 +2233,12 @@
           "docs/defects/evidence/2026-09-28-farblit-payoff/validate.py": "acd5f7913b1221fc3a5fe52ebdf5e3cb06168c1b3c6b167b07b8e930d5b06c33",
           "docs/defects/evidence/2026-09-28-farblit-payoff/check_bounds_shapes.py": "6ebdd5da386a47bf15923274e27f9c4f01f4cb3936f489b0ded9fa8e3fef8bc7",
           "docs/defects/evidence/2026-09-28-farblit-payoff/mame.sh": "eef6383b29adb315d61f4fd148a1ebeb49ae966470435fb6ee195aee4365b297",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-09-29T22:43:25.532815+00:00",
-        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:21:41.313982+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2171,12 +2251,12 @@
       "receipt": {
         "sources": {
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-09-29T22:43:26.263299+00:00",
-        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:21:41.719854+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2193,7 +2273,10 @@
         "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py",
         "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh",
         "docs/investigations/2026-09-28-far-word-policy.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
       ],
       "receipt": {
         "sources": {
@@ -2212,16 +2295,19 @@
           "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
           "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
           "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
-          "dev/toolchain.sh": "25c464bf9b0e61799b6b0aff81b71925e46abbecf636a12b697461fd6575c1df",
-          "dev/regen-patch.sh": "54f07f5243010e00a136c6ba23a654f831d2b904b0e1c068def11f7a8f3e32a2",
+          "dev/toolchain.sh": "7cb7f135b050288aee42c2b5a0abff09ed0e734b962e30c3b20564d452f1bc27",
+          "dev/regen-patch.sh": "784cac0cde97003c1196750ed5b507ef1538b1f0c9ec3a42248d8085688c1141",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
-          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-01T23:41:09.075915+00:00",
-        "note": "agent-handoff only gained the note that toolchain.sh now installs llc. This dated record's statement that the rebuilt llc was under build/llvm-mos/bin on 2026-09-28 remains correct as dated evidence; no status, publication or result changed.",
-        "attribution": "Claude Code 2.1.287, model Claude Sonnet 5.5 (claude-sonnet-5-5), reasoning effort low"
+        "reviewed_at": "2026-10-09T23:03:38.323803+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2233,13 +2319,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-09-29T22:42:11.193542+00:00",
-        "note": "Dated opt-failure sentence now links the closed option-collision record.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T14:21:41.941737+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2321,7 +2407,7 @@
           "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
           "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
@@ -2343,11 +2429,11 @@
           "docs/defects/evidence/2026-09-28-far-word-policy/sweep.py": "af76c7d0d483a6dd1c967bdba316b996a33f748d550754e3aa7a82960df8ce45",
           "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py": "2ced07c76cfb86b457bd85dbc9f7e698a5dfa2e2ab7903e3c880889a4707d3a8",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce"
         },
-        "reviewed_at": "2026-09-30T00:21:12.780232+00:00",
-        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T23:03:40.791809+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2361,11 +2447,11 @@
         "sources": {
           "docs/pr-preparations/2026-09-28/far-word-index/review.md": "560cb2c96e2a9b811db35b84224e0bace60596fa1f248512006df5be4cd04dc6",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce"
         },
-        "reviewed_at": "2026-09-30T00:22:42.352539+00:00",
-        "note": "Reviewed, no change. pr-body.md is the September 28 draft PR text; the September 30 packet supersedes it for filing and records the blocking review, and the body will be rewritten against the split series. The publication runbook is unaffected.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T23:03:40.917219+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2385,13 +2471,13 @@
           "docs/pr-preparations/2026-09-28/far-word-index/review.md": "560cb2c96e2a9b811db35b84224e0bace60596fa1f248512006df5be4cd04dc6",
           "docs/pr-preparations/2026-09-28/far-word-index/destination.json": "5ca65d663e18df843053f2eb36ad3f1e34faaaafeff53d1c74ae6ad741ed4adc",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce",
           "docs/pr-preparations/2026-09-28/far-word-index/0069-pr-body.md": "f3f54a14aaf4aff017c3d0d983d006a4e0378c19d933623e2348ad1a70b1ee22",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/REPRODUCE.md": "979aa213fe3f43ef8f279beacc53d712a3bd11528cf6c2422fd453538d590214"
         },
-        "reviewed_at": "2026-09-30T00:21:13.355674+00:00",
-        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-09T23:03:41.304251+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2425,11 +2511,11 @@
           "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/check-sensitivity.py": "7b70ce7d6e0e41e927e269eb7c41be65c74cab6360b46ec794d2dea49ef88943",
           "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/results.json": "4a430934db24497080fa8126ed9c89a35b23ec86e31d26e2e7c82d8f603a176c",
           "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/artifacts.tar.xz": "36dab8af7b782ef7131c31f22615de7c2b9b3f28bae14948812e22c40a3cc07a",
-          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce"
         },
-        "reviewed_at": "2026-09-28T13:24:24.399259+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-10-09T23:03:42.635072+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2502,7 +2588,7 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/split-series-r3.json": "ae2666bebd847af93fa2aa64f0f0e27105078281bff6a5f2c7d8b5bd761e2b13",
           "docs/pr-preparations/2026-09-28/0065/evidence/split-series.json": "8562c694b30902518518918c537aff2466c0a555ffac587d203c204d833ebbd2",
           "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
           "docs/pr-preparations/2026-09-28/0065/micro-inputs.tar.gz": "a38a3741c52433428aff50e8899fc66dd7bcdd5c5f0be77709e931028db8bc42",
           "docs/pr-preparations/2026-09-28/0065/evidence/candidate-micro.tar.gz": "0f65febc8b49f727c029202fd13426efb860226280857fb1326465e1cb4e5cce",
@@ -2519,9 +2605,9 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSRegisterInfo.td.txt": "a96ed543ff671dfb59a66d55756681fddc48342c5ea987a09d12d7c02e4e76c9",
           "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSTargetMachine.cpp.txt": "a10b1fe04db6fb3f33f502e62e1f653543ac1e5e9188c824e1234e0e5b4ce3ba"
         },
-        "reviewed_at": "2026-10-01T14:51:00.188127+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T14:21:59.948388+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2553,9 +2639,9 @@
         "sources": {
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda"
         },
-        "reviewed_at": "2026-10-01T14:51:00.546311+00:00",
-        "note": "Reviewed for round five: a test-only addition to #321-11 (frame-index-displacement.ll), the rebuilt 0065/near-index packet records, and record notes (HuC6280 test, far-fold commit hashes). Nothing these documents state changes; the 0065 README gained a fifth-round paragraph.",
-        "attribution": "Claude Code 2.1.285, t4-opus-high agent a7633adfeee82a4f5, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d"
+        "reviewed_at": "2026-10-09T12:28:52.465900+00:00",
+        "note": "Reviewed aggregate and script dependencies against the 171-file byte-identical bootstrap comparison: carry policy, near-index proof implementation, 0069 exclusion/reapplication, preserved tools and dated measurements are unchanged. Native-width blueprint now identifies the independent merged PRs correctly. #584 prerequisite is satisfied; #594 coordination and native-series posting holds remain. The extracted 0065 series still describes its dated base and has not been rebased or revalidated by this publication refresh.",
+        "attribution": "OpenAI Codex 0.162.0, model gpt-6.1-sol, medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2587,12 +2673,12 @@
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/sensitivity.json": "fa374bdbbb4f99ebebdd279d161d8ec6b35f095ddeeaa6bfd99af2f4f799b703",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/summary.json": "f823b0565304457c556dfb504627bcdaee29d7e80457afbe35ebcc2a75ca10b7",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/x86-0028.json": "feec89ce343c04f4eb2fec7733d62b3d34962c7f56e84faf865760e74b4da514",
-          "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
+          "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a"
         },
-        "reviewed_at": "2026-09-28T12:59:28.957274+00:00",
-        "note": "Reviewed the pinned 14-patch extraction, matching-input copy-cost repair and prior-work reconciliation, 160 MOS passes plus one unsupported file, two generic X86 RUNs, 228 wrong-opcode rejections, and 58 dual-emulator configurations with repeated profiles. Updated PR bodies, summaries and plans to distinguish the extracted frozen-IR backend replay from the preserved downstream full-LTO measurements. Reconciled final source/binary identities, patch/tree reconstruction, archive hashes and SDK relink receipts. New copy-cost repair is candidate-only; the whole compiler/ABI extraction remains pending independent review, with A8, far-ABI exhaustion, runtime length, DWARF, spill-hoisting and profitability limits explicit. Reviewed dependent Farblit gate, carry and earlier experiment records: their captured outputs, counts, compiler identities, independent-review scopes and publication states remain unchanged. The existing 0028 record gains a qualified observation without changing its original baseline or status. No upstream posting, downstream installation, SNES submission or website deployment is claimed. Reviewed the older feature-held ledger and package index: updated 0061/0062 extraction status while preserving all independent-review, excluded-feature and explicit 0028 publication holds. Increment-1/2 and standalone-ready packets retain their dated evidence and readiness scope.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-10-09T23:03:43.157642+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2630,13 +2716,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/series.json": "b34607f04be182c5e8e3192d74f58223cb3a83b9cdeb3e96bc7a426e46945141",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/sensitivity.json": "fa374bdbbb4f99ebebdd279d161d8ec6b35f095ddeeaa6bfd99af2f4f799b703"
         },
-        "reviewed_at": "2026-09-28T12:59:29.500758+00:00",
-        "note": "Reviewed the pinned 14-patch extraction, matching-input copy-cost repair and prior-work reconciliation, 160 MOS passes plus one unsupported file, two generic X86 RUNs, 228 wrong-opcode rejections, and 58 dual-emulator configurations with repeated profiles. Updated PR bodies, summaries and plans to distinguish the extracted frozen-IR backend replay from the preserved downstream full-LTO measurements. Reconciled final source/binary identities, patch/tree reconstruction, archive hashes and SDK relink receipts. New copy-cost repair is candidate-only; the whole compiler/ABI extraction remains pending independent review, with A8, far-ABI exhaustion, runtime length, DWARF, spill-hoisting and profitability limits explicit. Reviewed dependent Farblit gate, carry and earlier experiment records: their captured outputs, counts, compiler identities, independent-review scopes and publication states remain unchanged. The existing 0028 record gains a qualified observation without changing its original baseline or status. No upstream posting, downstream installation, SNES submission or website deployment is claimed. Reviewed the older feature-held ledger and package index: updated 0061/0062 extraction status while preserving all independent-review, excluded-feature and explicit 0028 publication holds. Increment-1/2 and standalone-ready packets retain their dated evidence and readiness scope.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-10-09T23:03:43.279772+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2646,11 +2732,203 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "67f31b2e3730a748f7dbb635c7535c4b8457fc40102bc9a70eaf0388cfc7ef8a"
+          "TODO.md": "c87c4e10ebd13bb9aef80f7ff7b1e03feff3faccdb8ebdc8e4e0a99e0dcae044"
         },
-        "reviewed_at": "2026-10-01T23:59:39.572401+00:00",
-        "note": "The finished install-llc item left TODO (11ccd690); the publication procedure is unchanged, and the site is republished after the push.",
-        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-10-09T23:03:43.397093+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+      "sources": [
+        "dev/llvm-mos-pin",
+        "dev/toolchain.sh",
+        "dev/regen-patch.sh",
+        "dev/lit.sh",
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json",
+        "docs/upstream-status/2026-10-09.json",
+        "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json",
+        {
+          "glob": "patches/llvm-mos/*.patch"
+        },
+        "docs/defects/mos-packed-layout-pin-rebase.json",
+        "docs/defects/mos-native-index-copy-cost.json",
+        {
+          "glob": "docs/pr-preparations/2026-10-09/pin-rebase/evidence/*"
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "dev/toolchain.sh": "7cb7f135b050288aee42c2b5a0abff09ed0e734b962e30c3b20564d452f1bc27",
+          "dev/regen-patch.sh": "784cac0cde97003c1196750ed5b507ef1538b1f0c9ec3a42248d8085688c1141",
+          "dev/lit.sh": "84ca574f032b6280b4c4a395cbca1757a95d4d3a417f8bbd460bd8da20e9a67e",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907",
+          "docs/defects/evidence/2026-09-25-coalescing-0015/original/patches/llvm-mos/0015-321-coalesce-rc-undef.patch": "99207f659449ae85f9dbb73a42f81940d110ee6f381468177661769d2a2f5ec4",
+          "patches/llvm-mos/0001-320-far-addrspace.patch": "970e3ac12352cae80c5f2390849fa3de1be75522c30d13bf902e6ad30d7c34ad",
+          "patches/llvm-mos/0002-321-accum16.patch": "55deed868e2adf9f1b267ad05fb9576804633acc55d4c69d164079a55fe41148",
+          "patches/llvm-mos/0004-320-far-cc.patch": "7a244194670ca9461572890ec5aabc30025b224001092e7928d1568625034b5a",
+          "patches/llvm-mos/0005-320-far-ptr-value-legalize.patch": "0ded5ab8f371543c42178065d0da5c206b6e47ae156fe85d139747413a7eb763",
+          "patches/llvm-mos/0006-320-packed24.patch": "8dbb1e3049d5589d01c907e3382b39dbfda0bbaaa3671a32ea46aa9019125201",
+          "patches/llvm-mos/0007-65816-near-abs-bank-relax.patch": "d5d90842a9cd37817154e36ffc189c1d5ad2f43eaecdeea7a92b65c543a0d99e",
+          "patches/llvm-mos/0009-321-a16-pressure-incdec.patch": "2e1e41976aa410127727f4592009ac6df6b17dc5ac5cc31fc2eefae90e25c7d1",
+          "patches/llvm-mos/0011-mos-scavenger-live-p-save.patch": "9dc33a936c89c09eb963161015f4be5813bb03421ad00142d88ecc701d3a3936",
+          "patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch": "c666f22831f0194b54be1acf2724f6d19f67e6aa0095fddaeb7f00ae3c01134f",
+          "patches/llvm-mos/0013-320-far-memops.patch": "c260942d57c00ee4ada175b207e64103c0f5278882addf1968aa58f5df6f14be",
+          "patches/llvm-mos/0014-321-far-ptr-phi-legalize.patch": "88cd05f4ba5561c9ecf5478c41e6eb6de86aad63fb79c4192e611f0dbcf44a39",
+          "patches/llvm-mos/0015-321-coalesce-rc-undef.patch": "99207f659449ae85f9dbb73a42f81940d110ee6f381468177661769d2a2f5ec4",
+          "patches/llvm-mos/0017-321-a16-s64-unmerge-anyext-legalize.patch": "dc48b7b2aca19bea48f4df5b156ab2865ea28c06e2caf74ec2ffa379682c3a47",
+          "patches/llvm-mos/0018-320-imag32-spill.patch": "1127018514058b5d707f0c94a03d8b9256ae63f025e5a712602c0c246ce65d3d",
+          "patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch": "4fb97f8f9e48fa674a9dbb577f0b9abe123c67bbd36ac25bdf90a8a2d9e3937a",
+          "patches/llvm-mos/0023-mos-trunc-selection-regclasses.patch": "b7c42b27c997fde1bc3b6ee11374221ce92a58194c1dd6caa41d3d29f0536226",
+          "patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy-vendor.patch": "ac73b4ce8519ef232d964a72bea7c58448cdbd6d307a4393bc3365db13f5fae4",
+          "patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy.patch": "946d7093460d5d270b145f13d6cd968854c71350f960b581c3b7ea7a3891b878",
+          "patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch": "0d7c22f61d9da0cb2eb919594225a88c552eea8066f40fb256f428069c957ef6",
+          "patches/llvm-mos/0030-mos-copy-phys-reg-liveness.patch": "4d3aca874ca47b5e09b805767103391836c1e44dbb2536d926e0b72cff939dfd",
+          "patches/llvm-mos/0031-mos-copy-phys-reg-reuse-dst.patch": "75e32cb2372214b87535ef9256b21ac57556388d520ea8a47f8272c66dc33374",
+          "patches/llvm-mos/0032-mos-quote-register-named-symbols-vendor.patch": "3bf239d798f150f7e71934fa9f51823cf54a5d9fdd94c3ea7469345099c6a84e",
+          "patches/llvm-mos/0032-mos-quote-register-named-symbols.patch": "1dad44009485886f8902d75af69a73226bab28336d62d150b141b8731ed77895",
+          "patches/llvm-mos/0033-llvm-spill-hoist-no-new-vregs.patch": "354df5d23df68133ce5196fd9c1a5a49fbe986bce074c77585e6d3bb92a91c59",
+          "patches/llvm-mos/0034-mos-legalize-prefetch.patch": "3547c979ca3f46a9016ffacc0af1e4a3650a0416c94821c4797fec30b3d0f155",
+          "patches/llvm-mos/0036-mos-zero-page-indexed-globals.patch": "0f59ed316257a987aa7a0b56ef0da3f2abfd23ce313f6b55cf025f0c6ea051ad",
+          "patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output-vendor.patch": "83d9febf3a84deed8e462a23234ab0e1cf99d78c727d284a1618736149762857",
+          "patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output.patch": "fe3cd0653aa7648161f793ffb4e4523ebc82a41ef37b22b9bf7c5a1f019c09fd",
+          "patches/llvm-mos/0038-mos-return-frame-address.patch": "f89d933259bed96a6b2381c89b5d0223d052e8f9d48e1a9ca4a10687e401e881",
+          "patches/llvm-mos/0039-mos-asm-modifier-width.patch": "36a5787a07b72287ebbb98a49d1f2358407805483151d57fc50b91f2c8c2d909",
+          "patches/llvm-mos/0040-llvm-inline-spiller-coalesce-scratch-vregs.patch": "eaacf0c0620f6ba3367cac9bf4a1129a2eb2125ade409aadb9df60947d610e62",
+          "patches/llvm-mos/0041-llvm-gisel-inline-asm-multi-register-vendor.patch": "7f5086666113a216e2225c0940e10549a6ff6b858a28899aa89ee4fe4a28cf75",
+          "patches/llvm-mos/0041-llvm-gisel-inline-asm-multi-register.patch": "e9e1620ff4678b0e9ca48d276e5652cd2d151824e9fe193482ea7eea1a311690",
+          "patches/llvm-mos/0042-mos-scavenger-p-undef-a16-test.patch": "eaf414cbd8e734a7e948c0f2c7c37b2217ab27c506bf1fbdd3f34b24bd2f4515",
+          "patches/llvm-mos/0043-mos-inline-asm-physreg-width.patch": "b7cd878471eea839e1e2120c1dc2b34156f4e1a04b152205a9177f4a95e88207",
+          "patches/llvm-mos/0044-mos-asm-print-long-address.patch": "2afad4b164bb771db8166c93ffee43584c53f06b488b9329d8501cc1632219f0",
+          "patches/llvm-mos/0045-mos-asm-print-a16-immediate.patch": "7094596a4577fd947f5f9bd8c94856cbd76c9bfbea356cde073362a64cee68dc",
+          "patches/llvm-mos/0046-mos-fixupkinds-addrasciz-row.patch": "d42701fa045a3f4c4a3cf73807cfb50e0dc838e51b3bc1b06e95be61d935e442",
+          "patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch": "b641d19787bcf09329b8535190f09c0d924d51177a4273cb258bacd211dd9d61",
+          "patches/llvm-mos/0048-mos-far-codegen-lit-tests.patch": "9f05c7f60818fb7237b63511ffcd5692ca40c10df0113f0ea78730cb3c9349be",
+          "patches/llvm-mos/0050-mos-float-vector-arithmetic.patch": "7a2fc01b9501617b8b6e054a1fd49c7551a7894886690876f8a0a788ab7f23fb",
+          "patches/llvm-mos/0051-mos-zp-byte-index.patch": "a556854efd35934b4c9d4554ff85fc083ca5145426cd20f3a6bd237fb5ab2c6c",
+          "patches/llvm-mos/0052-mos-bank-relax-section-offset.patch": "6133684707d20c64040dcb0c7b2900f369ca3e0e2807a891e8b9221e01c2b7db",
+          "patches/llvm-mos/0053-mos-lit-expectations.patch": "6461324efefda8fe4b56ea208bb06e90dc913bda76fd8dfa48ee2048e530246d",
+          "patches/llvm-mos/0054-llvm-scavenger-save-range.patch": "164c0731ae7000b7ad7463e75f31bfa7fd98bc1a3dd18cfc09e4a2c5bd513914",
+          "patches/llvm-mos/0055-mos-native-wide-anyext-vendor.patch": "b081322d5a2d27963d24806156c38ce1738691672cd590e5c627e07513fc98a3",
+          "patches/llvm-mos/0055-mos-native-wide-anyext.patch": "d9195b63ff4dab33b7c7ba7550b5322b85de88234f1a0abd299e61ba4ee826f4",
+          "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds-vendor.patch": "9f07249b13542c94da5655c4aac1d8731360eac84a6e3cf555dee742474bd9e1",
+          "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch": "5e9371ff0b8657706cb84b4fcaff87ede306f2b7b974f5e661e7afba6ac8d132",
+          "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch": "8c4213521cb578f7ff2c9acb331fa260087e286f943fcb2f775a841824bc5035",
+          "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch": "87710e8424951a95f0a0f40a59b748817fbc46d76466c12b0f2ce0c92711251d",
+          "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch": "2a3f0424702a4e714b91b4336e8b992b984455f541739707396b6a5774706162",
+          "patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch": "d12ccaec7f42cfa51cf6dec43d86df058e8258546c24dbf5b8488d27826093a4",
+          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
+          "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "8cab3c582d6b66f7fad83a74d90f34ce3762a08e76530838b93459a3435a0271",
+          "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
+          "patches/llvm-mos/0065-mos-near-store-profitability.patch": "7f6d9a7c9e9698ae886671acda27c3e8da24e0d3da0163248a8945c3a36ea7b9",
+          "patches/llvm-mos/0066-mos-far-extload-worklist.patch": "2c725a85fa3d485b875c2975cfa02a98461947d831bc6030528ef1aa1287b597",
+          "patches/llvm-mos/0067-mos-competing-carry-gate.patch": "86db849b6f81fb0eb52be5f80191adef1abaae7b77057eec5d45dd0301f1bd33",
+          "patches/llvm-mos/0068-mos-null-output-streamer.patch": "64a2595cc07a321e725e40a16aadaef2c156b8a63260e71f7fdc97591a6b1208",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
+          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+          "patches/llvm-mos/0071-mos-accumulator-pressure-set.patch": "2a50f8e119dc0ac68cd736cbf1562842b909354853163a62b7c27a65b82f82c6",
+          "docs/defects/mos-packed-layout-pin-rebase.json": "3483e6afa8380faf6cb52f006fd006eeea3121a85a52325198ac242337d94f51",
+          "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/bootstrap.log": "a2f9922e7ebe1a987b87c518eb923f4ad010321b17c131a53be05888683dc938",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/build-completion-commands.json": "da9a75416eddd6b4a2dc181b94f3a6c7f4ad2c2a082787df0d88051852a55c02",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/build-completion.log.gz": "5b9b222f1034141019b2be4d90fe330cc4b7ee5868bcf5f29e1f50e091b7c45d",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/builtin-prefetch-int16.c": "5b9e0afa1359eef18fa8b91e626f3f88a91ab97fde5c5f8bc5c718db9c6b8d9f",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/compiler-results.json": "8ea4b9d3696b3abc1e87852ce903a64e473c186d7580dd6696112e9c1485442f",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/july-stack-consolidation.diff.gz": "eb40a02cf218844699ee31e2b48e64bf894de1f5487c065722ac057fab368f08",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/mos-lit-notes.log": "3af52ef3c7b217a8746a089a7ecd89943b6cfd44b7fb0dbd741d9be063945bb5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/mos-lit.log.gz": "a1a9a51aa71d8c1cf12fbadeac2983b431900a133aa9c907b1440d9d0285dbb6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/native-copy-rebuild-commands.json": "47240e8266a28428af01a2fa41eec4be44655155007ee3edac730b1944e3cf3f",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/native-copy-rebuild.log": "fb0287520067a65305c237aa4e2c06967fcdec72309516b481b86b1909073f6b",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-retained-msp430-checks.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-retained-msp430-checks.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-retained-msp430.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-retained-msp430.stdout": "23151ac54f948209b6025951e633ac18177e53ab679e3db55b0d19acbce096d7",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-retained-x86_64-pc-linux-checks.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-retained-x86_64-pc-linux-checks.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-retained-x86_64-pc-linux.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-retained-x86_64-pc-linux.stdout": "18fc32888bd18389fa5859c14a78c0f9cd2c4a65fcb8fcffc1325fdcbf31ea5f",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-avr-checks.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-avr-checks.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-avr.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-avr.stdout": "65e4fb4ea6cae0cb88e45d88e2c02cf71933e7169c0a8e8077159a22e8b18519",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-mos-checks.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-mos-checks.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-mos.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-mos.stdout": "2198e621350ca3df8d0f1d682190fa53a5d82ccfbec10011c55ccfb480827dba",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-msp430-checks.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-msp430-checks.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-msp430.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-msp430.stdout": "215065d48421827f7ded5b46792b3dacf9eb1fc48aa7a1cb496c68acb4d3760e",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-x86_64-pc-linux-checks.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-x86_64-pc-linux-checks.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-x86_64-pc-linux.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-x86_64-pc-linux.stdout": "4f63e7ab9d2ad9b5c3190db99deee862ec8d6f1e259c5ef8c4de8eca1ce39952",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/tool-set-final-relink-commands.json": "46c030298d461931e267df771eca2d248dfc5243eb88551e5783b04b1e0a3c9a",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/validate.py": "5421bbeb441deab86ed178278c7546dc1c3cdf687553c61db7364fd181e347c1",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/verify-stack.py": "654d9c9f7106af08f8158df3535a3d1682672d39034004c1a4e8b60d00a3c04e"
+        },
+        "reviewed_at": "2026-10-09T23:03:43.911954+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+      }
+    },
+    {
+      "document": "docs/upstream-clang-prefetch-int16-pr.md",
+      "sources": [
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json",
+        "docs/pr-preparations/2026-09-23/0034-0035-validation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907",
+          "docs/pr-preparations/2026-09-23/0034-0035-validation.md": "cd1d18d5d78f300223aab28dd5234961aada06e5c3063e98fb3e61fb7f00dffb"
+        },
+        "reviewed_at": "2026-10-09T14:22:01.654794+00:00",
+        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+      }
+    },
+    {
+      "document": "docs/65816-patch-series-review-guide.md",
+      "sources": [
+        "dev/llvm-mos-pin",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/upstream-status/2026-10-09.json"
+      ],
+      "receipt": {
+        "sources": {
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981"
+        },
+        "reviewed_at": "2026-10-09T23:03:43.912055+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+      }
+    },
+    {
+      "document": "docs/upstream-mc-addr-asciz-symbolic-crash-pr.md",
+      "sources": [
+        "dev/llvm-mos-pin",
+        "patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch",
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md"
+      ],
+      "receipt": {
+        "sources": {
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch": "b641d19787bcf09329b8535190f09c0d924d51177a4273cb258bacd211dd9d61",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549"
+        },
+        "reviewed_at": "2026-10-09T23:03:44.037860+00:00",
+        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
+        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     }
   ]

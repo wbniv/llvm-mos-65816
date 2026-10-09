@@ -1,5 +1,10 @@
 # Bounded Farblit range proof: production validation
 
+**October 9 pin qualification:** the internal compiler stack is [rebased onto upstream `f24948c7d1a4`](../pr-preparations/2026-10-09/pin-rebase/README.md), removing merged repairs and adapting the remaining overlays. The measurements, compiler identities, closure evidence and extracted submission results below retain their recorded revisions. They do not certify the new pin. Native-width/far implementation remains carried locally; the new build has its own validation record.
+
+Pin qualification: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
+
 **Later September 28 speed-policy follow-up:** [0070 is integrated and installed locally](2026-09-28-far-word-policy.md). Native word indexing is enabled for speed at `-O2`/`-O3`; `-Os`/`-Oz` retain their existing output. The A16 size tradeoff is settled by the build policy. [Independent downstream AI source review](../pr-preparations/2026-09-28/far-word-index/independent-review.md) is complete: no valid-input compiler correctness defect was found. The P2 FileCheck finding is resolved: all 78 assertions have explicit opcode boundaries, all 156 wrong substitutions are rejected, the three real outputs pass, and four focused regression files pass. The preserved assertions accepted 104 of those substitutions; all 78 archived outputs already contained the intended exact opcode. The earlier evidence below is preserved. The [extracted upstream candidate](../pr-preparations/2026-09-28/far-word-index/upstream-series.md) now has separately identified build and replay evidence; independent review of that complete compiler/ABI series remains pending.
 
 Follow-up attribution: OpenAI Codex CLI 0.157.1 (session source: `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.

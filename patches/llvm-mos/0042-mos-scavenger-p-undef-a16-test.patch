@@ -4,7 +4,7 @@ index 000000000000..a35569246d42
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/scavenger-p-undef.mir
 @@ -0,0 +1,70 @@
-+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=prologepilog -verify-machineinstrs -o - %s | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=prolog-epilog -verify-machineinstrs -o - %s | FileCheck %s
 +#
 +# DOWNSTREAM-ONLY: this case needs the 16-bit accumulator feature (+mos-a16,
 +# $a16) of the llvm-mos-65816 tree and is not part of the upstream submission;

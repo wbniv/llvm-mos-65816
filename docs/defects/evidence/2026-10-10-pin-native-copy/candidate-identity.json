@@ -1,0 +1,5 @@
+{
+  "pin": "f24948c7d1a4b9f162d4d0192ccceecab1e441ff",
+  "binary_sha256": "de015012065803384372f026ab91b739203a26c3a6c01e95d7b3ebd02369b307",
+  "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+}

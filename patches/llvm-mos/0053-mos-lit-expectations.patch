@@ -123,7 +123,7 @@ diff --git a/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll b/llvm/test/CodeGen
 +++ b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
 @@ -1,4 +1,4 @@
 -; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prolog-epilog -verify-machineinstrs < %s | FileCheck %s
-+; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prologepilog -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prolog-epilog -verify-machineinstrs < %s | FileCheck %s
 
  ; Stock 6502 at -O0 (reduced with llvm-reduce from gcc.c-torture/execute/strlen-4.c).
  ; The frame is larger than 255 bytes, so a frame-index expansion is an

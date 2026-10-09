@@ -1,0 +1,145 @@
+{
+  "schema": 1,
+  "id": "mos-packed-layout-pin-rebase",
+  "title": "Packed pointer layout omitted from the centralized target description during the pin rebase",
+  "status": "fixed",
+  "reproducer_origin": "original",
+  "report": "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+  "summary": "The local compiler-pin rebase omitted packed-pointer layout p3:24:8 from the centralized target description. Porting the existing 0006 backend declaration to TargetParser repairs the paired Clang/backend layout contract. The retained preprocessed C input fails on the preserved intermediate rebase compiler and passes on the identified candidate; this is local integration work, not an upstream defect discovery.",
+  "attribution": [
+    "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+  ],
+  "prior_work": {
+    "disposition": "new_defect",
+    "search_terms": [
+      "Target-incompatible DataLayout",
+      "p3:24:8",
+      "MOSDataLayout",
+      "Triple::mos",
+      "computeDataLayout"
+    ],
+    "related_records": [],
+    "related_reports": [
+      "docs/plans/2026-06-21-320-five-address-space-model.md",
+      "docs/plans/2026-06-21-320-packed24-incrementB-handoff.md"
+    ],
+    "related_changes": [
+      "ebfc95e4",
+      "patches/llvm-mos/0006-320-packed24.patch"
+    ],
+    "source_assessment": "Old vendor HEAD 8be0546 MOSTargetMachine.cpp has its own packed layout; its centralized TargetDataLayout.cpp only contains p2. The new pin uses the centralized layout in MachineFunction creation and Clang ABI verification. The in-progress rebase dropped the old backend declaration without porting its p3 field.",
+    "binary_assessment": "clang version 24.0.0git (/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/clang f24948c7d1a4b9f162d4d0192ccceecab1e441ff)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-baseline\nBuild config: +assertions\n Binary hash 3d8f738ed1afa6dd0cfbd2f4aa7600bfa36449e2700955cebae89d0506527b32; the retained preprocessed arith input reproduces the target-layout rejection.",
+    "decision": "A new record documents the distinct local integration regression introduced by this unpublished rebase. The older work implements packed pointers correctly in the old backend location and has no canonical record for this mismatched centralized description. Do not submit a duplicate upstream report.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/prior-work.json",
+      "sha256": "32c2ca772d5c7744a54217e447342afc4486a428933fa64682331cc649387eba"
+    }
+  },
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-baseline/clang -target mos -mcpu=mosw65816 -ffreestanding -Os -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-10-10-pin-packed-layout/arith.i -o /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-baseline.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [],
+      "optimization": "Os",
+      "lto": false,
+      "verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-baseline/clang; preserved binary and baseline-identity.json",
+    "toolchain_sha256": "3d8f738ed1afa6dd0cfbd2f4aa7600bfa36449e2700955cebae89d0506527b32",
+    "input": {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/arith.i",
+      "sha256": "8249bb170d54c47c1ecb6e2a733b2c583550fba4ad340efbbf5d8716b78a0249"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/baseline.log",
+      "sha256": "3b3c9ceb8f687772af62938599655b34cd635804516fbdf3ec2dfb2faedf940f"
+    },
+    "exit_code": 1,
+    "failure_signature": "Target-incompatible DataLayout"
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/arith.c",
+      "sha256": "c64bb7255186539bb00169a6e460b6f60176a167c24b5dc56dec387a225c4a25"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/baseline-identity.json",
+      "sha256": "294c5210cfd7da46dc5f476078f8caba841ada379da78a783923e7c948eab0e1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/target-layout-baseline.cpp.txt",
+      "sha256": "2d36039bca35f63705ebda7b5673f95de4f0381df4a3a21d12c3b4ba40b7df24"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/baseline.ll",
+      "sha256": "5d59532e76241ed9b9c0f0f63b0f7c346c26e7f507ad15771b887b8965d0ea69"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/ir-capture.log",
+      "sha256": "0e7db0264d069da700943d472145dc870110d6aa7bb0eaf85e320ad47c7ab11a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/candidate.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/candidate.ll",
+      "sha256": "5d59532e76241ed9b9c0f0f63b0f7c346c26e7f507ad15771b887b8965d0ea69"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/candidate-identity.json",
+      "sha256": "041ad5f92582484dbc9a690f6af61a4c56dab744e815cb3df35d549e8dac3c9f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/candidate-ir-capture.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/candidate-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/candidate-final-identity.json",
+      "sha256": "5795129f46f3825960981b2c6cead2fbbadcad08bc9851a34e6b3976a1980455"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/check-layout.py",
+      "sha256": "3ced9cd3e635501ca2838ad785a7b84c3e8568a09f5c4c0842d3bc384db4b60f"
+    }
+  ],
+  "unknowns": [
+    "No MIR is produced: the layout guard rejects MachineFunction construction. Runtime correctness is not claimed by this compile-only regression."
+  ],
+  "resolution": {
+    "change": "patches/llvm-mos/0006-320-packed24.patch: centralized TargetDataLayout p3 declaration and bootstrap include filter",
+    "causal_explanation": "Upstream now obtains the backend layout from Triple::computeDataLayout in TargetParser. The packed pointer declaration remained in Clang while the old MOS-specific layout hunk no longer applied. Restoring p3:24:8 in the shared declaration makes both descriptions agree; the frontend and regression input remain unchanged.",
+    "trigger_check": "Both baseline.ll and candidate.ll retain p3:24:8. The same retained arith.i and target/configuration reject object generation on the baseline and pass on the candidate. No frontend transformation masks the backend guard. This regression validates object generation; no runtime claim.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/arith.i",
+      "sha256": "8249bb170d54c47c1ecb6e2a733b2c583550fba4ad340efbbf5d8716b78a0249"
+    },
+    "candidate": {
+      "command": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin/clang -target mos -mcpu=mosw65816 -ffreestanding -Os -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-10-10-pin-packed-layout/arith.i -o /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-candidate-final.o",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [],
+        "optimization": "Os",
+        "lto": false,
+        "verifier": true
+      },
+      "toolchain_location": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin/clang; candidate-identity.json",
+      "toolchain_sha256": "d310b1c073be1dd000e8faf08fb957571ab7a0b927c1016f012c3fecdbf70928",
+      "input": {
+        "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/arith.i",
+        "sha256": "8249bb170d54c47c1ecb6e2a733b2c583550fba4ad340efbbf5d8716b78a0249"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-10-10-pin-packed-layout/candidate-final.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_code": 0
+    }
+  }
+}

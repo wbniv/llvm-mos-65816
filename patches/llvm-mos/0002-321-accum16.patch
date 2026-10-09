@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
-index 584cc0c4c8cd..4a87ac655eff 100644
+index 692e219b18d9..263e4907b307 100644
 --- a/llvm/lib/Target/MOS/CMakeLists.txt
 +++ b/llvm/lib/Target/MOS/CMakeLists.txt
-@@ -31,6 +31,7 @@ add_llvm_target(MOSCodeGen
+@@ -36,6 +36,7 @@ add_llvm_target(MOSCodeGen
    MOSIndexIV.cpp
    MOSInlineAsmLowering.cpp
    MOSInsertCopies.cpp
@@ -10,19 +10,19 @@ index 584cc0c4c8cd..4a87ac655eff 100644
    MOSInstrCost.cpp
    MOSInstrInfo.cpp
    MOSInstructionSelector.cpp
-@@ -41,6 +42,7 @@ add_llvm_target(MOSCodeGen
+@@ -46,6 +47,7 @@ add_llvm_target(MOSCodeGen
    MOSMCInstLower.cpp
    MOSMachineScheduler.cpp
    MOSNonReentrant.cpp
 +  MOSRecoverNearNoWrap.cpp
    MOSPostRAScavenging.cpp
+   MOSRegAlloc.cpp
    MOSRegisterBankInfo.cpp
-   MOSRegisterInfo.cpp
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
-index 9389a4291b3e..3b69550a7064 100644
+index cd2f8f0ff187..64ecc809f9f3 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
-@@ -174,6 +174,23 @@ bool MOSAsmBackend::fixupNeedsRelaxationAdvanced(const MCFragment &F,
+@@ -179,6 +179,23 @@ bool MOSAsmBackend::fixupNeedsRelaxationAdvanced(const MCFragment &F,
    if (Sec->getFlags() & ELF::SHF_MOS_ZEROPAGE)
      return false;
 
@@ -47,11 +47,11 @@ index 9389a4291b3e..3b69550a7064 100644
  }
 
 diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
-index 66964b1fe0a0..2433911dd4b9 100644
+index 1bef48d6d037..5cf8ce440a11 100644
 --- a/llvm/lib/Target/MOS/MOS.h
 +++ b/llvm/lib/Target/MOS/MOS.h
-@@ -23,10 +23,12 @@ void initializeMOSCombinerPass(PassRegistry &);
- void initializeMOSCopyOptPass(PassRegistry &);
+@@ -25,10 +25,12 @@ void initializeMOSCopyOptPass(PassRegistry &);
+ void initializeMOSImagRegAllocPass(PassRegistry &);
  void initializeMOSIndexIVPass(PassRegistry &);
  void initializeMOSInsertCopiesPass(PassRegistry &);
 +void initializeMOSInsertREPSEPPass(PassRegistry &);
@@ -61,8 +61,8 @@ index 66964b1fe0a0..2433911dd4b9 100644
  void initializeMOSNonReentrantPass(PassRegistry &);
 +void initializeMOSRecoverNearNoWrapPass(PassRegistry &);
  void initializeMOSPostRAScavengingPass(PassRegistry &);
+ void initializeMOSRegAllocPass(PassRegistry &);
  void initializeMOSShiftRotateChainPass(PassRegistry &);
- void initializeMOSStaticStackAllocPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
 index dd5b16b807b5..ea200c1c555e 100644
 --- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
@@ -354,10 +354,10 @@ index f5462d3247a9..af58783971f6 100644
    }
 
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.cpp b/llvm/lib/Target/MOS/MOSCallingConv.cpp
-index 993ce3787622..8a47e863537c 100644
+index 9b5546351485..260c582cf41d 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.cpp
 +++ b/llvm/lib/Target/MOS/MOSCallingConv.cpp
-@@ -12,7 +12,86 @@
+@@ -12,8 +12,87 @@
 
  #include "MOSCallingConv.h"
 
@@ -365,6 +365,7 @@ index 993ce3787622..8a47e863537c 100644
  #include "llvm/CodeGen/MachineFunction.h"
  #include "llvm/IR/DataLayout.h"
 
+ #define GET_CALLING_CONV_IMPL
  #include "MOSGenCallingConv.inc"
 +
 +// #320 Inc 4 Ph2: far-pointer CC variant selectors (declared in MOSCallingConv.h,
@@ -634,7 +635,7 @@ index 76d7409c1f1b..561097194218 100644
 +    "mos-farcc-stack", "HasFarCCStack", "true",
 +    "Far-pointer CC variant (d): pass/return a far pointer on the 65816 hardware stack.">;
 diff --git a/llvm/lib/Target/MOS/MOSFrameLowering.cpp b/llvm/lib/Target/MOS/MOSFrameLowering.cpp
-index cd0d8fae27c1..204cb37d5623 100644
+index 3b1a16d391de..3b2b659464aa 100644
 --- a/llvm/lib/Target/MOS/MOSFrameLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSFrameLowering.cpp
 @@ -285,6 +285,38 @@ void MOSFrameLowering::emitPrologue(MachineFunction &MF,
@@ -696,7 +697,7 @@ index cd0d8fae27c1..204cb37d5623 100644
 
  uint64_t MOSFrameLowering::staticSize(const MachineFrameInfo &MFI) const {
 diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
-index 42b275080f88..3271f980152c 100644
+index 1727ef1ddccc..7379fc43ffe2 100644
 --- a/llvm/lib/Target/MOS/MOSISelLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSISelLowering.cpp
 @@ -38,7 +38,7 @@ using namespace llvm;
@@ -725,10 +726,10 @@ index 42b275080f88..3271f980152c 100644
 +  return TargetLowering::getPointerTy(DL, AS);
 +}
 +
- MVT MOSTargetLowering::getRegisterType(MVT VT) const {
+ MVT MOSTargetLowering::getCachedRegisterType(MVT VT) const {
    // Even though a 16-bit register is available, it's not actually an integer
    // register, so split to 8 bits instead.
-@@ -87,8 +100,20 @@ MOSTargetLowering::getNumRegisters(LLVMContext &Context, EVT VT,
+@@ -85,8 +98,20 @@ unsigned MOSTargetLowering::getCachedNumRegisters(MVT VT) const {
  MVT MOSTargetLowering::getRegisterTypeForCallingConv(
      LLVMContext &Context, CallingConv::ID CC, EVT VT,
      const ISD::ArgFlagsTy &Flags) const {
@@ -752,19 +753,20 @@ index 42b275080f88..3271f980152c 100644
  }
 
 diff --git a/llvm/lib/Target/MOS/MOSISelLowering.h b/llvm/lib/Target/MOS/MOSISelLowering.h
-index 4e7ff5b2015d..ba6a46222be0 100644
+index aeee4ec94a7b..fa568455ac5c 100644
 --- a/llvm/lib/Target/MOS/MOSISelLowering.h
 +++ b/llvm/lib/Target/MOS/MOSISelLowering.h
-@@ -45,6 +45,8 @@ public:
+@@ -45,6 +45,9 @@ public:
                                uint64_t Range, ProfileSummaryInfo *PSI,
                                BlockFrequencyInfo *BFI) const override;
 
 +  MVT getPointerTy(const DataLayout &DL, uint32_t AS = 0) const override;
 +
-   MVT getRegisterType(MVT VT) const override;
++
+   MVT getCachedRegisterType(MVT VT) const override;
 
-   unsigned
-@@ -94,6 +96,12 @@ public:
+   unsigned getCachedNumRegisters(MVT VT) const override;
+@@ -92,6 +95,12 @@ public:
    MachineBasicBlock *
    EmitInstrWithCustomInserter(MachineInstr &MI,
                                MachineBasicBlock *MBB) const override;
@@ -1634,7 +1636,7 @@ index 000000000000..34f7e16f3588
 +
 +#endif // LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
 diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
-index 12d05bed418f..ba38163ae084 100644
+index ca75d5524124..e21ba2d05954 100644
 --- a/llvm/lib/Target/MOS/MOSInstrFormats.td
 +++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
 @@ -57,6 +57,21 @@ def HasW65816 : Predicate<"Subtarget->hasW65816()">,
@@ -1659,7 +1661,7 @@ index 12d05bed418f..ba38163ae084 100644
  def Has65EL02 : Predicate<"Subtarget->has65EL02()">,
                  AssemblerPredicate<(all_of Feature65EL02), "65EL02"> {
    let PredicateName = "Feature65EL02";
-@@ -960,9 +975,13 @@ multiclass CC0_Regular< bits<3> aaa, string OpcodeStr = "nop"> {
+@@ -963,9 +978,13 @@ multiclass CC0_Regular< bits<3> aaa, string OpcodeStr = "nop"> {
      let XLow = 1;
    }
 
@@ -1859,10 +1861,10 @@ index 29032a1e32ea..21d4bdaa6c75 100644
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 6850ed4ab963..fa621b8e1dda 100644
+index 25e0114928ab..ed81da04b3b9 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-@@ -352,6 +352,11 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
+@@ -357,6 +357,11 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
    case MOS::CmpBrAbsIdx:
    case MOS::CmpBrIndir:
    case MOS::CmpBrIndirIdx:
@@ -1874,7 +1876,7 @@ index 6850ed4ab963..fa621b8e1dda 100644
      return MI.getOperand(0).getMBB();
    case MOS::JMPIndir:
    case MOS::JMPIdxIndir:
-@@ -388,11 +393,13 @@ bool MOSInstrInfo::analyzeBranch(MachineBasicBlock &MBB,
+@@ -393,11 +398,13 @@ bool MOSInstrInfo::analyzeBranch(MachineBasicBlock &MBB,
      return true;
    if (FirstBR->isConditionalBranch()) {
      if (!FirstBR->memoperands_empty()) {
@@ -1891,7 +1893,7 @@ index 6850ed4ab963..fa621b8e1dda 100644
          return true;
      }
 
-@@ -677,6 +684,18 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
+@@ -682,6 +689,18 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
                      TRI.getSubReg(SrcReg, MOS::sublo));
      copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::subhi),
                      TRI.getSubReg(SrcReg, MOS::subhi));
@@ -1910,7 +1912,7 @@ index 6850ed4ab963..fa621b8e1dda 100644
    } else if (AreClasses(MOS::Anyi1RegClass, MOS::Anyi1RegClass)) {
      assert(SrcReg.isPhysical() && DestReg.isPhysical());
      Register SrcReg8 =
-@@ -935,7 +954,24 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+@@ -940,7 +959,24 @@ void MOSInstrInfo::loadStoreRegStackSlot(
        Instr.addDef(Ptr, RegState::EarlyClobber);
      Instr.addFrameIndex(FrameIndex).addImm(0).addMemOperand(MMO);
    } else {
@@ -1936,7 +1938,7 @@ index 6850ed4ab963..fa621b8e1dda 100644
          (Reg.isVirtual() &&
           MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
        MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
-@@ -967,7 +1003,30 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+@@ -972,7 +1008,30 @@ void MOSInstrInfo::loadStoreRegStackSlot(
                                     MF.getMachineMemOperand(MMO, 1, 1));
        if (IsLoad && Tmp != Reg)
          Builder.buildCopy(Reg, Tmp);
@@ -1967,7 +1969,7 @@ index 6850ed4ab963..fa621b8e1dda 100644
        loadStoreByteStaticStackSlot(
            Builder, MachineOperand::CreateReg(Reg, IsLoad), FrameIndex, 0, MMO);
      }
-@@ -1042,6 +1101,13 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
+@@ -1047,6 +1106,13 @@ bool MOSInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
    case MOS::CmpBrIndirIdx:
      expandCmpBr(Builder);
      break;
@@ -1981,7 +1983,7 @@ index 6850ed4ab963..fa621b8e1dda 100644
 
    // Control flow
    case MOS::GBR:
-@@ -1362,6 +1428,63 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
+@@ -1367,6 +1433,63 @@ void MOSInstrInfo::expandCmpBr(MachineIRBuilder &Builder) const {
    MI.eraseFromParent();
  }
 
@@ -2073,7 +2075,7 @@ index d8377bc8b441..880709364cdd 100644
  enum TargetIndex {
    TI_STATIC_STACK,
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td
-index a71519559a50..b080bc3c6006 100644
+index 11dc0f83072c..5a28edaeae86 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.td
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.td
 @@ -65,24 +65,38 @@ defm INC : CC2_NonShift<0b111, "inc">;
@@ -2153,14 +2155,6 @@ index a71519559a50..b080bc3c6006 100644
 
  /// The conditional branch instructions all have the form xxy10000. The flag
  /// indicated by xx is compared with y, and the branch is taken if they are
-@@ -785,6 +809,7 @@ def TDC_Implied : InstLowB<"tdc", 0b0111>;
- def TSC_Implied : InstLowB<"tsc", 0b0011>;
-
- def WDM_Immediate : Inst16<"wdm", Opcode<0x42>, Immediate>;
-+def COP_Immediate : Inst16<"cop", Opcode<0x02>, Immediate>, InstUnconditionalBranch;
- }
-
- } // Predicates = [HasW65816]
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
 index 715766180b8c..ff015ada51d8 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
@@ -2812,10 +2806,10 @@ index 715766180b8c..ff015ada51d8 100644
 +  dag OutOperandList = (outs Ac16:$dst);
 +}
 diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-index 21910cfeab37..e3fece8b0616 100644
+index 8519606edde4..6f10e2842edf 100644
 --- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
 +++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-@@ -359,4 +359,52 @@ let mayLoad = true in {
+@@ -360,4 +360,52 @@ let mayLoad = true in {
    def CmpBrIndirIdx : MOSCmpBr {
      dag InOperandList = (ins label:$tgt, Flag:$flag, i1imm:$flag_val, Ac:$l, Imag16:$addr, Yc:$idx);
    }
@@ -4308,7 +4302,7 @@ index 9712a96e9e44..8306f4264e34 100644
      Opcode = MOS::STAbsIdx;
      break;
 diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-index d13429a713db..0e357b030d97 100644
+index 18c98da393a0..101001646920 100644
 --- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 +++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 @@ -50,6 +50,7 @@ public:
@@ -4327,7 +4321,7 @@ index d13429a713db..0e357b030d97 100644
      Changed |= tailJMP(MBB);
    }
    return Changed;
-@@ -400,6 +402,111 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
+@@ -405,6 +407,111 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
    return Changed;
  }
 
@@ -4440,7 +4434,7 @@ index d13429a713db..0e357b030d97 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 6356fa58723c..68b559580e87 100644
+index 6646ff90b73c..ee6369b2e7bd 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,7 +25,10 @@
@@ -4474,18 +4468,20 @@ index 6356fa58723c..68b559580e87 100644
 +  // value ever stands alone — there is no MVT::i24 / 24-bit register class).
 +  LLT PFP = LLT::pointer(3, 24);
 
-   // Constants
-
-@@ -92,13 +103,30 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   // There are no vector registers, but the optimizer freely forms vector
+   // operations over the vector types SROA invents for aggregates. Any
+@@ -98,15 +109,30 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
 
    // Integer Extension and Truncation
 
 -  getActionDefinitionsBuilder(G_ANYEXT)
 -      .legalFor({{S16, S8}})
 -      .customIf(typeIs(1, S1))
+-      .scalarize(0)
 -      .unsupported();
 -  getActionDefinitionsBuilder(G_TRUNC)
 -      .legalFor({{S1, S8}, {S1, S16}, {S8, S16}})
+-      .scalarize(0)
 -      .unsupported();
 +  // #321 a16: under +mos-a16 an s32 (long/int32_t) is represented as 2x s16 — s16 is a
 +  // legal type, so wide ops narrow to s16 (not s8), and the s32<->s16 ext/trunc/(un)merge
@@ -4502,19 +4498,19 @@ index 6356fa58723c..68b559580e87 100644
 +    B.customIf([](const LegalityQuery &Q) {
 +       unsigned SrcBits = Q.Types[1].getSizeInBits();
 +       return SrcBits == 1 || (SrcBits != 8 && SrcBits != 16 && SrcBits != 32);
-+     }).unsupported();
++     }).scalarize(0).unsupported();
 +  }
 +  {
 +    auto &B = getActionDefinitionsBuilder(G_TRUNC)
 +                  .legalFor({{S1, S8}, {S1, S16}, {S8, S16}});
 +    if (STI.hasAccum16())
 +      B.legalFor({{S16, S32}});
-+    B.unsupported();
++    B.scalarize(0).unsupported();
 +  }
 
-   getActionDefinitionsBuilder(G_SEXT).custom();
+   getActionDefinitionsBuilder(G_SEXT).scalarize(0).custom();
 
-@@ -125,19 +153,43 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -134,7 +160,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
    // #320 far runtime: near->far (AS0->AS2) zero-extends the 16-bit near pointer
    // to the 32-bit far pointer (bank byte $00); handled in legalizeAddrSpaceCast.
    getActionDefinitionsBuilder(G_ADDRSPACE_CAST)
@@ -4522,9 +4518,10 @@ index 6356fa58723c..68b559580e87 100644
 +      .customForCartesianProduct({P, PZ, PF, PFP})
        .unsupported();
 
-   // Scalar Operations
-
-   getActionDefinitionsBuilder({G_EXTRACT, G_INSERT}).lower();
+   // Bitcasts only appear once vector types are involved; a scalar-to-scalar
+@@ -159,12 +185,36 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   // inserts with constant indices, which the rule above then lowers further.
+   getActionDefinitionsBuilder(G_SHUFFLE_VECTOR).lower();
 
 -  getActionDefinitionsBuilder(G_MERGE_VALUES)
 -      .legalForCartesianProduct({S16, P}, {S8, PZ})
@@ -4565,12 +4562,13 @@ index 6356fa58723c..68b559580e87 100644
 
    getActionDefinitionsBuilder(G_BSWAP)
        .customFor({S8})
-@@ -155,18 +207,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -184,20 +234,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
        .widenScalarToNextMultipleOf(0, 8)
        .custom();
 
 -  getActionDefinitionsBuilder({G_AND, G_OR})
 -      .legalFor({S8})
+-      .scalarize(0)
 -      .widenScalarToNextMultipleOf(0, 8)
 -      .maxScalar(0, S8)
 -      .unsupported();
@@ -4583,12 +4581,13 @@ index 6356fa58723c..68b559580e87 100644
 +    auto &B = getActionDefinitionsBuilder({G_AND, G_OR}).legalFor({S8});
 +    if (STI.hasAccum16())
 +      B.legalFor({S16});
-+    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
++    B.scalarize(0).widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
 +  }
 
 -  getActionDefinitionsBuilder(G_XOR)
 -      .legalFor({S8})
 -      .customFor({S1})
+-      .scalarize(0)
 -      .widenScalarToNextMultipleOf(0, 8)
 -      .maxScalar(0, S8)
 -      .unsupported();
@@ -4596,34 +4595,23 @@ index 6356fa58723c..68b559580e87 100644
 +    auto &B = getActionDefinitionsBuilder(G_XOR).legalFor({S8}).customFor({S1});
 +    if (STI.hasAccum16())
 +      B.legalFor({S16});
-+    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
++    B.scalarize(0).widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
 +  }
 
    getActionDefinitionsBuilder(G_MUL)
        .libcallFor({S8, S16, S32, S64})
-@@ -228,6 +286,13 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
-
-   getActionDefinitionsBuilder({G_SMIN, G_SMAX, G_UMIN, G_UMAX}).lower();
-
-+  // Three-way compares (llvm.scmp/ucmp — the C `(a>b)-(a<b)` spaceship idiom and libc-style
-+  // comparators) have no native form on the 6502/65816; lower them to icmp+select primitives the
-+  // backend already legalizes (LegalizerHelper::lowerThreewayCompare). Without this the backend
-+  // aborts with "unable to legalize G_SCMP" on any qsort-style comparator. Not accum-specific —
-+  // it fires at every width and in default/+mos-a16/+mos-xy16 alike.
-+  getActionDefinitionsBuilder({G_SCMP, G_UCMP}).lower();
-+
-   getActionDefinitionsBuilder(G_ABS).custom();
-
-   // Odd operations are handled via even ones: 6502 has only ADC/SBC.
-@@ -330,14 +395,30 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -379,17 +433,30 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
 
    // Memory Operations
 
 -  getActionDefinitionsBuilder({G_LOAD, G_STORE})
 -      // Convert to int to load/store; that way the operation can be narrowed to
 -      // 8 bits. Once 8-bit, select an addressing mode to replace the generic
--      // G_LOAD and G_STORE. PF (far) pointers select to absolute-long. (#320)
+-      // G_LOAD and G_STORE.
 -      .customForCartesianProduct({S8, PZ, P}, {PZ, P, PF})
+-      // There are no vector registers, so break vector accesses apart into one
+-      // access per element and let the scalar rules below handle each.
+-      .scalarize(0)
 -      .widenScalarToNextMultipleOf(0, 8)
 -      .maxScalar(0, S8)
 -      .unsupported();
@@ -4649,12 +4637,12 @@ index 6356fa58723c..68b559580e87 100644
 +      B.customForCartesianProduct({S8, S16, PZ, P, PF, PFP}, {PZ, P, PF});
 +    else
 +      B.customForCartesianProduct({S8, PZ, P, PF, PFP}, {PZ, P, PF});
-+    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, S8).unsupported();
++    B.scalarize(0).widenScalarToNextMultipleOf(0, 8).maxScalar(0, S8).unsupported();
 +  }
 
    getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD}).custom();
 
-@@ -348,6 +429,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -400,6 +467,12 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
 
    getActionDefinitionsBuilder(G_PHI)
        .legalFor({S1, S8, P, PZ})
@@ -4664,10 +4652,10 @@ index 6356fa58723c..68b559580e87 100644
 +      // far load/store and legalizePtrAdd already rely on. (PFP/p3 is memory-only
 +      // — never a register/phi value — so it cannot reach here.)
 +      .customFor({PF})
+       .scalarize(0)
        .widenScalarToNextMultipleOf(0, 8)
        .maxScalar(0, S8)
-       .unsupported();
-@@ -479,6 +566,37 @@ bool MOSLegalizerInfo::legalizeIntrinsic(LegalizerHelper &Helper,
+@@ -534,6 +607,37 @@ bool MOSLegalizerInfo::legalizeIntrinsic(LegalizerHelper &Helper,
    return false;
  }
 
@@ -4705,7 +4693,7 @@ index 6356fa58723c..68b559580e87 100644
  bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
                                        LostDebugLocObserver &LocObserver) const {
    MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
-@@ -499,6 +617,18 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+@@ -554,6 +658,18 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
    case G_FREEZE:
      return legalizeToCopy(Helper, MRI, MI);
 
@@ -4724,7 +4712,7 @@ index 6356fa58723c..68b559580e87 100644
    // Integer Operations
    case G_ADD:
    case G_SUB:
-@@ -539,8 +669,12 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+@@ -594,8 +710,12 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
    case G_SEXTLOAD:
    case G_ZEXTLOAD:
    case G_LOAD:
@@ -4737,7 +4725,7 @@ index 6356fa58723c..68b559580e87 100644
      return legalizeStore(Helper, MRI, cast<GStore>(MI));
    case G_MEMCPY:
    case G_MEMCPY_INLINE:
-@@ -549,6 +683,8 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+@@ -604,6 +724,8 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
      return legalizeMemOp(Helper, MRI, MI, LocObserver);
 
    // Control Flow
@@ -4746,7 +4734,7 @@ index 6356fa58723c..68b559580e87 100644
    case G_BRCOND:
      return legalizeBrCond(Helper, MRI, MI);
    case G_BRJT:
-@@ -595,6 +731,97 @@ static auto unmergeDefsSplitHigh(MachineInstr *MI) {
+@@ -650,6 +772,97 @@ static auto unmergeDefsSplitHigh(MachineInstr *MI) {
                       MI->getOperand(MI->getNumOperands() - 2)};
  }
 
@@ -4844,32 +4832,29 @@ index 6356fa58723c..68b559580e87 100644
  bool MOSLegalizerInfo::legalizeAnyExt(LegalizerHelper &Helper,
                                        MachineRegisterInfo &MRI,
                                        MachineInstr &MI) const {
-@@ -677,11 +904,23 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+@@ -732,14 +945,21 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
    auto [Dst, Src] = MI.getFirst2Regs();
    assert(MRI.getType(Dst).isByteSized());
 
-+  // #321 Increment 1d-retry: under +mos-a16, leave an s16 add/sub UN-narrowed for the
-+  // selector (selectAlu16Native), which carries the value in an Imag16 zero-page pair
-+  // and emits a single 16-bit lda/adc/sta on the transient A16. This now includes ±1:
-+  // selectAlu16Native turns a 16-bit ±1 into one `inc a`/`dec a` (the 8-bit byte
-+  // inc/dec-with-carry chain below thrashes M-mode inside a 16-bit region). Gated on
-+  // hasAccum16 so default 8-bit codegen keeps narrowing (incl. the byte inc/dec path).
++  // Native 16-bit arithmetic is selected directly under accumulator mode.
 +  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
-+  const LLT Ty = MRI.getType(Dst);
-+  if (STI.hasAccum16() && Ty == LLT::scalar(16))
-+    return true; // legal as-is; selected natively (selectAlu16Native)
++  if (STI.hasAccum16() && MRI.getType(Dst) == LLT::scalar(16))
++    return true;
 +
+   assert(MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB);
    auto RHSConst =
        getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
--  if (!RHSConst || std::abs(RHSConst->Value.getSExtValue()) != 1)
-+  if (!RHSConst || std::abs(RHSConst->Value.getSExtValue()) != 1) {
+   // Constants too wide for int64_t cannot be +/-1, and would assert in
+   // getSExtValue().
+   if (!RHSConst || RHSConst->Value.getSignificantBits() > 64)
++ {
      return Helper.narrowScalarAddSub(MI, 0, S8) !=
             LegalizerHelper::UnableToLegalize;
 +  }
 
-   // Handle multi-byte increments and decrements.
-
-@@ -869,6 +1108,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+   // Take the magnitude without negating; -INT64_MIN would overflow.
+   const int64_t Amt = RHSConst->Value.getSExtValue();
+@@ -928,6 +1148,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      return true;
    }
 
@@ -4894,7 +4879,7 @@ index 6356fa58723c..68b559580e87 100644
    Register Partial;
    Register NewAmt;
    // Shift by one multiples of one byte.
-@@ -885,11 +1142,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+@@ -944,11 +1182,16 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
      case MOS::G_ROTR:
        break;
      case MOS::G_ASHR: {
@@ -4916,7 +4901,7 @@ index 6356fa58723c..68b559580e87 100644
        break;
      }
      case MOS::G_LSHR:
-@@ -1259,6 +1521,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1318,6 +1561,28 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
 
    LLT Type = MRI.getType(LHS);
 
@@ -4945,7 +4930,7 @@ index 6356fa58723c..68b559580e87 100644
    // Compare pointers by first converting to integer. This allows the
    // comparison to be reduced to 8-bit comparisons.
    if (Type.isPointer()) {
-@@ -1277,7 +1561,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1336,7 +1601,142 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
    bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
    Register CIn;
 
@@ -5089,7 +5074,7 @@ index 6356fa58723c..68b559580e87 100644
      if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
          all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
            return MI.getOpcode() == MOS::G_BRCOND_IMM;
-@@ -1348,16 +1767,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1407,16 +1807,22 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      CIn = Builder.buildConstant(S1, 1).getReg(0);
    }
 
@@ -5114,7 +5099,7 @@ index 6356fa58723c..68b559580e87 100644
      if (!isNZUseLegal(Dst, MRI))
        Z = buildNZSelect(Z, Builder);
      Builder.buildCopy(Dst, Z);
-@@ -1365,8 +1790,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+@@ -1424,8 +1830,11 @@ bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
      break;
    }
    case CmpInst::ICMP_UGE: {
@@ -5127,7 +5112,7 @@ index 6356fa58723c..68b559580e87 100644
      Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
      MI.eraseFromParent();
      break;
-@@ -1455,6 +1883,46 @@ bool MOSLegalizerInfo::legalizeAbs(LegalizerHelper &Helper,
+@@ -1514,6 +1923,46 @@ bool MOSLegalizerInfo::legalizeAbs(LegalizerHelper &Helper,
    return true;
  }
 
@@ -5174,7 +5159,7 @@ index 6356fa58723c..68b559580e87 100644
  bool MOSLegalizerInfo::legalizePtrAdd(LegalizerHelper &Helper,
                                        MachineRegisterInfo &MRI,
                                        MachineInstr &MI) const {
-@@ -1520,6 +1988,37 @@ bool MOSLegalizerInfo::legalizeAddrSpaceCast(LegalizerHelper &Helper,
+@@ -1594,6 +2043,37 @@ bool MOSLegalizerInfo::legalizeAddrSpaceCast(LegalizerHelper &Helper,
    LLT DestTypeS = LLT::scalar(DestTypeP.getScalarSizeInBits());
    LLT SrcTypeS = LLT::scalar(SrcTypeP.getScalarSizeInBits());
 
@@ -5212,7 +5197,7 @@ index 6356fa58723c..68b559580e87 100644
    auto Tmp = Builder.buildPtrToInt(SrcTypeS, SrcReg);
 
    if (DestTypeS.getSizeInBits() < SrcTypeS.getSizeInBits()) {
-@@ -1615,14 +2114,252 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1689,14 +2169,252 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
 
@@ -5466,7 +5451,7 @@ index 6356fa58723c..68b559580e87 100644
 
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1652,6 +2389,51 @@ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
+@@ -1726,6 +2444,51 @@ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
    return true;
  }
 
@@ -5518,7 +5503,7 @@ index 6356fa58723c..68b559580e87 100644
  // Converts pointer to integer before store, allowing the store to later be
  // narrowed to 8 bits.
  bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
-@@ -1659,6 +2441,17 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1733,6 +2496,17 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);
@@ -5536,7 +5521,7 @@ index 6356fa58723c..68b559580e87 100644
 
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    auto ValueType = MRI.getType(MI.getValueReg());
-@@ -1685,6 +2478,169 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+@@ -1759,6 +2533,169 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
    return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
  }
 
@@ -5706,7 +5691,7 @@ index 6356fa58723c..68b559580e87 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
-@@ -1709,6 +2665,10 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
+@@ -1783,6 +2720,10 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
      // long (`lda [dp]`) through a ZP Imag32 quad.
      if (tryFarAbsoluteAddressing(Helper, MRI, MI))
        return true;
@@ -5717,7 +5702,7 @@ index 6356fa58723c..68b559580e87 100644
      return tryFarIndirectAddressing(Helper, MRI, MI);
    }
    default:
-@@ -1823,6 +2783,265 @@ bool MOSLegalizerInfo::tryFarIndirectAddressing(LegalizerHelper &Helper,
+@@ -1897,6 +2838,265 @@ bool MOSLegalizerInfo::tryFarIndirectAddressing(LegalizerHelper &Helper,
    return true;
  }
 
@@ -5983,7 +5968,7 @@ index 6356fa58723c..68b559580e87 100644
  bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                                                      MachineRegisterInfo &MRI,
                                                      GLoadStore &MI,
-@@ -1887,6 +3106,8 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -1961,6 +3161,8 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
      }
      if (const auto *PtrAddAddr =
              cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
@@ -5992,7 +5977,7 @@ index 6356fa58723c..68b559580e87 100644
        Addr = PtrAddAddr->getBaseReg();
        Register NewOffset = PtrAddAddr->getOffsetReg();
        if (auto ConstOffset =
-@@ -1913,7 +3134,75 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -1987,7 +3189,75 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                .countMaxActiveBits() <= 8) {
          if (Index)
            return false;
@@ -6069,7 +6054,7 @@ index 6356fa58723c..68b559580e87 100644
          continue;
        }
      }
-@@ -1972,7 +3261,8 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -2046,7 +3316,8 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
        isa<GLoad>(MI) ? MOS::G_LOAD_INDIR_IDX : MOS::G_STORE_INDIR_IDX;
 
    if (const auto *PtrAddAddr =
@@ -6079,7 +6064,7 @@ index 6356fa58723c..68b559580e87 100644
      Register Base = PtrAddAddr->getBaseReg();
      Register Offset = PtrAddAddr->getOffsetReg();
      if (auto ConstOffset = getIConstantVRegValWithLookThrough(Offset, MRI)) {
-@@ -1996,6 +3286,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -2070,6 +3341,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
                     .countMaxActiveBits() <= 8) {
        Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
        Addr = Base;
@@ -6091,7 +6076,7 @@ index 6356fa58723c..68b559580e87 100644
      }
    }
 
-@@ -2020,12 +3315,137 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -2094,12 +3370,137 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
    return true;
  }
 
@@ -6229,7 +6214,7 @@ index 6356fa58723c..68b559580e87 100644
    // Special handling for HuC6280 block copy extensions.
    if (STI.hasHUC6280())
      if (tryHuCBlockCopy(Helper, MRI, MI))
-@@ -2065,6 +3485,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+@@ -2139,6 +3540,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
      return true;
    }
 
@@ -6493,7 +6478,7 @@ index 868f6c71270a..b62986d09ab4 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 8e9b57fc9669..00ec59c49bd3 100644
+index 97d22841526a..13d462823850 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -20,8 +20,11 @@
@@ -7212,8 +7197,24 @@ index 8e9b57fc9669..00ec59c49bd3 100644
    // Don't coalesce Imag8 and AImag8 registers together when used by shifts or
    // rotates.  This may cause expensive ASL zp's to be used when ASL A would
    // have sufficed. It's better to do arithmetic in A and then copy it out.
+@@ -1021,6 +1517,15 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+   if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
+     return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
+   }
++  if (AreClasses(MOS::Xc16RegClass, MOS::Imag16RegClass) ||
++      AreClasses(MOS::Imag16RegClass, MOS::Xc16RegClass) ||
++      AreClasses(MOS::Yc16RegClass, MOS::Imag16RegClass) ||
++      AreClasses(MOS::Imag16RegClass, MOS::Yc16RegClass)) {
++    // LDX/LDY/STX/STY dp with a 16-bit index transfers two bytes in four
++    // cycles. REP/SEP placement depends on surrounding instructions and is
++    // not part of the individual copy cost.
++    return MOSInstrCost(2, 4);
++  }
+   if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
+     // #320 far runtime: a 32-bit far-pointer (Imag32/RL) copy costs four byte
+     // copies — mirrors copyPhysRegImpl's two-16-bit-word recursion (line ~674).
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.h b/llvm/lib/Target/MOS/MOSRegisterInfo.h
-index 1d2f8027e01c..78fe70d863f7 100644
+index 5181617ce025..e666fd8d592d 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.h
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h
 @@ -16,8 +16,10 @@
@@ -7286,10 +7287,10 @@ index 1d2f8027e01c..78fe70d863f7 100644
 
    bool shouldCoalesce(MachineInstr *MI, const TargetRegisterClass *SrcRC,
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index fe863f0a98bb..1bbf81ec3614 100644
+index 3cefba5bac0c..ad28f66f3a49 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-@@ -96,6 +96,38 @@ def P : MOSReg<12, "P"> {
+@@ -117,6 +117,38 @@ def P : MOSReg<3, "P"> {
    let SubRegIndices = [subcarry, subnz, subv];
  }
 
@@ -7328,7 +7329,7 @@ index fe863f0a98bb..1bbf81ec3614 100644
  //===----------------------------------------------------------------------===//
  //  Imaginary registers
  //===----------------------------------------------------------------------===//
-@@ -215,6 +247,22 @@ def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
+@@ -247,6 +279,22 @@ def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
  // The runtime far pointer dereferenced by `lda [dp]`/`sta [dp]` lives here.
  def Imag32 : MOSReg32Class<(sequence "RL%u", 0, !add(MaxImag32Regs, -1))>;
 
@@ -7419,18 +7420,18 @@ index 6d303255c67f..870fb52004e8 100644
    // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
    // no variable, so we instead bind pseudo features to this variable.
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index ceb0afe8a654..6f8f5deb7874 100644
+index de70a7d09e6b..0ddf5354c1fb 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 +++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-@@ -29,6 +29,7 @@
- #include "llvm/Passes/PassBuilder.h"
+@@ -30,6 +30,7 @@
  #include "llvm/Support/CodeGen.h"
+ #include "llvm/Support/CommandLine.h"
  #include "llvm/Transforms/InstCombine/InstCombine.h"
 +#include "llvm/Transforms/Scalar.h"
  #include "llvm/Transforms/Scalar/IndVarSimplify.h"
  #include "llvm/Transforms/Utils.h"
 
-@@ -39,12 +40,14 @@
+@@ -42,6 +43,7 @@
  #include "MOSIndexIV.h"
  #include "MOSInsertCopies.h"
  #include "MOSInternalize.h"
@@ -7438,42 +7439,25 @@ index ceb0afe8a654..6f8f5deb7874 100644
  #include "MOSLateOptimization.h"
  #include "MOSLowerSelect.h"
  #include "MOSMachineFunctionInfo.h"
- #include "MOSMachineScheduler.h"
+@@ -49,6 +51,7 @@
  #include "MOSNonReentrant.h"
  #include "MOSPostRAScavenging.h"
+ #include "MOSRegAlloc.h"
 +#include "MOSRecoverNearNoWrap.h"
  #include "MOSShiftRotateChain.h"
  #include "MOSStaticStackAlloc.h"
  #include "MOSTargetObjectFile.h"
-@@ -61,7 +64,9 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
-   initializeGlobalISel(PR);
-   initializeMOSCombinerPass(PR);
+@@ -72,7 +75,9 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeMOSConventionalSSAPass(PR);
    initializeMOSCopyOptPass(PR);
+   initializeMOSImagRegAllocPass(PR);
 +  initializeMOSRecoverNearNoWrapPass(PR);
    initializeMOSInsertCopiesPass(PR);
 +  initializeMOSInsertREPSEPPass(PR);
    initializeMOSInternalizePass(PR);
    initializeMOSLateOptimizationPass(PR);
    initializeMOSLowerSelectPass(PR);
-@@ -72,11 +77,13 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
-   initializeMOSZeroPageAllocPass(PR);
- }
-
--// p2:32:8 — addrspace 2 ("far"): 32-bit pointer (only the low 24 bits are emitted as
--// 65816 absolute-long; LLVM requires a power-of-two pointer size, so 32 not 24). Inert
--// for 6502 — nothing creates addrspace-2 pointers unless built for the 65816. #320.
-+// p2:32:8 — addrspace 2 ("far"): 32-bit pointer (only the low 24 bits are the 65816
-+// absolute-long address; 32 not 24 because there is no MVT::i24, so far stays a simple
-+// register/CC type). p3:24:8 — addrspace 3 ("packed far"): the 3-byte STORAGE form of a
-+// far pointer (memory-only; converts to/from p2 at load/store). Both inert for 6502 —
-+// nothing creates addrspace-2/3 pointers unless built for the 65816. #320.
- static const char *MOSDataLayout =
--    "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
-+    "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
-
- /// Processes a CPU name.
- static StringRef getCPU(StringRef CPU) {
-@@ -230,6 +237,9 @@ TargetPassConfig *MOSTargetMachine::createPassConfig(PassManagerBase &PM) {
+@@ -237,6 +242,9 @@ TargetPassConfig *MOSTargetMachine::createPassConfig(PassManagerBase &PM) {
  }
 
  void MOSPassConfig::addIRPasses() {
@@ -7483,7 +7467,7 @@ index ceb0afe8a654..6f8f5deb7874 100644
    if (getOptLevel() != CodeGenOptLevel::None)
      addPass(createMOSNonReentrantPass());
    TargetPassConfig::addIRPasses();
-@@ -325,7 +335,13 @@ void MOSPassConfig::addPreSched2() {
+@@ -339,7 +347,13 @@ void MOSPassConfig::addPreSched2() {
      addPass(createMOSStaticStackAllocPass());
  }
 
@@ -7496,13 +7480,13 @@ index ceb0afe8a654..6f8f5deb7874 100644
 +  addPass(&BranchRelaxationPassID);
 +}
 
- namespace {
-
+ void MOSPassConfig::addExperimentalRegAlloc() {
+   addPass(&DetectDeadLanesID);
 diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
-index 2fb9967160e5..cdb29e3bc941 100644
+index d5908928d20d..438c34fc093c 100644
 --- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
 +++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
-@@ -385,7 +385,21 @@ bool MOSZeroPageAlloc::runOnModule(Module &M) {
+@@ -387,7 +387,21 @@ bool MOSZeroPageAlloc::runOnModule(Module &M) {
          DenseMap<Register, size_t> &CSRZPOffsets =
              MF.getInfo<MOSFunctionInfo>()->CSRZPOffsets;
          const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
@@ -7525,7 +7509,7 @@ index 2fb9967160e5..cdb29e3bc941 100644
            CSRZPOffsets[Cand->CSR] =
                CSRZPOffsets[TRI.getSubReg(Cand->CSR, MOS::sublo)] = Offset++;
            CSRZPOffsets[TRI.getSubReg(Cand->CSR, MOS::subhi)] = Offset++;
-@@ -558,6 +572,7 @@ void MOSZeroPageAlloc::collectCandidates(
+@@ -563,6 +577,7 @@ void MOSZeroPageAlloc::collectCandidates(
    TFL.determineCalleeSaves(MF, SavedRegs, /*RS=*/nullptr);
    unsigned Idx = 0;
    DenseSet<Register> Imag16Regs;
@@ -7533,7 +7517,7 @@ index 2fb9967160e5..cdb29e3bc941 100644
    for (Register Reg : SavedRegs.set_bits()) {
      if (!MOS::Imag8RegClass.contains(Reg))
        continue;
-@@ -578,6 +593,49 @@ void MOSZeroPageAlloc::collectCandidates(
+@@ -583,6 +598,49 @@ void MOSZeroPageAlloc::collectCandidates(
        Benefit += 12 * RestoreFreq; // LDA ABS,STA ZP
      }
 
@@ -8111,17 +8095,17 @@ index 000000000000..afbb33595c50
 +!20 = !DILocation(line: 2, scope: !10)
 diff --git a/llvm/test/CodeGen/MOS/far-indir-indexed.ll b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
 new file mode 100644
-index 000000000000..3bfb2aacec89
+index 000000000000..10b477f36a00
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
-@@ -0,0 +1,512 @@
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,A16
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
+@@ -0,0 +1,513 @@
++; RUN: llc -disable-lsr -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,A16
++; RUN: llc -disable-lsr -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
 +; RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,XY16
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj -o %t.xy.o < %s
++; RUN: llc -disable-lsr -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,XY16
++; RUN: llc -disable-lsr -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj -o %t.xy.o < %s
 +; RUN: llvm-objdump -d --print-imm-hex %t.xy.o | FileCheck %s --check-prefix=OBJXY
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -stop-after=instruction-select < %s | FileCheck %s --check-prefix=MIR
++; RUN: llc -disable-lsr -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -stop-after=instruction-select < %s | FileCheck %s --check-prefix=MIR
 +
 +; A runtime far pointer plus a constant byte displacement in [1,3] selects
 +; indirect-long indexed addressing: lda [dp],y ($b7) / sta [dp],y ($97).
@@ -8358,7 +8342,8 @@ index 000000000000..3bfb2aacec89
 +
 +
 +; The far index and loop counter need separate registers. The near global's
-+; unsigned-wrap proof permits an absolute indexed store using X.
++; unsigned-wrap proof permits an absolute indexed store using X. Disabling
++; loop strength reduction preserves that pointer-add proof at legalization.
 +@nearbuf = global [64 x i8] zeroinitializer
 +define void @far_rt_y_contended(i32 %a, i8 %m) {
 +; CHECK-LABEL: far_rt_y_contended:
@@ -8375,7 +8360,7 @@ index 000000000000..3bfb2aacec89
 +  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
 +  %v = load volatile i8, ptr addrspace(2) %q
 +  %w = xor i8 %v, %j
-+  %d = getelementptr inbounds [64 x i8], ptr @nearbuf, i8 0, i8 %j
++  %d = getelementptr inbounds nuw [64 x i8], ptr @nearbuf, i8 0, i8 %j
 +  store i8 %w, ptr %d
 +  %j1 = add nuw nsw i8 %j, 1
 +  %c = icmp eq i8 %j1, 64
@@ -8740,13 +8725,13 @@ index 000000000000..8e5c99502ae4
 +declare void @llvm.memmove.p2.p2.i32(ptr addrspace(2), ptr addrspace(2), i32, i1 immarg)
 diff --git a/llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll b/llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll
 new file mode 100644
-index 000000000000..7361bb31c8bf
+index 000000000000..a73a0740cc4a
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll
 @@ -0,0 +1,78 @@
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs -stop-after=irtranslator < %s | FileCheck %s
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -stop-after=irtranslator < %s | FileCheck %s
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs -stop-after=irtranslator < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs -stop-after=ir-translator < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -stop-after=ir-translator < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs -stop-after=ir-translator < %s | FileCheck %s
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -o /dev/null < %s
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs -o /dev/null < %s
 +
@@ -9166,25 +9151,17 @@ index 000000000000..17a137a5e255
 +}
 diff --git a/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
 new file mode 100644
-index 000000000000..13d1aa2e1475
+index 000000000000..8c11616955e7
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,29 @@
 +# REQUIRES: asserts
 +# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer,mos-combiner -verify-machineinstrs -o - %s | FileCheck %s
 +#
-+# tryAbsoluteIndexedAddressing rewrites every use of an 8-active-bit s16 offset
-+# to an explicitly zero-extended s16 (G_TRUNC + G_CONSTANT 0 + G_MERGE_VALUES)
-+# and then hands the store to selectIndirectAddressing. The users it rewrites in
-+# place can be CSE-able; each rewrite must go through the legalizer's observer
-+# so that GISelCSEInfo re-profiles them. The G_ADD below is legal under +mos-a16
-+# and is legalized before the store (bottom-up), so it survives to the end of the
-+# legalizer with its rewritten operand. Without the observer notification its
-+# CSE node keeps the profile of the original operand and the post-legalizer
-+# mos-combiner's CSEInfo::verify() asserts ("CSEInfo is not consistent") — in the
-+# full pipeline that stale node makes a later G_TRUNC lookup hit or miss with the
-+# heap layout, i.e. a non-reproducible build (the `sec` placement flip in the
-+# SNES title-card demos' _title_blank).
++# An explicitly non-wrapping near pointer add uses an eight-bit-active offset.
++# Indexed addressing decomposes that offset into a low byte and a zero high
++# byte, replacing CSE-able uses through the legalizer observer. The following
++# combiner verifies that its CSE profiles describe the rewritten operands.
 +---
 +name: indexed_offset_rewrite_notifies_observer
 +body: |
@@ -9201,11 +9178,89 @@ index 000000000000..13d1aa2e1475
 +    %3:_(s8) = COPY $rc0
 +    %4:_(s16) = G_CONSTANT i16 255
 +    %5:_(s16) = G_AND %1, %4
-+    %6:_(p0) = G_PTR_ADD %0, %5
++    %6:_(p0) = nuw G_PTR_ADD %0, %5
 +    G_STORE %3(s8), %6(p0) :: (store (s8))
 +    %7:_(s16) = G_ADD %5, %2
 +    $rs0 = COPY %7(s16)
 +    RTS implicit $rs0
++...
+diff --git a/llvm/test/CodeGen/MOS/native-index-copy-cost.mir b/llvm/test/CodeGen/MOS/native-index-copy-cost.mir
+new file mode 100644
+index 000000000000..9b2bb80ce6d1
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-index-copy-cost.mir
+@@ -0,0 +1,72 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
++
++# Native index registers and imaginary pairs support equal-width copies in both
++# directions. Allocation must cost each of these legal copy edges.
++
++---
++name: x_from_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1
++    ; CHECK-LABEL: name: x_from_pair
++    ; CHECK: $x16 = COPY{{( killed)?( renamable)?}} $rs
++    %0:imag16 = COPY $rs1
++    %1:xc16 = COPY %0
++    $x16 = COPY %1
++    RTS implicit $x16
++...
++
++---
++name: x_to_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $x16
++    ; CHECK-LABEL: name: x_to_pair
++    ; CHECK: $rs{{[0-9]+}} = COPY{{( killed)?( renamable)?}} $x16
++    %0:xc16 = COPY $x16
++    %1:imag16 = COPY %0
++    $rs1 = COPY %1
++    RTS implicit $rs1
++...
++
++---
++name: y_from_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1
++    ; CHECK-LABEL: name: y_from_pair
++    ; CHECK: $y16 = COPY{{( killed)?( renamable)?}} $rs
++    %0:imag16 = COPY $rs1
++    %1:yc16 = COPY %0
++    $y16 = COPY %1
++    RTS implicit $y16
++...
++
++---
++name: y_to_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $y16
++    ; CHECK-LABEL: name: y_to_pair
++    ; CHECK: $rs{{[0-9]+}} = COPY{{( killed)?( renamable)?}} $y16
++    %0:yc16 = COPY $y16
++    %1:imag16 = COPY %0
++    $rs1 = COPY %1
++    RTS implicit $rs1
 +...
 diff --git a/llvm/test/CodeGen/MOS/native-width-default-pressure.ll b/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
 new file mode 100644
@@ -9626,20 +9681,3 @@ index 000000000000..079715374a17
 +  store volatile i16 %v, ptr %q, align 1
 +  ret void
 +}
-diff --git a/llvm/test/MC/MOS/all-65816-opcodes.s b/llvm/test/MC/MOS/all-65816-opcodes.s
-index cc766817ec26..270c169d16f0 100644
---- a/llvm/test/MC/MOS/all-65816-opcodes.s
-+++ b/llvm/test/MC/MOS/all-65816-opcodes.s
-@@ -84,7 +84,6 @@
-
- 	mvn	#$ea, #$ea              ; CHECK: encoding: [0x54,0xea,0xea]
- 	mvp	#$ea, #$ea              ; CHECK: encoding: [0x44,0xea,0xea]
--
- 	pea	$eaea                   ; CHECK: encoding: [0xf4,0xea,0xea]
- 	pei	($ea)                   ; CHECK: encoding: [0xd4,0xea]
- 	per	$eaea                   ; CHECK: encoding: [0x62,0xea,0xea]
-@@ -105,3 +104,4 @@
- 	xce                             ; CHECK: encoding: [0xfb]
-
- 	wdm #$ea                        ; CHECK: encoding: [0x42,0xea]
-+	cop #$5a                        ; CHECK: encoding: [0x02,0x5a]

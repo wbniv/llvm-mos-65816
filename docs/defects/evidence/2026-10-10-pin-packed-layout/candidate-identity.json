@@ -1,0 +1,7 @@
+{
+  "sha256": "a01983a517b2a86a7c12e2335d766beb66955254385f81f2870918d1e2b4883f",
+  "version": "clang version 24.0.0git (/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/clang f24948c7d1a4b9f162d4d0192ccceecab1e441ff)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin\nBuild config: +assertions\n",
+  "command": "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin/clang -target mos -mcpu=mosw65816 -ffreestanding -Os -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-10-10-pin-packed-layout/arith.i -o /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/layout-candidate.o",
+  "exit_code": 0,
+  "ir_exit_code": 0
+}

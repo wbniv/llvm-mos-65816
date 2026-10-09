@@ -31,6 +31,18 @@ ROOT=/work
 SRC="$ROOT/vendor/llvm-mos"
 BUILDDIR="$ROOT/build/llvm-mos"
 JOBS="${BUILD_JOBS:-6}"
+LLVM_MOS_PIN="${LLVM_MOS_PIN:-$(cat "$ROOT/dev/llvm-mos-pin")}"
+if [ -z "${LLVM_MOS_SOURCE:-}" ] && [ -e "$SRC/.git" ] &&
+   [ "$(git -C "$SRC" rev-parse HEAD)" != "$LLVM_MOS_PIN" ]; then
+  SRC="$ROOT/vendor/llvm-mos-${LLVM_MOS_PIN:0:12}"
+  BUILDDIR="$ROOT/build/llvm-mos-${LLVM_MOS_PIN:0:12}"
+fi
+SRC="${LLVM_MOS_SOURCE:-$SRC}"
+BUILDDIR="${LLVM_MOS_BUILDDIR:-$BUILDDIR}"
+[ -e "$SRC/.git" ] && [ "$(git -C "$SRC" rev-parse HEAD)" = "$LLVM_MOS_PIN" ] || {
+  echo "FATAL: lit requires source at $LLVM_MOS_PIN (run dev/run.sh toolchain)" >&2
+  exit 1
+}
 export CCACHE_DIR="$ROOT/build/.ccache"
 # See dev/toolchain.sh: put host /usr/bin first so this native build never
 # resolves the mos cross toolchain that shadows it on the image PATH.

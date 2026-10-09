@@ -5,11 +5,12 @@
  "status": "confirmed",
  "reproducer_origin": "original",
  "report": "docs/upstream-late-opt-nongpr-ldimm-pr.md",
- "summary": "MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On current upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The fix is our own open upstream PR #584 (restrict the immediate-load folding to GPR destinations), carried downstream as patch 0003. It is not carried in the #320/#321 split series: the third round briefly carried it as its own commit, and on 2026-10-01 the user decided to sequence it instead (#584 files first). Until #584 lands, mosspc700 crashes in MOS Late Optimizations identically before and after the series. Upstream is not fixed until #584 merges, so the status stays confirmed.",
+ "summary": "Historical baseline on upstream 06bc967d2668: MOSLateOptimization::combineLdImm selects an A/X/Y tracking slot with a switch over the LDImm destination and then stores through it unconditionally. On SPC700, MOSInstrInfo::getRegClass widens LDImm's destination to Anyi8 to model `mov dp, #imm`, so `$rcN = LDImm imm` is legal, verifier-clean MIR, and the store goes through a null pointer (SIGSEGV). On the recorded upstream main 06bc967d2668 it crashes 31 of the 90 inputs of the series' default-mode set at -mcpu=mosspc700 -O2, 13 of them in-tree CodeGen/MOS tests (fcmp.ll, zp-alloc.ll, light-spill.ll, ...). The tested repair is our upstream PR #584 (restrict the immediate-load folding to GPR destinations), supplied by the October 9 compiler pin f24948c7d1a4 after retiring standalone 0003 and its duplicate aggregate hunk. The initial July-base consolidation retained it in 0002 before the pin advanced; that intermediate result is dated evidence. It is not carried in the #320/#321 split series: the third round briefly carried it as its own commit, and on 2026-10-01 the user decided to sequence it instead (#584 files first). On that pre-merge base, mosspc700 crashes in MOS Late Optimizations identically before and after the series. PR #584 merged October 5 (ce37cddc0c141c52af6fdff6ab6ff5d81e4bf999). The confirmed status describes the immutable captured baseline; this publication refresh does not claim a compiler rebuild or new runtime verification.",
  "attribution": [
   "Found in the 138 LZSS far-decode investigation and fixed in PR #584 / patch 0003 (2026-07-31): credits as recorded in the PR commits (Will Norris, co-authored by Claude Opus 4.8 (1M context); agent/tool version and reasoning effort unknown).",
   "Rediscovered as finding N17 by the third independent review of the #320 series: Claude Code 2.1.285, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d.",
-  "Prior-work reconciliation, upstream measurement, evidence and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
+  "Prior-work reconciliation, upstream measurement, evidence and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F).",
+  "October 9 publication reconciliation and patch retirement: OpenAI Codex 0.162.0, model gpt-6.1-sol, medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919."
  ],
  "unknowns": [
   "The original July baseline toolchain (the downstream fork at that time) is not preserved here; the 138 plan describes it. This record's baseline is a fresh capture on upstream 06bc967d2668.",
@@ -240,5 +241,12 @@
    "exit_code": 0,
    "observed": "passes"
   }
- ]
+ ],
+ "publication": {
+  "status": "merged",
+  "url": "https://github.com/llvm-mos/llvm-mos/pull/584",
+  "merged_at": "2026-10-05T22:55:19Z",
+  "merge_commit": "ce37cddc0c141c52af6fdff6ab6ff5d81e4bf999",
+  "evidence": "docs/upstream-status/2026-10-09.json"
+ }
 }

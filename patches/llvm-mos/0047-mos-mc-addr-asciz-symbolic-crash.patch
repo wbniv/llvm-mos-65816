@@ -29,7 +29,7 @@ index 8fd6ff4..6bde586 100644
 +      SmallString<64> Text;
 +      raw_svector_ostream SS(Text);
 +      SS << "\t.mos_addr_asciz\t";
-+      getContext().getAsmInfo()->printExpr(SS, *AddrExpr);
++      getContext().getAsmInfo().printExpr(SS, *AddrExpr);
 +      SS << ", " << CharCount;
 +      getStreamer().emitRawText(SS.str());
      } else {

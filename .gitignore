@@ -34,3 +34,6 @@ __pycache__/
 !.claude/settings.json
 !.claude/hooks/
 !.claude/skills/
+
+# Local source reconstructions and temporary validation workspaces.
+/.scratch/

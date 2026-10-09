@@ -7,27 +7,10 @@
 # committing). So the tracked source of truth for our backend changes is the patch
 # series, which must be regenerated whenever the live tree changes.
 #
-# Method (baseline = pristine vendor HEAD + 0001 + 0003 committed):
-#   1. fresh detached worktree at pristine HEAD;
-#   2. apply 0001 (the #320 far-pointer patch) AND 0003 (the upstream-bound
-#      mos-late-opt fix, if present) and commit them — this becomes the baseline so
-#      the regenerated 0002 captures ONLY the accum16 delta. 0003 lives inside
-#      llvm/lib/Target/MOS (MOSLateOptimization.cpp), so without it in the baseline
-#      the mirror+diff below would wrongly absorb that edit into 0002;
-#
-#   ⚠ STALE BASELINE (2026-07-31): 0018-320-imag32-spill and
-#     0019-mos-branch-range-diagnostic were historically omitted here. They
-#     depend on the existing 0002 and therefore cannot be baked into a pristine
-#     baseline. The current method mirrors live, then reverse-applies every
-#     standalone patch in reverse stack order before deriving the new 0002.
-#   3. mirror the live llvm/lib/Target/MOS dir over the worktree (all 0002 files
-#      live there) with rsync --delete;
-#   4. `git diff --cached` against the baseline -> 0002 (0003's MOSLateOptimization.cpp
-#      is byte-identical in baseline and mirror, so it drops out of the diff).
-# Then round-trip verify: apply 0001+the new 0002+0003 to another pristine worktree
-# and `diff -rq` its MOS dir against the live vendor MOS dir — they must be identical.
-# 0003 is optional: once it merges upstream and the vendor pin is bumped, drop the
-# patch file and this script keeps regenerating 0002 unchanged.
+# The baseline is pristine vendor HEAD plus 0001. Mirror the live MOS sources
+# and selected tests, then reverse the standalone patches before deriving 0002.
+# A fresh application must reproduce the same sources and selected tests.
+# Merged upstream fixes are supplied by the pin and excluded from the overlay.
 #
 # Runs on the HOST (needs git + rsync; no container). See the #321 plans.
 set -euo pipefail
@@ -36,11 +19,15 @@ usage() { echo "Usage: dev/regen-patch.sh   # regenerate + round-trip-verify pat
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VENDOR="$ROOT/vendor/llvm-mos"
+VENDOR="${LLVM_MOS_SOURCE:-$ROOT/vendor/llvm-mos}"
+LLVM_MOS_PIN="${LLVM_MOS_PIN:-$(cat "$ROOT/dev/llvm-mos-pin")}"
+if [ -z "${LLVM_MOS_SOURCE:-}" ] && [ -e "$VENDOR/.git" ] &&
+   [ "$(git -C "$VENDOR" rev-parse HEAD)" != "$LLVM_MOS_PIN" ]; then
+  VENDOR="$ROOT/vendor/llvm-mos-${LLVM_MOS_PIN:0:12}"
+fi
 PATCHES="$ROOT/patches/llvm-mos"
 P1="$PATCHES/0001-320-far-addrspace.patch"
 P2="$PATCHES/0002-321-accum16.patch"
-P3="$PATCHES/0003-late-opt-nongpr-ldimm-dest.patch"  # upstream-bound mos-late-opt fix; optional (dropped once merged)
 MOSREL="llvm/lib/Target/MOS"
 
 # Standalone upstream-bound patches that live INSIDE $MOSREL and are therefore
@@ -48,15 +35,9 @@ MOSREL="llvm/lib/Target/MOS"
 # Each is optional (dropped once it merges upstream and the vendor pin is bumped).
 # Order = dev/toolchain.sh apply order (reverse-applied back to front below).
 STANDALONE_MOSDIR=(
-  "$PATCHES/0010-coalesce-rotate-ac.patch"
   "$PATCHES/0018-320-imag32-spill.patch"
-  "$PATCHES/0019-mos-branch-range-diagnostic.patch"
   "$PATCHES/0020-mos-65816-block-move-bank-order.patch"
-  "$PATCHES/0021-mos-zp-alloc-deterministic.patch"
-  "$PATCHES/0022-mos-late-opt-cmpzero-lowering.patch"
   "$PATCHES/0023-mos-trunc-selection-regclasses.patch"
-  "$PATCHES/0024-mos-brk-signature-operand.patch"
-  "$PATCHES/0025-llvm-mc-preserve-motorola-default.patch"
   "$PATCHES/0030-mos-copy-phys-reg-liveness.patch"
   "$PATCHES/0031-mos-copy-phys-reg-reuse-dst.patch"
   "$PATCHES/0032-mos-quote-register-named-symbols-vendor.patch"
@@ -70,11 +51,10 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0045-mos-asm-print-a16-immediate.patch"   # a16 immediate width; downstream-only
   "$PATCHES/0046-mos-fixupkinds-addrasciz-row.patch"  # AddrAsciz Infos[] row; pristine-upstream
   "$PATCHES/0047-mos-mc-addr-asciz-symbolic-crash.patch"  # -show-encoding crash; pristine-upstream
-  "$PATCHES/0049-mos-vector-scalarize-backport.patch"
   "$PATCHES/0050-mos-float-vector-arithmetic.patch"
   "$PATCHES/0051-mos-zp-byte-index.patch"
   "$PATCHES/0052-mos-bank-relax-section-offset.patch"
-  "$PATCHES/0055-mos-native-wide-anyext.patch"
+  "$PATCHES/0055-mos-native-wide-anyext-vendor.patch"
   "$PATCHES/0061-mos-far-global-long-x.patch"
   "$PATCHES/0062-mos-native-far-word.patch"
   "$PATCHES/0063-mos-near-shared-store.patch"
@@ -88,6 +68,15 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0071-mos-accumulator-pressure-set.patch"
 )
 TESTRELS=(
+  "llvm/test/CodeGen/MOS/native-index-copy-cost.mir"
+  "llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir"
+  "llvm/test/CodeGen/MOS/copy-opt-chain.mir"
+  "llvm/test/CodeGen/MOS/copy-opt-loop.mir"
+  "llvm/test/CodeGen/MOS/late-opt-cmpzero.mir"
+  "llvm/test/CodeGen/MOS/late-opt-spc700.mir"
+  "llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll"
+  "llvm/test/MC/MOS/branch-range-errors.s"
+  "llvm/test/MC/MOS/brk-signature.s"
   "llvm/test/CodeGen/MOS/carry-pressure-schedule.mir"
   "llvm/test/CodeGen/MOS/carry-pressure-gate.mir"
   "llvm/test/CodeGen/MOS/anyext-wide.mir"
@@ -125,7 +114,12 @@ TESTRELS=(
   "llvm/test/CodeGen/MOS/native-width-pressure-opt-level.ll"   # native-width pressure sets (-O3 gate)
 )
 
-[ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
+[ -e "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }
+[ "$(git -C "$VENDOR" rev-parse HEAD)" = "$LLVM_MOS_PIN" ] || {
+  echo "FATAL: patch regeneration requires source at $LLVM_MOS_PIN" >&2
+  exit 1
+}
+
 command -v rsync >/dev/null || { echo "FATAL: rsync not found"; exit 1; }
 
 PRISTINE="$(git -C "$VENDOR" rev-parse HEAD)"
@@ -141,12 +135,11 @@ trap cleanup EXIT
 
 GIT_ID=(-c user.email=patchgen@local -c user.name=patchgen)
 
-echo "==> [gen] worktree @ pristine + commit 0001 (+0003) as baseline"
+echo "==> [gen] worktree @ pristine + commit 0001 as baseline"
 git -C "$VENDOR" worktree add --detach "$WT_GEN" "$PRISTINE" >/dev/null
 git -C "$WT_GEN" apply "$P1"
-[ -f "$P3" ] && { echo "    baking 0003 into baseline so it drops out of 0002"; git -C "$WT_GEN" apply "$P3"; }
 git -C "$WT_GEN" add -A
-git "${GIT_ID[@]}" -C "$WT_GEN" commit -q -m "0001(+0003) baseline"
+git "${GIT_ID[@]}" -C "$WT_GEN" commit -q -m "0001 baseline"
 
 echo "==> [gen] mirror live $MOSREL over the baseline, diff -> 0002"
 rsync -a --delete "$VENDOR/$MOSREL/" "$WT_GEN/$MOSREL/"
@@ -180,11 +173,10 @@ echo "    wrote $P2 ($(wc -l < "$P2") lines, $(grep -c '^diff --git' "$P2") file
 # before allocating the independent verification checkout.
 git -C "$VENDOR" worktree remove --force "$WT_GEN"
 
-echo "==> [verify] apply 0001 + new 0002 (+0003) to a fresh pristine worktree"
+echo "==> [verify] apply 0001 + new 0002 to a fresh pristine worktree"
 git -C "$VENDOR" worktree add --detach "$WT_VFY" "$PRISTINE" >/dev/null
 git -C "$WT_VFY" apply "$P1"
 git -C "$WT_VFY" apply "$P2"
-[ -f "$P3" ] && git -C "$WT_VFY" apply "$P3"   # 0003 restores MOSLateOptimization.cpp to the live (fixed) state
 for p in "${STANDALONE_MOSDIR[@]}"; do
   ctx=(); case "$p" in *0038-*) ctx=(-C1);; esac   # see the reverse loop above
   [ -f "$p" ] && git -C "$WT_VFY" apply "${ctx[@]}" "$p"

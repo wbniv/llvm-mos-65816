@@ -53,8 +53,8 @@ new file mode 100644
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir
 @@ -0,0 +1,54 @@
-+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=prologepilog -verify-machineinstrs %s -o - | FileCheck %s
-+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-xy16 -run-pass=prologepilog -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=scavenger-test -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-xy16 -run-pass=scavenger-test -verify-machineinstrs %s -o - | FileCheck %s
 +#
 +# Both index registers and carry are live across the temporary carry value.
 +# Extending its status save to the preceding virtual-register use would cross

@@ -1,5 +1,10 @@
 # Broader near-store profitability (T3)
 
+**October 9 pin qualification:** the internal compiler stack is [rebased onto upstream `f24948c7d1a4`](../pr-preparations/2026-10-09/pin-rebase/README.md), removing merged repairs and adapting the remaining overlays. The measurements, compiler identities, closure evidence and extracted submission results below retain their recorded revisions. They do not certify the new pin. Native-width/far implementation remains carried locally; the new build has its own validation record.
+
+Pin qualification: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
+
 Date: September 27, 2026. Status: complete, committed and pushed to downstream `main`; upstream extraction and independent review remain separate.
 
 Requested by the user to finish the [T3 item](../../TODO.md#M2--Optimizing-Payoff).

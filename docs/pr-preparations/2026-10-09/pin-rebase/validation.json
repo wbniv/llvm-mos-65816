@@ -1,0 +1,207 @@
+{
+  "date": "2026-10-09",
+  "old_pin": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "pin": "f24948c7d1a4b9f162d4d0192ccceecab1e441ff",
+  "status": "passed",
+  "bootstrap": {
+    "pin": "f24948c7d1a4b9f162d4d0192ccceecab1e441ff",
+    "patch_count": 50,
+    "mismatches": []
+  },
+  "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; session 01a1208b-91e0-7e33-b5bf-8787d2a9c919",
+  "upstream_regressions": [
+    {
+      "path": "llvm/test/CodeGen/MOS/cmpzero-terminator-invalid.mir",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "0b4509ce470c8597a993123d0b61eeefc2f515a46bab4bf44290b4280d9eef2a"
+    },
+    {
+      "path": "llvm/test/CodeGen/MOS/copy-opt-chain.mir",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "6c52a55e0df9b102193ff28c246ec5f75f01947efd9f853f5228c0f3f6b43e79"
+    },
+    {
+      "path": "llvm/test/CodeGen/MOS/copy-opt-loop.mir",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "eeb851c0616a08fbcbcab179edcff8912a721a8d209c652d550f8413c8276d72"
+    },
+    {
+      "path": "llvm/test/CodeGen/MOS/late-opt-cmpzero.mir",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "06c87d4349a341abdbdfbbc662a18f13e7cca4eb75af466fb5d6c62710c7e193"
+    },
+    {
+      "path": "llvm/test/CodeGen/MOS/late-opt-spc700.mir",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d"
+    },
+    {
+      "path": "llvm/test/CodeGen/MOS/scmp-ucmp.ll",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "c5269c62bbd5df4f035a157cb06376f5e3c2cc0f0b09343306d006003d123e7c"
+    },
+    {
+      "path": "llvm/test/CodeGen/MOS/zp-alloc-deterministic.ll",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "4459a8a850c4bede0c429989ca18f459678daa9004134a4cad2e3c42c0d9746d"
+    },
+    {
+      "path": "llvm/test/MC/MOS/branch-range-errors.s",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "2481b8088319fbb43109e5ae5a2219f7bb40245258accd517cab9b92a8a5c84a"
+    },
+    {
+      "path": "llvm/test/MC/MOS/brk-signature.s",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "8a017656fabbf8b5bd90ff73adad7f68f2d942a2ba2828cfb141c5774f461af5"
+    },
+    {
+      "path": "llvm/test/MC/MOS/motorola-integers-default.s",
+      "upstream_path_present": true,
+      "matches_upstream": true,
+      "sha256": "e0d57c2a451f5b8fa034061569d539fc0b5e7ecf8e1739282d28df4222aadb45"
+    }
+  ],
+  "checks": {
+    "script_syntax": "PASS: bash -n dev/toolchain.sh dev/regen-patch.sh dev/lit.sh",
+    "comment_history": "PASS: final staged patch and source comments",
+    "defect_evidence": "PASS: 40 final staged records",
+    "aggregate_regeneration": "PASS: dev/regen-patch.sh final MOS source and focused-test round-trip"
+  },
+  "retired_bootstrap_carries": [
+    "0003",
+    "0010",
+    "0016",
+    "0019",
+    "0021",
+    "0022",
+    "0024",
+    "0025",
+    "0035",
+    "0049"
+  ],
+  "preserved_closure_artifacts_with_vendor_twins": [
+    "0028",
+    "0055",
+    "0056"
+  ],
+  "build": {
+    "directory": ".scratch/upstream-pin-2026-10-09/build",
+    "assertions": true,
+    "optimization": "-O1 -DNDEBUG",
+    "host_compiler_revision": "155e209c4cee8eeac01397aac3542e76841a9856",
+    "host_compiler": ".scratch/carry-clang-upstream/build/bin/clang++",
+    "host_linker": "build/llvm-mos/bin/ld.lld",
+    "status": "clang, lld and the full MOS lit tool set built and linked",
+    "compatibility_adaptations": [
+      "MOSImagReg32 DWARF number template argument matches upstream bits<32> register contract",
+      "Symbolic .mos_addr_asciz printer uses the upstream MCContext::getAsmInfo reference API",
+      "VirtRegRewriter readsUndefSubreg receives the instruction and operand under the upstream API",
+      "GlobalISel inline-asm piece truncation uses the upstream ResRegs destination",
+      "MCAsmInfo reserved identifiers use the upstream lowercase CachedHashStringRef API with owned StringSet storage",
+      "Existing packed layout p3:24:8 moves from the removed MOS declaration to TargetParser (0006 and bootstrap path filter)",
+      "Existing native-index copy-cost repair from the extracted series is carried into 0002 with its focused MIR test"
+    ],
+    "parallel_jobs": 6,
+    "link_jobs": 1,
+    "completion": "Ninja dependency-log corruption forced a rebuild; remaining missing MachO sparse-checkout headers were restored from the pin. Completion and the two final source-object rebuilds used exact generated Ninja commands, retained in evidence. All objects belong to this pinned assertions build."
+  },
+  "completed_at": "2026-10-10",
+  "suite": {
+    "discovered": 206,
+    "passed": 205,
+    "unsupported": 1,
+    "failed": 0,
+    "log": "evidence/mos-lit.log.gz",
+    "unsupported_test": "getchar-regression.ll: upstream-disabled target test"
+  },
+  "c_object_checks": {
+    "passed": 56,
+    "failed": 0,
+    "cpu": "mosw65816",
+    "modes": [
+      "default",
+      "+mos-a16",
+      "+mos-a16,+mos-xy16"
+    ],
+    "optimizations": [
+      "Os",
+      "O2"
+    ],
+    "scope": "Native-only far and packed tests omit default mode; far-CC tests enable +mos-farcc-imag32. Verify-machineinstrs and attribute diagnostics enforced. Compile-only, no SDK installation or runtime claim."
+  },
+  "prefetch_checks": {
+    "upstream": {
+      "triples": [
+        "x86_64-pc-linux",
+        "msp430",
+        "avr",
+        "mos"
+      ],
+      "compile_and_FileCheck": "PASS"
+    },
+    "retained_downstream": {
+      "triples": [
+        "x86_64-pc-linux",
+        "msp430"
+      ],
+      "compile_and_FileCheck": "PASS",
+      "scope": "Original two RUN configurations. Exploratory AVR matching of this archived test is not counted; upstream AVR regression passes."
+    }
+  },
+  "compiler_results": "evidence/compiler-results.json",
+  "toolchain": {
+    "llc": {
+      "sha256": "de015012065803384372f026ab91b739203a26c3a6c01e95d7b3ebd02369b307",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+    },
+    "opt": {
+      "sha256": "f3d6005754ba71865fae145aec3f8ce00828a43928412ba7236d61eb0a4bbbc2",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n"
+    },
+    "llvm-mc": {
+      "sha256": "532bb28a8206345759f0eedb3e953ab5ba553a2710e36abec979714212ee8e7c",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+    },
+    "clang": {
+      "sha256": "d310b1c073be1dd000e8faf08fb957571ab7a0b927c1016f012c3fecdbf70928",
+      "version": "clang version 24.0.0git (/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/clang f24948c7d1a4b9f162d4d0192ccceecab1e441ff)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/build/bin\nBuild config: +assertions\n"
+    },
+    "lld": {
+      "sha256": "2fc4d69933c57aac5e037e024e987e614fffc3e738a21440af55104e53473307",
+      "version": "LLD 24.0.0 (/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/llvm f24948c7d1a4b9f162d4d0192ccceecab1e441ff) (compatible with GNU linkers)\n"
+    },
+    "FileCheck": {
+      "sha256": "acad4d1e3f2ee52c5623fd5180e5fc620d5087d93fbe1cbe515f213ef316330b",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n"
+    }
+  },
+  "fixture_ports": [
+    "Legacy pass names irtranslator/prologepilog become ir-translator/prolog-epilog",
+    "Inline-asm illegal physical widths are still rejected; expect upstream ordinary constraint diagnostics rather than a crash",
+    "Near-index observer MIR has an explicit nuw promise to reach the safe fold",
+    "Far-index addressing fixture disables LSR so upstream strength reduction cannot erase the near pointer-add proof; original arithmetic and addressing checks remain Normal-LSR far_rt_y_contended uses explicit near address materialization; focused no-wrap recovery tests pass, earlier performance claims remain dated.",
+    "Two-address safety checks remain shared; allowed X-copy ordering uses separate livevars/liveintervals expectations",
+    "Scavenger save-range fixture invokes scavenger-test; its virtual scratch operands are outside the PEI entry contract"
+  ],
+  "defect_records": [
+    "docs/defects/mos-packed-layout-pin-rebase.json",
+    "docs/defects/mos-native-index-copy-cost.json"
+  ],
+  "scope": "Compiler/tool rebase validation. Existing installed July compiler, separately extracted submissions, old performance measurements and SNES runtime/SDK distribution evidence are preserved and are not extended to this build.",
+  "retained_consolidation": {
+    "path": "docs/pr-preparations/2026-10-09/pin-rebase/evidence/july-stack-consolidation.diff.gz",
+    "sha256": "eb40a02cf218844699ee31e2b48e64bf894de1f5487c065722ac057fab368f08",
+    "decompressed_sha256": "8e991d23ad7562639797f1efdf2b6b3ee3a5e16fed3c91c2b051edab51b75446",
+    "format": "gzip with mtime 0; exact intermediate diff bytes preserved"
+  }
+}

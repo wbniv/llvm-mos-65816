@@ -17,13 +17,19 @@ mode (crt0 does `XCE`); under `+mos-a16` the accumulator is 16-bit (`M=0`, enter
 
 ## Source of truth & the `vendor/` model — read before editing
 
-- The compiler source is **`vendor/llvm-mos/`** — the full LLVM/clang tree, **gitignored and edited in
-  place.** You change C++ there and rebuild (`dev/run.sh toolchain`).
+- The compiler source is the gitignored LLVM/clang checkout selected by **`dev/llvm-mos-pin`**.
+  The default is `vendor/llvm-mos/`; if that shared checkout has another base, the scripts select
+  `vendor/llvm-mos-<first 12 pin characters>/` and a matching build directory. Edit and rebuild the
+  selected checkout (`dev/run.sh toolchain`), or set `LLVM_MOS_SOURCE` and `LLVM_MOS_BUILDDIR` explicitly.
 - The **tracked** artifacts are **`patches/llvm-mos/*.patch`** (`0002-321-accum16.patch` = all #321
-  codegen). After editing `vendor/`, regenerate with **`dev/regen-patch.sh`**.
+  codegen before the later standalone carries). After editing the selected checkout, regenerate with
+  **`dev/regen-patch.sh`**, using the same `LLVM_MOS_SOURCE` override if one was supplied.
 - **`vendor/` is shared** with concurrent agents/humans. **Only commit your own files.** Never stage
   `vendor/` (gitignored), a patch you didn't author, or `docs/transcripts/`. If you find another worker's
   in-progress `vendor/` edits, leave them — rebuild on top, don't revert.
+
+Pin-selection update: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort;
+verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
 
 ## The bar
 

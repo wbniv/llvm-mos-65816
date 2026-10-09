@@ -113,12 +113,12 @@
         {
           "label": "PR #586",
           "url": "https://github.com/llvm-mos/llvm-mos/pull/586",
-          "status": "open"
+          "status": "merged"
         },
         {
           "label": "PR #588",
           "url": "https://github.com/llvm-mos/llvm-mos/pull/588",
-          "status": "open"
+          "status": "merged"
         }
       ],
       "pr_simulations": [
@@ -132,7 +132,7 @@
           "pr": {
             "label": "PR #586",
             "url": "https://github.com/llvm-mos/llvm-mos/pull/586",
-            "status": "open"
+            "status": "merged"
           },
           "pr_simulation": "docs/upstream-brk-signature-operand-pr.md"
         },
@@ -142,7 +142,7 @@
           "pr": {
             "label": "PR #588",
             "url": "https://github.com/llvm-mos/llvm-mos/pull/588",
-            "status": "open"
+            "status": "merged"
           },
           "pr_simulation": "docs/upstream-cop-brk-signature-pr.md"
         }
@@ -158,7 +158,7 @@
         {
           "label": "PR #584",
           "url": "https://github.com/llvm-mos/llvm-mos/pull/584",
-          "status": "open"
+          "status": "merged"
         },
         {
           "label": "PR #590",
@@ -178,7 +178,7 @@
           "pr": {
             "label": "PR #584",
             "url": "https://github.com/llvm-mos/llvm-mos/pull/584",
-            "status": "open"
+            "status": "merged"
           },
           "pr_simulation": "docs/upstream-late-opt-nongpr-ldimm-pr.md"
         },
@@ -312,5 +312,22 @@
       "prs": [],
       "pr_simulations": []
     }
-  ]
+  ],
+  "pr_status_refresh": {
+    "checked_at": "2026-10-09",
+    "scope": "#578/#584/#586/#588/#589 merges; other statuses retain their recorded check dates",
+    "evidence": "docs/upstream-status/2026-10-09.json"
+  },
+  "latest_pr_status_update": {
+    "checked_at": "2026-10-09",
+    "prs": [
+      578,
+      584,
+      586,
+      588
+    ],
+    "receipt": "docs/upstream-status/2026-10-09.json",
+    "scope": "Incremental merge-status refresh; the earlier full-snapshot check date and technical evidence dates are preserved.",
+    "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+  }
 }

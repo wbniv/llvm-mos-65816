@@ -1,5 +1,7 @@
 # Far-loop and native-word upstream candidate
 
+**October 10 downstream qualification:** the existing [native-index copy-cost repair](../../../defects/mos-native-index-copy-cost.json) is now carried in the rebased downstream 0002 at pin `f24948c7d1a4`. Both original IR inputs reproduced the missing-cost assertion on the intermediate build and pass after the backport; its allocation MIR passes too. The [pin receipt](../../2026-10-09/pin-rebase/README.md) records the isolated compiler validation. The September extraction and its runtime measurements below remain dated evidence; the shared July installation was preserved. Update: OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
+
 **Local extraction for review, September 28, 2026.** The proposed compiler stack is based on exact llvm-mos revision `26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6`. The ordered patches, source trees, binary identities, executed checks, and rebased measurements are retained in [the series packet](upstream-series/series.json). No upstream PR has been opened. The complete #320/#321 compiler and ABI contract still needs independent review; SNES platform code remains on its separate submission track.
 
 ## What reviewers receive

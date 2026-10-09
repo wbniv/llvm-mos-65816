@@ -1,5 +1,9 @@
 | Date | Change |
 |------|--------|
+| [2026-10-01](https://github.com/wbniv/llvm-mos-65816/commit/0ec78ab1) | Land the native-width pressure sets in 0002 and the accumulator set as 0071 |
+| [2026-10-01](https://github.com/wbniv/llvm-mos-65816/commit/24eb8e91) | Trace carry scheduling's pressure dependence; measure an accumulator-set candidate |
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/c4c7bce2) | Fix stale X reload across XY16 narrowing |
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/9a2ece34) | Fix stale X reload across XY16 narrowing |
 | [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/7a249b08) | Check each Farblit instruction shape and use task md for previews |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/6c5907b4) | Recover near-index proofs and record the null-output streamer repair |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/86dbb3ee) | mos: investigate carry profitability and prototype size selection |
@@ -12,6 +16,24 @@
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/cbd1cd5b) | Publish computed-carry scheduler implementation and upstream PR packet |
 
 <!--history-meta v1
+0ec78ab1	author	Will Norris
+0ec78ab1	added	1
+0ec78ab1	deleted	1
+0ec78ab1	files	1
+0ec78ab1	body	0002 now carries the #320/#321 split's native-width pressure-set design\nverbatim (GeneratePressureSet = 0 on Ac16/Xc16/Yc16, the MOSRegisterInfo\nhooks with the -O3 gate), minus getLargestRegClassForRegPressureSet, which\nthe downstream TRI lacks. Every line it adds over the previous 0002 is that\ndesign or its two tests.\n\nThe new standalone 0071 appends an explicit accumulator pressure set in\n8-bit mode (limit 1, every level), the signal 0064/0067's carry scheduling\nrelies on. It is registered in dev/toolchain.sh and dev/regen-patch.sh; a\nfresh bootstrap (pin export in its own repo) applies all 59 patches and\nreproduces the built source.\n\nThe shared vendor/ gained only these files (its three pre-existing foreign\nitems are untouched), and the shared toolchain was rebuilt: llc 6f303945,\nclang-23 e532fbee, lld 0d74dddc, bit-identical to the measured candidate.\nDefault code is 0.45-0.74% smaller than before at every level; native\ncode is +0.05..0.42% (accepted). Lit, the verifier sweep, the SDK rebuild,\ncorpus 84/84, corpus-a16 83/83 and the Farblit gate pass; sizes and clocks\nre-measured on the installed llc match the candidate exactly.\n\nApproved by the user 2026-10-01 (native option (a); set kept at every\nlevel). Plan: docs/plans/2026-10-01-carry-pressure-contract.md#landing.\n\nClaude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning\neffort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+24eb8e91	author	Will Norris
+24eb8e91	added	2
+24eb8e91	deleted	0
+24eb8e91	files	1
+24eb8e91	body	Computed-carry scheduling (0064/0067) reads no pressure set. Its 39,209 B\ndownstream saving at -Os came from repairing a side effect of the old\ngenerated tables' accumulator set (Ac16, limit 2) in the scheduler. That\nset's own gain came through MachineLICM: with MachineLICM off, the upstream\n6-set change costs 1,800 B instead of 13,427 B.\n\nThe candidate is an explicit accumulator pressure set, appended in 8-bit\nmode with limit 1 at every level, on top of the upstream native-width\ndesign. Against current downstream (llc f1fa50a2), default code is 0.65%,\n0.45%, 0.74% and 0.46% smaller at -Os/-Oz/-O2/-O3, and 0.20% faster at -O3\nbut 0.16% slower at -O2 (one sim). Native modes keep the upstream design's\n+0.05..0.42% bytes, which is escalated. lit, the verifier sweep and\ncorpus-a16 (83/83) pass. Nothing lands in 0002 or vendor/; the candidate\npatch, tools and per-input tables are in the evidence directory.\n\nAlso a repeat sighting of mos-xy16-preserve-x-p-save (truchet.c, O3 XY16,\nverifier only, same on both compilers).\n\nClaude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning\neffort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+c4c7bce2	author	Will Norris
+c4c7bce2	added	2
+c4c7bce2	deleted	0
+c4c7bce2	files	1
+9a2ece34	author	Will Norris
+9a2ece34	added	2
+9a2ece34	deleted	0
+9a2ece34	files	1
 7a249b08	author	Will Norris
 7a249b08	added	2
 7a249b08	deleted	0

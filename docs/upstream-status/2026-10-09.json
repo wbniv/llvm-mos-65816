@@ -1,0 +1,810 @@
+{
+  "verified_at": "2026-10-09",
+  "attribution": "OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.",
+  "scope": "Read-only GitHub PR status; no publication or compiler rebuild.",
+  "pull_requests": [
+    {
+      "repository": "llvm-mos/llvm-mos",
+      "comments": [
+        {
+          "id": "IC_kwDOE3b6388AAAABMu9TnQ",
+          "author": {
+            "login": "wbniv"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Updated (`1824492` \u2192 `edc9bbd`, amended): added `coalesce-rotate-ac-no-pessimize.ll`, pinning the cost side \u2014 common straight-line shift chains (`i8`/`i16` `<< 2`) keep their tight `asl`/`rol` form with the guard in place, byte-identical to the unguarded output. Also rewrote the PR body: a precise scope section (what the guard fixes vs. the downstream RA behavior it deliberately doesn't change), exact Csmith accounting, why no end-to-end miscompile test is extractable, and dropped the embedded patch listing that had drifted from the real diff. Fix unchanged.",
+          "createdAt": "2026-08-01T03:07:32Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/578#issuecomment-5149512605",
+          "viewerDidAuthor": true
+        },
+        {
+          "id": "IC_kwDOE3b6388AAAABQIKcKA",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "Yeah, reading the PR description, I reheheaaally don't like that this is papering over a bug elsewhere. That might *work*, but we really should get to the bottom of why this is happening. Especially since fixing upstream bugs is part of the game, *and* since I'm an upstream llvm contributor, and if we fix something wrong there, well, that's good for everyone.",
+          "createdAt": "2026-08-22T02:05:36Z",
+          "includesCreatedEdit": true,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/578#issuecomment-5377268776",
+          "viewerDidAuthor": false
+        },
+        {
+          "id": "IC_kwDOE3b6388AAAABUWKy_Q",
+          "author": {
+            "login": "wbniv"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "You were right, and it wasn't the coalescer or RA at all. Got to the bottom of it; the branch and description are replaced (`edc9bbd` \u2192 `b474922`).\n\nThe coalescer's join and greedy's allocation were both correct \u2014 the rewriter emits the `A = COPY Y` restore at the loop header exactly as it should. What eats it is `MOSCopyOpt`: it forwards that copy away (legitimately \u2014 the value is already in Y), which changes the register that has to stay live around the back edge from Y to A. Then its liveness update is a *single* post-order pass over the blocks, which visits the latch before the header, so the header's new `$a` live-in never propagates to the latch. `mos-late-opt` later sees A dead at the latch and uses it as scratch when lowering the `CmpBrZero` \u2014 the stale-A read that looked like an RA bug from the outside. Pass-by-pass evidence in the description.\n\nFix is a `fullyRecomputeLiveIns` before the dead-copy cleanup so live-ins reach a fixed point first. The `shouldCoalesce` guard and both its tests are gone; ordinary rotate coalescing is back on. It's entirely inside the target pass \u2014 nothing upstream was wrong, so nothing to send upstream, sorry.\n\nRegression is a reduced MIR loop: fails on both prefixes without the fix (latch lacks `$a`; the bad `LDImag8` reload appears), and the original CRC demo goes from a host/ROM mismatch to agreement. The recompute costs +0.8% retired instructions across a 176-file corpus, worst case +2.4% on a loop-dense kernel.\n",
+          "createdAt": "2026-09-14T07:15:22Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/578#issuecomment-5660390141",
+          "viewerDidAuthor": true
+        }
+      ],
+      "headRefOid": "b4749221bf3735ad1c83d80c103054f745f8c8cd",
+      "mergeCommit": {
+        "oid": "7bd67c0ae4e8bb65a3f980912bf201df22131e34"
+      },
+      "mergedAt": "2026-09-25T01:26:53Z",
+      "number": 578,
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOE3b6388AAAABPKI9oA",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "LGTM!",
+          "submittedAt": "2026-09-25T01:26:40Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "b4749221bf3735ad1c83d80c103054f745f8c8cd"
+          }
+        }
+      ],
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T08:21:35Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34816584788/job/103888408974",
+          "name": "Build and Test / Lit Tests (ubuntu-24.04)",
+          "startedAt": "2026-09-14T07:10:09Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T09:12:30Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34816584788/job/103888409017",
+          "name": "Build and Test / Lit Tests (windows-2022)",
+          "startedAt": "2026-09-14T07:10:09Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T08:39:09Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34816584788/job/103888408715",
+          "name": "Build and Test / Lit Tests (macOS-15)",
+          "startedAt": "2026-09-14T07:10:14Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        }
+      ],
+      "title": "[MOS] Recompute loop liveness after copy forwarding",
+      "updatedAt": "2026-09-25T01:26:53Z",
+      "url": "https://github.com/llvm-mos/llvm-mos/pull/578"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos",
+      "comments": [
+        {
+          "id": "IC_kwDOE3b6388AAAABMurz1A",
+          "author": {
+            "login": "wbniv"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Two updates after a post-hoc review of this PR:\n\n1. **7eedb14 hardens the guard.** The bare `continue` was correct only because no current non-GPR `LDImm` destination aliases `A`/`X`/`Y` \u2014 an invariant the register file happens to satisfy rather than one the code enforces. The follow-up commit invalidates any tracked GPR the instruction modifies before continuing, mirroring the invalidation the loop already performs for non-`LDImm` instructions. Behaviour-identical for all current inputs (the checks are dead code until something widens `LDImm`'s destination class further); all four `late-opt*.mir` tests pass unchanged, including the transparency case pinning that a `TAX` rewrite still fires across `$rc2 = LDImm 7`. For the record: the `TA` handler at the top of the same loop has the identical switch-then-store shape, but nothing widens `TA`'s destination class, so it is deliberately left untouched.\n\n2. **The description's live-byte claim was corrected.** The original text said eight simultaneously-live bytes was the smallest count that reliably forces a constant into an imaginary register, and that four stayed in the GPRs. Re-measured (MIR captured with `-mllvm -stop-before=mos-late-opt`, fed to an unfixed `llc -run-pass=mos-late-opt`): **three** live bytes crash at every level above `-O0`, and **two** crash at `-Oz`. The 8-variable repro stands as posted \u2014 the bug is easier to hit than the original text claimed, not harder.",
+          "createdAt": "2026-08-01T02:28:13Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/584#issuecomment-5149225940",
+          "viewerDidAuthor": true
+        },
+        {
+          "id": "IC_kwDOE3b6388AAAABMu9TzA",
+          "author": {
+            "login": "wbniv"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Updated (`7eedb14` \u2192 `3ce98fe`): new commit hardens the sibling `TA` handler in `combineLdImm`, which has the same switch-then-unconditional-store shape the LDImm fix guards \u2014 unreachable today (`TA`'s destination class is XY-only), but this function is where \"unreachable today\" already failed once, so it now falls through to the generic invalidation instead of trusting the switch. No behavior change for any current input; all four late-opt tests green. Body re-synced with the shipped defensive-invalidation guard.",
+          "createdAt": "2026-08-01T03:07:33Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/584#issuecomment-5149512652",
+          "viewerDidAuthor": true
+        }
+      ],
+      "headRefOid": "7f4c37de62191eb6abdaf60c2bc1ccc079bb485b",
+      "mergeCommit": {
+        "oid": "ce37cddc0c141c52af6fdff6ab6ff5d81e4bf999"
+      },
+      "mergedAt": "2026-10-05T22:55:19Z",
+      "number": 584,
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOE3b6388AAAABLZSMog",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "",
+          "submittedAt": "2026-08-30T01:44:59Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "3ce98fed82deef4bfb8ac81be8751a340bba59d2"
+          }
+        },
+        {
+          "id": "PRR_kwDOE3b6388AAAABQvFy6g",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "LGTM!",
+          "submittedAt": "2026-10-05T17:08:36Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "7f4c37de62191eb6abdaf60c2bc1ccc079bb485b"
+          }
+        }
+      ],
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-13T23:31:46Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34783289355/job/103794084738",
+          "name": "Build and Test / Lit Tests (ubuntu-24.04)",
+          "startedAt": "2026-09-13T21:15:55Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T03:16:21Z",
+          "conclusion": "CANCELLED",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34783289355/job/103794084611",
+          "name": "Build and Test / Lit Tests (windows-2022)",
+          "startedAt": "2026-09-13T21:15:55Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T00:15:50Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34783289355/job/103794084487",
+          "name": "Build and Test / Lit Tests (macOS-15)",
+          "startedAt": "2026-09-13T21:15:59Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        }
+      ],
+      "title": "[MOS] Fix non-GPR immediate loads in mos-late-opt",
+      "updatedAt": "2026-10-05T22:55:19Z",
+      "url": "https://github.com/llvm-mos/llvm-mos/pull/584"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos",
+      "comments": [
+        {
+          "id": "IC_kwDOE3b6388AAAABOEhu8g",
+          "author": {
+            "login": "johnwbyrd"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "The major concern about such a change is how the disassembler would deal with it.  Strictly, it changes disassembly from being deterministic to non-deterministic.  I could buy off on this, if disassembly always ends up being the Implied version.  Would be nice to see some round-trip tests added to prove that this breaks no one else.",
+          "createdAt": "2026-08-10T10:59:11Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/586#issuecomment-5239238386",
+          "viewerDidAuthor": false
+        },
+        {
+          "id": "IC_kwDOE3b6388AAAABRgoPZw",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "> The major concern about such a change is how the disassembler would deal with it. Strictly, it changes disassembly from being deterministic to non-deterministic. I could buy off on this, if disassembly always ends up being the Implied version. Would be nice to see some round-trip tests added to prove that this breaks no one else.\r\n\r\nI'd be curious what the prior art is here; are other disassemblers (particularly da65) willing to infer a tag for `BRK`? In the absence of compelling prior art, I'd expect `brk #66` to be purely syntactic sugar in the assembler for `brk .byte 66`. I'd never expect the disassembler to produce a `brk #66` accordingly; it's not in the business of lifting the disassembly to a higher level.\r\n\r\nAlong those lines, I'm broadly in favor, if just because `ca65` supports this.",
+          "createdAt": "2026-08-30T16:57:11Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/586#issuecomment-5470031719",
+          "viewerDidAuthor": false
+        }
+      ],
+      "headRefOid": "a2f81a87b01c9fb396f52aafdc15c1d6b4a71975",
+      "mergeCommit": {
+        "oid": "0861021b1158def6ab21f875d6d42fb91cff5d78"
+      },
+      "mergedAt": "2026-09-29T01:06:42Z",
+      "number": 586,
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOE3b6388AAAABLa61ig",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "This does need a test, as @johnwbyrd mentioned, to establish the disassembler behavior.",
+          "submittedAt": "2026-08-30T16:58:21Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "064d33fc43ca992893984978d88d7550a382c0c2"
+          }
+        },
+        {
+          "id": "PRR_kwDOE3b6388AAAABPq0BWw",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "LGTM",
+          "submittedAt": "2026-09-29T01:06:22Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "a2f81a87b01c9fb396f52aafdc15c1d6b4a71975"
+          }
+        }
+      ],
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T01:06:42Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34785289108/job/103799534301",
+          "name": "Build and Test / Lit Tests (ubuntu-24.04)",
+          "startedAt": "2026-09-13T21:56:28Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T04:01:28Z",
+          "conclusion": "CANCELLED",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34785289108/job/103799534397",
+          "name": "Build and Test / Lit Tests (windows-2022)",
+          "startedAt": "2026-09-13T21:56:28Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T00:46:35Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34785289108/job/103799534428",
+          "name": "Build and Test / Lit Tests (macOS-15)",
+          "startedAt": "2026-09-13T21:56:32Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        }
+      ],
+      "title": "[MOS] Accept an optional BRK signature operand",
+      "updatedAt": "2026-09-29T01:06:42Z",
+      "url": "https://github.com/llvm-mos/llvm-mos/pull/586"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos",
+      "comments": [],
+      "headRefOid": "34f31af3c7d4f6f43119e898b5777c124a5227b2",
+      "mergeCommit": {
+        "oid": "1910acb432cad6da4983bd49136178e8bfa272f9"
+      },
+      "mergedAt": "2026-10-05T22:55:38Z",
+      "number": 588,
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOE3b6388AAAABLbFiZQ",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "",
+          "submittedAt": "2026-08-30T18:23:50Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "3ac109760642259e8bf76f0f3a84ef2c15da3406"
+          }
+        },
+        {
+          "id": "PRR_kwDOE3b6388AAAABQvUE_Q",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "LGTM!",
+          "submittedAt": "2026-10-05T17:30:35Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "34f31af3c7d4f6f43119e898b5777c124a5227b2"
+          }
+        }
+      ],
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-15T23:07:00Z",
+          "conclusion": "CANCELLED",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/35023871222/job/104566560778",
+          "name": "Build and Test / Lit Tests (ubuntu-24.04)",
+          "startedAt": "2026-09-15T21:10:14Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-15T22:53:15Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/35023871222/job/104566561023",
+          "name": "Build and Test / Lit Tests (windows-2022)",
+          "startedAt": "2026-09-15T21:10:13Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-15T22:27:50Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/35023871222/job/104566561091",
+          "name": "Build and Test / Lit Tests (macOS-15)",
+          "startedAt": "2026-09-15T21:10:17Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        }
+      ],
+      "title": "[MOS] Add the COP mnemonic with a mandatory signature operand",
+      "updatedAt": "2026-10-05T22:55:38Z",
+      "url": "https://github.com/llvm-mos/llvm-mos/pull/588"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos",
+      "comments": [
+        {
+          "id": "IC_kwDOE3b6388AAAABUSiO8g",
+          "author": {
+            "login": "wbniv"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "This is exactly the fix pushed here: `CmpZero` is now `isTerminator = true`, and `lowerCmpZeros` scans `MBB.terminators()` instead of the whole block. The original reproducer (a normal instruction after `CmpZero`) is no longer reachable at all \u2014 the verifier itself rejects it, so it's replaced with a negative test (`cmpzero-terminator-invalid.mir`) that asserts exactly that rejection, plus a positive test with adjacent `CmpZero`s that must fold and lower independently.\n\nWhile making the pseudo a terminator, I also found and fixed the bug the original PR's reproducer was standing in for: `lowerCmpZeros` shared the function's `Changed` accumulator as the per-`CmpZero` \"did this one fold\" flag, so once any `CmpZero` in a block folded, every later one took the early continue and was never lowered \u2014 silently dropping a flag test, since a surviving `CmpZero` is legal MIR and the asm printer emits nothing for it. That's a separate `Folded` flag now, with `Changed` set correctly on the dead-comparison erase path too.\n\nUpdated branch incoming.\n",
+          "createdAt": "2026-09-13T22:24:42Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/589#issuecomment-5656579826",
+          "viewerDidAuthor": true
+        }
+      ],
+      "headRefOid": "9aead7afaa4a13f4e7151e2b62adbc0b6937a018",
+      "mergeCommit": {
+        "oid": "f24948c7d1a4b9f162d4d0192ccceecab1e441ff"
+      },
+      "mergedAt": "2026-10-05T22:55:59Z",
+      "number": 589,
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOE3b6388AAAABLbG8VQ",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "Ah, this scenario is explicitly impossible, just for a reason that isn't checked. CmpZero should be a terminator, but it isn't. So it seems the right move here is... to make it a terminator. This also should allow improving the iteration here to just scan terminators.",
+          "submittedAt": "2026-08-30T18:33:08Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "CHANGES_REQUESTED",
+          "commit": {
+            "oid": "8c8d28b0c35a79142e456f75dc821b17a76c4cf1"
+          }
+        },
+        {
+          "id": "PRR_kwDOE3b6388AAAABQvVbHQ",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "LGTM!",
+          "submittedAt": "2026-10-05T17:32:43Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "9aead7afaa4a13f4e7151e2b62adbc0b6937a018"
+          }
+        }
+      ],
+      "state": "MERGED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T01:40:35Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34786679419/job/103803323158",
+          "name": "Build and Test / Lit Tests (ubuntu-24.04)",
+          "startedAt": "2026-09-13T22:24:09Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T04:08:11Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34786679419/job/103803322939",
+          "name": "Build and Test / Lit Tests (windows-2022)",
+          "startedAt": "2026-09-13T22:24:08Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-14T00:43:08Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/34786679419/job/103803323126",
+          "name": "Build and Test / Lit Tests (macOS-15)",
+          "startedAt": "2026-09-13T22:24:13Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        }
+      ],
+      "title": "[MOS] Mark CmpZero as a terminator",
+      "updatedAt": "2026-10-05T22:55:59Z",
+      "url": "https://github.com/llvm-mos/llvm-mos/pull/589"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos",
+      "comments": [],
+      "headRefOid": "ae3108c3189076607b12fd5ff514a21678df8c8b",
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 604,
+      "reviewDecision": "",
+      "reviews": [],
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-20T05:08:13Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/35482415048/job/106002472057",
+          "name": "Build and Test / Lit Tests (ubuntu-24.04)",
+          "startedAt": "2026-09-20T01:50:20Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-20T04:01:25Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/35482415048/job/106002472158",
+          "name": "Build and Test / Lit Tests (windows-2022)",
+          "startedAt": "2026-09-20T01:50:19Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-20T03:00:37Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/35482415048/job/106002472321",
+          "name": "Build and Test / Lit Tests (macOS-15)",
+          "startedAt": "2026-09-20T01:50:22Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        }
+      ],
+      "title": "[MOS] Encode MVN/MVP bank operands in destination-source byte order",
+      "updatedAt": "2026-09-20T01:55:52Z",
+      "url": "https://github.com/llvm-mos/llvm-mos/pull/604"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos",
+      "comments": [
+        {
+          "id": "IC_kwDOE3b6388AAAABXMorug",
+          "author": {
+            "login": "wbniv"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Closing this PR because work on computed-carry scheduling continues. This is not a rejection or abandonment of the work; the validation retained here remains useful evidence for this review snapshot.",
+          "createdAt": "2026-09-27T01:45:13Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [
+            {
+              "content": "THUMBS_UP",
+              "users": {
+                "totalCount": 1
+              }
+            }
+          ],
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/609#issuecomment-5851720634",
+          "viewerDidAuthor": true
+        }
+      ],
+      "headRefOid": "155e209c4cee8eeac01397aac3542e76841a9856",
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 609,
+      "reviewDecision": "",
+      "reviews": [],
+      "state": "CLOSED",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-26T23:09:36Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/36274907699/job/108495647954",
+          "name": "Build and Test / Lit Tests (ubuntu-24.04)",
+          "startedAt": "2026-09-26T22:01:42Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-27T00:10:01Z",
+          "conclusion": "FAILURE",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/36274907699/job/108495647729",
+          "name": "Build and Test / Lit Tests (windows-2022)",
+          "startedAt": "2026-09-26T22:01:43Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-09-26T23:14:31Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/36274907699/job/108495647862",
+          "name": "Build and Test / Lit Tests (macOS-15)",
+          "startedAt": "2026-09-26T22:01:45Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        }
+      ],
+      "title": "[MOS] Prefer schedules with fewer overlapping computed carries",
+      "updatedAt": "2026-09-27T01:45:13Z",
+      "url": "https://github.com/llvm-mos/llvm-mos/pull/609"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos",
+      "comments": [],
+      "headRefOid": "7b80f7e187685418218e74e6fbeb9cb84a9bd8a8",
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 594,
+      "reviewDecision": "",
+      "reviews": [],
+      "state": "OPEN",
+      "statusCheckRollup": [
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-08-10T18:21:13Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/31401368496/job/93496889051",
+          "name": "Build and Test / Lit Tests (ubuntu-24.04)",
+          "startedAt": "2026-08-10T15:01:54Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-08-10T21:02:18Z",
+          "conclusion": "CANCELLED",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/31401368496/job/93496889058",
+          "name": "Build and Test / Lit Tests (windows-2022)",
+          "startedAt": "2026-08-10T15:01:49Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        },
+        {
+          "__typename": "CheckRun",
+          "completedAt": "2026-08-10T18:51:48Z",
+          "conclusion": "SUCCESS",
+          "detailsUrl": "https://github.com/llvm-mos/llvm-mos/actions/runs/31401368496/job/93496889148",
+          "name": "Build and Test / Lit Tests (macOS-15)",
+          "startedAt": "2026-08-10T15:01:49Z",
+          "status": "COMPLETED",
+          "workflowName": "LLVM Tests"
+        }
+      ],
+      "title": "[MOS] Add 32-bit imaginary register foundation",
+      "updatedAt": "2026-08-19T21:30:27Z",
+      "url": "https://github.com/llvm-mos/llvm-mos/pull/594"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos-sdk",
+      "comments": [],
+      "headRefOid": "0f8ad11589f556daa8b4c02707c53a17db1cadb0",
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 450,
+      "reviewDecision": "CHANGES_REQUESTED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOFMA1Zs8AAAABQvbD0A",
+          "author": {
+            "login": "mysterymath"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "The code for this seems fine, but we definitely shouldn't test this in the SDK. We generally route generic C++ functionality using the simulator to llvm-test-suite. It's *really* surprising that there isn't a test for this behavior there; maybe there is one and we just haven't turned it on for some reason? If there isn't such a test and we can't find an easy way to enable it, then it still seems preferable to add the test there, as it is tried in many more scenarios than the SDK tests are (given the difficulty of running tests in real-system emulation).",
+          "submittedAt": "2026-10-05T17:41:27Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "CHANGES_REQUESTED",
+          "commit": {
+            "oid": "0f8ad11589f556daa8b4c02707c53a17db1cadb0"
+          }
+        }
+      ],
+      "state": "OPEN",
+      "statusCheckRollup": [],
+      "title": "[common] Make longjmp(env, 0) return one from setjmp",
+      "updatedAt": "2026-10-05T17:41:27Z",
+      "url": "https://github.com/llvm-mos/llvm-mos-sdk/pull/450"
+    },
+    {
+      "repository": "llvm-mos/llvm-mos-sdk",
+      "comments": [
+        {
+          "id": "IC_kwDOFMA1Zs7OdsnX",
+          "author": {
+            "login": "asiekierka"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Overall, this is a solid proof of concept, but as discussed in `#general`, I would not wish to merge any of this until proper 65816 support exists. People may end up depending on the quirks of using the 65816 in 16-bit address/8-bit data mode, which will cause us support headaches later on.",
+          "createdAt": "2025-10-29T20:40:20Z",
+          "includesCreatedEdit": false,
+          "isMinimized": false,
+          "minimizedReason": "",
+          "reactionGroups": [],
+          "url": "https://github.com/llvm-mos/llvm-mos-sdk/pull/415#issuecomment-3463891415",
+          "viewerDidAuthor": false
+        }
+      ],
+      "headRefOid": "e6a5c17cab52026cb66924a8e2bf5fab870536f2",
+      "mergeCommit": null,
+      "mergedAt": null,
+      "number": 415,
+      "reviewDecision": "",
+      "reviews": [
+        {
+          "id": "PRR_kwDOFMA1Zs7KbCwF",
+          "author": {
+            "login": "asiekierka"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "",
+          "submittedAt": "2025-10-29T20:34:44Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "e6a5c17cab52026cb66924a8e2bf5fab870536f2"
+          }
+        },
+        {
+          "id": "PRR_kwDOFMA1Zs7KbFz-",
+          "author": {
+            "login": "asiekierka"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "",
+          "submittedAt": "2025-10-29T20:36:35Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "e6a5c17cab52026cb66924a8e2bf5fab870536f2"
+          }
+        },
+        {
+          "id": "PRR_kwDOFMA1Zs7KbHmK",
+          "author": {
+            "login": "asiekierka"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "",
+          "submittedAt": "2025-10-29T20:37:39Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "e6a5c17cab52026cb66924a8e2bf5fab870536f2"
+          }
+        },
+        {
+          "id": "PRR_kwDOFMA1Zs7KbNc-",
+          "author": {
+            "login": "asiekierka"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "",
+          "submittedAt": "2025-10-29T20:41:26Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "e6a5c17cab52026cb66924a8e2bf5fab870536f2"
+          }
+        },
+        {
+          "id": "PRR_kwDOFMA1Zs7KbPIi",
+          "author": {
+            "login": "asiekierka"
+          },
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "",
+          "submittedAt": "2025-10-29T20:42:30Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "e6a5c17cab52026cb66924a8e2bf5fab870536f2"
+          }
+        }
+      ],
+      "state": "OPEN",
+      "statusCheckRollup": [],
+      "title": "[SNES] Add target",
+      "updatedAt": "2025-10-29T20:42:30Z",
+      "url": "https://github.com/llvm-mos/llvm-mos-sdk/pull/415"
+    }
+  ]
+}

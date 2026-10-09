@@ -1,0 +1,44 @@
+; ModuleID = '/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/clang/test/CodeGen/builtin-prefetch-arg-type.c'
+source_filename = "/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/clang/test/CodeGen/builtin-prefetch-arg-type.c"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux"
+
+; Function Attrs: noinline nounwind optnone
+define dso_local void @test_int(ptr noundef %p) #0 {
+entry:
+  %p.addr = alloca ptr, align 8
+  store ptr %p, ptr %p.addr, align 8
+  %0 = load ptr, ptr %p.addr, align 8
+  call void @llvm.prefetch.p0(ptr %0, i32 1, i32 3, i32 1)
+  ret void
+}
+
+; Function Attrs: nocallback nofree nosync nounwind willreturn memory(argmem: readwrite, inaccessiblemem: readwrite)
+declare void @llvm.prefetch.p0(ptr readonly captures(none), i32 immarg range(i32 0, 2), i32 immarg range(i32 0, 4), i32 immarg range(i32 0, 2)) #1
+
+; Function Attrs: noinline nounwind optnone
+define dso_local void @test_long(ptr noundef %p) #0 {
+entry:
+  %p.addr = alloca ptr, align 8
+  store ptr %p, ptr %p.addr, align 8
+  %0 = load ptr, ptr %p.addr, align 8
+  call void @llvm.prefetch.p0(ptr %0, i32 1, i32 3, i32 1)
+  ret void
+}
+
+; Function Attrs: noinline nounwind optnone
+define dso_local void @test_defaulted_hints(ptr noundef %p) #0 {
+entry:
+  %p.addr = alloca ptr, align 8
+  store ptr %p, ptr %p.addr, align 8
+  %0 = load ptr, ptr %p.addr, align 8
+  call void @llvm.prefetch.p0(ptr %0, i32 0, i32 3, i32 1)
+  ret void
+}
+
+attributes #0 = { noinline nounwind optnone "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-features"="+cx8,+mmx,+sse,+sse2,+x87" }
+attributes #1 = { nocallback nofree nosync nounwind willreturn memory(argmem: readwrite, inaccessiblemem: readwrite) }
+
+!llvm.ident = !{!0}
+
+!0 = !{!"clang version 24.0.0git (/home/will/llvm-mos-65816/.scratch/upstream-pin-2026-10-09/source/clang f24948c7d1a4b9f162d4d0192ccceecab1e441ff)"}
