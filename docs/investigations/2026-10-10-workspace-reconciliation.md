@@ -6,7 +6,7 @@ Will requested disk cleanup after recent merges, then specified reviewing pendin
 - [x] Recover the held-out carry-pressure draft and its three measurement helpers for check-in.
 - [x] Validate helper syntax/help and a size-table fixture covering failures, the common successful subset and minimum-object selection.
 - [x] Retire identical files and stale versions in favor of the identified current records.
-- [ ] Complete retirement of the remaining expanded copies, preserving compiler baselines and dated evidence.
+- [x] Complete retirement of all four expanded copies, preserving compiler baselines and dated evidence.
 
 | Worktree | Reviewed local files | Decision |
 |---|---|---|
@@ -19,6 +19,8 @@ Nested compiler source review also matters. Of 173 modified/untracked compiler f
 
 The three recovered helper files retain their original bytes. Their original tool/model attribution could not be independently recovered, so it is not guessed. This review identifies two outstanding runner issues before current-pin execution: `torture-clocks.py` applies resource limits through `preexec_fn` while launching subprocesses from worker threads and does not retain failure rows for uncaught timeouts. `policy-summary.py` requires a nonempty successful intersection and nonzero reference byte total. Check-in preserves the unfinished experiment; syntax and fixture results are not compiler/runtime acceptance.
 
-Whole-directory private archives of `near-proofs` and `carry-profitability` were created and compared against their originals before the user's refinement. Changed files were extracted for this review. These archives retain source/build baselines and evidence, but do not substitute for reconciliation. They remain ignored private build artifacts, separate from this checked-in result. Unmerged or otherwise unrelated worktrees, the active vendor checkouts, installed compiler and current pin build remain intact.
+Whole-directory private archives of `near-proofs` and `carry-profitability` were created and compared against their originals before the user's refinement. Changed files were extracted for this review. After reconciliation and check-in, `carry-scheduling` and `llvm-mos-65816-carrypress` were also archived and compared, then removed. All four original branches remain. These archives retain source/build baselines and evidence, but do not substitute for reconciliation. They remain ignored private build artifacts, separate from this checked-in result. Unmerged or otherwise unrelated worktrees, the active vendor checkouts, installed compiler and current pin build remain intact.
 
 Reconciliation and checks: Codex CLI 0.162.1, model `gpt-6.1-sol`, medium reasoning effort; verified environment/session `01a11e9e-a386-7462-b3f4-86364e106ee0`. Existing contributors' credits and immutable evidence are preserved.
+
+Final disk observation: **37.54 GiB available**, compared with approximately 6.8 GiB at the start of the cleanup. The four worktrees are removed; their verified private archives total approximately 12.3 GiB. The 2.35 GiB of old compiler object files, unused Docker build cache and browser HTTP/JavaScript caches were also removed. Reusable container images and the Emscripten SDK remain.
