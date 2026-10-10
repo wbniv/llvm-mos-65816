@@ -2894,12 +2894,12 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "2487e66f8de036266b80b382370622bcd34a09fcbb7a6eded68beea551a925ba",
+          "TODO.md": "feb2e9ae3e0af794384fde42938c27afd414b3c08b71497db43e53cfc8acb85a",
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621"
         },
-        "reviewed_at": "2026-10-10T18:11:04.763957+00:00",
-        "note": "Publication procedure is unaffected by the SPC700 status line and the two triage Inbox entries captured from its plan.",
-        "attribution": "Claude Code 2.1.296 t4-opus-high agent, model claude-opus-5-5, high reasoning effort; session https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx"
+        "reviewed_at": "2026-10-10T20:22:19.019830+00:00",
+        "note": "Checked the TODO.md-derived claims after removing the finished demo-failures item and adding the unranked SNES-page PR-links item: the doc describes the publish workflow (push compiler first, then task open-source:publish), not item content, so no prose changes; the edit changes the public pending queue, so publication follows the push.",
+        "attribution": "Claude Code 2.1.296, claude-sonnet-5-5, reasoning effort unknown"
       }
     },
     {
