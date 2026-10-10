@@ -1,10 +1,10 @@
 diff --git a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
-index 3c72a03493d1..c31a673a15d7 100644
+index 09931b1a46d9c73fa6241028e191cc57eea1b7db..97d80cbbde23382c83edbd1df0d7ce52804427a4 100644
 --- a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 +++ b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 @@ -100,7 +100,7 @@ public:
  } // namespace
-
+ 
  /// Assign virtual/physical registers for the specified register operand.
 -static void getRegistersForValue(MachineFunction &MF,
 +static bool getRegistersForValue(MachineFunction &MF,
@@ -12,12 +12,12 @@ index 3c72a03493d1..c31a673a15d7 100644
                                   GISelAsmOperandInfo &OpInfo,
                                   GISelAsmOperandInfo &RefOpInfo) {
 @@ -110,7 +110,7 @@ static void getRegistersForValue(MachineFunction &MF,
-
+ 
    // No work to do for memory operations.
    if (OpInfo.ConstraintType == TargetLowering::C_Memory)
 -    return;
 +    return true;
-
+ 
    // If this is a constraint for a single physreg, or a constraint for a
    // register class, find it.
 @@ -120,13 +120,13 @@ static void getRegistersForValue(MachineFunction &MF,
@@ -27,19 +27,19 @@ index 3c72a03493d1..c31a673a15d7 100644
 -    return;
 +    return true;
    OpInfo.RegClass = RC;
-
+ 
    // No need to allocate a matching input constraint since the constraint it's
    // matching to has already been allocated.
    if (OpInfo.isMatchingInputConstraint())
 -    return;
 +    return true;
-
+ 
    // Initialize NumRegs.
    unsigned NumRegs = 1;
 @@ -134,27 +134,24 @@ static void getRegistersForValue(MachineFunction &MF,
      NumRegs = TLI.getNumRegistersForInlineAsm(MF.getFunction().getContext(),
                                                OpInfo.ConstraintVT);
-
+ 
 -  // If this is a constraint for a specific physical register, but the type of
 -  // the operand requires more than one register to be passed, we allocate the
 -  // required amount of physical registers, starting from the selected physical
@@ -58,7 +58,7 @@ index 3c72a03493d1..c31a673a15d7 100644
 +      OpInfo.Regs.push_back(RegInfo.createVirtualRegister(RC));
 +    return true;
    }
-
+ 
 -  // Finally, assign the registers. If the AssignedReg isn't set, create virtual
 -  // registers with the provided register class
 -  for (; NumRegs; --NumRegs, ++I) {
@@ -77,11 +77,11 @@ index 3c72a03493d1..c31a673a15d7 100644
 +    OpInfo.Regs.push_back(Register(*I));
 +  return true;
  }
-
+ 
  static void computeConstraintToUse(const TargetLowering *TLI,
 @@ -443,7 +440,17 @@ bool InlineAsmLowering::lowerInlineAsm(
              : OpInfo;
-
+ 
      // Assign registers for register operands
 -    getRegistersForValue(MF, MIRBuilder, OpInfo, RefOpInfo);
 +    if (!getRegistersForValue(MF, MIRBuilder, OpInfo, RefOpInfo)) {
@@ -95,12 +95,12 @@ index 3c72a03493d1..c31a673a15d7 100644
 +          MIRBuilder.buildUndef(Reg);
 +      return true;
 +    }
-
+ 
      switch (OpInfo.Type) {
      case InlineAsm::isOutput:
 diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll
 new file mode 100644
-index 000000000000..c458095339c3
+index 0000000000000000000000000000000000000000..c458095339c33e4cfe8cc317f928c67a83630b04
 --- /dev/null
 +++ b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll
 @@ -0,0 +1,30 @@

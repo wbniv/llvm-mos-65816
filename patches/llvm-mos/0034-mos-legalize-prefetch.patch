@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 5769520d6f93..082c719358b3 100644
+index ee6369b2e7bd9982b063fd8db2eb995c69bf8771..30ab4d0b6fb08a35e00392f6e156da944794e9a9 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -407,6 +407,9 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+@@ -491,6 +491,9 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
  
    getActionDefinitionsBuilder(G_TRAP).custom();
  
@@ -12,7 +12,7 @@ index 5769520d6f93..082c719358b3 100644
    // Variadic Arguments
  
    getActionDefinitionsBuilder({G_VASTART, G_VAARG}).custom();
-@@ -599,6 +602,9 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+@@ -732,6 +735,9 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
      return legalizeBrJt(Helper, MRI, MI);
    case G_TRAP:
      return legalizeTrap(Helper, MRI, MI);
@@ -24,7 +24,7 @@ index 5769520d6f93..082c719358b3 100644
    case G_VAARG:
 diff --git a/llvm/test/CodeGen/MOS/prefetch.ll b/llvm/test/CodeGen/MOS/prefetch.ll
 new file mode 100644
-index 000000000000..a480dacb77b0
+index 0000000000000000000000000000000000000000..a480dacb77b0d16222cf679831073b8d20b2cf9b
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/prefetch.ll
 @@ -0,0 +1,26 @@

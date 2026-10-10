@@ -1,11 +1,11 @@
 diff --git a/llvm/lib/CodeGen/InlineSpiller.cpp b/llvm/lib/CodeGen/InlineSpiller.cpp
-index 72cf158..58597c4 100644
+index 30997d809bb799fe38dc1bbae0b0f2dc98f6b84e..196b22df07b9a7242582006bc6211004464085ca 100644
 --- a/llvm/lib/CodeGen/InlineSpiller.cpp
 +++ b/llvm/lib/CodeGen/InlineSpiller.cpp
-@@ -881,6 +881,20 @@ bool InlineSpiller::coalesceStackAccess(MachineInstr *MI, Register Reg) {
+@@ -948,6 +948,20 @@ bool InlineSpiller::coalesceStackAccess(MachineInstr *MI, Register Reg) {
    if (InstrReg != Reg || FI != StackSlot)
      return false;
-
+ 
 +  // A target's spill hook may need scratch registers and express them as extra
 +  // virtual defs on the spill or reload it builds; getVDefInterval() above gives
 +  // those registers live intervals, and the allocator assigns them like any
@@ -22,10 +22,10 @@ index 72cf158..58597c4 100644
 +
    if (!IsLoad)
      HSpiller.rmFromMergeableSpills(*MI, StackSlot);
-
+ 
 diff --git a/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll b/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll
 new file mode 100644
-index 0000000..ae02122
+index 0000000000000000000000000000000000000000..ae021222fe09a290d424b9d82ab52f377366d730
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll
 @@ -0,0 +1,104 @@

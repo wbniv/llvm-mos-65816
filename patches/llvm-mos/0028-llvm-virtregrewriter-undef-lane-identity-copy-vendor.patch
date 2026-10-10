@@ -1,10 +1,10 @@
 diff --git a/llvm/lib/CodeGen/VirtRegMap.cpp b/llvm/lib/CodeGen/VirtRegMap.cpp
-index 92a5996c733e..fc875b15a3a2 100644
+index 92a5996c733e4f4f51bb0835a44e2abf1abd12cb..02b049c360e2a32bce81d4acaa795adfe7eeee94 100644
 --- a/llvm/lib/CodeGen/VirtRegMap.cpp
 +++ b/llvm/lib/CodeGen/VirtRegMap.cpp
 @@ -225,10 +225,10 @@ class VirtRegRewriter {
    bool ClearVirtRegs;
-
+ 
    void rewrite();
 +  void rewriteInstruction(MachineInstr &MI);
    void addMBBLiveIns();
@@ -17,7 +17,7 @@ index 92a5996c733e..fc875b15a3a2 100644
 @@ -489,39 +489,6 @@ bool VirtRegRewriter::readsUndefSubreg(const MachineInstr &MI,
    return true;
  }
-
+ 
 -void VirtRegRewriter::handleIdentityCopy(MachineInstr &MI) {
 -  if (!MI.isIdentityCopy())
 -    return;
@@ -57,7 +57,7 @@ index 92a5996c733e..fc875b15a3a2 100644
 @@ -651,126 +618,180 @@ LaneBitmask VirtRegRewriter::liveOutUndefPhiLanesForUndefSubregDef(
    return LiveOutUndefLanes;
  }
-
+ 
 -void VirtRegRewriter::rewrite() {
 +/// Rewrite one instruction and preserve its physical-register liveness.
 +/// Redundant identity copies may be erased.
@@ -66,7 +66,7 @@ index 92a5996c733e..fc875b15a3a2 100644
    SmallVector<Register, 8> SuperDeads;
    SmallVector<Register, 8> SuperDefs;
    SmallVector<Register, 8> SuperKills;
-
+ 
 -  for (MachineFunction::iterator MBBI = MF->begin(), MBBE = MF->end();
 -       MBBI != MBBE; ++MBBI) {
 -    LLVM_DEBUG(MBBI->print(dbgs(), Indexes));
@@ -167,7 +167,7 @@ index 92a5996c733e..fc875b15a3a2 100644
 +    // Make sure MRI knows about registers clobbered by regmasks.
 +    if (MO.isRegMask())
 +      MRI->addPhysRegsUsedFromRegMask(MO.getRegMask());
-
+ 
 -          // The def undef and def internal flags only make sense for
 -          // sub-register defs, and we are substituting a full physreg.  An
 -          // implicit killed operand from the SuperKills list will represent the
@@ -182,7 +182,7 @@ index 92a5996c733e..fc875b15a3a2 100644
 +    MCRegister PhysReg = VRM->getPhys(VirtReg);
 +    if (!PhysReg)
 +      continue;
-
+ 
 -          // PhysReg operands cannot have subregister indexes.
 -          PhysReg = TRI->getSubReg(PhysReg, SubReg);
 -          assert(PhysReg.isValid() && "Invalid SubReg for physical register");
@@ -250,7 +250,7 @@ index 92a5996c733e..fc875b15a3a2 100644
 -        MO.setReg(PhysReg);
 -        MO.setIsRenamable(true);
        }
-
+ 
 -      // Add any missing super-register kills after rewriting the whole
 -      // instruction.
 -      while (!SuperKills.empty())
@@ -279,20 +279,20 @@ index 92a5996c733e..fc875b15a3a2 100644
 +  // instruction.
 +  while (!SuperKills.empty())
 +    MI.addRegisterKilled(SuperKills.pop_back_val(), TRI, true);
-
+ 
 -      while (!SuperDeads.empty())
 -        MI.addRegisterDead(SuperDeads.pop_back_val(), TRI, true);
 +  while (!SuperDeads.empty())
 +    MI.addRegisterDead(SuperDeads.pop_back_val(), TRI, true);
-
+ 
 -      while (!SuperDefs.empty())
 -        MI.addRegisterDefined(SuperDefs.pop_back_val(), TRI);
 +  while (!SuperDefs.empty())
 +    MI.addRegisterDefined(SuperDefs.pop_back_val(), TRI);
-
+ 
 -      LLVM_DEBUG(dbgs() << "> " << MI);
 +  LLVM_DEBUG(dbgs() << "> " << MI);
-
+ 
 -      expandCopyBundle(MI);
 +  expandCopyBundle(MI);
 +
@@ -309,7 +309,7 @@ index 92a5996c733e..fc875b15a3a2 100644
 +    return;
 +
 +  RewriteRegs.insert(DstReg);
-
+ 
 -      // We can remove identity copies right now.
 -      handleIdentityCopy(MI);
 +  // Copies like:
@@ -339,10 +339,10 @@ index 92a5996c733e..fc875b15a3a2 100644
 +      rewriteInstruction(MI);
      }
    }
-
+ 
 diff --git a/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir b/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir
 new file mode 100644
-index 000000000000..8413c22c82ce
+index 0000000000000000000000000000000000000000..8413c22c82ce773e5814cd3a48f7178657f88df9
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir
 @@ -0,0 +1,103 @@
@@ -451,7 +451,7 @@ index 000000000000..8413c22c82ce
 +...
 diff --git a/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir b/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir
 new file mode 100644
-index 000000000000..fd15dc2cf89e
+index 0000000000000000000000000000000000000000..fd15dc2cf89e79a1d05665f9dd630350f80b9e03
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir
 @@ -0,0 +1,20 @@

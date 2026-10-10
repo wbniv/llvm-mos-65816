@@ -1,0 +1,193 @@
+$ git init --quiet /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify remote add origin https://github.com/llvm-mos/llvm-mos.git
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify config remote.origin.promisor true
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify config remote.origin.partialclonefilter blob:none
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify config http.lowSpeedLimit 1024
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify config http.lowSpeedTime 60
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify sparse-checkout set --no-cone --stdin
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify checkout --quiet --detach 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0001-320-far-addrspace.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0002-321-accum16.patch
+/home/will/llvm-mos-65816/patches/llvm-mos/0002-321-accum16.patch:8809: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0042-mos-scavenger-p-undef-a16-test.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0018-320-imag32-spill.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty '--include=clang/*' '--include=llvm/include/*' '--include=llvm/lib/CodeGen/*' '--include=llvm/lib/TargetParser/*' /home/will/llvm-mos-65816/patches/llvm-mos/0006-320-packed24.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0033-llvm-spill-hoist-no-new-vregs.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0040-llvm-inline-spiller-coalesce-scratch-vregs.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0041-llvm-gisel-inline-asm-multi-register-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0023-mos-trunc-selection-regclasses.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0030-mos-copy-phys-reg-liveness.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0031-mos-copy-phys-reg-reuse-dst.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0032-mos-quote-register-named-symbols-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0034-mos-legalize-prefetch.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0039-mos-asm-modifier-width.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0036-mos-zero-page-indexed-globals.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty -C1 /home/will/llvm-mos-65816/patches/llvm-mos/0038-mos-return-frame-address.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0043-mos-inline-asm-physreg-width.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0044-mos-asm-print-long-address.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0045-mos-asm-print-a16-immediate.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0046-mos-fixupkinds-addrasciz-row.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0048-mos-far-codegen-lit-tests.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0050-mos-float-vector-arithmetic.patch
+/home/will/llvm-mos-65816/patches/llvm-mos/0050-mos-float-vector-arithmetic.patch:135: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0051-mos-zp-byte-index.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0052-mos-bank-relax-section-offset.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty --include=llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll /home/will/llvm-mos-65816/patches/llvm-mos/0011-mos-scavenger-live-p-save.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0064-mos-computed-carry-scheduling.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty --include=llvm/test/CodeGen/MOS/far-memset.ll /home/will/llvm-mos-65816/patches/llvm-mos/0013-320-far-memops-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0053-mos-lit-expectations.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0054-llvm-scavenger-save-range.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0055-mos-native-wide-anyext-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0058-aarch64-inline-asm-unknown-type-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts-vendor.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0061-mos-far-global-long-x.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0062-mos-native-far-word.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0063-mos-near-shared-store.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0065-mos-near-store-profitability.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0066-mos-far-extload-worklist.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0067-mos-competing-carry-gate.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0068-mos-null-output-streamer.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0069-mos-far-loop-range.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0070-mos-far-word-index-policy.patch
+/home/will/llvm-mos-65816/patches/llvm-mos/0070-mos-far-word-index-policy.patch:743: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0071-mos-accumulator-pressure-set.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify apply --allow-empty /home/will/llvm-mos-65816/patches/llvm-mos/0072-amdgpu-rci-test-template-spacing.patch
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify add -A
+
+exit: 0
+$ git -C /home/will/llvm-mos-65816/.scratch/repin/20261010T033430Z-ardhs7qy/published-verify write-tree
+065937b873d8229d96932f59f0141724ccd0c9a9
+
+exit: 0

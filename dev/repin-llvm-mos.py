@@ -23,6 +23,26 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def protected_patches(root):
+    """Hashed patch artifacts in defect records retain their recorded bytes."""
+    paths = set()
+
+    def visit(value):
+        if isinstance(value, dict):
+            path = value.get('path', '')
+            if isinstance(path, str) and path.startswith('patches/llvm-mos/') and 'sha256' in value:
+                paths.add(path)
+            for child in value.values():
+                visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    for record in (root / 'docs/defects').glob('*.json'):
+        visit(json.loads(record.read_text()))
+    return paths
+
+
 def calls(text):
     """Keep each shell call's literal text for exact removal on retirement."""
     result, pending = [], ''
@@ -121,7 +141,7 @@ class Run:
         """Each private checkout shares only this run's retained object store."""
         self.command(['git', 'init', '--quiet', path])
         objects = path / '.git/objects/info/alternates'
-        objects.write_text(str(self.repo / '.git/objects') + '\n')
+        objects.write_text(os.path.relpath(self.repo / '.git/objects', path / '.git/objects') + '\n')
         shallow = self.repo / '.git/shallow'
         if shallow.exists():
             (path / '.git/shallow').write_bytes(shallow.read_bytes())
@@ -150,6 +170,41 @@ class Run:
                     copied += 1
                     break
         self.state['cached_baseline_blobs'] = copied
+
+    def seed_build_cache(self):
+        """Retain local immutable objects so full checkout fetches only misses."""
+        if self.state.get('build_cache_seeded'):
+            return
+        stores = []
+        for index, cache in enumerate([self.root / 'vendor' / ('llvm-mos-' + self.state['old_pin'][:12]),
+                                       self.root / 'vendor/llvm-mos']):
+            objects = cache / '.git/objects'
+            if not objects.is_dir():
+                continue
+            retained = self.directory / ('build-objects-' + str(index))
+            retained.mkdir(exist_ok=True)
+            # Exclude info/alternates: every referenced store must be retained
+            # inside this run, independent of the shared cache's lifetime.
+            for source in objects.iterdir():
+                if source.is_dir() and (source.name == 'pack' or re.fullmatch(r'[0-9a-f]{2}', source.name)):
+                    destination = retained / source.name
+                    destination.mkdir(exist_ok=True)
+                    self.command(['cp', '-a', '--reflink=auto', str(source) + '/.', destination])
+            stores.append(str(retained))
+        if stores:
+            (self.repo / '.git/objects/info/alternates').write_text(
+                ''.join(os.path.relpath(x, self.repo / '.git/objects') + '\n' for x in stores))
+        self.state['build_cache_seeded'] = True
+        self.state['retained_build_object_stores'] = stores
+        self.save()
+
+    def ensure_full_base(self):
+        inventory = self.git('rev-list', '--objects', '--missing=print', self.state['target']).stdout
+        if any(line.startswith(b'?') for line in inventory.splitlines()):
+            # A complete shallow pack lets the server traverse one revision,
+            # rather than assemble a request for thousands of individual blobs.
+            self.git('-c', 'http.lowSpeedTime=300', 'fetch', '--quiet', '--depth=1',
+                     '--refetch', '--no-filter', 'origin', self.state['target'])
 
     def replay(self):
         self.unchanged()
@@ -227,6 +282,8 @@ class Run:
             raise RuntimeError('Verified source changed; refusing to validate a different candidate')
         # Configure/build may edit their source cache. Each attempt starts from
         # the frozen exported tree and keeps the independent replay untouched.
+        self.seed_build_cache()
+        self.ensure_full_base()
         source_dir = Path(tempfile.mkdtemp(prefix='build-source-', dir=self.directory))
         self.checkout(source_dir)
         self.git('read-tree', '--reset', '-u', self.state['candidate_commit'], repo=source_dir)
@@ -256,6 +313,8 @@ class Run:
         boot = (self.directory / 'inputs' / BOOT).read_text()
         regen = (self.directory / 'inputs' / REGEN).read_text()
         retired = []
+        protected = protected_patches(self.root)
+        preserved = {}
         for entry in self.state['patches']:
             if entry['empty'] and not entry['name'].startswith(('0001-', '0002-')):
                 retired.append(entry['name'])
@@ -266,7 +325,16 @@ class Run:
                     regen = ''.join(line for line in regen.splitlines(keepends=True)
                                     if f'$PATCHES/{entry["name"]}.patch' not in line)
                 continue
-            changed[entry['path']] = (self.directory / 'output' / Path(entry['path']).name).read_bytes()
+            destination = entry['path']
+            if destination in protected:
+                destination = str(Path(destination).with_name(entry['name'] + '-vendor.patch'))
+                if (self.root / destination).exists():
+                    raise RuntimeError('Protected artifact vendor destination already exists: ' + destination)
+                preserved[entry['path']] = destination
+                boot = boot.replace(entry['call'], entry['call'].replace(entry['name'], entry['name'] + '-vendor', 1))
+                regen = regen.replace(f'$PATCHES/{entry["name"]}.patch',
+                                      f'$PATCHES/{entry["name"]}-vendor.patch')
+            changed[destination] = (self.directory / 'output' / Path(entry['path']).name).read_bytes()
         boot = boot.replace('git -C "$SRC" apply "$@" "$p"',
                             'git -C "$SRC" apply --allow-empty "$@" "$p"')
         if any(x['empty'] and x['name'].startswith(('0001-', '0002-')) for x in self.state['patches']):
@@ -278,6 +346,7 @@ class Run:
         receipt = {'old_pin': self.state['old_pin'], 'pin': self.state['target'],
                    'upstream': self.state['upstream'], 'ref': self.state['ref'],
                    'candidate_tree': self.state['candidate_tree'], 'retired_applications': retired,
+                   'preserved_artifacts': preserved,
                    'input_sha256': self.state['inputs'],
                    'output_sha256': {p: digest(b) for p, b in changed.items()},
                    'run_directory': str(self.directory), 'commands': str(self.log),

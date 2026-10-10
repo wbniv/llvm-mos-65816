@@ -320,7 +320,7 @@ index e12e5762211b..a1319c6e23ef 100644
  /// Processes a CPU name.
  static StringRef getCPU(StringRef CPU) {
 diff --git a/clang/lib/Basic/Targets/MOS.cpp b/clang/lib/Basic/Targets/MOS.cpp
-index eda1ec61c9eb..26abe93a8554 100644
+index eda1ec61c9eb4d22b70e8941c8088cae9e31d4df..26abe93a85541fef5aeada48dab5a5e428f421ae 100644
 --- a/clang/lib/Basic/Targets/MOS.cpp
 +++ b/clang/lib/Basic/Targets/MOS.cpp
 @@ -19,9 +19,11 @@ using namespace clang::targets;
@@ -335,7 +335,7 @@ index eda1ec61c9eb..26abe93a8554 100644
 -      "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
 +      "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8";
    resetDataLayout(Layout);
-
+ 
    PointerWidth = 16;
 @@ -208,6 +210,8 @@ uint64_t MOSTargetInfo::getPointerWidthV(LangAS AddrSpace) const {
      return 8;
@@ -347,13 +347,13 @@ index eda1ec61c9eb..26abe93a8554 100644
      return 16;
    }
 diff --git a/llvm/include/llvm/CodeGen/AsmPrinter.h b/llvm/include/llvm/CodeGen/AsmPrinter.h
-index 83c3f86befa7..5e123572e5bf 100644
+index 83c3f86befa7dc3e922a39d65bc40013f35c2c3a..5e123572e5bf520be8bf853d9bf4ad046b0361d3 100644
 --- a/llvm/include/llvm/CodeGen/AsmPrinter.h
 +++ b/llvm/include/llvm/CodeGen/AsmPrinter.h
 @@ -588,6 +588,17 @@ public:
                                        const Constant *BaseCV = nullptr,
                                        uint64_t Offset = 0);
-
+ 
 +  /// Hook for emitting a scalar constant whose size has no standard data fixup
 +  /// (e.g. a 3-byte / 24-bit pointer). The generic path emits such a constant via
 +  /// OutStreamer->emitValue(ME, Size), but MCFixup::getDataKindForSize only covers
@@ -369,13 +369,13 @@ index 83c3f86befa7..5e123572e5bf 100644
    /// On AIX, when an alias refers to a sub-element of a global variable, the
    /// label of that alias needs to be emitted before the corresponding element.
 diff --git a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
-index 37de384df866..7da883273abe 100644
+index 37de384df866fdd72b5a9eea5c8fddafee9760d6..7da883273abe12363a54024c05862dde5ff46e80 100644
 --- a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
 +++ b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
 @@ -4651,7 +4651,11 @@ static void emitGlobalConstantImpl(const DataLayout &DL, const Constant *CV,
    if (AP.getObjFileLowering().supportIndirectSymViaGOTPCRel())
      handleIndirectSymViaGOTPCRel(AP, &ME, BaseCV, Offset);
-
+ 
 -  AP.OutStreamer->emitValue(ME, Size);
 +  // Give the target a chance to emit a constant whose size has no standard data
 +  // fixup (e.g. MOS's 3-byte / 24-bit packed far pointer, #320). getDataKindForSize
@@ -383,10 +383,10 @@ index 37de384df866..7da883273abe 100644
 +  if (!AP.emitNonStandardSizedConstant(CV, ME, Size))
 +    AP.OutStreamer->emitValue(ME, Size);
  }
-
+ 
  /// EmitGlobalConstant - Print a general LLVM constant to the .s file.
 diff --git a/llvm/lib/TargetParser/TargetDataLayout.cpp b/llvm/lib/TargetParser/TargetDataLayout.cpp
-index c125d99b..c63578e2 100644
+index c125d99b01937ad52c0bc7dd92f9351d4212af0a..c63578e285185ef48f07991f570633f6a59c37f2 100644
 --- a/llvm/lib/TargetParser/TargetDataLayout.cpp
 +++ b/llvm/lib/TargetParser/TargetDataLayout.cpp
 @@ -630,7 +630,8 @@ std::string Triple::computeDataLayout(StringRef ABIName) const {

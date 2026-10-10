@@ -1,18 +1,8 @@
-diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
---- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
-+++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
-@@ -40,6 +40,7 @@
-   void printOperand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
-   void printBranchOperand(const MCInst *MI, uint64_t Address, unsigned OpNo,
-                           raw_ostream &OS);
-+  void printAddr24Operand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
-   void printCustomAliasOperand(const MCInst *MI, uint64_t Address,
-                                unsigned OpIdx, unsigned PrintMethodIdx,
-                                raw_ostream &OS);
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
+index 5b530be1d134a2703d018b16c59a95ae3777a05b..d5b239a4c6dc418e3e92807ac3baff3ed834e0ec 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
-@@ -78,6 +78,37 @@
+@@ -78,6 +78,37 @@ void MOSInstPrinter::printOperand(const MCInst *MI, unsigned OpNo,
    }
  }
  
@@ -50,10 +40,23 @@ diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Targ
  void MOSInstPrinter::printBranchOperand(const MCInst *MI, uint64_t Address,
                                          unsigned OpNo, raw_ostream &OS) {
    const MCOperand &Op = MI->getOperand(OpNo);
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+index e450fadb62960e34f177f20626ebb33ef85aff14..8c61f605e922343a45dd7dd11ed5f02de7d5e873 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+@@ -40,6 +40,7 @@ public:
+   void printOperand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
+   void printBranchOperand(const MCInst *MI, uint64_t Address, unsigned OpNo,
+                           raw_ostream &OS);
++  void printAddr24Operand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
+   void printCustomAliasOperand(const MCInst *MI, uint64_t Address,
+                                unsigned OpIdx, unsigned PrintMethodIdx,
+                                raw_ostream &OS);
 diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
+index bb3a687fdbcd853e223e58af8f80188b985ae4be..0f29140028697b47faf604d2add3cfbb5e79e6e0 100644
 --- a/llvm/lib/Target/MOS/MOSInstrFormats.td
 +++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
-@@ -276,6 +276,11 @@
+@@ -279,6 +279,11 @@ def addr16at3 : addr16at<3>;
  
  class addr24at<int offset> : Operand<i32> {
    let ParserMatchClass = Addr24Operand<"Addr24">;
@@ -67,6 +70,7 @@ diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSIns
    let OperandType = "OPERAND_ADDR24";
 diff --git a/llvm/test/MC/MOS/long-address-roundtrip-65816.s b/llvm/test/MC/MOS/long-address-roundtrip-65816.s
 new file mode 100644
+index 0000000000000000000000000000000000000000..2c182109e414325013ca29a621d9f09b92bbd86a
 --- /dev/null
 +++ b/llvm/test/MC/MOS/long-address-roundtrip-65816.s
 @@ -0,0 +1,51 @@

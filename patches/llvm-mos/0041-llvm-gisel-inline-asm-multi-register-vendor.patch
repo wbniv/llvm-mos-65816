@@ -1,11 +1,11 @@
 diff --git a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
-index d370eeab5728..3c72a03493d1 100644
+index d370eeab5728255d52cc5c0a3349bdd9bad13b2b..09931b1a46d9c73fa6241028e191cc57eea1b7db 100644
 --- a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 +++ b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 @@ -236,6 +236,107 @@ static bool buildAnyextOrCopy(Register Dst, Register Src,
    return true;
  }
-
+ 
 +/// Return the common width in bits of the registers assigned to one inline asm
 +/// operand, or 0 if the operand has no registers or mixes register widths.
 +static unsigned getAsmRegPieceSize(ArrayRef<Register> Regs,
@@ -136,22 +136,22 @@ index d370eeab5728..3c72a03493d1 100644
          }
 -        assert(NumOpRegs == 1 && "Wrong flag: multi-register tied operands "
 -                                 "not supported in GlobalISel inline asm");
-
+ 
          const InlineAsm::Flag MatchedOperandFlag(Inst->getOperand(InstFlagIdx).getImm());
          if (MatchedOperandFlag.isMemKind()) {
 @@ -451,7 +538,7 @@ bool InlineAsmLowering::lowerInlineAsm(
            return false;
          }
-
+ 
 -        // We want to tie input to register in next operand.
 +        // We want to tie the input to the def registers that follow the flag.
          unsigned DefRegIdx = InstFlagIdx + 1;
          Register Def = Inst->getOperand(DefRegIdx).getReg();
-
+ 
 @@ -470,18 +557,30 @@ bool InlineAsmLowering::lowerInlineAsm(
              Def.isVirtual() ? MRI->getRegClass(Def) : OpInfo.RegClass;
          assert(RC && "Expected a register class for matching constraint");
-
+ 
 -        // Materialize `In` in a new vreg that has a register class that matches
 -        // the register class of `Def`.
 -        Register In = MRI->createVirtualRegister(RC);
@@ -169,7 +169,7 @@ index d370eeab5728..3c72a03493d1 100644
 +        } else if (!buildAnyextOrCopy(In[0], SrcRegs[0], MIRBuilder)) {
            return false;
 +        }
-
+ 
 -        // Add Flag and input register operand (In) to Inst. Tie In to Def.
 -        InlineAsm::Flag UseFlag(InlineAsm::Kind::RegUse, 1);
 +        // Add Flag and the input register operands to Inst, tying each of them
@@ -186,9 +186,9 @@ index d370eeab5728..3c72a03493d1 100644
 +          Inst->tieOperands(DefRegIdx + I, UseRegIdx + I);
          break;
        }
-
+ 
 @@ -587,9 +686,9 @@ bool InlineAsmLowering::lowerInlineAsm(
-
+ 
        unsigned NumRegs = OpInfo.Regs.size();
        ArrayRef<Register> SourceRegs = GetOrCreateVRegs(*OpInfo.CallOperandVal);
 -      if (NumRegs != 1 || SourceRegs.size() != 1) {
@@ -199,7 +199,7 @@ index d370eeab5728..3c72a03493d1 100644
 +                             "virtual register\n");
          return false;
        }
-
+ 
 @@ -600,9 +699,16 @@ bool InlineAsmLowering::lowerInlineAsm(
          Flag.setRegClass(RC->getID());
        }
@@ -218,8 +218,8 @@ index d370eeab5728..3c72a03493d1 100644
 +        Inst.addReg(Reg);
        break;
      }
-
-@@ -665,19 +771,26 @@ bool InlineAsmLowering::lowerInlineAsm(
+ 
+@@ -665,21 +771,28 @@ bool InlineAsmLowering::lowerInlineAsm(
      switch (OpInfo.ConstraintType) {
      case TargetLowering::C_Register:
      case TargetLowering::C_RegisterClass: {
@@ -254,9 +254,11 @@ index d370eeab5728..3c72a03493d1 100644
 -        MIRBuilder.buildTrunc(ResRegs[i], Copy);
 +        MIRBuilder.buildTrunc(ResRegs[i], Tmp1Reg);
        } else if (ResTy.isScalar() && ResTy.getSizeInBits() > SrcSize) {
+          Register Tmp = SrcReg;
+          if (!MRI->getType(SrcReg).isValid())
 diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll
 new file mode 100644
-index 000000000000..5da63b13d1f5
+index 0000000000000000000000000000000000000000..2f92366fe34af95dbe298a6731cc15083e910c08
 --- /dev/null
 +++ b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll
 @@ -0,0 +1,70 @@
@@ -331,7 +333,7 @@ index 000000000000..5da63b13d1f5
 +  ret void
 +}
 diff --git a/llvm/test/CodeGen/AArch64/build-pair-isel.ll b/llvm/test/CodeGen/AArch64/build-pair-isel.ll
-index cd68bde0f8da..cc95d2bfbd4d 100644
+index cd68bde0f8da73c8e688a056484a0f8940f40660..cc95d2bfbd4d08d3c5f2a3a29acf792f3f3916c9 100644
 --- a/llvm/test/CodeGen/AArch64/build-pair-isel.ll
 +++ b/llvm/test/CodeGen/AArch64/build-pair-isel.ll
 @@ -1,23 +1,40 @@
@@ -341,7 +343,7 @@ index cd68bde0f8da..cc95d2bfbd4d 100644
 +; RUN: llc -mtriple=aarch64 -o - -O0 -global-isel=0 %s | FileCheck %s --check-prefix=SDAG
  target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
  target triple = "arm64-apple-ios5.0.0"
-
+ 
  ; This test checks we don't fail isel due to unhandled build_pair nodes.
  define void @compare_and_swap128() {
 -; CHECK-LABEL: compare_and_swap128:
@@ -391,7 +393,7 @@ index cd68bde0f8da..cc95d2bfbd4d 100644
    ret void
 diff --git a/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll b/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll
 new file mode 100644
-index 000000000000..879899865631
+index 0000000000000000000000000000000000000000..9f8c8a636b39537a86a2ab1eed1a3008fff5f153
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll
 @@ -0,0 +1,77 @@

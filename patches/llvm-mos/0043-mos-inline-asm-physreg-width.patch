@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
-index 3271f98..b176cab 100644
+index 7379fc43ffe24673f175e48f33d5cde867b4abe7..f5954d39d12566bfc1c48df1e0c481f91d19e396 100644
 --- a/llvm/lib/Target/MOS/MOSISelLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSISelLowering.cpp
-@@ -129,11 +129,26 @@ unsigned MOSTargetLowering::getNumRegistersForInlineAsm(LLVMContext &Context,
+@@ -127,11 +127,26 @@ unsigned MOSTargetLowering::getNumRegistersForInlineAsm(LLVMContext &Context,
                                                          EVT VT) const {
    // 16-bit inputs and outputs must be passed in Imag16 registers to allow using
    // pointer values in inline assembly.
@@ -15,7 +15,7 @@ index 3271f98..b176cab 100644
      return 1;
    return TargetLowering::getNumRegistersForInlineAsm(Context, VT);
  }
-
+ 
 +// True when VT is a concrete, sized type wider than Bits. Types with no
 +// meaningful width of their own (MVT::Other for an operand with no value type,
 +// the abstract iPTR) are never wider than anything.
@@ -29,7 +29,7 @@ index 3271f98..b176cab 100644
  TargetLowering::ConstraintType
  MOSTargetLowering::getConstraintType(StringRef Constraint) const {
    if (Constraint.size() == 1) {
-@@ -166,26 +181,56 @@ MOSTargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
+@@ -164,26 +179,56 @@ MOSTargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
        if (VT == MVT::i16)
          return std::make_pair(0U, &MOS::Imag16RegClass);
        return std::make_pair(0U, &MOS::Imag8RegClass);
@@ -72,7 +72,7 @@ index 3271f98..b176cab 100644
 -  if (Constraint == "{cc}")
 +  if (Constraint == "{cc}" && !isWiderThan(VT, 8))
      return std::make_pair(MOS::P, &MOS::PcRegClass);
-
+ 
 -  return TargetLowering::getRegForInlineAsmConstraint(TRI, Constraint, VT);
 +  auto Result =
 +      TargetLowering::getRegForInlineAsmConstraint(TRI, Constraint, VT);
@@ -86,11 +86,11 @@ index 3271f98..b176cab 100644
 +    return std::make_pair(0U, nullptr);
 +  return Result;
  }
-
+ 
  bool is8BitIndex(Type *Ty) {
 diff --git a/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll b/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll
 new file mode 100644
-index 0000000..f9b7702
+index 0000000000000000000000000000000000000000..0739d273da883b2eb1e0dc90d0e5815c0ab674a7
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll
 @@ -0,0 +1,165 @@

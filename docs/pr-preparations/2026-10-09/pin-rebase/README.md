@@ -1,5 +1,7 @@
 # October 9 compiler pin rebase
 
+**Later pin, October 10:** the compiler now uses `0f031168a7cc`; [full validation](../../../test-results/repin/2026-10-10/full-validation.json) records 51 retained applications, a Release build and 204 passing MOS tests. This packet preserves the October 9 pin, validation configuration and measurements as dated evidence.
+
 **October 10 test-only addition:** bootstrap carry 0072 restores Windows coverage for the AMDGPU analysis-preservation test and its matcher fix is appended to [#604](https://github.com/llvm-mos/llvm-mos/pull/604) at `bece1fc91204` (#617 is closed). The bootstrap now applies 51 patches; the 50-patch replay and compiler results below remain the preceding rebase's dated evidence. The additional patch changes only test matching and the Windows skip, with [seven focused FileCheck checks](../../2026-10-10/windows-amdgpu-rci/publication.json); no compiler rebuild or new runtime result is claimed.
 
 The bootstrap pin advances from `8be0546128a55e78c63ca571d466aa72a782cd36` to `f24948c7d1a4b9f162d4d0192ccceecab1e441ff`, immediately after compiler PR #589 merged. The selected upstream revision includes #577, #578, #579, #582, #584, #585, #586, #587, #588, #589, #590 and #591, as well as the earlier #562/#563. Upstream CI passed on Linux, macOS and Windows at this revision.

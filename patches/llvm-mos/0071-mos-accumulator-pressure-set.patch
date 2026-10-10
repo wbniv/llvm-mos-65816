@@ -1,23 +1,5 @@
-diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.h b/llvm/lib/Target/MOS/MOSRegisterInfo.h
-index 78fe70d..c984940 100644
---- a/llvm/lib/Target/MOS/MOSRegisterInfo.h
-+++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h
-@@ -45,6 +45,13 @@ class MOSRegisterInfo : public MOSGenRegisterInfo {
- 
-   bool hasNativePressureSets() const;
- 
-+  // Without native widths, one appended pressure set models the accumulator;
-+  // see getNumRegPressureSets. Fixed at construction, like
-+  // AppendNativePressureSets. Lists as for the native sets.
-+  const bool AppendAccumulatorPressureSet;
-+  SmallVector<SmallVector<int, 8>, 0> AccumClassPSets;
-+  SmallVector<SmallVector<int, 8>, 0> AccumUnitPSets;
-+
- public:
-   MOSRegisterInfo(const MOSSubtarget &STI, CodeGenOptLevel OptLevel);
- 
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 51de823..e1a2521 100644
+index 61815ad7fd8e40035feae2566a4da6e2eaad185d..c71b7c379b4ce82e0f09365f1b77b084420368ee 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -64,7 +64,8 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
@@ -126,9 +108,27 @@ index 51de823..e1a2521 100644
    }
    return MOSGenRegisterInfo::getRegUnitPressureSets(RegUnit);
  }
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.h b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+index e666fd8d592da234f809c1d057ac04238449959f..9ec2151955a49b6fadb70bb9a956ec1d2a026ccd 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.h
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+@@ -45,6 +45,13 @@ class MOSRegisterInfo : public MOSGenRegisterInfo {
+ 
+   bool hasNativePressureSets() const;
+ 
++  // Without native widths, one appended pressure set models the accumulator;
++  // see getNumRegPressureSets. Fixed at construction, like
++  // AppendNativePressureSets. Lists as for the native sets.
++  const bool AppendAccumulatorPressureSet;
++  SmallVector<SmallVector<int, 8>, 0> AccumClassPSets;
++  SmallVector<SmallVector<int, 8>, 0> AccumUnitPSets;
++
+ public:
+   MOSRegisterInfo(const MOSSubtarget &STI, CodeGenOptLevel OptLevel);
+ 
 diff --git a/llvm/test/CodeGen/MOS/accumulator-pressure-set.ll b/llvm/test/CodeGen/MOS/accumulator-pressure-set.ll
 new file mode 100644
-index 0000000..4e372a4
+index 0000000000000000000000000000000000000000..4e372a457b6fedfa1262d18b71b81774c2a45343
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/accumulator-pressure-set.ll
 @@ -0,0 +1,76 @@
@@ -209,7 +209,7 @@ index 0000000..4e372a4
 +
 +attributes #0 = { nounwind optsize }
 diff --git a/llvm/test/CodeGen/MOS/char-stats.ll b/llvm/test/CodeGen/MOS/char-stats.ll
-index 23d85c8..3017df4 100644
+index 23d85c8ccb8b901b6cb17123f0b5ec55bd784343..3017df42fd9b07b92b39a8b056119a5f9c2004e6 100644
 --- a/llvm/test/CodeGen/MOS/char-stats.ll
 +++ b/llvm/test/CodeGen/MOS/char-stats.ll
 @@ -52,15 +52,16 @@ define void @char_stats() local_unnamed_addr #0 {
@@ -254,7 +254,7 @@ index 23d85c8..3017df4 100644
  ; CMOS-NEXT:    sta __rc3
  ; CMOS-NEXT:    lda (__rc2)
 diff --git a/llvm/test/CodeGen/MOS/native-width-default-pressure.ll b/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
-index 832ed7b..742dd7f 100644
+index 832ed7b375dcf2e6f845b56ee77c93ddb1f8a396..742dd7f347e47a2ab6f83da2787acb5b5c5cd267 100644
 --- a/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
 +++ b/llvm/test/CodeGen/MOS/native-width-default-pressure.ll
 @@ -5,7 +5,9 @@

@@ -1,7 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
+index ff015ada51d8b317c2fb6f12711bfb96aa8d0a0f..c1947d89fc964fff36f2b0349a54926b07a8725a 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
-@@ -1048,6 +1048,8 @@ def : Pat<(i16 (anyext Anyi8:$s)), (INSERT_SUBREG (IMPLICIT_DEF), Anyi8:$s, sub
+@@ -1105,6 +1105,8 @@ def : Pat<(i16 (anyext Anyi8:$s)), (INSERT_SUBREG (IMPLICIT_DEF), Anyi8:$s, subl
  
  def : Pat<(i1 (trunc Ac:$s)), (EXTRACT_SUBREG (ANDImm Ac:$s, 1), sublsb)>;
  def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
@@ -11,9 +12,10 @@ diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSIns
  //===---------------------------------------------------------------------===//
  // Constant Patterns
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+index 8306f4264e345300e1309f84ad9552fb7ac5b993..4dbd7fb8d37451fdee11276fa77c76b5e162da4f 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-@@ -2316,6 +2316,19 @@ bool MOSInstructionSelector::selectTrunc(MachineInstr &MI) {
+@@ -2322,6 +2322,19 @@ bool MOSInstructionSelector::selectTrunc(MachineInstr &MI) {
  
    Register From = MI.getOperand(1).getReg();
  
@@ -35,6 +37,7 @@ diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MO
           LLT::scalar(1));
 diff --git a/llvm/test/CodeGen/MOS/a16-trunc-i32.ll b/llvm/test/CodeGen/MOS/a16-trunc-i32.ll
 new file mode 100644
+index 0000000000000000000000000000000000000000..ebf981ac35065101cdcbbbebf721183c982f3408
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/a16-trunc-i32.ll
 @@ -0,0 +1,8 @@
@@ -47,6 +50,7 @@ new file mode 100644
 +  ret i16 %low
 +}
 diff --git a/llvm/test/CodeGen/MOS/instruction-selector.mir b/llvm/test/CodeGen/MOS/instruction-selector.mir
+index e719f3d0bf86382aa5566737950f97d185fbb37a..447cde0bc58bedae01b03767b5155d1e3fda66d0 100644
 --- a/llvm/test/CodeGen/MOS/instruction-selector.mir
 +++ b/llvm/test/CodeGen/MOS/instruction-selector.mir
 @@ -2300,6 +2300,29 @@ body: |

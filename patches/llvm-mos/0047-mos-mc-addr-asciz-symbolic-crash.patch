@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp b/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
-index 8fd6ff4..6bde586 100644
+index 637ad4974be85674b5e4a985362c391bb6e41497..f336b12606897a6a2094f6fc302c8e6c4fae8907 100644
 --- a/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
 +++ b/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
 @@ -26,6 +26,7 @@
@@ -15,9 +15,9 @@ index 8fd6ff4..6bde586 100644
  #include "llvm/MC/TargetRegistry.h"
  #include "llvm/Support/Debug.h"
 +#include "llvm/Support/raw_ostream.h"
-
+ 
  #define DEBUG_TYPE "mos-asm-parser"
-
+ 
 @@ -590,8 +592,18 @@ public:
        getStreamer().emitBytes(Str);
        getStreamer().emitBytes(
@@ -40,7 +40,7 @@ index 8fd6ff4..6bde586 100644
        getStreamer().emitValue(Expr, CharCount + 1, Loc);
 diff --git a/llvm/test/MC/MOS/addr-asciz-invalid-modifier.s b/llvm/test/MC/MOS/addr-asciz-invalid-modifier.s
 new file mode 100644
-index 0000000..88874ba
+index 0000000000000000000000000000000000000000..88874bab7f18878d5f732819e8f758c0c4b0312e
 --- /dev/null
 +++ b/llvm/test/MC/MOS/addr-asciz-invalid-modifier.s
 @@ -0,0 +1,6 @@
@@ -52,7 +52,7 @@ index 0000000..88874ba
 +; CHECK: error: unknown modifier 'addrasciz'
 diff --git a/llvm/test/MC/MOS/addr-asciz-roundtrip.s b/llvm/test/MC/MOS/addr-asciz-roundtrip.s
 new file mode 100644
-index 0000000..f13875c
+index 0000000000000000000000000000000000000000..f13875c6faa1a445a7c61ac59e7a2cf837517f57
 --- /dev/null
 +++ b/llvm/test/MC/MOS/addr-asciz-roundtrip.s
 @@ -0,0 +1,30 @@
@@ -87,13 +87,13 @@ index 0000000..f13875c
 +
 +; CHECK: 0x00000000 38000034 32003700 00
 diff --git a/llvm/test/MC/MOS/addr-asciz.s b/llvm/test/MC/MOS/addr-asciz.s
-index db3b4d3..8b9c2ef 100644
+index db3b4d3d3ec3645bd1b83bdfecf233fcea006f16..8b9c2ef3f2147a1242a05e38a4e1dabe986e7247 100644
 --- a/llvm/test/MC/MOS/addr-asciz.s
 +++ b/llvm/test/MC/MOS/addr-asciz.s
 @@ -1,6 +1,11 @@
  ; RUN: llvm-mc -triple mos -motorola-integers --filetype=obj -o=%t.obj %s
  ; RUN: llvm-readelf --relocs -x .header %t.obj | FileCheck %s
-
+ 
 +; A symbolic .mos_addr_asciz operand must round-trip as plain text under the
 +; non-object-file (-show-encoding) streamer, including when its value is not
 +; yet resolvable at parse time.

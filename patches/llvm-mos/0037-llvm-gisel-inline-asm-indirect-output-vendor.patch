@@ -1,9 +1,9 @@
 diff --git a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
-index 53eeca95b40b..d370eeab5728 100644
+index 53eeca95b40bd37a56211a2b2911a301a4dc1879..d370eeab5728255d52cc5c0a3349bdd9bad13b2b 100644
 --- a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 +++ b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
 @@ -14,7 +14,9 @@
-
+ 
  #include "llvm/CodeGen/GlobalISel/InlineAsmLowering.h"
  #include "llvm/CodeGen/GlobalISel/MachineIRBuilder.h"
 +#include "llvm/CodeGen/LowLevelTypeUtils.h"
@@ -13,13 +13,13 @@ index 53eeca95b40b..d370eeab5728 100644
  #include "llvm/CodeGen/MachineRegisterInfo.h"
  #include "llvm/CodeGen/TargetLowering.h"
 @@ -49,6 +51,9 @@ public:
-
+ 
    /// The register class selected for this operand's constraint.
    const TargetRegisterClass *RegClass = nullptr;
 +  /// For an indirect operand (=*r, *r), the type of the value the pointer
 +  /// argument refers to (the elementtype attribute).
 +  llvm::Type *IndirectTy = nullptr;
-
+ 
    explicit GISelAsmOperandInfo(const TargetLowering::AsmOperandInfo &Info)
        : TargetLowering::AsmOperandInfo(Info) {}
 @@ -273,6 +278,7 @@ bool InlineAsmLowering::lowerInlineAsm(
@@ -28,21 +28,21 @@ index 53eeca95b40b..d370eeab5728 100644
          assert(OpTy && "Indirect operand must have elementtype attribute");
 +        OpInfo.IndirectTy = OpTy;
        }
-
+ 
        // FIXME: Support aggregate input operands
 @@ -325,6 +331,9 @@ bool InlineAsmLowering::lowerInlineAsm(
-
+ 
    // Collects the output operands for later processing
    GISelAsmOperandInfoVector OutputOperands;
 +  // Indirect register outputs (=*r): written back through their pointer
 +  // argument after the INLINEASM instead of producing a call result.
 +  GISelAsmOperandInfoVector IndirectOutputs;
-
+ 
    for (auto &OpInfo : ConstraintOperands) {
      GISelAsmOperandInfo &RefOpInfo =
 @@ -395,7 +404,10 @@ bool InlineAsmLowering::lowerInlineAsm(
          }
-
+ 
          // Remember this output operand for later processing
 -        OutputOperands.push_back(OpInfo);
 +        if (OpInfo.isIndirect)
@@ -50,10 +50,10 @@ index 53eeca95b40b..d370eeab5728 100644
 +        else
 +          OutputOperands.push_back(OpInfo);
        }
-
+ 
        break;
 @@ -635,15 +647,8 @@ bool InlineAsmLowering::lowerInlineAsm(
-
+ 
    // Finally, copy the output operands into the output registers
    ArrayRef<Register> ResRegs = GetOrCreateVRegs(Call);
 -  // FIXME: This check doesn't account for indirect output constraints (=*).
@@ -73,7 +73,7 @@ index 53eeca95b40b..d370eeab5728 100644
 @@ -705,6 +710,40 @@ bool InlineAsmLowering::lowerInlineAsm(
      }
    }
-
+ 
 +  // Store each indirect register output through its pointer argument, as
 +  // SelectionDAG does for "=*r"-style constraints.
 +  for (GISelAsmOperandInfo &OpInfo : IndirectOutputs) {
@@ -110,10 +110,10 @@ index 53eeca95b40b..d370eeab5728 100644
 +
    return true;
  }
-
+ 
 diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll
 new file mode 100644
-index 000000000000..9523e25444d5
+index 0000000000000000000000000000000000000000..0981841bb7a574602abcc521bf4d9df4d72bf92f
 --- /dev/null
 +++ b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll
 @@ -0,0 +1,34 @@
@@ -153,7 +153,7 @@ index 000000000000..9523e25444d5
 +}
 diff --git a/llvm/test/CodeGen/MOS/inline-asm-indirect-output.ll b/llvm/test/CodeGen/MOS/inline-asm-indirect-output.ll
 new file mode 100644
-index 000000000000..09bfa1fc26af
+index 0000000000000000000000000000000000000000..494641b1fc61f6d952db1f1a01c74844d1f3d3a9
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/inline-asm-indirect-output.ll
 @@ -0,0 +1,34 @@

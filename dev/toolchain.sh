@@ -105,7 +105,7 @@ if [ ! -e "$SRC/.git" ]; then
     local p="$ROOT/patches/llvm-mos/$1.patch"; shift
     [ -e "$p" ] || { echo "FATAL: missing $p"; exit 1; }
     echo "    applying patch $(basename "$p")${1:+ (path-filtered)}"
-    git -C "$SRC" apply "$@" "$p"
+    git -C "$SRC" apply --allow-empty "$@" "$p"
   }
   apply_patch 0001-320-far-addrspace
   apply_patch 0002-321-accum16
@@ -228,15 +228,15 @@ if [ ! -e "$SRC/.git" ]; then
   # Keep the computed-carry scheduling optimization as a standalone patch.
   apply_patch 0064-mos-computed-carry-scheduling
   # Far memop lowering is in 0002; retain its independent runtime-ABI test.
-  apply_patch 0013-320-far-memops \
+  apply_patch 0013-320-far-memops-vendor \
     --include='llvm/test/CodeGen/MOS/far-memset.ll'
   apply_patch 0053-mos-lit-expectations
   apply_patch 0054-llvm-scavenger-save-range
   apply_patch 0055-mos-native-wide-anyext-vendor
   apply_patch 0056-llvm-gisel-inline-asm-register-bounds-vendor
-  apply_patch 0057-llvm-selectiondag-inline-asm-register-bounds
-  apply_patch 0058-aarch64-inline-asm-unknown-type
-  apply_patch 0059-llvm-selectiondag-vector-asm-parts
+  apply_patch 0057-llvm-selectiondag-inline-asm-register-bounds-vendor
+  apply_patch 0058-aarch64-inline-asm-unknown-type-vendor
+  apply_patch 0059-llvm-selectiondag-vector-asm-parts-vendor
   apply_patch 0060-llvm-reduce-parallel-mir
   apply_patch 0061-mos-far-global-long-x
   apply_patch 0062-mos-native-far-word

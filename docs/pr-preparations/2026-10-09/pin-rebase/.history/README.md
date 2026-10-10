@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-10-10](https://github.com/wbniv/llvm-mos-65816/commit/1fc3e463) | Restore Windows coverage for the AMDGPU analysis-preservation test |
 | [2026-10-10](https://github.com/wbniv/llvm-mos-65816/commit/5c68aa5e) | Advance compiler pin and retire merged upstream carries |
 
 <!--history-meta v1
+1fc3e463	author	Will Norris
+1fc3e463	added	2
+1fc3e463	deleted	0
+1fc3e463	files	1
+1fc3e463	body	Carry patch 0072 in clean toolchain bootstraps. Accept compiler-dependent spacing after the RequireAnalysisPass template comma while preserving the analysis names and reuse ordering, and remove the Windows skip.\n\nAppend the upstream test fix to existing llvm-mos PR #604 at bece1fc91204e8a2a89903a96183e62a90f18f44 and close standalone PR #617 as requested. Update current tracking and retain the posted body and validation evidence. Preserve the original MOS bank-order fix and retained publication history.\n\nValidation: seven focused FileCheck checks pass, including the captured MSVC trace prefix, reconstructed complete traces for both spacing forms, and rejection of wrong or recomputed analysis. Patch application, shell syntax, and whitespace checks pass. Full upstream CI is pending.\n\nAI assistance: OpenAI Codex 0.162.1, model gpt-6.1-sol, medium reasoning effort. Session: 01a1208b-91e0-7e33-b5bf-8787d2a9c919.
 5c68aa5e	author	Will Norris
 5c68aa5e	added	17
 5c68aa5e	deleted	0

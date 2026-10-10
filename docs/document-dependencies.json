@@ -121,7 +121,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "7ef5f11bab7b98f5547b532823f174e38969752eecde71ac44a1078d1cee52c4"
+          "docs/upstream-dashboard.json": "822b9ed8e14d192eeed07ee71fec94547ceab7bc348fe3814cdf4bbf16cb4106"
         }
       }
     },
@@ -142,13 +142,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "aca18903a3fabde79d687cf8b54397b663f92d0c617d5aca0d7de1793fd8da5c",
+          "docs/upstream-pending-work.md": "f83bf52d0f6078f7df725defb044ad35cb6a0d1a5d97b581f720e33c21e3230a",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "7ef5f11bab7b98f5547b532823f174e38969752eecde71ac44a1078d1cee52c4",
+          "docs/upstream-dashboard.json": "822b9ed8e14d192eeed07ee71fec94547ceab7bc348fe3814cdf4bbf16cb4106",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "af0c49a269321a4904c6fed3f63de59b2408af8766b882f32678c45c01b65a64"
+          "docs/upstream-dashboard-graph.json": "7177e298e427f29a1774cb7e8dc6fa68c7ce79a262a0d3e0ebe81949a73b35f1"
         }
       }
     },
@@ -311,7 +311,9 @@
         "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
         "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
         "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json",
-        "docs/upstream-status/2026-10-10-sjlj-merges.json"
+        "docs/upstream-status/2026-10-10-sjlj-merges.json",
+        "docs/test-results/repin/2026-10-10/full-validation.json",
+        "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json"
       ],
       "receipt": {
         "sources": {
@@ -382,17 +384,19 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
           "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669",
           "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "efbf5e5c0f045a429fd744c0d7fe675abe0809015ecb1b4948766e39ced7c262",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28",
-          "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7"
+          "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7",
+          "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
+          "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9"
         },
-        "reviewed_at": "2026-10-10T03:11:37.986313+00:00",
-        "note": "Verified live GitHub merged flags, mysterymath merge identities, timestamps and merge commits: SDK 450 b2b09b72dfca at 02:09:41 UTC and test-suite 20 5f38e99463eb at 02:10:09 UTC on October 10. Current tables, pending summary, README and dashboard now mark both merged and review/landing complete; the completed TODO follow-up is removed. The existing SDK comment was edited only to replace both bare cross-repository 20 references with explicit test-suite links and read back. Retained draft/publication copies and recorded runtime checks remain dated evidence; no new SDK CI pickup or runtime validation is claimed. Compiler 604 and other submission holds are unaffected. Website publication workflow was reviewed; no deployment occurred.",
+        "reviewed_at": "2026-10-10T08:44:57.106254+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -434,7 +438,9 @@
         "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
         "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
         "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json",
-        "docs/upstream-status/2026-10-10-sjlj-merges.json"
+        "docs/upstream-status/2026-10-10-sjlj-merges.json",
+        "docs/test-results/repin/2026-10-10/full-validation.json",
+        "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json"
       ],
       "receipt": {
         "sources": {
@@ -496,17 +502,19 @@
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
           "docs/upstream-status/patch-retirement-2026-10-09.json": "0f2bb5c1d79956b52c04214a53dc77563d430f9b41b683b2a2a8b9b393bae9c5",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
           "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669",
           "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "efbf5e5c0f045a429fd744c0d7fe675abe0809015ecb1b4948766e39ced7c262",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28",
-          "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7"
+          "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7",
+          "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
+          "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9"
         },
-        "reviewed_at": "2026-10-10T03:11:38.273676+00:00",
-        "note": "Verified live GitHub merged flags, mysterymath merge identities, timestamps and merge commits: SDK 450 b2b09b72dfca at 02:09:41 UTC and test-suite 20 5f38e99463eb at 02:10:09 UTC on October 10. Current tables, pending summary, README and dashboard now mark both merged and review/landing complete; the completed TODO follow-up is removed. The existing SDK comment was edited only to replace both bare cross-repository 20 references with explicit test-suite links and read back. Retained draft/publication copies and recorded runtime checks remain dated evidence; no new SDK CI pickup or runtime validation is claimed. Compiler 604 and other submission holds are unaffected. Website publication workflow was reviewed; no deployment occurred.",
+        "reviewed_at": "2026-10-10T08:44:57.626523+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -549,7 +557,9 @@
         "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
         "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json",
         "docs/upstream-pending-work.md",
-        "docs/upstream-status/2026-10-10-sjlj-merges.json"
+        "docs/upstream-status/2026-10-10-sjlj-merges.json",
+        "docs/test-results/repin/2026-10-10/full-validation.json",
+        "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json"
       ],
       "receipt": {
         "sources": {
@@ -611,18 +621,20 @@
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
           "docs/upstream-status/patch-retirement-2026-10-09.json": "0f2bb5c1d79956b52c04214a53dc77563d430f9b41b683b2a2a8b9b393bae9c5",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
           "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669",
           "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "efbf5e5c0f045a429fd744c0d7fe675abe0809015ecb1b4948766e39ced7c262",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28",
-          "docs/upstream-pending-work.md": "aca18903a3fabde79d687cf8b54397b663f92d0c617d5aca0d7de1793fd8da5c",
-          "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7"
+          "docs/upstream-pending-work.md": "f83bf52d0f6078f7df725defb044ad35cb6a0d1a5d97b581f720e33c21e3230a",
+          "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7",
+          "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
+          "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9"
         },
-        "reviewed_at": "2026-10-10T03:11:38.412026+00:00",
-        "note": "Verified live GitHub merged flags, mysterymath merge identities, timestamps and merge commits: SDK 450 b2b09b72dfca at 02:09:41 UTC and test-suite 20 5f38e99463eb at 02:10:09 UTC on October 10. Current tables, pending summary, README and dashboard now mark both merged and review/landing complete; the completed TODO follow-up is removed. The existing SDK comment was edited only to replace both bare cross-repository 20 references with explicit test-suite links and read back. Retained draft/publication copies and recorded runtime checks remain dated evidence; no new SDK CI pickup or runtime validation is claimed. Compiler 604 and other submission holds are unaffected. Website publication workflow was reviewed; no deployment occurred.",
+        "reviewed_at": "2026-10-10T08:44:57.891158+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -708,17 +720,19 @@
         "AGENTS.md",
         "docs/howto-defect-evidence.md",
         "dev/llvm-mos-pin",
-        "docs/pr-preparations/2026-10-09/pin-rebase/README.md"
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/plans/2026-10-10-repeatable-compiler-repin.md"
       ],
       "receipt": {
         "sources": {
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644"
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
+          "docs/plans/2026-10-10-repeatable-compiler-repin.md": "5184a11ca0f2302f66618b1db3c010576fa6d6191de08905fd8d40c15a85ef6e"
         },
-        "reviewed_at": "2026-10-10T00:15:30.702405+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:44:58.346826+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -767,7 +781,9 @@
         "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
         "docs/pr-preparations/2026-09-28/0065/README.md",
         "dev/llvm-mos-pin",
-        "docs/pr-preparations/2026-10-09/pin-rebase/README.md"
+        "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
+        "docs/test-results/repin/2026-10-10/full-validation.json",
+        "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json"
       ],
       "receipt": {
         "sources": {
@@ -791,11 +807,13 @@
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644"
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
+          "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
+          "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9"
         },
-        "reviewed_at": "2026-10-10T00:15:37.044112+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:44:59.351669+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -838,13 +856,13 @@
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "36337397c1d7b44b6f377307e0249a7c1949824b1c32e6f7bd5ac327e530c043",
-          "patches/llvm-mos/0002-321-accum16.patch": "55deed868e2adf9f1b267ad05fb9576804633acc55d4c69d164079a55fe41148",
-          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
-          "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
-          "patches/llvm-mos/0063-mos-near-shared-store.patch": "8cab3c582d6b66f7fad83a74d90f34ce3762a08e76530838b93459a3435a0271",
+          "patches/llvm-mos/0002-321-accum16.patch": "caabe329fa98cfccbf7729bcd7a8ee5a6d0a9a83a133f9a9ab8e3a7f82f48f99",
+          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "ad27cbec6a8aeb9151188026a82338eecfef1886ea42723528fcf424a25261d3",
+          "patches/llvm-mos/0062-mos-native-far-word.patch": "8b4d7da832d13e88b678d3e97593727d46fe820fd24250acd381f78a312f5b06",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "e7039fa70defd5376bc34fa1cbc596d690a9f2baa1663ce9f2302bada775b9d7",
           "examples/65816/farindex.c": "a30e67ce9c63b898b10eb891ecab30ebc36f455f55dd046be15f9da9caa6cd6d",
           "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
-          "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
+          "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "ce787c8bdc1e5ccd9e12e3b3eb6a947046630f90c906b23f69a4a3f5f263fda2",
           "dev/measure-carry-scheduling.py": "92544eb196fdf7c98d304c0ef2dcf6a7d6b6560b257192c31f267451b81eedfb",
           "docs/defects/mos-carry-scheduling-pressure.json": "f92f8325aee8203ed7bb76773efa7d3473107ff69e6f6aef98f37a3efe9fe64a",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
@@ -866,12 +884,12 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-10T00:15:39.987519+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:05.757462+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -1087,12 +1105,12 @@
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907"
         },
-        "reviewed_at": "2026-10-10T00:15:42.585756+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:13.239755+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -1609,12 +1627,12 @@
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907"
         },
-        "reviewed_at": "2026-10-10T00:15:33.846620+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:13.510825+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -1666,15 +1684,15 @@
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "patches/llvm-mos/0002-321-accum16.patch": "55deed868e2adf9f1b267ad05fb9576804633acc55d4c69d164079a55fe41148",
+          "patches/llvm-mos/0002-321-accum16.patch": "caabe329fa98cfccbf7729bcd7a8ee5a6d0a9a83a133f9a9ab8e3a7f82f48f99",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-10T00:15:42.832789+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:14.011298+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -1750,11 +1768,11 @@
           "docs/plans/2026-09-25-near-s16-store-residency.md": "f29e75eb33bf497832c6c542ef8bd756d2312b9716ca4380eb8252e0814413cf",
           "docs/plans/2026-09-25-near-indirect-s16-store-residency.md": "f6158a7e95b464bd35528dda5dfd00fece702eb40f5b1daaf1c84bdfb7b7ee9c",
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
-          "patches/llvm-mos/0063-mos-near-shared-store.patch": "8cab3c582d6b66f7fad83a74d90f34ce3762a08e76530838b93459a3435a0271",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "e7039fa70defd5376bc34fa1cbc596d690a9f2baa1663ce9f2302bada775b9d7",
           "dev/near-store/indirect.c": "6b32b412f588b332be11341971cc7a490088b28385f105586efb7c1484f5611c",
           "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
-          "patches/llvm-mos/0065-mos-near-store-profitability.patch": "7f6d9a7c9e9698ae886671acda27c3e8da24e0d3da0163248a8945c3a36ea7b9",
+          "patches/llvm-mos/0065-mos-near-store-profitability.patch": "d888a2d043b07036fd3ae4ed488592e9f252d5e442db1d499d6352e7d731ee7d",
           "dev/near-store/broad.c": "97e3330bc1ca16cdc71a64762b8724ed375f6cb174c7e34e89f2a93f473d4bc6",
           "dev/measure-near-store-shapes.py": "f56de2773806058396a731db03fb9e31a7adcb02755a91a60a2128d3359fad75",
           "dev/check-near-store-profitability.py": "fa875476dd4e4848adae11ab64dc408ac1335198b167e0e990375289b8230cb4",
@@ -1765,12 +1783,12 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/independent-review.json": "450cc488aa8f8dac0e4daa05f6a0eb8c001bf3202850fa5e801366d724b5678a",
           "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-10T00:15:33.231944+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:18.436751+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -1882,11 +1900,11 @@
       "receipt": {
         "sources": {
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
-          "patches/llvm-mos/0066-mos-far-extload-worklist.patch": "2c725a85fa3d485b875c2975cfa02a98461947d831bc6030528ef1aa1287b597",
+          "patches/llvm-mos/0066-mos-far-extload-worklist.patch": "07f613f5a094f41c9bfc13a02a8c30376f40db32184eb0eea11c53cb16660e1b",
           "dev/farblit.sh": "46f48290eb4e7f1e46f38459cc8b23150b331f0cc4fa5f5bf2b801358453209e",
           "examples/65816/farblit.c": "1516171c532d55976a21ae6c4acedd070b8ee129d79d8016de10c8321cabf0a3",
-          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
-          "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
+          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "ad27cbec6a8aeb9151188026a82338eecfef1886ea42723528fcf424a25261d3",
+          "patches/llvm-mos/0062-mos-native-far-word.patch": "8b4d7da832d13e88b678d3e97593727d46fe820fd24250acd381f78a312f5b06",
           "docs/defects/evidence/2026-09-28-farblit-shapes/analysis.json": "9feb44ffe5673d03e02b65eb5e0d905fac79fcb606d99a4c533d251dea8f7b71",
           "docs/defects/evidence/2026-09-28-farblit-shapes/identity.json": "30388a0cf16e5f65f358cccaa52c3cdf74f5964959a43b0615b1f0f06292569f",
           "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log": "77e4fbe65cca6a9b168fcb98693b0a7e42d52735104b48a9b46ff5028245fc31",
@@ -1902,9 +1920,9 @@
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-10-09T14:21:37.161726+00:00",
-        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T08:45:21.949042+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1981,7 +1999,7 @@
       ],
       "receipt": {
         "sources": {
-          "patches/llvm-mos/0067-mos-competing-carry-gate.patch": "86db849b6f81fb0eb52be5f80191adef1abaae7b77057eec5d45dd0301f1bd33",
+          "patches/llvm-mos/0067-mos-competing-carry-gate.patch": "a59d1aaf51957e839e389f61c260e2f8c43dcd38a162cf6796d8548b44029177",
           "dev/count-carry-saves.py": "5f16ba9554452c7250cf95045a1144efc96376f639f3f5b48300468374752894",
           "dev/measure-carry-gate.py": "38ae0c7cb000a2778d99f3a446353083cbcdb669348c6f6e2d660b94bdf02b6c",
           "docs/defects/evidence/2026-09-27-competing-carry-gate/additional-growth-timing.json": "0bc92c3bd83af3c530d3f1146abdedf7ea8448f2f26a36971468174165522909",
@@ -2019,9 +2037,9 @@
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776"
         },
-        "reviewed_at": "2026-09-28T03:24:49.769309+00:00",
-        "note": "Reviewed the X-preservation repair against retained original-input red/green on both emulators, focused MIR and stack/flags runtime evidence. Updated the original report, open-task entry and current Vlastack summaries; qualified earlier VLA mismatch text as dated evidence. The carry pressure contract, dated size/timing measurements, withdrawn PR and #321 submission requirements remain separate. Recorded five opt registration failures without claiming full-suite success.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
+        "reviewed_at": "2026-10-10T08:45:24.005284+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2089,16 +2107,16 @@
       "receipt": {
         "sources": {
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
-          "patches/llvm-mos/0002-321-accum16.patch": "55deed868e2adf9f1b267ad05fb9576804633acc55d4c69d164079a55fe41148",
+          "patches/llvm-mos/0002-321-accum16.patch": "caabe329fa98cfccbf7729bcd7a8ee5a6d0a9a83a133f9a9ab8e3a7f82f48f99",
           "dev/check-near-index-proofs.py": "8f514c4c8625bb8fdc08447deb44dd027a32090c37dc4176399eab0f427d498e",
           "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
           "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-10T00:15:43.201311+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:24.995205+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -2332,21 +2350,21 @@
           "docs/defects/evidence/2026-09-28-farblit-range-integration/prior-work.json": "d6a9014d245793b7bb6f4a2131e5356a48ac56940b958c289a45b3880e209f88",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/receipt.json": "ac174f2f6b45c5be3b98f8087bc529f9906ef131fba45423e9be6be20322f80e",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/results.json": "fe3e31eb7c0704a21a819632f7fd0407489fc899c823ec3ebd33094527037241",
-          "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "e4cde56542dafa6d87dc38dac74707259d88fd9325b02f2592e355ea867925d5",
           "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
           "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
-          "dev/toolchain.sh": "09d5750e135026594f2ef4e0e7db5220bb131dc56e3322821848833f4343d65e",
+          "dev/toolchain.sh": "5abd19878a780efae9fcbd54b7bc965a9910807b40daa9cbf68e61b99166eb85",
           "dev/regen-patch.sh": "784cac0cde97003c1196750ed5b507ef1538b1f0c9ec3a42248d8085688c1141",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-10T00:15:36.170287+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:26.692159+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -2380,16 +2398,16 @@
       ],
       "receipt": {
         "sources": {
-          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "625fb312cfc202df543549b4a6c07296ddd431b21874b2997944cdd081f0e308",
           "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
           "docs/defects/evidence/2026-09-28-far-word-policy/identity.json": "7782dd8ee661d14ed63b44ca5b0931c79ba40f46059ee910c9c17ee23480f215",
           "docs/defects/evidence/2026-09-28-far-word-policy/installed-control.json": "5b07db25e6276a425058c17c4c88499dbbccbca9d4676c06244f18db58f2d9a1",
           "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json": "0be5acc2dd52f062c05482b61531333d4a491b857b1d37b8751c60d943902439",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-09-28T13:24:21.960864+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-10-10T08:45:28.451737+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2443,8 +2461,8 @@
       ],
       "receipt": {
         "sources": {
-          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
-          "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
+          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "625fb312cfc202df543549b4a6c07296ddd431b21874b2997944cdd081f0e308",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "e4cde56542dafa6d87dc38dac74707259d88fd9325b02f2592e355ea867925d5",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
@@ -2471,9 +2489,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce"
         },
-        "reviewed_at": "2026-10-09T23:03:40.791809+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T08:45:32.346205+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2546,16 +2564,16 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review/basis.json": "61ed7052eba000b1991bbaddf9e01b1299c8beccd43291ea0ce86f278d162e03",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review/retained-opcodes.json": "f2fddc5189b71c958d962fa727d46177e6373d412af60e30d886f94b1fa8223b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review/audit-retained-opcodes.py": "cd5b2e0dd87b85f11db87ce41eee9f1330b26fb0912b4fbb29ba824de679478f",
-          "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
-          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "e4cde56542dafa6d87dc38dac74707259d88fd9325b02f2592e355ea867925d5",
+          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "625fb312cfc202df543549b4a6c07296ddd431b21874b2997944cdd081f0e308",
           "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/check-sensitivity.py": "7b70ce7d6e0e41e927e269eb7c41be65c74cab6360b46ec794d2dea49ef88943",
           "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/results.json": "4a430934db24497080fa8126ed9c89a35b23ec86e31d26e2e7c82d8f603a176c",
           "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/artifacts.tar.xz": "36dab8af7b782ef7131c31f22615de7c2b9b3f28bae14948812e22c40a3cc07a",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce"
         },
-        "reviewed_at": "2026-10-09T23:03:42.635072+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T08:45:35.544625+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2772,10 +2790,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "47cf80bbad1ccd05dbb0c84cbb5b3ef82f185fc0a47edd1882ff4414855c60a4"
+          "TODO.md": "81583f227f535f45af50df3e84adf65d8a887894fcd5b1f0f5039c394677c5c1"
         },
-        "reviewed_at": "2026-10-10T03:11:40.209910+00:00",
-        "note": "Verified live GitHub merged flags, mysterymath merge identities, timestamps and merge commits: SDK 450 b2b09b72dfca at 02:09:41 UTC and test-suite 20 5f38e99463eb at 02:10:09 UTC on October 10. Current tables, pending summary, README and dashboard now mark both merged and review/landing complete; the completed TODO follow-up is removed. The existing SDK comment was edited only to replace both bare cross-repository 20 references with explicit test-suite links and read back. Retained draft/publication copies and recorded runtime checks remain dated evidence; no new SDK CI pickup or runtime validation is claimed. Compiler 604 and other submission holds are unaffected. Website publication workflow was reviewed; no deployment occurred.",
+        "reviewed_at": "2026-10-10T08:45:40.344976+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -2796,83 +2814,89 @@
         "docs/defects/mos-native-index-copy-cost.json",
         {
           "glob": "docs/pr-preparations/2026-10-09/pin-rebase/evidence/*"
-        }
+        },
+        "docs/test-results/repin/2026-10-10/full-validation.json",
+        "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json"
       ],
       "receipt": {
         "sources": {
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "dev/toolchain.sh": "09d5750e135026594f2ef4e0e7db5220bb131dc56e3322821848833f4343d65e",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "dev/toolchain.sh": "5abd19878a780efae9fcbd54b7bc965a9910807b40daa9cbf68e61b99166eb85",
           "dev/regen-patch.sh": "784cac0cde97003c1196750ed5b507ef1538b1f0c9ec3a42248d8085688c1141",
           "dev/lit.sh": "84ca574f032b6280b4c4a395cbca1757a95d4d3a417f8bbd460bd8da20e9a67e",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907",
           "docs/defects/evidence/2026-09-25-coalescing-0015/original/patches/llvm-mos/0015-321-coalesce-rc-undef.patch": "99207f659449ae85f9dbb73a42f81940d110ee6f381468177661769d2a2f5ec4",
-          "patches/llvm-mos/0001-320-far-addrspace.patch": "970e3ac12352cae80c5f2390849fa3de1be75522c30d13bf902e6ad30d7c34ad",
-          "patches/llvm-mos/0002-321-accum16.patch": "55deed868e2adf9f1b267ad05fb9576804633acc55d4c69d164079a55fe41148",
+          "patches/llvm-mos/0001-320-far-addrspace.patch": "ba876bff2a0eec80d4a3bed03227f0199b9dd3c7b1b09e207647893d7a7aee8d",
+          "patches/llvm-mos/0002-321-accum16.patch": "caabe329fa98cfccbf7729bcd7a8ee5a6d0a9a83a133f9a9ab8e3a7f82f48f99",
           "patches/llvm-mos/0004-320-far-cc.patch": "7a244194670ca9461572890ec5aabc30025b224001092e7928d1568625034b5a",
           "patches/llvm-mos/0005-320-far-ptr-value-legalize.patch": "0ded5ab8f371543c42178065d0da5c206b6e47ae156fe85d139747413a7eb763",
-          "patches/llvm-mos/0006-320-packed24.patch": "8dbb1e3049d5589d01c907e3382b39dbfda0bbaaa3671a32ea46aa9019125201",
+          "patches/llvm-mos/0006-320-packed24.patch": "52c2420941cab8a471df5e5591c3cd7bdac9319749ad18207826699b7964dde2",
           "patches/llvm-mos/0007-65816-near-abs-bank-relax.patch": "d5d90842a9cd37817154e36ffc189c1d5ad2f43eaecdeea7a92b65c543a0d99e",
           "patches/llvm-mos/0009-321-a16-pressure-incdec.patch": "2e1e41976aa410127727f4592009ac6df6b17dc5ac5cc31fc2eefae90e25c7d1",
-          "patches/llvm-mos/0011-mos-scavenger-live-p-save.patch": "9dc33a936c89c09eb963161015f4be5813bb03421ad00142d88ecc701d3a3936",
+          "patches/llvm-mos/0011-mos-scavenger-live-p-save.patch": "050ac2da034c13b9170b9b692239807c17c00ee286a17612736ab5b67fee9899",
           "patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch": "c666f22831f0194b54be1acf2724f6d19f67e6aa0095fddaeb7f00ae3c01134f",
+          "patches/llvm-mos/0013-320-far-memops-vendor.patch": "a0636e5733297b5defb963707a7a5e8f3e39d0a6f9e1ce4462d835cc6c8b762e",
           "patches/llvm-mos/0013-320-far-memops.patch": "c260942d57c00ee4ada175b207e64103c0f5278882addf1968aa58f5df6f14be",
           "patches/llvm-mos/0014-321-far-ptr-phi-legalize.patch": "88cd05f4ba5561c9ecf5478c41e6eb6de86aad63fb79c4192e611f0dbcf44a39",
           "patches/llvm-mos/0015-321-coalesce-rc-undef.patch": "99207f659449ae85f9dbb73a42f81940d110ee6f381468177661769d2a2f5ec4",
           "patches/llvm-mos/0017-321-a16-s64-unmerge-anyext-legalize.patch": "dc48b7b2aca19bea48f4df5b156ab2865ea28c06e2caf74ec2ffa379682c3a47",
-          "patches/llvm-mos/0018-320-imag32-spill.patch": "1127018514058b5d707f0c94a03d8b9256ae63f025e5a712602c0c246ce65d3d",
-          "patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch": "4fb97f8f9e48fa674a9dbb577f0b9abe123c67bbd36ac25bdf90a8a2d9e3937a",
-          "patches/llvm-mos/0023-mos-trunc-selection-regclasses.patch": "b7c42b27c997fde1bc3b6ee11374221ce92a58194c1dd6caa41d3d29f0536226",
-          "patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy-vendor.patch": "ac73b4ce8519ef232d964a72bea7c58448cdbd6d307a4393bc3365db13f5fae4",
+          "patches/llvm-mos/0018-320-imag32-spill.patch": "a83848a891c86b46c4391891aeb436db2f9e015e20d96efbbd23148c41b6d808",
+          "patches/llvm-mos/0020-mos-65816-block-move-bank-order.patch": "8cc62a9f61609dba5e8ef90066109cab7e76b19638b787e82e4bf9860da23327",
+          "patches/llvm-mos/0023-mos-trunc-selection-regclasses.patch": "0ac31900eb0199a35b5caafa5a4bce057f07512a378b8c6476b98de91a6697e6",
+          "patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy-vendor.patch": "0ca2ea4c418a1d06912d5af1170aab7a24fdc72b14975d9d564171492ac3c049",
           "patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy.patch": "946d7093460d5d270b145f13d6cd968854c71350f960b581c3b7ea7a3891b878",
-          "patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch": "0d7c22f61d9da0cb2eb919594225a88c552eea8066f40fb256f428069c957ef6",
-          "patches/llvm-mos/0030-mos-copy-phys-reg-liveness.patch": "4d3aca874ca47b5e09b805767103391836c1e44dbb2536d926e0b72cff939dfd",
-          "patches/llvm-mos/0031-mos-copy-phys-reg-reuse-dst.patch": "75e32cb2372214b87535ef9256b21ac57556388d520ea8a47f8272c66dc33374",
-          "patches/llvm-mos/0032-mos-quote-register-named-symbols-vendor.patch": "3bf239d798f150f7e71934fa9f51823cf54a5d9fdd94c3ea7469345099c6a84e",
+          "patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch": "5582281889379404f0ee829ed109453410cd2574a23a8bccafab33f7bbbc5d70",
+          "patches/llvm-mos/0030-mos-copy-phys-reg-liveness.patch": "55e8e363fa2795be1649f77b82931118561a1dfe01fc553eeffc5687f66a5145",
+          "patches/llvm-mos/0031-mos-copy-phys-reg-reuse-dst.patch": "092e7c18b695b4b3b49663f08a41a211f5dbca86c8c0978156d0fe25c85f5011",
+          "patches/llvm-mos/0032-mos-quote-register-named-symbols-vendor.patch": "0ea9f0a9f26258f163f5a909c5d8f6a0168c8aeed982a75bbaed65ef1e437e22",
           "patches/llvm-mos/0032-mos-quote-register-named-symbols.patch": "1dad44009485886f8902d75af69a73226bab28336d62d150b141b8731ed77895",
-          "patches/llvm-mos/0033-llvm-spill-hoist-no-new-vregs.patch": "354df5d23df68133ce5196fd9c1a5a49fbe986bce074c77585e6d3bb92a91c59",
-          "patches/llvm-mos/0034-mos-legalize-prefetch.patch": "3547c979ca3f46a9016ffacc0af1e4a3650a0416c94821c4797fec30b3d0f155",
-          "patches/llvm-mos/0036-mos-zero-page-indexed-globals.patch": "0f59ed316257a987aa7a0b56ef0da3f2abfd23ce313f6b55cf025f0c6ea051ad",
-          "patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output-vendor.patch": "83d9febf3a84deed8e462a23234ab0e1cf99d78c727d284a1618736149762857",
+          "patches/llvm-mos/0033-llvm-spill-hoist-no-new-vregs.patch": "3eebe16445d1ddf2e91440d5f91a6fbcf7ca5253f323288e8861e9cf011cdc85",
+          "patches/llvm-mos/0034-mos-legalize-prefetch.patch": "e598b142592e15bd5f611208e13a6c3b9c81faf5e9c7aa8e8d66df76515aa293",
+          "patches/llvm-mos/0036-mos-zero-page-indexed-globals.patch": "97bf121f801a5a5f2f42c99e6f0955a1aa330961c06b33d6412cbc10c6d56ada",
+          "patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output-vendor.patch": "5edfde2e604df2e267f2a93bb228b535a1a0fa1773c15438195bd641538b196c",
           "patches/llvm-mos/0037-llvm-gisel-inline-asm-indirect-output.patch": "fe3cd0653aa7648161f793ffb4e4523ebc82a41ef37b22b9bf7c5a1f019c09fd",
-          "patches/llvm-mos/0038-mos-return-frame-address.patch": "f89d933259bed96a6b2381c89b5d0223d052e8f9d48e1a9ca4a10687e401e881",
-          "patches/llvm-mos/0039-mos-asm-modifier-width.patch": "36a5787a07b72287ebbb98a49d1f2358407805483151d57fc50b91f2c8c2d909",
-          "patches/llvm-mos/0040-llvm-inline-spiller-coalesce-scratch-vregs.patch": "eaacf0c0620f6ba3367cac9bf4a1129a2eb2125ade409aadb9df60947d610e62",
-          "patches/llvm-mos/0041-llvm-gisel-inline-asm-multi-register-vendor.patch": "7f5086666113a216e2225c0940e10549a6ff6b858a28899aa89ee4fe4a28cf75",
+          "patches/llvm-mos/0038-mos-return-frame-address.patch": "c6be0f4f232c4844e2ed1aa90ed9e6fdfb9c46edc76e74a2bb7980ab521091f5",
+          "patches/llvm-mos/0039-mos-asm-modifier-width.patch": "2e5cfd4003e706e45e5b504ef73a15ebc4268dc2e0c971e99358acf197a4e5a0",
+          "patches/llvm-mos/0040-llvm-inline-spiller-coalesce-scratch-vregs.patch": "8f8cb9227946d75ef90962d9568e1df32fee21a705fe1ba6ddf9d11698ebb716",
+          "patches/llvm-mos/0041-llvm-gisel-inline-asm-multi-register-vendor.patch": "94a9394e79a2410d9e54fae92aaca4248fcda34bc0cfd4311f32311b3a21fe14",
           "patches/llvm-mos/0041-llvm-gisel-inline-asm-multi-register.patch": "e9e1620ff4678b0e9ca48d276e5652cd2d151824e9fe193482ea7eea1a311690",
-          "patches/llvm-mos/0042-mos-scavenger-p-undef-a16-test.patch": "eaf414cbd8e734a7e948c0f2c7c37b2217ab27c506bf1fbdd3f34b24bd2f4515",
-          "patches/llvm-mos/0043-mos-inline-asm-physreg-width.patch": "b7cd878471eea839e1e2120c1dc2b34156f4e1a04b152205a9177f4a95e88207",
-          "patches/llvm-mos/0044-mos-asm-print-long-address.patch": "2afad4b164bb771db8166c93ffee43584c53f06b488b9329d8501cc1632219f0",
-          "patches/llvm-mos/0045-mos-asm-print-a16-immediate.patch": "7094596a4577fd947f5f9bd8c94856cbd76c9bfbea356cde073362a64cee68dc",
-          "patches/llvm-mos/0046-mos-fixupkinds-addrasciz-row.patch": "d42701fa045a3f4c4a3cf73807cfb50e0dc838e51b3bc1b06e95be61d935e442",
-          "patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch": "b641d19787bcf09329b8535190f09c0d924d51177a4273cb258bacd211dd9d61",
-          "patches/llvm-mos/0048-mos-far-codegen-lit-tests.patch": "9f05c7f60818fb7237b63511ffcd5692ca40c10df0113f0ea78730cb3c9349be",
-          "patches/llvm-mos/0050-mos-float-vector-arithmetic.patch": "7a2fc01b9501617b8b6e054a1fd49c7551a7894886690876f8a0a788ab7f23fb",
-          "patches/llvm-mos/0051-mos-zp-byte-index.patch": "a556854efd35934b4c9d4554ff85fc083ca5145426cd20f3a6bd237fb5ab2c6c",
-          "patches/llvm-mos/0052-mos-bank-relax-section-offset.patch": "6133684707d20c64040dcb0c7b2900f369ca3e0e2807a891e8b9221e01c2b7db",
-          "patches/llvm-mos/0053-mos-lit-expectations.patch": "6461324efefda8fe4b56ea208bb06e90dc913bda76fd8dfa48ee2048e530246d",
-          "patches/llvm-mos/0054-llvm-scavenger-save-range.patch": "164c0731ae7000b7ad7463e75f31bfa7fd98bc1a3dd18cfc09e4a2c5bd513914",
-          "patches/llvm-mos/0055-mos-native-wide-anyext-vendor.patch": "b081322d5a2d27963d24806156c38ce1738691672cd590e5c627e07513fc98a3",
+          "patches/llvm-mos/0042-mos-scavenger-p-undef-a16-test.patch": "318416a1ddc3fbb443e1cf7cd5929ee88a373268a4ed614d705b456debfe55b4",
+          "patches/llvm-mos/0043-mos-inline-asm-physreg-width.patch": "380ec16bd784b5d550e3f54dcdb968a86ecb29bb35d455da18d2f694f0c67e4f",
+          "patches/llvm-mos/0044-mos-asm-print-long-address.patch": "d8d3f80104eb2ab27ce037279c1f30788426537422954690b9a1512154f273cd",
+          "patches/llvm-mos/0045-mos-asm-print-a16-immediate.patch": "932715bafac268e8b32a9559f56a5b40b5ce4ce88ed6af2449922e5edda2ac85",
+          "patches/llvm-mos/0046-mos-fixupkinds-addrasciz-row.patch": "fc307e1169bf529edba24f841f5d974b2f14f2b6be701ab8a1f0e13e988f878d",
+          "patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch": "4ad32636798046e698eb5545dfcf91df3cb36cb43e80c1a0275099bcc80ad523",
+          "patches/llvm-mos/0048-mos-far-codegen-lit-tests.patch": "d4ef67c18a07f2df536c03dbb70fbe643d65292af0e1abd8b94acc42a515f67b",
+          "patches/llvm-mos/0050-mos-float-vector-arithmetic.patch": "9693035a8b7c7e121e167a54be06ce575230fa6b8e1db51e0e85e9964fa55f27",
+          "patches/llvm-mos/0051-mos-zp-byte-index.patch": "06dbd3e6f1e6e861e267c6ae784e6ce97003ed5243949d829d6c8a4e0a9b3b47",
+          "patches/llvm-mos/0052-mos-bank-relax-section-offset.patch": "0c8934b063c93827fd53632e66bcb26546717e678d2803b5e826cb20123a9b2d",
+          "patches/llvm-mos/0053-mos-lit-expectations.patch": "ee8c4cf409e2d3a66296d5f43c252b3463ca9c54509eac5bb70b2fb767013c07",
+          "patches/llvm-mos/0054-llvm-scavenger-save-range.patch": "d918da58389a94f4efcf5ae30ac164e2c7d16b4b817c3a3db3b92afb4fc325ea",
+          "patches/llvm-mos/0055-mos-native-wide-anyext-vendor.patch": "99262decf9f86106cef34e1f3178dd58502b47b0718f737afe20b5418073c906",
           "patches/llvm-mos/0055-mos-native-wide-anyext.patch": "d9195b63ff4dab33b7c7ba7550b5322b85de88234f1a0abd299e61ba4ee826f4",
-          "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds-vendor.patch": "9f07249b13542c94da5655c4aac1d8731360eac84a6e3cf555dee742474bd9e1",
+          "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds-vendor.patch": "23292adf8130b407a5187447d87aca87f1bec7064bebabcd0058f863d47716c1",
           "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch": "5e9371ff0b8657706cb84b4fcaff87ede306f2b7b974f5e661e7afba6ac8d132",
+          "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds-vendor.patch": "62a0d05c4d226d13d0c65dc199e9f937c03a5c84d6e63a660707bfaf4526276c",
           "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch": "8c4213521cb578f7ff2c9acb331fa260087e286f943fcb2f775a841824bc5035",
+          "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type-vendor.patch": "330c6477b1cf5b406870d27539d59fc9f526074e9ac5a06d92c4d59b61e3b210",
           "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch": "87710e8424951a95f0a0f40a59b748817fbc46d76466c12b0f2ce0c92711251d",
+          "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts-vendor.patch": "a9bd66b56a31834e2679eca26d4a231c2bcdce406b3e060d4c00ee2c05dd0932",
           "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch": "2a3f0424702a4e714b91b4336e8b992b984455f541739707396b6a5774706162",
-          "patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch": "d12ccaec7f42cfa51cf6dec43d86df058e8258546c24dbf5b8488d27826093a4",
-          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
-          "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
-          "patches/llvm-mos/0063-mos-near-shared-store.patch": "8cab3c582d6b66f7fad83a74d90f34ce3762a08e76530838b93459a3435a0271",
-          "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
-          "patches/llvm-mos/0065-mos-near-store-profitability.patch": "7f6d9a7c9e9698ae886671acda27c3e8da24e0d3da0163248a8945c3a36ea7b9",
-          "patches/llvm-mos/0066-mos-far-extload-worklist.patch": "2c725a85fa3d485b875c2975cfa02a98461947d831bc6030528ef1aa1287b597",
-          "patches/llvm-mos/0067-mos-competing-carry-gate.patch": "86db849b6f81fb0eb52be5f80191adef1abaae7b77057eec5d45dd0301f1bd33",
-          "patches/llvm-mos/0068-mos-null-output-streamer.patch": "64a2595cc07a321e725e40a16aadaef2c156b8a63260e71f7fdc97591a6b1208",
-          "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
-          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
-          "patches/llvm-mos/0071-mos-accumulator-pressure-set.patch": "2a50f8e119dc0ac68cd736cbf1562842b909354853163a62b7c27a65b82f82c6",
-          "patches/llvm-mos/0072-amdgpu-rci-test-template-spacing.patch": "7a8a69e99a81c66d2a30e30bad0eb018cc8d6c124dbed64729dde301d6aa7dea",
+          "patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch": "389d3fe9b288001da48ed529b36a717999a36fdc996b7866928baadb6cb2c9c5",
+          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "ad27cbec6a8aeb9151188026a82338eecfef1886ea42723528fcf424a25261d3",
+          "patches/llvm-mos/0062-mos-native-far-word.patch": "8b4d7da832d13e88b678d3e97593727d46fe820fd24250acd381f78a312f5b06",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "e7039fa70defd5376bc34fa1cbc596d690a9f2baa1663ce9f2302bada775b9d7",
+          "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "ce787c8bdc1e5ccd9e12e3b3eb6a947046630f90c906b23f69a4a3f5f263fda2",
+          "patches/llvm-mos/0065-mos-near-store-profitability.patch": "d888a2d043b07036fd3ae4ed488592e9f252d5e442db1d499d6352e7d731ee7d",
+          "patches/llvm-mos/0066-mos-far-extload-worklist.patch": "07f613f5a094f41c9bfc13a02a8c30376f40db32184eb0eea11c53cb16660e1b",
+          "patches/llvm-mos/0067-mos-competing-carry-gate.patch": "a59d1aaf51957e839e389f61c260e2f8c43dcd38a162cf6796d8548b44029177",
+          "patches/llvm-mos/0068-mos-null-output-streamer.patch": "6bf1825d346ee7d415ab59e1f61d37a6e51465fefe7d8c5aec1554e54f53492d",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "e4cde56542dafa6d87dc38dac74707259d88fd9325b02f2592e355ea867925d5",
+          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "625fb312cfc202df543549b4a6c07296ddd431b21874b2997944cdd081f0e308",
+          "patches/llvm-mos/0071-mos-accumulator-pressure-set.patch": "a354d43ac626424f0bd057ed52e384e6a709a91d114b2f55429b8ae25414e8df",
+          "patches/llvm-mos/0072-amdgpu-rci-test-template-spacing.patch": "cdb498e53405d0207f4cbe4c50b804fef858274896e11b819ccc99f81a78f7b4",
           "docs/defects/mos-packed-layout-pin-rebase.json": "3483e6afa8380faf6cb52f006fd006eeea3121a85a52325198ac242337d94f51",
           "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/bootstrap.log": "a2f9922e7ebe1a987b87c518eb923f4ad010321b17c131a53be05888683dc938",
@@ -2911,10 +2935,12 @@
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/prefetch-upstream-x86_64-pc-linux.stdout": "4f63e7ab9d2ad9b5c3190db99deee862ec8d6f1e259c5ef8c4de8eca1ce39952",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/tool-set-final-relink-commands.json": "46c030298d461931e267df771eca2d248dfc5243eb88551e5783b04b1e0a3c9a",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/validate.py": "5421bbeb441deab86ed178278c7546dc1c3cdf687553c61db7364fd181e347c1",
-          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/verify-stack.py": "654d9c9f7106af08f8158df3535a3d1682672d39034004c1a4e8b60d00a3c04e"
+          "docs/pr-preparations/2026-10-09/pin-rebase/evidence/verify-stack.py": "654d9c9f7106af08f8158df3535a3d1682672d39034004c1a4e8b60d00a3c04e",
+          "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
+          "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9"
         },
-        "reviewed_at": "2026-10-10T00:15:36.646240+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:37.141475+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -2927,13 +2953,13 @@
       ],
       "receipt": {
         "sources": {
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907",
           "docs/pr-preparations/2026-09-23/0034-0035-validation.md": "cd1d18d5d78f300223aab28dd5234961aada06e5c3063e98fb3e61fb7f00dffb"
         },
-        "reviewed_at": "2026-10-09T14:22:01.654794+00:00",
-        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T08:45:37.445598+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2941,16 +2967,20 @@
       "sources": [
         "dev/llvm-mos-pin",
         "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
-        "docs/upstream-status/2026-10-09.json"
+        "docs/upstream-status/2026-10-09.json",
+        "docs/test-results/repin/2026-10-10/full-validation.json",
+        "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json"
       ],
       "receipt": {
         "sources": {
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
-          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981"
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
+          "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
+          "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9"
         },
-        "reviewed_at": "2026-10-10T00:15:30.822069+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:37.445829+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -2963,12 +2993,12 @@
       ],
       "receipt": {
         "sources": {
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch": "b641d19787bcf09329b8535190f09c0d924d51177a4273cb258bacd211dd9d61",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644"
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
+          "patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch": "4ad32636798046e698eb5545dfcf91df3cb36cb43e80c1a0275099bcc80ad523",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080"
         },
-        "reviewed_at": "2026-10-10T00:15:43.319357+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T08:45:37.805961+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -3036,21 +3066,72 @@
         "dev/regen-patch.sh",
         "dev/llvm-mos-pin",
         "docs/test-results/repin/2026-10-10/validation.json",
-        "docs/test-results/repin/2026-10-10/real-replay.log.gz"
+        "docs/test-results/repin/2026-10-10/real-replay.log.gz",
+        "docs/test-results/repin/2026-10-10/full-validation.json",
+        "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json",
+        "docs/test-results/repin/2026-10-10/initial-publication.json",
+        "docs/test-results/repin/2026-10-10/protected-publication-replay.log",
+        {
+          "glob": "docs/defects/*.json"
+        }
       ],
       "receipt": {
         "sources": {
-          "dev/repin-llvm-mos.py": "436ccd97463226cba19c544f306c8b9b88039fe763c649f35b837663c68468c5",
-          "dev/test-repin-llvm-mos.py": "d4e1dd50c88d3048e2cf3879eb53d0d9f000fa6316480882e51131b652c2c1e6",
+          "dev/repin-llvm-mos.py": "ed125a1550a56c428b34e12d478bbb1403af599e5f0b2439f9a6c35e7fb6dbd9",
+          "dev/test-repin-llvm-mos.py": "48c51ee227384bb0d9aed95319e74c3063847f18aaf3cf9a4b52cdddc979c7e0",
           "Taskfile.yml": "28c39cb8fadb1f68dd566e1ee566c0cd33b7278abf3e8208d4b850c982e722b9",
-          "dev/toolchain.sh": "09d5750e135026594f2ef4e0e7db5220bb131dc56e3322821848833f4343d65e",
+          "dev/toolchain.sh": "5abd19878a780efae9fcbd54b7bc965a9910807b40daa9cbf68e61b99166eb85",
           "dev/regen-patch.sh": "784cac0cde97003c1196750ed5b507ef1538b1f0c9ec3a42248d8085688c1141",
-          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
           "docs/test-results/repin/2026-10-10/validation.json": "0e82f6221a7d18eed244ab0cc8682c059109bdafccd3fafcf87633d99092268c",
-          "docs/test-results/repin/2026-10-10/real-replay.log.gz": "92d14a86761423be6dfb1abf6b6d04f4cd66a03faee1d0d8845e1cd2a1c9d586"
+          "docs/test-results/repin/2026-10-10/real-replay.log.gz": "92d14a86761423be6dfb1abf6b6d04f4cd66a03faee1d0d8845e1cd2a1c9d586",
+          "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
+          "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9",
+          "docs/test-results/repin/2026-10-10/initial-publication.json": "ca75a3674c16d0df3a69fcc4217ac259504e7c04e17c77e06e314e9cb3214606",
+          "docs/test-results/repin/2026-10-10/protected-publication-replay.log": "a2167c364f1b2fb0674e0ea2adac59ff307e6517ff9e01c190e15756f52bf3bb",
+          "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
+          "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
+          "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
+          "docs/defects/mos-bank-relax-section-offset.json": "12bd09bd688b5d1453eb10947d4481ba4900482e46133d6f7cca1677cd250353",
+          "docs/defects/mos-carry-scheduling-pressure.json": "f92f8325aee8203ed7bb76773efa7d3473107ff69e6f6aef98f37a3efe9fe64a",
+          "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
+          "docs/defects/mos-far-access-non-65816.json": "552b6483adfedf17890efc86ef069432227360cc96ee1188e8abda15206d0b3f",
+          "docs/defects/mos-far-cc-split-axy-custom-args.json": "07f335500f42673c0eca96ed83e4fd40db8e5cd500971efcb72fbf6bc74a2087",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "5c6940877e86b81992f2c0e3c109ce3fdf3192f417d4ecd2cdf5c66b8f1db00b",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "2723962e3606e07e617c4ebcfde823d3505d9168d4d87cf397d1b9e2a9439cd8",
+          "docs/defects/mos-far-memop-length-truncation.json": "91f4fe1cc38b07aae2f03652fd45de84fd39bd23a2a90a80fd902c2949ade72d",
+          "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "bc62029675d6c745522a7f2dd823787379dd57877591b659d93f2dfb83695669",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
+          "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
+          "docs/defects/mos-huc-blockmove-frameindex-offset.json": "701adc983c0e2576dd2f27ab91501d841429cc2874d9d0a7da747e0508b0c563",
+          "docs/defects/mos-imag32-reserved-pair-units.json": "77c4e9eae0f1b77813cc9be6ac34a5e9a8ea290f0a7c4b3e9c1495f25c178ab4",
+          "docs/defects/mos-late-opt-nongpr-ldimm.json": "8874dea616f76c7264d694f38faad1180abe6115fe55e3ba99e2aa7600621ca7",
+          "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "80663f5d8e17cf3203aba58c8dfa8e86a98cc3f45c4f1e6caee514ed44b8853a",
+          "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
+          "docs/defects/mos-native-width-pressure-sets.json": "dcb44c4de5caf03bf4791f32c30d41c3fdeb5d7643117d030ee96be8118de119",
+          "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
+          "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
+          "docs/defects/mos-near-nowrap-option-clash.json": "f02673b6a5a6895a2ec4edd8d312ad02cb8813c4e42a411719b353c858ce33b1",
+          "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
+          "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
+          "docs/defects/mos-packed-layout-pin-rebase.json": "3483e6afa8380faf6cb52f006fd006eeea3121a85a52325198ac242337d94f51",
+          "docs/defects/mos-spc700-hint-outside-order.json": "230a9fc7bfebdcfd2a82e51a456bac310e382fd89ab2b3642a3b0c01735ff19d",
+          "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
+          "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
+          "docs/defects/mos-xy16-preserve-x-p-save.json": "2ef845beb221866329de3bab055b5f8b78e0e4ba89ebcd52677a4ec37b2aeb8e",
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "5e5d75c0c4494e7d0f10b7bbd0053751e025e041259f27786ede5984e3c1a123",
+          "docs/defects/mos-zp-index-same-width-trunc.json": "cdbe44541ce1abc9cdfe7d3e0cb666cb1d7cb8865d29b378aa146c55941f7640",
+          "docs/defects/reentrant-attribute-contract.json": "15e8272f46879514803da4effd45251fec86befccfc553341f16cbcbad1827ad",
+          "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "b58ad1cc26c6cee550e6b4f2b3677a7b7e3d9d004ad5d9c94cf77fcc6a09d2cd",
+          "docs/defects/selectiondag-inline-asm-register-bounds.json": "fde070950bc0fe9e941061619ad5aca6cd31adc7c65bb28a3748f8fa46c943b0",
+          "docs/defects/selectiondag-inline-asm-vector-parts.json": "0fe97bab63ba3f6aab5ae5e59072bb32e7100439478bd1f249eef5441c813497",
+          "docs/defects/shift64-narrow-count.json": "f838d2f297cd5723db603e66c195b8cf870af624c52b74203b2f0510afd834c6",
+          "docs/defects/snes-soft-stack-static-data-collision.json": "f271d6cb0cfeb0da676a4e59e4a647a0d0f1b82e6a59b8a64acfee824858afe8"
         },
-        "reviewed_at": "2026-10-10T04:17:01.075894+00:00",
-        "note": "Reviewed implementation, 12 passing local Git fixtures and the 51-application real prepare-only tree-equality evidence. Added explicit PASS for those completed checks while keeping the real compiler build and MOS lit gates pending. Next-step commands distinguish current-main updates from the frozen retained candidate and require post-publication document review. The tracked pin and patch stack remain unchanged.",
+        "reviewed_at": "2026-10-10T08:45:39.964868+00:00",
+        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     }

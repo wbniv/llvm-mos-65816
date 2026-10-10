@@ -1,18 +1,19 @@
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index f1a4740f948be02867e1ce42dc66a2bda843cc5a..e05554dc7da18253ff16a0f019834bd51c440a8b 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -53,6 +53,7 @@
+@@ -54,6 +54,7 @@
  #include "llvm/IR/Instructions.h"
  #include "llvm/IR/Intrinsics.h"
  #include "llvm/IR/RuntimeLibcalls.h"
 +#include "llvm/Support/CommandLine.h"
  #include "llvm/Support/ErrorHandling.h"
  #include "llvm/Support/MathExtras.h"
-
-@@ -3122,6 +3123,111 @@
+ 
+@@ -3203,6 +3204,111 @@ static bool noCallBetween(const MachineInstr &VDef, const MachineInstr &U,
           Clean(UB->begin(), U.getIterator());
  }
-
+ 
 +static cl::opt<bool> FarLoopRange(
 +    "mos-far-loop-range", cl::Hidden, cl::init(true),
 +    cl::desc("Use bounded loop ranges for runtime far byte indexing"));
@@ -121,17 +122,17 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
  // The pointer add disappears only when every use is a non-atomic access, or
  // a constant non-negative displacement leading exclusively to such accesses.
  // MaxEnd includes each access's final byte. Escapes and selected fallbacks keep
-@@ -3171,7 +3277,7 @@
+@@ -3252,7 +3358,7 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
    return true;
  }
-
+ 
 -// Fold a runtime byte offset only when its known-bits maximum plus the last
 +// Fold a runtime byte offset only when its proven maximum plus the last
  // accessed byte fits Y (8 bits, or 16 bits under +mos-xy16). Use the computed
  // offset value directly, preserving narrow integer wrapping and bank carries.
  // All uses must fold so the 32-bit pointer add disappears. Absolute bases are
-@@ -3208,10 +3314,11 @@
-
+@@ -3289,10 +3395,11 @@ static bool tryFarRuntimeIndexFold(
+ 
    // (b) range proof on the offset itself, before the (costlier) user walk.
    const uint64_t Limit = STI.hasIndex16() ? 0xFFFF : 0xFF;
 -  const APInt MaxOffAP = VT->getKnownBits(Off).getMaxValue();
@@ -142,11 +143,12 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
 +  if (MaxOff > Limit)
      return false;
 -  const uint64_t MaxOff = MaxOffAP.getZExtValue();
-
+ 
    // (c) every user of V folds, and the furthest byte any of them reads/writes
    // still satisfies (b).
 diff --git a/llvm/test/CodeGen/MOS/far-loop-range.mir b/llvm/test/CodeGen/MOS/far-loop-range.mir
 new file mode 100644
+index 0000000000000000000000000000000000000000..5ade1d242420bb6dc533e56b8fe1f2a283f7b932
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-loop-range.mir
 @@ -0,0 +1,1066 @@

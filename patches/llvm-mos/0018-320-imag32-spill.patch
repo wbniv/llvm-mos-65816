@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index ed81da04b3b9798682fbc43deda2eee8557d029d..7f458c89880213f09cdaad654f528264c077257c 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-@@ -951,8 +951,64 @@ void MOSInstrInfo::loadStoreRegStackSlot(
-     if (IsLoad)
+@@ -959,7 +959,63 @@ void MOSInstrInfo::loadStoreRegStackSlot(
        Instr.addDef(Ptr, RegState::EarlyClobber);
      Instr.addFrameIndex(FrameIndex).addImm(0).addMemOperand(MMO);
    } else {
@@ -67,7 +67,7 @@ diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstr
          (Reg.isVirtual() &&
           MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Ac16RegClass))) {
        // #321: spill/reload the 16-bit accumulator A16 with a single 16-bit
-@@ -1033,7 +1089,8 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+@@ -1030,7 +1086,8 @@ void MOSInstrInfo::loadStoreRegStackSlot(
        // #321 SPILL CONTRACT (static-stack mirror of MOSRegisterInfo::expandLDSTStk):
        // this single-byte fall-through is correct ONLY for 8-bit classes. Every
        // spillable >=16-bit register class needs its OWN case above. Handled:
@@ -78,9 +78,10 @@ diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstr
        loadStoreByteStaticStackSlot(
            Builder, MachineOperand::CreateReg(Reg, IsLoad), FrameIndex, 0, MMO);
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index 13d462823850a6f98be923ba1d2057d0e0b51e18..61815ad7fd8e40035feae2566a4da6e2eaad185d 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-@@ -662,6 +662,38 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -913,6 +913,38 @@ void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
      return;
    }
  
@@ -119,7 +120,7 @@ diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRe
    if (MOS::Imag16RegClass.contains(Loc)) {
      if (!IsLoad) {
        // Loc may not be fully alive at this point, which would create uses of
-@@ -707,6 +739,7 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+@@ -960,6 +992,7 @@ void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
    //   - Ac16   (16-bit accumulator): one 16-bit indirect STAIndir16/LDAIndir16.
    //   - Xc16   (16-bit X index): TXA16 → STAIndir16 / LDAIndir16 → TAX16.
    //   - Yc16   (16-bit Y index): TYA16 → STAIndir16 / LDAIndir16 → TAY16.
@@ -128,13 +129,13 @@ diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRe
    assert(Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc));
  
 diff --git a/llvm/test/CodeGen/MOS/prologepilog.mir b/llvm/test/CodeGen/MOS/prologepilog.mir
+index 4fa2e3acd73fa3c07a3e15510a38d3a67eaaa05a..f8dad8ad3d860e5810078511f6f5fbc152bef67b 100644
 --- a/llvm/test/CodeGen/MOS/prologepilog.mir
 +++ b/llvm/test/CodeGen/MOS/prologepilog.mir
-@@ -270,6 +270,32 @@ body: |
-     $rs0, early-clobber $rs1 = LDStk %stack.0, 2 :: (load 2 from %stack.0 + 2)
+@@ -253,6 +253,32 @@ body: |
  
  ...
-+---
+ ---
 +name: ld_far_ptr
 +stack:
 +  - { id: 0, size: 4 }
@@ -160,6 +161,7 @@ diff --git a/llvm/test/CodeGen/MOS/prologepilog.mir b/llvm/test/CodeGen/MOS/prol
 +    ; CHECK: $a = COPY $rc7
 +    early-clobber $rs1 = STStk $rl1, %stack.0, 0 :: (store 4 into %stack.0)
 +...
- ---
++---
  name: st_byte
  stack:
+   - { id: 0, size: 1 }

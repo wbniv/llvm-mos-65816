@@ -1,9 +1,9 @@
 diff --git a/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp b/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
-index 198865959a00..8fd6ff4e439c 100644
+index a1c3d102771f20f94fb1bc9c96a12974fbd4a45c..637ad4974be85674b5e4a985362c391bb6e41497 100644
 --- a/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
 +++ b/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
 @@ -127,22 +127,28 @@ public:
-
+ 
      // MOS-specific modifier: check if result fits in range
      if (const auto *ME = dyn_cast<MOSMCExpr>(Imm)) {
 -      const MOS::Fixups FixupKind = ME->getFixupKind();
@@ -27,7 +27,7 @@ index 198865959a00..8fd6ff4e439c 100644
 +      // 16-bit immediate.
 +      if (MaxValue > High)
 +        return false;
-
+ 
 -      // Try to evaluate constant now
 +      // Try to evaluate constant now. MOSMCExpr::evaluateAsConstant has
 +      // already masked the value to the modifier's width, so this only rejects
@@ -36,15 +36,15 @@ index 198865959a00..8fd6ff4e439c 100644
        if (ME->evaluateAsConstant(Value) && Value > 0)
 -        return Value <= MaxValue;
 +        return Value >= Low && Value <= MaxValue;
-
+ 
 -      return MaxValue <= High;
 +      return true;
      }
-
+ 
      // Symbol reference: defer to linker
 diff --git a/llvm/test/MC/MOS/modifier-width-65816.s b/llvm/test/MC/MOS/modifier-width-65816.s
 new file mode 100644
-index 000000000000..cf897ca11612
+index 0000000000000000000000000000000000000000..cf897ca1161238cb45cede5dbaeab5ad53dfddff
 --- /dev/null
 +++ b/llvm/test/MC/MOS/modifier-width-65816.s
 @@ -0,0 +1,40 @@
@@ -90,7 +90,7 @@ index 000000000000..cf897ca11612
 +    lda 1193046,x               ; CHECK: encoding: [0xbf,0x56,0x34,0x12]
 diff --git a/llvm/test/MC/MOS/modifier-width-errors.s b/llvm/test/MC/MOS/modifier-width-errors.s
 new file mode 100644
-index 000000000000..c82ddb89acaa
+index 0000000000000000000000000000000000000000..c82ddb89acaa918da66d5293cdf31fef695fb4d0
 --- /dev/null
 +++ b/llvm/test/MC/MOS/modifier-width-errors.s
 @@ -0,0 +1,32 @@
@@ -128,7 +128,7 @@ index 000000000000..c82ddb89acaa
 +lda #mos16(5)
 diff --git a/llvm/test/MC/MOS/modifier-width.s b/llvm/test/MC/MOS/modifier-width.s
 new file mode 100644
-index 000000000000..393e241e862b
+index 0000000000000000000000000000000000000000..393e241e862b8a12c9e2bdfc41fbfca61aa6a1f1
 --- /dev/null
 +++ b/llvm/test/MC/MOS/modifier-width.s
 @@ -0,0 +1,54 @@

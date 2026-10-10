@@ -1,6 +1,8 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index e05554dc7da18253ff16a0f019834bd51c440a8b..2edaf71065af0a243312577fe29835ae52b5fc7f 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -56,6 +56,7 @@
+@@ -57,6 +57,7 @@
  #include "llvm/Support/CommandLine.h"
  #include "llvm/Support/ErrorHandling.h"
  #include "llvm/Support/MathExtras.h"
@@ -8,7 +10,7 @@
  
  using namespace llvm;
  using namespace TargetOpcode;
-@@ -3228,36 +3229,57 @@
+@@ -3309,36 +3310,57 @@ static uint64_t getFarOffsetMax(Register Reg, const MachineRegisterInfo &MRI,
    }
    return Max;
  }
@@ -78,7 +80,7 @@
        continue;
      }
      if (const auto *PA = dyn_cast<GPtrAdd>(&U)) {
-@@ -3266,9 +3288,9 @@
+@@ -3347,9 +3369,9 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
        auto C = getIConstantVRegValWithLookThrough(PA->getOffsetReg(), MRI);
        if (!C || C->Value.isNegative() || C->Value.getActiveBits() > 16)
          return false;
@@ -91,7 +93,7 @@
          return false;
        continue;
      }
-@@ -3285,16 +3307,22 @@
+@@ -3366,16 +3388,22 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
  // pressure. Calls must not separate the add from its accesses; multiple
  // accesses require a call-free function to avoid repeated spilled-base reloads.
  // Prefer an 8-bit Y whenever the remaining users fit it.
@@ -121,7 +123,7 @@
      return false;
  
    // (a)
-@@ -3313,7 +3341,7 @@
+@@ -3394,7 +3422,7 @@ static bool tryFarRuntimeIndexFold(
      return false;
  
    // (b) range proof on the offset itself, before the (costlier) user walk.
@@ -130,7 +132,7 @@
    const uint64_t MaxOff =
        FarLoopRange ? getFarOffsetMax(Off, MRI, *VT, *MI.getParent())
                     : VT->getKnownBits(Off).getMaxValue().getLimitedValue();
-@@ -3328,12 +3356,17 @@
+@@ -3409,12 +3437,17 @@ static bool tryFarRuntimeIndexFold(
        FnMayCall |= mayBecomeCall(I, MRI);
    uint64_t MaxEnd = 0;
    unsigned NumAccesses = 0;
@@ -149,7 +151,7 @@
    if (MaxOff + MaxEnd > Limit)
      return false;
    // This access is one of V's users, so its displacement is inside the walk.
-@@ -3343,15 +3376,18 @@
+@@ -3424,15 +3457,18 @@ static bool tryFarRuntimeIndexFold(
    const LLT IdxTy = LLT::scalar(Wide ? 16 : 8);
    Register Idx = Builder.buildZExtOrTrunc(IdxTy, Off).getReg(0);
    if (ConstOffset)
@@ -174,7 +176,7 @@
        .addUse(V->getBaseReg()) // far pointer -> Imag32 ZP quad
        .addUse(Idx)             // proven-in-range byte offset -> Y
        .addMemOperand(*MI.memoperands_begin());
-@@ -3359,8 +3395,9 @@
+@@ -3460,8 +3496,9 @@ static bool tryFarRuntimeIndexFold(
    return true;
  }
  
@@ -186,7 +188,7 @@
    MachineIRBuilder &Builder = Helper.MIRBuilder;
  
    Register Addr = MI.getPointerReg();
-@@ -3384,11 +3421,10 @@
+@@ -3485,11 +3522,10 @@ bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(
  
    // Fold the range-proven runtime offset and displacement together when the
    // pointer add can disappear, preserving the offset's integer arithmetic.
@@ -202,6 +204,9 @@
      return true;
  
    // (b) Only the zero-proof displacement window.
+diff --git a/llvm/test/CodeGen/MOS/far-word-policy.mir b/llvm/test/CodeGen/MOS/far-word-policy.mir
+new file mode 100644
+index 0000000000000000000000000000000000000000..21e0042ed9eef187c0eda1ca2d2265b2d82bb2dc
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-word-policy.mir
 @@ -0,0 +1,531 @@

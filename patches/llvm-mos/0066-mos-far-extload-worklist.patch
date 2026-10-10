@@ -1,10 +1,11 @@
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 8a9c9ff98de5b0b862e8280a45b245fa731fcf88..f1a4740f948be02867e1ce42dc66a2bda843cc5a 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -2937,11 +2937,14 @@
+@@ -3018,11 +3018,14 @@ bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
    if (!Operand.has_value())
      return false;
-
+ 
 -  Helper.Observer.changingInstr(MI);
 -  MI.setDesc(Builder.getTII().get(Opcode));
 -  MI.removeOperand(1);
@@ -20,9 +21,10 @@ diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSL
 +  MI.eraseFromParent();
    return true;
  }
-
+ 
 diff --git a/llvm/test/CodeGen/MOS/far-absolute-extload.mir b/llvm/test/CodeGen/MOS/far-absolute-extload.mir
 new file mode 100644
+index 0000000000000000000000000000000000000000..1a57c36941a6b7b8c7caedb54ee37404bf3df1aa
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-absolute-extload.mir
 @@ -0,0 +1,40 @@

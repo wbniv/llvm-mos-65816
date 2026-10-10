@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/MOSMachineScheduler.cpp b/llvm/lib/Target/MOS/MOSMachineScheduler.cpp
-index 03ef97dca..1b24b7b55 100644
+index 03ef97dca95bccc03261480a9bf4eaa338417fc3..1b24b7b55214aaa706368c9e711209b68882f7ca 100644
 --- a/llvm/lib/Target/MOS/MOSMachineScheduler.cpp
 +++ b/llvm/lib/Target/MOS/MOSMachineScheduler.cpp
 @@ -32,6 +32,7 @@
@@ -8,12 +8,12 @@ index 03ef97dca..1b24b7b55 100644
  #include "llvm/CodeGen/MachineOperand.h"
 +#include "llvm/CodeGen/MachineRegisterInfo.h"
  #include "llvm/CodeGen/MachineScheduler.h"
-
+ 
  using namespace llvm;
 @@ -39,6 +40,85 @@ using namespace llvm;
  MOSSchedStrategy::MOSSchedStrategy(const MachineSchedContext *C)
      : GenericScheduler(C) {}
-
+ 
 +void MOSSchedStrategy::initialize(ScheduleDAGMI *DAG) {
 +  GenericScheduler::initialize(DAG);
 +  Carries.clear();
@@ -99,7 +99,7 @@ index 03ef97dca..1b24b7b55 100644
 @@ -49,6 +129,10 @@ bool MOSSchedStrategy::tryCandidate(SchedCandidate &Cand,
      return true;
    }
-
+ 
 +  if (tryLess(carryExcessDiff(TryCand.SU, TryCand.AtTop),
 +              carryExcessDiff(Cand.SU, Cand.AtTop), TryCand, Cand, RegExcess))
 +    return TryCand.Reason != NoCand;
@@ -108,20 +108,20 @@ index 03ef97dca..1b24b7b55 100644
            registerClassPressureDiff(MOS::AcRegClass, TryCand.SU, TryCand.AtTop),
            registerClassPressureDiff(MOS::AcRegClass, Cand.SU, Cand.AtTop),
 diff --git a/llvm/lib/Target/MOS/MOSMachineScheduler.h b/llvm/lib/Target/MOS/MOSMachineScheduler.h
-index 6b1bb37ee..932ae5ae6 100644
+index 6b1bb37ee34cc5dab91881b322e7dc504795015a..932ae5ae6ae0d7a9d3a3742fd7a9f203e211fa9d 100644
 --- a/llvm/lib/Target/MOS/MOSMachineScheduler.h
 +++ b/llvm/lib/Target/MOS/MOSMachineScheduler.h
 @@ -13,14 +13,36 @@
  #ifndef LLVM_LIB_TARGET_MOS_MOS_MACHINESCHEDULER_H
  #define LLVM_LIB_TARGET_MOS_MOS_MACHINESCHEDULER_H
-
+ 
 +#include "llvm/ADT/DenseMap.h"
 +#include "llvm/ADT/SmallPtrSet.h"
 +#include "llvm/ADT/SmallVector.h"
  #include "llvm/CodeGen/MachineScheduler.h"
-
+ 
  namespace llvm {
-
+ 
  class MOSSchedStrategy : public GenericScheduler {
 +  // Track the defining node rather than the virtual register: two-address
 +  // carry chains may redefine the same register at each arithmetic step.
@@ -141,16 +141,16 @@ index 6b1bb37ee..932ae5ae6 100644
 +
  public:
    MOSSchedStrategy(const MachineSchedContext *C);
-
+ 
 +  void initialize(ScheduleDAGMI *DAG) override;
 +  void schedNode(SUnit *SU, bool IsTopNode) override;
 +
    bool tryCandidate(SchedCandidate &Cand, SchedCandidate &TryCand,
                      SchedBoundary *Zone) const override;
-
+ 
 diff --git a/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir b/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
 new file mode 100644
-index 000000000..8789d4b22
+index 0000000000000000000000000000000000000000..8789d4b220ea2c8d5066d9e84a63adf07b32b54f
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
 @@ -0,0 +1,82 @@

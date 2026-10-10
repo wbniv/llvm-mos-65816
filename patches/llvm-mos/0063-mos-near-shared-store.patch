@@ -1,9 +1,9 @@
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index fb436a568112..9ce5e11fa460 100644
+index fb436a568112af91cd4359d074fff7cac50fce51..9ce5e11fa4602450b5b6ea94b0372b40ee7e2d46 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -957,8 +957,55 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
-
+ 
    // Native 16-bit arithmetic is selected directly under accumulator mode.
    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
 -  if (STI.hasAccum16() && MRI.getType(Dst) == LLT::scalar(16))
@@ -57,7 +57,7 @@ index fb436a568112..9ce5e11fa460 100644
 +    if (!ByteSequence)
 +      return true; // selected natively (selectAlu16Native)
 +  }
-
+ 
    assert(MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB);
    auto RHSConst =
 @@ -2287,6 +2334,22 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
@@ -84,13 +84,13 @@ index fb436a568112..9ce5e11fa460 100644
          return none_of(Use.memoperands(), [](const MachineMemOperand *MMO) {
            return MMO->isAtomic();
 diff --git a/llvm/test/CodeGen/MOS/a16-byte-store.ll b/llvm/test/CodeGen/MOS/a16-byte-store.ll
-index d9c2a64528c6..ec8228bc2bde 100644
+index d9c2a64528c65e5a91e7f498655e83819621e7b5..ec8228bc2bdebe9037e85fcbeffeb3560d9f8a38 100644
 --- a/llvm/test/CodeGen/MOS/a16-byte-store.ll
 +++ b/llvm/test/CodeGen/MOS/a16-byte-store.ll
 @@ -87,13 +87,13 @@ define void @store_copy() {
    ret void
  }
-
+ 
 -; A byte-built argument with a native arithmetic use already needs Imag16.
 +; A byte-built argument stored before a unit increment can stay in A:X.
  define i16 @store_mixed(i16 %value) {

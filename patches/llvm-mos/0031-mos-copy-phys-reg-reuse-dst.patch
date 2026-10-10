@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index bb835d3..853df21 100644
+index 061ca7652d30a70065583083803192288ec40041..5124d7b2f85eaa1b78ee1a2cab0699d40cdb7ae5 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-@@ -763,7 +763,9 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
+@@ -789,7 +789,9 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
    const TargetRegisterInfo *TRI = Builder.getMRI()->getTargetRegisterInfo();
  
    const auto ReuseReg = [&](MachineInstr &Copy, Register Reg) {
@@ -13,7 +13,7 @@ index bb835d3..853df21 100644
      for (MachineInstr &MI : make_range(MachineBasicBlock::iterator(Copy),
                                        Builder.getInsertPt()))
        MI.clearRegisterKills(Reg, TRI);
-@@ -777,27 +779,29 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
+@@ -803,27 +805,29 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
    for (MachineInstr &MI :
         make_range(MachineBasicBlock::reverse_iterator(Builder.getInsertPt()),
                    Builder.getMBB().rend())) {
@@ -63,7 +63,7 @@ index bb835d3..853df21 100644
  none:
 diff --git a/llvm/test/CodeGen/MOS/copy-phys-reg-reuse-dst.mir b/llvm/test/CodeGen/MOS/copy-phys-reg-reuse-dst.mir
 new file mode 100644
-index 000000000000..e92037a53df8
+index 0000000000000000000000000000000000000000..e92037a53df880bc5e24e5ef084d3e7bdfc3aaff
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/copy-phys-reg-reuse-dst.mir
 @@ -0,0 +1,93 @@
@@ -161,7 +161,7 @@ index 000000000000..e92037a53df8
 +    RTS implicit $y, implicit $a
 +...
 diff --git a/llvm/test/CodeGen/MOS/copy-phys-reg.mir b/llvm/test/CodeGen/MOS/copy-phys-reg.mir
-index 9de851df125c..5f236e155670 100644
+index 9de851df125c0aede37c03b9bd1a009360f4988b..5f236e155670a90ce2c6f5b04781b8ae8a0bd3b2 100644
 --- a/llvm/test/CodeGen/MOS/copy-phys-reg.mir
 +++ b/llvm/test/CodeGen/MOS/copy-phys-reg.mir
 @@ -135,8 +135,7 @@ body: |

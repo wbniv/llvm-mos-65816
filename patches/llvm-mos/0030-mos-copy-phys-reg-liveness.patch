@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index a7eacc0d6b0e..bb835d372ce9 100644
+index 7f458c89880213f09cdaad654f528264c077257c..061ca7652d30a70065583083803192288ec40041 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-@@ -762,6 +762,14 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
+@@ -788,6 +788,14 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
  
    const TargetRegisterInfo *TRI = Builder.getMRI()->getTargetRegisterInfo();
  
@@ -17,7 +17,7 @@ index a7eacc0d6b0e..bb835d372ce9 100644
    // Whether the register still holds the value it does at the Builder
    // instruction.
    DenseMap<Register, bool> Clobbered;
-@@ -785,11 +793,11 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
+@@ -811,11 +819,11 @@ Register MOSInstrInfo::getRegWithVal(MachineIRBuilder &Builder, Register Val,
  
      if (Dst == Val) {
        if (RC.contains(Src) && !Clobbered[Src])
@@ -33,7 +33,7 @@ index a7eacc0d6b0e..bb835d372ce9 100644
  none:
 diff --git a/llvm/test/CodeGen/MOS/copy-phys-reg-liveness.mir b/llvm/test/CodeGen/MOS/copy-phys-reg-liveness.mir
 new file mode 100644
-index 000000000000..60722fb81796
+index 0000000000000000000000000000000000000000..60722fb81796b9d90408ce42cb453efb8074cf5f
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/copy-phys-reg-liveness.mir
 @@ -0,0 +1,117 @@

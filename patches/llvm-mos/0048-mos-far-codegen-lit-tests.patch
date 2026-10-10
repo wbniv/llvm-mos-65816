@@ -1,6 +1,6 @@
 diff --git a/llvm/test/CodeGen/MOS/far-addressing.ll b/llvm/test/CodeGen/MOS/far-addressing.ll
 new file mode 100644
-index 0000000..1029714
+index 0000000000000000000000000000000000000000..1029714e7472ce272f95b3b3ca217ce6da0f3039
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-addressing.ll
 @@ -0,0 +1,90 @@
@@ -96,7 +96,7 @@ index 0000000..1029714
 +}
 diff --git a/llvm/test/CodeGen/MOS/far-call.ll b/llvm/test/CodeGen/MOS/far-call.ll
 new file mode 100644
-index 0000000..85635e5
+index 0000000000000000000000000000000000000000..85635e5c1965c6405ddb70d899d99406015820d7
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-call.ll
 @@ -0,0 +1,67 @@
@@ -169,7 +169,7 @@ index 0000000..85635e5
 +}
 diff --git a/llvm/test/CodeGen/MOS/far-legalizer-bridges.ll b/llvm/test/CodeGen/MOS/far-legalizer-bridges.ll
 new file mode 100644
-index 0000000..4b13581
+index 0000000000000000000000000000000000000000..4b13581976a6cc7e9159185fb8fd11e3258e3db0
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-legalizer-bridges.ll
 @@ -0,0 +1,92 @@
@@ -267,7 +267,7 @@ index 0000000..4b13581
 +; ASM: .size slot, 3
 diff --git a/llvm/test/CodeGen/MOS/far-phi.ll b/llvm/test/CodeGen/MOS/far-phi.ll
 new file mode 100644
-index 0000000..db204a9
+index 0000000000000000000000000000000000000000..db204a99c067159b686c63205123385cac48600b
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-phi.ll
 @@ -0,0 +1,72 @@

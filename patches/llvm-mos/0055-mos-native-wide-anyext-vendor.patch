@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index d76b2c0cbdb2..14dd392b97c4 100644
+index d76b2c0cbdb205192ba82d2e97f037ade00845e8..14dd392b97c4d9d5ac849f4f97282225402eac37 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -117,10 +117,10 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
@@ -19,7 +19,7 @@ index d76b2c0cbdb2..14dd392b97c4 100644
         return SrcBits == 1 || (SrcBits != 8 && SrcBits != 16 && SrcBits != 32);
 diff --git a/llvm/test/CodeGen/MOS/anyext-masked-byte.ll b/llvm/test/CodeGen/MOS/anyext-masked-byte.ll
 new file mode 100644
-index 000000000000..e3ba456f0fd6
+index 0000000000000000000000000000000000000000..e3ba456f0fd65606d7dfa28dcd25c90693bf02f8
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/anyext-masked-byte.ll
 @@ -0,0 +1,13 @@
@@ -38,7 +38,7 @@ index 000000000000..e3ba456f0fd6
 +}
 diff --git a/llvm/test/CodeGen/MOS/anyext-wide.mir b/llvm/test/CodeGen/MOS/anyext-wide.mir
 new file mode 100644
-index 000000000000..2e99fc2d4029
+index 0000000000000000000000000000000000000000..2e99fc2d4029e2a0661c74cc74279cae03323239
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/anyext-wide.mir
 @@ -0,0 +1,79 @@

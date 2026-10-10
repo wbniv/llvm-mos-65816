@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-10",
+  "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919",
+  "preparation_record": "docs/test-results/repin/2026-10-10/validation.json",
+  "publication_receipt": "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json",
+  "old_pin": "f24948c7d1a4b9f162d4d0192ccceecab1e441ff",
+  "pin": "0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63",
+  "candidate_tree": "065937b873d8229d96932f59f0141724ccd0c9a9",
+  "active_applications": 51,
+  "retired_applications": [],
+  "compiler_validation": {
+    "result": "PASS",
+    "build": "build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw",
+    "duration": "141m17s",
+    "assertions": false,
+    "lto": false,
+    "host_compiler": "Clang 21.1.8",
+    "compiler_version": "clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos.git 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63)",
+    "source": ".scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw",
+    "install": "build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/install",
+    "docker_image": "sha256:5bcaeac0ab7a1f3498ee304b1149ea4365c9c1ae19c75ea415310c90babb455a",
+    "mos_lit": {
+      "discovered": 208,
+      "passed": 204,
+      "unsupported": 4,
+      "failed": 0,
+      "seconds": 6.32
+    },
+    "binary_sha256": {
+      "/home/will/llvm-mos-65816/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang": "e1578293be2fea1ef090a1db48609c97407508dcff052b3019e18d8aca166074",
+      "/home/will/llvm-mos-65816/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc": "e8dcef6480b04aa1a3e85697deaa25236a5d223af07372a42b66abc39dcb022d",
+      "/home/will/llvm-mos-65816/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/ld.lld": "49c6fada0ab812a00f9d5a8a4b1f0cae8b99cf716eba9695435392f46fca00a9"
+    },
+    "validated_source_diff_sha256": "e5f4339ef2ba300ce6eea42f778c50e4f6ec6bc6e565fc172248bd52d646bc50",
+    "source_note": "Normal toolchain MOS.cmake project trim is retained in validated-source.diff; the independent replay tree is recorded separately.",
+    "build_actions": "Release distribution build, install-distribution and lit tools"
+  },
+  "workflow_validation": {
+    "result": "PASS",
+    "command": "task upstream:repin:test",
+    "tests": 17,
+    "seconds": 58.511,
+    "final_file_sha256": {
+      "dev/repin-llvm-mos.py": "ed125a1550a56c428b34e12d478bbb1403af599e5f0b2439f9a6c35e7fb6dbd9",
+      "dev/test-repin-llvm-mos.py": "48c51ee227384bb0d9aed95319e74c3063847f18aaf3cf9a4b52cdddc979c7e0"
+    },
+    "identity_note": "Hashes identify final workflow files tested by fixtures. The compiler process began before relative-alternates and protected-artifact publication edits; private Git metadata was repaired during the build. Final bootstrap aliases were independently reapplied and produced the same tested compiler tree, without another compiler build.",
+    "earlier_fixture_run": {
+      "tests": 15,
+      "seconds": 103.736
+    }
+  },
+  "infrastructure": "Three full-checkout attempts timed out before compilation. Retained local object copies plus a complete shallow target pack supplied the missing objects. Relative alternates resolve under the container mount and after run relocation. These are workflow failures, not new compiler defects.",
+  "nonfatal_warnings": [
+    "TypePrinter.cpp: MOSFarCall switch coverage",
+    "CodeGenCommonISel.cpp: unused NewDbg",
+    "MOSCombiner.cpp: unused nearAbsLoad and isCommutativeAlu",
+    "MOSStaticStackAlloc.cpp and MOSZeroPageAlloc.cpp: deprecated getGetElementPtr"
+  ],
+  "limitations": "No new SNES runtime or performance checks, assertions build, global installed-toolchain promotion, independent upstream packet validation, historical defect closure or live upstream status refresh.",
+  "artifacts": {
+    "docs/test-results/repin/2026-10-10/full-validation.log.gz": {
+      "sha256": "1764d80d69e7bd93b9ddf865cae4a19e30a9d306db01b6d8fd97b81adb4a4bd5",
+      "uncompressed_sha256": "bcf00c4fef9ec9d8802e06eae682d59a26485a2bcbde5e7c576ac7c1b0bf6ac0"
+    },
+    "docs/test-results/repin/2026-10-10/validated-source.diff.gz": {
+      "sha256": "a96d2a7ac6947ecf15fe2c880553c1832cbcf9125c8e47b7b8e4223fa5b712fc",
+      "uncompressed_sha256": "e5f4339ef2ba300ce6eea42f778c50e4f6ec6bc6e565fc172248bd52d646bc50"
+    },
+    "docs/test-results/repin/2026-10-10/published-state.json.gz": {
+      "sha256": "42bdce4c99b1866027dc9255f646883dab819970a947d02efb5ca35146baae89",
+      "uncompressed_sha256": "09001ada233289c91f987c645074a3af907f3fe558b2770a1fd416b4d281872f"
+    },
+    "docs/test-results/repin/2026-10-10/initial-publication.json": {
+      "sha256": "ca75a3674c16d0df3a69fcc4217ac259504e7c04e17c77e06e314e9cb3214606"
+    },
+    "docs/test-results/repin/2026-10-10/protected-publication-replay.log": {
+      "sha256": "a2167c364f1b2fb0674e0ea2adac59ff307e6517ff9e01c190e15756f52bf3bb"
+    },
+    "docs/test-results/repin/2026-10-10/workflow-fixtures.log.gz": {
+      "sha256": "3529ade004f43b1081531d11701cf2823a95632af660d4d115dc474f7f2a23f1"
+    }
+  },
+  "preserved_artifacts": {
+    "patches/llvm-mos/0013-320-far-memops.patch": "patches/llvm-mos/0013-320-far-memops-vendor.patch",
+    "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch": "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds-vendor.patch",
+    "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type-vendor.patch",
+    "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts-vendor.patch"
+  },
+  "publication_note": "The initial publication exposed hash-protected defect artifacts during staged evidence checks. Original bytes were restored and the command re-published using vendor twins for 0013/0057/0058/0059. The final bootstrap tree equals the tested candidate. Initial receipt, state and build logs remain retained; no defect record or baseline was edited."
+}

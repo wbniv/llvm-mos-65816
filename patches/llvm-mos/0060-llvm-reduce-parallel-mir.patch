@@ -1,5 +1,33 @@
+diff --git a/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce.mir b/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce.mir
+new file mode 100644
+index 0000000000000000000000000000000000000000..252ea6c9d1e7eec5add4f28ea3ab17859b1aec54
+--- /dev/null
++++ b/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce.mir
+@@ -0,0 +1,22 @@
++# REQUIRES: thread_support, mos-registered-target
++# RUN: llvm-reduce -x=mir -j 2 --delta-passes=instructions --test FileCheck --test-arg --check-prefix=INTERESTING --test-arg %s --test-arg --input-file %s -o %t
++# RUN: FileCheck --check-prefix=CHECK %s < %t
++
++# INTERESTING: STAbs {{.*}}, 1
++# CHECK: STAbs {{.*}}, 1
++# CHECK: RTS
++
++---
++name:            parallel_instr_reduce
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    %0:gpr = LDImm 1
++    undef %1.sublo:imag16 = COPY %0
++    %2:imag16 = COPY %1
++    %3:gpr = COPY %2.sublo
++    STAbs %3, 0
++    %4:gpr = COPY %2.subhi
++    STAbs %4, 1
++    RTS
++...
 diff --git a/llvm/tools/llvm-reduce/deltas/Delta.cpp b/llvm/tools/llvm-reduce/deltas/Delta.cpp
-index 0c1e40f223c6..325a278b03bf 100644
+index 3b1d5fddf5bd310dca4e103cac5f95f09144fa9b..1a2a701bf73bec85f0526ae3a57d07cca7ce1ff5 100644
 --- a/llvm/tools/llvm-reduce/deltas/Delta.cpp
 +++ b/llvm/tools/llvm-reduce/deltas/Delta.cpp
 @@ -21,6 +21,7 @@
@@ -18,7 +46,7 @@ index 0c1e40f223c6..325a278b03bf 100644
  
  using namespace llvm;
  
-@@ -152,23 +154,46 @@ CheckChunk(const Chunk ChunkToCheckForUninterestingness,
+@@ -154,23 +156,46 @@ CheckChunk(const Chunk ChunkToCheckForUninterestingness,
    return Clone;
  }
  
@@ -68,7 +96,7 @@ index 0c1e40f223c6..325a278b03bf 100644
      ChunkResult->writeBitcode(BCOS);
      // Communicate that the task reduced a chunk.
      AnyReduced = true;
-@@ -176,7 +201,7 @@ static SmallString<0> ProcessChunkFromSerializedBitcode(
+@@ -178,7 +203,7 @@ static SmallString<0> ProcessChunkFromSerializedBitcode(
    return Result;
  }
  
@@ -77,7 +105,7 @@ index 0c1e40f223c6..325a278b03bf 100644
  
  /// Runs the Delta Debugging algorithm, splits the code into chunks and
  /// reduces the amount of chunks that are considered interesting by the
-@@ -253,9 +278,9 @@ void llvm::runDeltaPass(TestRunner &Test, const DeltaPass &Pass) {
+@@ -255,9 +280,9 @@ void llvm::runDeltaPass(TestRunner &Test, const DeltaPass &Pass) {
  
      UninterestingChunks.clear();
  
@@ -90,7 +118,7 @@ index 0c1e40f223c6..325a278b03bf 100644
        OriginalBC.clear();
        raw_svector_ostream BCOS(OriginalBC);
        Test.getProgram().writeBitcode(BCOS);
-@@ -278,16 +303,12 @@ void llvm::runDeltaPass(TestRunner &Test, const DeltaPass &Pass) {
+@@ -280,16 +305,12 @@ void llvm::runDeltaPass(TestRunner &Test, const DeltaPass &Pass) {
          assert(TaskQueue.empty());
  
          AnyReduced = false;
@@ -110,7 +138,7 @@ index 0c1e40f223c6..325a278b03bf 100644
                Pass.Func, UninterestingChunks, ChunksStillConsideredInteresting,
                OriginalBC, std::ref(AnyReduced)));
          }
-@@ -303,14 +324,14 @@ void llvm::runDeltaPass(TestRunner &Test, const DeltaPass &Pass) {
+@@ -305,14 +326,14 @@ void llvm::runDeltaPass(TestRunner &Test, const DeltaPass &Pass) {
            Future.wait();
  
            NumChunksProcessed++;
@@ -127,7 +155,7 @@ index 0c1e40f223c6..325a278b03bf 100644
                    std::ref(Test), Pass.Func, UninterestingChunks,
                    ChunksStillConsideredInteresting, OriginalBC,
                    std::ref(AnyReduced)));
-@@ -318,10 +339,14 @@ void llvm::runDeltaPass(TestRunner &Test, const DeltaPass &Pass) {
+@@ -320,10 +341,14 @@ void llvm::runDeltaPass(TestRunner &Test, const DeltaPass &Pass) {
              continue;
            }
  
@@ -146,30 +174,3 @@ index 0c1e40f223c6..325a278b03bf 100644
            break;
          }
  
-diff --git a/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce.mir b/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce.mir
-new file mode 100644
---- /dev/null
-+++ b/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce.mir
-@@ -0,0 +1,22 @@
-+# REQUIRES: thread_support, mos-registered-target
-+# RUN: llvm-reduce -x=mir -j 2 --delta-passes=instructions --test FileCheck --test-arg --check-prefix=INTERESTING --test-arg %s --test-arg --input-file %s -o %t
-+# RUN: FileCheck --check-prefix=CHECK %s < %t
-+
-+# INTERESTING: STAbs {{.*}}, 1
-+# CHECK: STAbs {{.*}}, 1
-+# CHECK: RTS
-+
-+---
-+name:            parallel_instr_reduce
-+tracksRegLiveness: true
-+body:             |
-+  bb.0:
-+    %0:gpr = LDImm 1
-+    undef %1.sublo:imag16 = COPY %0
-+    %2:imag16 = COPY %1
-+    %3:gpr = COPY %2.sublo
-+    STAbs %3, 0
-+    %4:gpr = COPY %2.subhi
-+    STAbs %4, 1
-+    RTS
-+...

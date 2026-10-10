@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 9ce5e11fa460..8a9c9ff98de5 100644
+index 9ce5e11fa4602450b5b6ea94b0372b40ee7e2d46..8a9c9ff98de5b0b862e8280a45b245fa731fcf88 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -959,12 +959,13 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
@@ -96,7 +96,7 @@ index 9ce5e11fa460..8a9c9ff98de5 100644
 +      }
 +    }
    }
-
+ 
    assert(MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB);
 @@ -2348,7 +2394,7 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
            return false;
@@ -110,7 +110,7 @@ index 9ce5e11fa460..8a9c9ff98de5 100644
 @@ -2365,10 +2411,11 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
      });
    };
-
+ 
 -  // A single plain indirect store can consume an A:X value directly. Imaginary
 -  // argument pairs and values shared with other stores can favor one wide load.
 -  // Allow only copies and byte splits between the merge and its consumers: other
@@ -206,7 +206,7 @@ index 9ce5e11fa460..8a9c9ff98de5 100644
      });
 diff --git a/llvm/test/CodeGen/MOS/a16-near-store-profit.ll b/llvm/test/CodeGen/MOS/a16-near-store-profit.ll
 new file mode 100644
-index 000000000000..bc8d9aa4ef13
+index 0000000000000000000000000000000000000000..bc8d9aa4ef135214a370a529bd87647dc2ca7c78
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/a16-near-store-profit.ll
 @@ -0,0 +1,187 @@

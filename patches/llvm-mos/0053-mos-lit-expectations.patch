@@ -1,7 +1,8 @@
 diff --git a/llvm/test/CodeGen/MOS/legalizer.mir b/llvm/test/CodeGen/MOS/legalizer.mir
+index f566385dd9b4761dbc294dc3035d58669e0b4ef1..44de26530432411413df12efcf51db46088c163a 100644
 --- a/llvm/test/CodeGen/MOS/legalizer.mir
 +++ b/llvm/test/CodeGen/MOS/legalizer.mir
-@@ -1351,12 +1351,13 @@
+@@ -1351,12 +1351,13 @@ body: |
      ; CHECK-NEXT: [[C:%[0-9]+]]:_(s8) = G_CONSTANT i8 0
      ; CHECK-NEXT: [[C1:%[0-9]+]]:_(s1) = G_CONSTANT i1 true
      ; CHECK-NEXT: [[SBC:%[0-9]+]]:_(s8), [[SBC1:%[0-9]+]]:_(s1), [[SBC2:%[0-9]+]]:_, [[SBC3:%[0-9]+]]:_, [[SBC4:%[0-9]+]]:_ = G_SBC [[COPY1]], [[C]], [[C1]]
@@ -22,9 +23,10 @@ diff --git a/llvm/test/CodeGen/MOS/legalizer.mir b/llvm/test/CodeGen/MOS/legaliz
      %1:_(s8) = COPY $x
      %2:_(s8) = COPY $y
 diff --git a/llvm/test/CodeGen/MOS/shift-rotate.ll b/llvm/test/CodeGen/MOS/shift-rotate.ll
+index d7617fbebf2ee93bf64a192f5259b3bf71621f6a..06c8c985b0490a86c66b21a1e1457b0638745a11 100644
 --- a/llvm/test/CodeGen/MOS/shift-rotate.ll
 +++ b/llvm/test/CodeGen/MOS/shift-rotate.ll
-@@ -346,13 +346,20 @@
+@@ -346,13 +346,20 @@ entry:
  define i16 @ashr_8(i16 %a) {
  ; CHECK-LABEL: ashr_8:
  ; CHECK:       ; %bb.0: ; %entry
@@ -48,7 +50,7 @@ diff --git a/llvm/test/CodeGen/MOS/shift-rotate.ll b/llvm/test/CodeGen/MOS/shift
  ; CHECK-NEXT:    rts
  entry:
    %0 = ashr i16 %a, 8
-@@ -365,25 +372,28 @@
+@@ -365,25 +372,28 @@ define i16 @ashr_15(i16 %a) {
  ; CHECK-NEXT:    txa
  ; CHECK-NEXT:    bpl .LBB21_2
  ; CHECK-NEXT:  ; %bb.1: ; %entry
@@ -78,17 +80,16 @@ diff --git a/llvm/test/CodeGen/MOS/shift-rotate.ll b/llvm/test/CodeGen/MOS/shift
 +; CHECK-NEXT:    jmp .LBB21_8
  ; CHECK-NEXT:  .LBB21_7: ; %entry
 -; CHECK-NEXT:    asl __rc2
--; CHECK-NEXT:    rol
--; CHECK-NEXT:    stx __rc2
 +; CHECK-NEXT:    ldy #0
 +; CHECK-NEXT:  .LBB21_8: ; %entry
 +; CHECK-NEXT:    cpx #1
-+; CHECK-NEXT:    rol
+ ; CHECK-NEXT:    rol
+-; CHECK-NEXT:    stx __rc2
 +; CHECK-NEXT:    sty __rc2
  ; CHECK-NEXT:    rol __rc2
  ; CHECK-NEXT:    ldx __rc2
  ; CHECK-NEXT:    rts
-@@ -394,17 +404,24 @@
+@@ -394,17 +404,24 @@ entry:
  define i32 @ashr_16(i32 %a) {
  ; CHECK-LABEL: ashr_16:
  ; CHECK:       ; %bb.0: ; %entry
@@ -118,12 +119,3 @@ diff --git a/llvm/test/CodeGen/MOS/shift-rotate.ll b/llvm/test/CodeGen/MOS/shift
  ; CHECK-NEXT:    rts
  entry:
    %0 = ashr i32 %a, 16
-diff --git a/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
---- a/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
-+++ b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
-@@ -1,4 +1,4 @@
--; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prolog-epilog -verify-machineinstrs < %s | FileCheck %s
-+; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prolog-epilog -verify-machineinstrs < %s | FileCheck %s
-
- ; Stock 6502 at -O0 (reduced with llvm-reduce from gcc.c-torture/execute/strlen-4.c).
- ; The frame is larger than 255 bytes, so a frame-index expansion is an

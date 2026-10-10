@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/MOSMCInstLower.cpp b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
-index 75fc2ea7bded..b0badcb4d5ea 100644
+index 7c3abcc077bb46a9bb852162d25c1162c687754e..8951382cc4291e59492d8634e5bbda6b8243ee72 100644
 --- a/llvm/lib/Target/MOS/MOSMCInstLower.cpp
 +++ b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
 @@ -39,10 +39,12 @@ static bool canUseZeroPageIdx(const MachineOperand &MO) {
@@ -19,7 +19,7 @@ index 75fc2ea7bded..b0badcb4d5ea 100644
  }
  
  // Instructions with indexed addressing must have zero page-matching bases
-@@ -651,7 +653,7 @@ void MOSMCInstLower::lower(const MachineInstr *MI, MCInst &OutMI) {
+@@ -649,7 +651,7 @@ void MOSMCInstLower::lower(const MachineInstr *MI, MCInst &OutMI) {
    case MOS::STZpIdx:
    case MOS::STAbsIdx: {
      bool MustZP = MI->getOpcode() == MOS::STZpIdx;
@@ -30,7 +30,7 @@ index 75fc2ea7bded..b0badcb4d5ea 100644
        llvm_unreachable("Unexpected register.");
 diff --git a/llvm/test/CodeGen/MOS/zero-page-indexed-stz.mir b/llvm/test/CodeGen/MOS/zero-page-indexed-stz.mir
 new file mode 100644
-index 000000000000..2c36ff58845a
+index 0000000000000000000000000000000000000000..2c36ff58845a452705d64251feb4d9fa420ddd7e
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/zero-page-indexed-stz.mir
 @@ -0,0 +1,22 @@
@@ -58,7 +58,7 @@ index 000000000000..2c36ff58845a
 +...
 diff --git a/llvm/test/CodeGen/MOS/zero-page-indexed.ll b/llvm/test/CodeGen/MOS/zero-page-indexed.ll
 new file mode 100644
-index 000000000000..782931356866
+index 0000000000000000000000000000000000000000..782931356866716575d32187ca4a775a2636f5a1
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/zero-page-indexed.ll
 @@ -0,0 +1,32 @@
@@ -96,7 +96,7 @@ index 000000000000..782931356866
 +}
 diff --git a/llvm/test/CodeGen/MOS/zero-page-indexed.mir b/llvm/test/CodeGen/MOS/zero-page-indexed.mir
 new file mode 100644
-index 000000000000..c5fabb453b2b
+index 0000000000000000000000000000000000000000..c5fabb453b2b3c32c70aefd3cc799c0ee9de6a8a
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/zero-page-indexed.mir
 @@ -0,0 +1,110 @@

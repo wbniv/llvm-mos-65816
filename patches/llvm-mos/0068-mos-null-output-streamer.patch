@@ -1,4 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp
+index e99bd15951ab42c64e9aca1ec4922b2910e770ce..46b79c33b20aa6c9206b8b15355ab7a7b197ff4b 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp
 @@ -93,6 +93,27 @@ static MCTargetStreamer *createMCAsmTargetStreamer(MCStreamer &S,
@@ -42,6 +43,7 @@ diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp b/llvm/lib/Tar
  }
 diff --git a/llvm/test/CodeGen/MOS/filetype-null.ll b/llvm/test/CodeGen/MOS/filetype-null.ll
 new file mode 100644
+index 0000000000000000000000000000000000000000..10f1ae7eb82ba459e99d0c07d5f8bf195ffb7d99
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/filetype-null.ll
 @@ -0,0 +1,10 @@

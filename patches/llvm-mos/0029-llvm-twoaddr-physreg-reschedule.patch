@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp b/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
-index 20f209358639..03bd7a420d93 100644
+index aa1116a2e6f6138e48219ddcb176b9f11ab640c2..3f0dd5332080875cf018abd92501f482cd0f88fc 100644
 --- a/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
 +++ b/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
 @@ -28,6 +28,7 @@
@@ -10,7 +10,7 @@ index 20f209358639..03bd7a420d93 100644
  #include "llvm/ADT/SmallPtrSet.h"
  #include "llvm/ADT/SmallVector.h"
  #include "llvm/ADT/Statistic.h"
-@@ -1218,6 +1219,16 @@ bool TwoAddressInstructionImpl::rescheduleKillAboveMI(
+@@ -1197,6 +1198,16 @@ bool TwoAddressInstructionImpl::rescheduleKillAboveMI(
        Register MOReg = MO.getReg();
        if (!MOReg)
          continue;
@@ -29,7 +29,7 @@ index 20f209358639..03bd7a420d93 100644
            // Moving KillMI can clobber the physical register if the def has
 diff --git a/llvm/test/CodeGen/MOS/mixed-width-call.ll b/llvm/test/CodeGen/MOS/mixed-width-call.ll
 new file mode 100644
-index 000000000000..bb69a1ebf347
+index 0000000000000000000000000000000000000000..bb69a1ebf347a03591151cd492fa68961183613a
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/mixed-width-call.ll
 @@ -0,0 +1,33 @@
@@ -68,7 +68,7 @@ index 000000000000..bb69a1ebf347
 +declare i16 @ext(i16, i16)
 diff --git a/llvm/test/CodeGen/MOS/twoaddr-reschedule-physreg.mir b/llvm/test/CodeGen/MOS/twoaddr-reschedule-physreg.mir
 new file mode 100644
-index 000000000000..6616391f5966
+index 0000000000000000000000000000000000000000..35a086fb323569fd0ee09448a44d93f21ea38aff
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/twoaddr-reschedule-physreg.mir
 @@ -0,0 +1,79 @@

@@ -1,8 +1,8 @@
 diff --git a/clang/lib/Driver/ToolChains/CommonArgs.cpp b/clang/lib/Driver/ToolChains/CommonArgs.cpp
-index 3d210db669db..5a4c27045518 100644
+index dc69e47513d09ca9003785435a9155de8124c81d..1ed0f91321066ffafa762d538e5da795f73faf84 100644
 --- a/clang/lib/Driver/ToolChains/CommonArgs.cpp
 +++ b/clang/lib/Driver/ToolChains/CommonArgs.cpp
-@@ -2731,16 +2731,6 @@ void tools::addMOSCodeGenArgs(llvm::opt::ArgStringList &CmdArgs) {
+@@ -2759,16 +2759,6 @@ void tools::addMOSCodeGenArgs(llvm::opt::ArgStringList &CmdArgs) {
    CmdArgs.push_back("-mllvm");
    CmdArgs.push_back("-align-large-globals=false");
  
@@ -20,7 +20,7 @@ index 3d210db669db..5a4c27045518 100644
    // essential on the 6502. There's far less code to compile, so we can be
    // pickier.
 diff --git a/llvm/lib/CodeGen/InlineSpiller.cpp b/llvm/lib/CodeGen/InlineSpiller.cpp
-index 82309cf8ef64..30997d809bb7 100644
+index 82309cf8ef641e94680b38b9eeba58f2632e5aa9..30997d809bb799fe38dc1bbae0b0f2dc98f6b84e 100644
 --- a/llvm/lib/CodeGen/InlineSpiller.cpp
 +++ b/llvm/lib/CodeGen/InlineSpiller.cpp
 @@ -1868,6 +1868,9 @@ void HoistSpillHelper::hoistAllSpills() {
@@ -77,7 +77,7 @@ index 82309cf8ef64..30997d809bb7 100644
      NumSpills -= SpillsToRm.size();
 diff --git a/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll b/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll
 new file mode 100644
-index 000000000000..eaf3792b7420
+index 0000000000000000000000000000000000000000..eaf3792b7420cd62b41c7522e84e5de22c570827
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll
 @@ -0,0 +1,63 @@

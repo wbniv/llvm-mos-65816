@@ -1,10 +1,11 @@
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
+index 64ecc809f9f3849e75cb38c0b5f53aa62f736af7..f22b17ca12c90d753c1eddd2c854b7beeaa53238 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
-@@ -174,21 +174,12 @@
+@@ -179,21 +179,12 @@ bool MOSAsmBackend::fixupNeedsRelaxationAdvanced(const MCFragment &F,
    if (Sec->getFlags() & ELF::SHF_MOS_ZEROPAGE)
      return false;
-
+ 
 -  // #320 65816: bank relaxation (Absolute -> AbsoluteLong) grows a 16-bit
 -  // absolute access into a 24-bit absolute-long one. It is only ever needed when
 -  // the symbol lives in a non-zero bank. A NEAR (bank-0) symbol accessed via
@@ -27,10 +28,11 @@ diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp b/llvm/lib/Targe
 +  // Explicit width modifiers and zero-page contracts are handled above.
 +  if (BankRelax && !Sec->getName().starts_with(".far") && Value <= UINT16_MAX)
      return false;
-
+ 
    return !MOS::isZeroPageSectionName(Sec->getName());
 diff --git a/llvm/test/MC/MOS/bank-relax-section-offset.s b/llvm/test/MC/MOS/bank-relax-section-offset.s
 new file mode 100644
+index 0000000000000000000000000000000000000000..2e28c95b5f6e7c29fa0d90089f54203b4c83e834
 --- /dev/null
 +++ b/llvm/test/MC/MOS/bank-relax-section-offset.s
 @@ -0,0 +1,42 @@

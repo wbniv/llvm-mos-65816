@@ -1,16 +1,18 @@
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 2f81fcc7ce616d30f5af4abc48c18fb6a44e4aba..40e872addda73d64c89fa21bcf43e5e132e06330 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -371,6 +371,7 @@
+@@ -399,6 +399,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
                                 G_INTRINSIC_TRUNC,
                                 G_INTRINSIC_ROUNDEVEN,
                                 G_FSINCOS})
 +      .scalarize(0)
        .libcallFor({S32, S64})
        .unsupported();
-
+ 
 diff --git a/llvm/test/CodeGen/MOS/float-vector.ll b/llvm/test/CodeGen/MOS/float-vector.ll
 new file mode 100644
+index 0000000000000000000000000000000000000000..09da7bed35a3bb30c07133f78a69f3e65dbfff5c
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/float-vector.ll
 @@ -0,0 +1,118 @@

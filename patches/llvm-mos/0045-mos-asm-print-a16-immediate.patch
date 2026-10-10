@@ -1,11 +1,11 @@
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
-index ecfe05d..ee02dbf 100644
+index d5b239a4c6dc418e3e92807ac3baff3ed834e0ec..3687db758249ffa044c192a654759836c190810d 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
 @@ -109,6 +109,48 @@ void MOSInstPrinter::printAddr24Operand(const MCInst *MI, unsigned OpNo,
    OS << ')';
  }
-
+ 
 +// A 16-bit immediate prints its width explicitly whenever the bare text could
 +// be re-parsed as an 8-bit one. The assembler has no notion of the M/X flags,
 +// so `adc #66` always matches the narrowest candidate and reassembles to two
@@ -52,7 +52,7 @@ index ecfe05d..ee02dbf 100644
                                          unsigned OpNo, raw_ostream &OS) {
    const MCOperand &Op = MI->getOperand(OpNo);
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
-index 8c61f60..c6795eb 100644
+index 8c61f605e922343a45dd7dd11ed5f02de7d5e873..c6795eb5dbb6fb0c0dc75e7b5d091be8013e4c37 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
 @@ -41,6 +41,7 @@ public:
@@ -64,10 +64,10 @@ index 8c61f60..c6795eb 100644
                                 unsigned OpIdx, unsigned PrintMethodIdx,
                                 raw_ostream &OS);
 diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
-index ad9c595..e48d582 100644
+index 0f29140028697b47faf604d2add3cfbb5e79e6e0..c99df777ad5c172fb7d3fcd9a7b71958a4729892 100644
 --- a/llvm/lib/Target/MOS/MOSInstrFormats.td
 +++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
-@@ -225,7 +225,15 @@ class imm16at<int offset> : Operand<i32> {
+@@ -227,7 +227,15 @@ class imm16at<int offset> : Operand<i32> {
    let OperandNamespace = "MOSOp";
    let Type = i16;
  }
@@ -82,11 +82,11 @@ index ad9c595..e48d582 100644
 +  let PrintMethod = "printImm16Operand";
 +}
  def imm16at5 : imm16at<5>;
-
+ 
  /// An 8-bit pc-relative reference, for branch instructions.
 diff --git a/llvm/test/CodeGen/MOS/a16-immediate-width.ll b/llvm/test/CodeGen/MOS/a16-immediate-width.ll
 new file mode 100644
-index 0000000..6edf135
+index 0000000000000000000000000000000000000000..6edf13521a41c5ba2c42b99103cb1b5a00002255
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/a16-immediate-width.ll
 @@ -0,0 +1,65 @@

@@ -248,7 +248,7 @@ index baf6de604cb7..3d2ac83dafe6 100644
    if (UseHardStack)
 diff --git a/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
 new file mode 100644
-index 000000000000..e04a4074b30b
+index 0000000000000000000000000000000000000000..e04a4074b30b29b44a1023cdc2e327b5f9d2c2f1
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
 @@ -0,0 +1,314 @@

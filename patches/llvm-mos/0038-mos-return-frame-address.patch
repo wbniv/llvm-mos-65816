@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
-index 584cc0c4c8cd..b2d91c3a3d56 100644
+index 263e4907b307ca8513bdd202d97e55f0fd848869..8b5be4850130cf82c45cc1f25a78f0ce4df2b970 100644
 --- a/llvm/lib/Target/MOS/CMakeLists.txt
 +++ b/llvm/lib/Target/MOS/CMakeLists.txt
-@@ -37,6 +37,7 @@ add_llvm_target(MOSCodeGen
+@@ -43,6 +43,7 @@ add_llvm_target(MOSCodeGen
    MOSInternalize.cpp
    MOSLateOptimization.cpp
    MOSLegalizerInfo.cpp
@@ -11,25 +11,25 @@ index 584cc0c4c8cd..b2d91c3a3d56 100644
    MOSMCInstLower.cpp
    MOSMachineScheduler.cpp
 diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
-index 66964b1fe0a0..7654df1345be 100644
+index 5cf8ce440a118ab0c0a743efb3ea8d5e2a9ff435..ccbb162edeff25478cd5f4f254b6833280afbc3a 100644
 --- a/llvm/lib/Target/MOS/MOS.h
 +++ b/llvm/lib/Target/MOS/MOS.h
-@@ -25,6 +25,7 @@ void initializeMOSIndexIVPass(PassRegistry &);
- void initializeMOSInsertCopiesPass(PassRegistry &);
+@@ -28,6 +28,7 @@ void initializeMOSInsertCopiesPass(PassRegistry &);
+ void initializeMOSInsertREPSEPPass(PassRegistry &);
  void initializeMOSInternalizePass(PassRegistry &);
  void initializeMOSLateOptimizationPass(PassRegistry &);
 +void initializeMOSLowerReturnAddressPass(PassRegistry &);
  void initializeMOSLowerSelectPass(PassRegistry &);
  void initializeMOSNonReentrantPass(PassRegistry &);
- void initializeMOSPostRAScavengingPass(PassRegistry &);
+ void initializeMOSRecoverNearNoWrapPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
-index 70e8bb0d45b3..23b706c2d58e 100644
+index 21d4bdaa6c758341d613b11b6433f0d0612eecf5..89e59d7f90ce0c3cfd205c2db1e27c5854e4c0f1 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
 +++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
 @@ -41,6 +41,18 @@ def G_BRCOND_IMM : MOSGenericInstruction {
    let isTerminator = true;
  }
-
+ 
 +// One byte of the address the current function returns to, as JSR/JSL left it
 +// on the hard stack: byte 0 is the low byte, byte 1 the high byte. Everything
 +// pushed on the hard stack since entry sits above that word, so the read stays
@@ -46,13 +46,13 @@ index 70e8bb0d45b3..23b706c2d58e 100644
  // CPX, and CPY. Depending on the outputs and inputs are used, this will select
  // to one or more of these instructions.
 diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-index 21910cfeab37..14e033c2449c 100644
+index e515682a2b8a16333f9fb81578fa3bf194806465..bf7ccb3fbcfc170a34b9db35a610df42de8f451c 100644
 --- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
 +++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-@@ -59,6 +59,23 @@ def LDAbsIdx : MOSPseudo {
+@@ -71,6 +71,23 @@ def LDAbsIdx : MOSPseudo {
    let mayLoad = true;
  }
-
+ 
 +// The selected forms of G_RETURN_ADDRESS_BYTE, expanded by
 +// MOSLowerReturnAddress once the hard-stack depth at the entry block is final.
 +// The 6502 family reads the stack through TSX and an absolute indexed load in
@@ -74,18 +74,18 @@ index 21910cfeab37..14e033c2449c 100644
  def LDImm1 : MOSPseudo {
    dag OutOperandList = (outs CV_GPR_LSB:$dst);
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index d4936aabfadd..6ae473b6f871 100644
+index 4dbd7fb8d37451fdee11276fa77c76b5e162da4f..3bde54f47d82c21abe793358ec4acf9e17a6e0e1 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-@@ -86,6 +86,7 @@ private:
+@@ -89,6 +89,7 @@ private:
    bool selectFrameIndex(MachineInstr &MI);
    std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
    bool selectAddr(MachineInstr &MI);
 +  bool selectReturnAddressByte(MachineInstr &MI);
    std::pair<Register, Register> selectAddrLoHi(MachineInstr &MI);
-   bool selectStore(MachineInstr &MI);
-   bool selectRMW(MachineInstr &MI);
-@@ -218,6 +219,8 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+   // #320 far runtime: materialize a far (addrspace 2) symbol's 24-bit address as
+   // two Imag16 words — the low word is the segment (bits 0-15), the high word is
+@@ -298,6 +299,8 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
      return selectSbc(MI);
    case MOS::G_FRAME_INDEX:
      return selectFrameIndex(MI);
@@ -94,10 +94,10 @@ index d4936aabfadd..6ae473b6f871 100644
    case MOS::G_BLOCK_ADDR:
    case MOS::G_CONSTANT:
    case MOS::G_GLOBAL_VALUE:
-@@ -1253,6 +1256,25 @@ bool MOSInstructionSelector::selectFrameIndex(MachineInstr &MI) {
+@@ -1755,6 +1758,25 @@ bool MOSInstructionSelector::selectFrameIndex(MachineInstr &MI) {
    return true;
  }
-
+ 
 +bool MOSInstructionSelector::selectReturnAddressByte(MachineInstr &MI) {
 +  MachineIRBuilder Builder(MI);
 +  MachineRegisterInfo &MRI = *Builder.getMRI();
@@ -121,10 +121,10 @@ index d4936aabfadd..6ae473b6f871 100644
  MOSInstructionSelector::selectFrameIndexLoHi(MachineInstr &MI) {
    const MachineFunction &MF = *MI.getMF();
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 082c719358b3..91a78cb6d1e1 100644
+index 30ab4d0b6fb08a35e00392f6e156da944794e9a9..2f81fcc7ce616d30f5af4abc48c18fb6a44e4aba 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-@@ -436,6 +436,9 @@ bool MOSLegalizerInfo::legalizeIntrinsic(LegalizerHelper &Helper,
+@@ -520,6 +520,9 @@ bool MOSLegalizerInfo::legalizeIntrinsic(LegalizerHelper &Helper,
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    const MachineRegisterInfo &MRI = *Builder.getMRI();
    switch (cast<GIntrinsic>(MI).getIntrinsicID()) {
@@ -134,10 +134,10 @@ index 082c719358b3..91a78cb6d1e1 100644
    case Intrinsic::vacopy: {
      MachinePointerInfo MPO;
      auto Tmp =
-@@ -2357,6 +2360,63 @@ bool MOSLegalizerInfo::legalizeBrJt(LegalizerHelper &Helper,
+@@ -3837,6 +3840,63 @@ bool MOSLegalizerInfo::legalizeBrJt(LegalizerHelper &Helper,
    return true;
  }
-
+ 
 +// __builtin_frame_address(0) is the incoming soft stack pointer: the address
 +// just above this function's soft-stack frame, where its stack arguments begin.
 +// A fixed object at offset zero names exactly that address, so the existing
@@ -199,13 +199,13 @@ index 082c719358b3..91a78cb6d1e1 100644
                                      MachineRegisterInfo &MRI,
                                      MachineInstr &MI) const {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-index 6c1f0987d982..10e6edb0c850 100644
+index 040412dd1b45186b26a56fda576e5307d965c85c..212f4ca36cb29f80a43c3ae6cb18632305a5ca93 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-@@ -108,6 +108,9 @@ private:
+@@ -142,6 +142,9 @@ private:
    bool legalizeTrap(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
                      MachineInstr &MI) const;
-
+ 
 +  bool legalizeReturnOrFrameAddress(LegalizerHelper &Helper,
 +                                    MachineInstr &MI) const;
 +
@@ -214,7 +214,7 @@ index 6c1f0987d982..10e6edb0c850 100644
                       MachineInstr &MI) const;
 diff --git a/llvm/lib/Target/MOS/MOSLowerReturnAddress.cpp b/llvm/lib/Target/MOS/MOSLowerReturnAddress.cpp
 new file mode 100644
-index 000000000000..1e765145cc0b
+index 0000000000000000000000000000000000000000..1e765145cc0b2c306362a3ee48d1e4f4cb68e86b
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSLowerReturnAddress.cpp
 @@ -0,0 +1,193 @@
@@ -413,7 +413,7 @@ index 000000000000..1e765145cc0b
 +}
 diff --git a/llvm/lib/Target/MOS/MOSLowerReturnAddress.h b/llvm/lib/Target/MOS/MOSLowerReturnAddress.h
 new file mode 100644
-index 000000000000..6af09c0e0300
+index 0000000000000000000000000000000000000000..6af09c0e0300308b8d3e4bed69ee2e8d8e8935dc
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSLowerReturnAddress.h
 @@ -0,0 +1,25 @@
@@ -443,27 +443,27 @@ index 000000000000..6af09c0e0300
 +
 +#endif // not LLVM_LIB_TARGET_MOS_MOSLOWERRETURNADDRESS_H
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index aae795c4877b..da4f693cab5c 100644
+index 0ddf5354c1fb432dffb0453d29c5585f733d4d07..7c171f6d6038f3b4920e5bcefc324ca9b36a609a 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 +++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-@@ -40,6 +40,7 @@
- #include "MOSInsertCopies.h"
+@@ -45,6 +45,7 @@
  #include "MOSInternalize.h"
+ #include "MOSInsertREPSEP.h"
  #include "MOSLateOptimization.h"
 +#include "MOSLowerReturnAddress.h"
  #include "MOSLowerSelect.h"
  #include "MOSMachineFunctionInfo.h"
  #include "MOSMachineScheduler.h"
-@@ -64,6 +65,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
-   initializeMOSInsertCopiesPass(PR);
+@@ -80,6 +81,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeMOSInsertREPSEPPass(PR);
    initializeMOSInternalizePass(PR);
    initializeMOSLateOptimizationPass(PR);
 +  initializeMOSLowerReturnAddressPass(PR);
    initializeMOSLowerSelectPass(PR);
    initializeMOSNonReentrantPass(PR);
    initializeMOSPostRAScavengingPass(PR);
-@@ -314,6 +316,8 @@ void MOSPassConfig::addPreSched2() {
-
+@@ -343,6 +345,8 @@ void MOSPassConfig::addPreSched2() {
+ 
    // This is currently mandatory, since it lowers CMPTermZ.
    addPass(createMOSLateOptimizationPass());
 +  // Every hard-stack push is in place now; expand the return-address reads.
@@ -473,7 +473,7 @@ index aae795c4877b..da4f693cab5c 100644
  }
 diff --git a/llvm/test/CodeGen/MOS/return-address-spc700.ll b/llvm/test/CodeGen/MOS/return-address-spc700.ll
 new file mode 100644
-index 000000000000..b15ebdfd8c1c
+index 0000000000000000000000000000000000000000..b15ebdfd8c1c94665b3352b6cebe1c1ce9d8fd81
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/return-address-spc700.ll
 @@ -0,0 +1,37 @@
@@ -516,7 +516,7 @@ index 000000000000..b15ebdfd8c1c
 +declare ptr @llvm.returnaddress(i32 immarg)
 diff --git a/llvm/test/CodeGen/MOS/return-frame-address.ll b/llvm/test/CodeGen/MOS/return-frame-address.ll
 new file mode 100644
-index 000000000000..14020c4538aa
+index 0000000000000000000000000000000000000000..14020c4538aaa1824763900a1bb318ab06004625
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/return-frame-address.ll
 @@ -0,0 +1,103 @@

@@ -3,6 +3,7 @@
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -129,6 +130,37 @@ for name in ['clang', 'llc', 'ld.lld']:
         self.assertTrue((self.root / run.state['receipt']).is_file())
         self.assertEqual(git(run.repo, 'rev-parse', 'HEAD^{tree}'), run.state['candidate_tree'])
 
+    def test_hashed_defect_artifact_uses_vendor_copy(self):
+        records = self.root / 'docs/defects'
+        records.mkdir(parents=True)
+        path = 'patches/llvm-mos/0006-filtered.patch'
+        (records / 'fixture.json').write_text(json.dumps({'observations': [
+            {'path': path, 'sha256': repin.digest((self.root / path).read_bytes())}]}))
+        regen = self.root / repin.REGEN
+        regen.write_text(regen.read_text() + 'reverse "$PATCHES/0006-filtered.patch"\n')
+        commit(self.root, 'fixture protected regeneration artifact')
+        run = self.invoke()
+        self.assertEqual((self.root / path).read_bytes(), self.before[path])
+        vendor = 'patches/llvm-mos/0006-filtered-vendor.patch'
+        receipt = json.loads((self.root / run.state['receipt']).read_text())
+        self.assertEqual(receipt['preserved_artifacts'], {path: vendor})
+        self.assertIn('apply_patch 0006-filtered-vendor', (self.root / repin.BOOT).read_text())
+        self.assertIn('$PATCHES/0006-filtered-vendor.patch', regen.read_text())
+        self.assertEqual((self.root / vendor).read_bytes(), (run.directory / 'output/0006-filtered.patch').read_bytes())
+
+    def test_protected_vendor_collision_leaves_inputs_unchanged(self):
+        records = self.root / 'docs/defects'
+        records.mkdir(parents=True)
+        path = 'patches/llvm-mos/0006-filtered.patch'
+        (records / 'fixture.json').write_text(json.dumps({'regression': {
+            'path': path, 'sha256': repin.digest((self.root / path).read_bytes())}}))
+        run = self.invoke('--prepare-only')
+        collision = self.patches / '0006-filtered-vendor.patch'
+        collision.write_text('retain existing destination\n')
+        self.invoke('--continue', str(run.directory), success=False)
+        self.assertEqual(collision.read_text(), 'retain existing destination\n')
+        self.assert_inputs_unchanged()
+
     def test_prepare_only_and_resume(self):
         run = self.invoke('--prepare-only')
         self.assertEqual(run.state['phase'], 'verified')
@@ -184,6 +216,58 @@ for name in ['clang', 'llc', 'ld.lld']:
         run = self.invoke('--prepare-only')
         self.assertGreater(run.state['cached_baseline_blobs'], 0)
         self.assertEqual(git(self.upstream, 'status', '--porcelain'), before)
+        self.assert_inputs_unchanged()
+
+    def test_build_cache_is_retained_without_external_alternates(self):
+        run = self.invoke('--prepare-only')
+        cache = self.root / 'vendor/llvm-mos'
+        cache.parent.mkdir()
+        git(self.upstream, 'clone', '--quiet', '--no-hardlinks', str(self.upstream), str(cache))
+        marker = self.base / 'cache-only.txt'
+        marker.write_text('immutable cache-only object\n')
+        object_id = git(cache, 'hash-object', '-w', str(marker))
+        external = cache / '.git/objects/info/alternates'
+        external.write_text(str(self.upstream / '.git/objects') + '\n')
+        before = {str(p.relative_to(cache)): p.read_bytes()
+                  for p in (cache / '.git/objects').rglob('*') if p.is_file()}
+        run.seed_build_cache()
+        self.assertEqual(before, {str(p.relative_to(cache)): p.read_bytes()
+                                  for p in (cache / '.git/objects').rglob('*') if p.is_file()})
+        cache.rename(self.root / 'vendor/moved-cache')
+        self.assertEqual(git(run.repo, 'cat-file', '-t', object_id), 'blob')
+        self.assertTrue(run.state['build_cache_seeded'])
+        self.assertFalse((Path(run.state['retained_build_object_stores'][0]) / 'info/alternates').exists())
+        self.assert_inputs_unchanged()
+
+    def test_missing_base_objects_are_fetched_as_a_complete_pack(self):
+        run = self.invoke('--prepare-only')
+        thin = self.base / 'thin-target'
+        thin.mkdir()
+        git(thin, 'init', '-q')
+        git(thin, 'remote', 'add', 'origin', str(self.upstream))
+        tree = git(self.upstream, 'rev-parse', self.target + '^{tree}')
+        for kind, object_id in [('tree', tree), ('commit', self.target)]:
+            data = subprocess.check_output(['git', '-C', self.upstream, 'cat-file', kind, object_id])
+            copied = subprocess.check_output(['git', '-C', thin, 'hash-object', '-w', '-t', kind, '--stdin'], input=data).decode().strip()
+            self.assertEqual(copied, object_id)
+        missing = git(thin, 'rev-list', '--objects', '--missing=print', self.target)
+        self.assertTrue(any(x.startswith('?') for x in missing.splitlines()))
+        run.repo = thin
+        run.ensure_full_base()
+        present = git(thin, 'rev-list', '--objects', '--missing=print', self.target)
+        self.assertFalse(any(x.startswith('?') for x in present.splitlines()))
+        self.assertEqual(git(thin, 'rev-parse', self.target + '^{tree}'), tree)
+        self.assert_inputs_unchanged()
+
+    def test_private_checkouts_survive_run_relocation(self):
+        run = self.invoke('--prepare-only')
+        moved = self.base / 'moved-run'
+        run.directory.rename(moved)
+        result = subprocess.run(['git', '-C', moved / 'verify', 'cat-file', '-t', self.target],
+                                env={**os.environ, 'GIT_NO_LAZY_FETCH': '1'},
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), 'commit')
         self.assert_inputs_unchanged()
 
     def test_empty_aggregates_keep_bootstrap_placeholders(self):

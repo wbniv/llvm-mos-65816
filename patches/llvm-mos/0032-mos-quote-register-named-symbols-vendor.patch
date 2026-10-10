@@ -1,18 +1,18 @@
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.cpp
-index 51c99f7d705e..262d44a8a438 100644
+index 51c99f7d705ef98ca51e9712b8aa5ea80c32194a..262d44a8a4382386d4fd8a42f23b034d2974c173 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.cpp
 @@ -12,6 +12,7 @@
-
+ 
  #include "MOSMCAsmInfo.h"
  #include "MCTargetDesc/MOSMCExpr.h"
 +#include "MOSInstPrinter.h"
  #include "MOSMCTargetDesc.h"
-
+ 
  #include "llvm/ADT/Enum.h"
 @@ -53,6 +54,22 @@ MOSMCAsmInfo::MOSMCAsmInfo(const Triple &TT, const MCTargetOptions &Options)
    SupportsDebugInformation = true;
-
+ 
    initializeAtSpecifiers(AtSpecifiers);
 +
 +  // Symbol names that also denote registers need quotes in operand position.
@@ -31,22 +31,22 @@ index 51c99f7d705e..262d44a8a438 100644
 +  for (StringRef Name : {"sp", "r", "rp", "ya", "psw"})
 +    ReserveName(Name);
  }
-
+ 
  unsigned MOSMCAsmInfo::getMaxInstLength(const MCSubtargetInfo *STI) const {
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.h
-index 15cbb36bbab3..31b0dd530adc 100644
+index 15cbb36bbab396cb331ca228619d90577e7c250c..31b0dd530adc25b96e3b936cb9f533e5cfb9a19b 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.h
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCAsmInfo.h
 @@ -13,6 +13,7 @@
  #ifndef LLVM_MOS_ASM_INFO_H
  #define LLVM_MOS_ASM_INFO_H
-
+ 
 +#include "llvm/ADT/StringSet.h"
  #include "llvm/MC/MCAsmInfoELF.h"
-
+ 
  namespace llvm {
 @@ -21,6 +22,9 @@ class Triple;
-
+ 
  /// Specifies the format of MOS assembly files.
  class MOSMCAsmInfo : public MCAsmInfoELF {
 +  // Own the lowercase names referenced by the reserved-identifier set.
@@ -54,9 +54,9 @@ index 15cbb36bbab3..31b0dd530adc 100644
 +
  public:
    explicit MOSMCAsmInfo(const Triple &TT, const MCTargetOptions &Options);
-
+ 
 diff --git a/llvm/test/CodeGen/MOS/asm-printer-ir.mir b/llvm/test/CodeGen/MOS/asm-printer-ir.mir
-index 912bd025676f..6ee1061d65ce 100644
+index 912bd025676fe0ec88ee17349194bab38f5f44bf..6ee1061d65ce3db56109a3ab1c55bcbf758031e6 100644
 --- a/llvm/test/CodeGen/MOS/asm-printer-ir.mir
 +++ b/llvm/test/CodeGen/MOS/asm-printer-ir.mir
 @@ -11,15 +11,15 @@ name: zero_page_offsets
@@ -82,7 +82,7 @@ index 912bd025676f..6ee1061d65ce 100644
  ...
 diff --git a/llvm/test/CodeGen/MOS/register-named-globals.ll b/llvm/test/CodeGen/MOS/register-named-globals.ll
 new file mode 100644
-index 000000000000..700d8bf0fbb5
+index 0000000000000000000000000000000000000000..700d8bf0fbb5e30e142d89ff0661f15dd8b25177
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/register-named-globals.ll
 @@ -0,0 +1,46 @@
@@ -134,7 +134,7 @@ index 000000000000..700d8bf0fbb5
 +; CHECK: "a":
 diff --git a/llvm/test/MC/MOS/register-named-symbols-65816.s b/llvm/test/MC/MOS/register-named-symbols-65816.s
 new file mode 100644
-index 000000000000..f66f21bf8118
+index 0000000000000000000000000000000000000000..f66f21bf8118039badbbc5e0d807b33cc8c86ded
 --- /dev/null
 +++ b/llvm/test/MC/MOS/register-named-symbols-65816.s
 @@ -0,0 +1,15 @@
@@ -155,7 +155,7 @@ index 000000000000..f66f21bf8118
 +; CHECK: lda ["x"],y ; encoding: [0xb7,A]
 diff --git a/llvm/test/MC/MOS/register-named-symbols.s b/llvm/test/MC/MOS/register-named-symbols.s
 new file mode 100644
-index 000000000000..c8cea6df14d7
+index 0000000000000000000000000000000000000000..c8cea6df14d7a0088838259dbd50fd4fb38b5093
 --- /dev/null
 +++ b/llvm/test/MC/MOS/register-named-symbols.s
 @@ -0,0 +1,66 @@

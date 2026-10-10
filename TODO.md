@@ -1,7 +1,9 @@
 # TODO — current work
 
+- **Compiler re-pin (October 10):** advanced to `0f031168a7cc`; all 51 active applications retained. Release build and MOS suites pass (204 passed, four unsupported), as do 17 workflow fixtures. [Full validation](docs/test-results/repin/2026-10-10/full-validation.json).
+
 - **Upstream follow-up (October 10):** #578/#586/#584/#588/#589 are merged; #584's prerequisite is satisfied and its parked comment is superseded. #604 remains open without review. SDK #450 and test-suite #20 merged October 10; their review/landing follow-up is complete ([receipt](docs/upstream-status/2026-10-10-sjlj-merges.json)). #594 coordination remains held with no reply. [Current status](docs/upstream-contribution-status.md#current-pr-progress).
-- **Compiler pin (October 9):** advanced to `f24948c7d1a4`; merged repairs come from upstream and are removed from `0001`/`0002` and the standalone stack. [Rebase validation](docs/pr-preparations/2026-10-09/pin-rebase/README.md).
+- **Dated compiler pin (October 9):** advanced to `f24948c7d1a4`; merged repairs come from upstream and are removed from `0001`/`0002` and the standalone stack. [Rebase validation](docs/pr-preparations/2026-10-09/pin-rebase/README.md).
 
 llvm-mos-65816 brings an optimizing C compiler to the WDC 65816 through [llvm-mos](https://github.com/llvm-mos/llvm-mos), with the SNES platform as a runtime test. See the [roadmap](docs/ROADMAP.md), [upstream submission tracker](docs/upstream-pending-work.md), and [plan index](docs/investigations/plan-index.md).
 

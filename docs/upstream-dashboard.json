@@ -1274,9 +1274,10 @@
       "nextStep": "Merged October 10; review/landing follow-up complete.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sdk450-publication/publication.json"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-status/2026-10-10-sjlj-merges.json"
       ],
-      "evidenceNote": "Detailed evidence awaits publication.",
+      "evidenceNote": "",
       "dependsOn": [],
       "demoUrls": []
     },
@@ -1484,9 +1485,10 @@
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-09/validation.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-status/2026-10-10-sjlj-merges.json"
       ],
-      "evidenceNote": "Detailed evidence awaits publication.",
+      "evidenceNote": "",
       "demoUrls": []
     }
   ]

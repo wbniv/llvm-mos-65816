@@ -1,5 +1,7 @@
 # llvm-mos-65816 — project guide
 
+Compiler pin updates use `task upstream:repin`, which validates an isolated build and MOS suites before publishing tracked inputs. See the [command plan and October 10 completion](docs/plans/2026-10-10-repeatable-compiler-repin.md).
+
 Project-specific guide; **extends the shared `~/CLAUDE.md`** (generic conventions: plan-first, TODO
 format, commit-at-checkpoints, only-commit-your-work, markdown rules). It is **auto-loaded every session**,
 so it is the standing preface for every handoff: each piece of work = this guide (general) **+** a per-task

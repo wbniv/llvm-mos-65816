@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
-index cebbb7b..7c5e356 100644
+index cebbb7be1c0e8faab571eb0daf8dfd0385f918bd..7c5e356911adf81040e1b9904dcc9c40c3e5c71d 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
 @@ -17,7 +17,7 @@ namespace llvm {
