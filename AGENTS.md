@@ -36,6 +36,14 @@ The pre-commit hook runs `python3 dev/docs-deps.py --staged`. Stage the sources,
 dependent outputs, review receipts, and inventory together. Do not acknowledge
 an unreviewed document just to clear a stale-dependency check.
 
+After updating upstream tracking or other documentation that feeds the public
+compiler-work view, update https://wald3n.com/open-source as part of the same
+work. Follow [the publication workflow](docs/open-source-dashboard-publication.md):
+commit and push the compiler documentation first, then run
+`task open-source:publish` in `/home/will/wald3n.com` and verify the live result.
+This publication has standing user authorization; do not leave it as a suggested
+follow-up or request routine permission again.
+
 # Defect evidence and closure
 
 Before treating a compiler failure as new or starting a fix, reconcile prior work:

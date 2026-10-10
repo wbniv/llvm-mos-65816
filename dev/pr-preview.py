@@ -6,15 +6,22 @@ usage: pr-preview.py --template T.html --md PR.md --patch P.patch --number NNNN 
                      --notice "text" --aside aside.html --out OUT.html
 The markdown subset rendered: paragraphs, ``` fenced code, "- " bullet lists,
 `inline code`, **bold**, and a leading "# " title (used as the <h1>).
+HTTP(S) Markdown links render as anchors. Optional --review and --validation
+HTML inputs replace the template's corresponding metadata panels.
 """
 import argparse, hashlib, html, re
 ap = argparse.ArgumentParser()
 for a in ("template", "md", "patch", "number", "notice", "aside", "out"):
     ap.add_argument("--" + a, required=True)
+for a in ("review", "validation"):
+    ap.add_argument("--" + a, help="HTML content for the named preview section")
 args = ap.parse_args()
 
 def inline(t):
     t = html.escape(t, quote=False)
+    t = re.sub(r"\[([^\]]+)\]\((https?://[^\s)]+)\)",
+               lambda m: '<a href="' + html.escape(html.unescape(m[2]), quote=True)
+               + '">' + m[1] + '</a>', t)
     t = re.sub(r"`([^`]+)`", r"<code>\1</code>", t)
     t = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", t)
     return t
@@ -71,6 +78,13 @@ s = page.index("<aside>"); e = page.index("</aside>", s) + len("</aside>")
 page = page[:s] + "<aside>" + open(args.aside, encoding="utf-8").read().strip() + "</aside>" + page[e:]
 s = page.index('<section id="files">'); e = page.index("</section>", s) + len("</section>")
 page = page[:s] + '<section id="files"><h2>Files changed</h2>' + files_html + "</section>" + page[e:]
+for section in ("review", "validation"):
+    content_path = getattr(args, section)
+    if content_path:
+        s = re.search(rf'<section id="{section}"[^>]*>', page).start()
+        e = page.index("</section>", s) + len("</section>")
+        content = open(content_path, encoding="utf-8").read().strip()
+        page = page[:s] + f'<section id="{section}">' + content + "</section>" + page[e:]
 sha = hashlib.sha256(patch).hexdigest()
 page = re.sub(r"(Patch SHA-256: <code>)[0-9a-f]{64}(</code>)", rf"\g<1>{sha}\g<2>", page)
 open(args.out, "w", encoding="utf-8").write(page)

@@ -1,0 +1,13 @@
+diff --git a/clang/cmake/caches/MOS.cmake b/clang/cmake/caches/MOS.cmake
+index 0f173696602ce788652dcc99419b25826c749780..7ce24a67fdc57c3bcc76a74ad1c67a4cd46d4b7a 100644
+--- a/clang/cmake/caches/MOS.cmake
++++ b/clang/cmake/caches/MOS.cmake
+@@ -5,7 +5,7 @@
+ 
+ set(LLVM_TARGETS_TO_BUILD "" CACHE STRING "")
+ set(LLVM_EXPERIMENTAL_TARGETS_TO_BUILD "MOS" CACHE STRING "")
+-set(LLVM_ENABLE_PROJECTS clang;clang-tools-extra;lld CACHE STRING "")
++set(LLVM_ENABLE_PROJECTS clang;lld CACHE STRING "")
+ set(LLVM_ENABLE_LIBXML2 "OFF" CACHE STRING "")
+ set(LLVM_ENABLE_ZLIB "OFF" CACHE STRING "")
+ set(LLVM_ENABLE_ZSTD "OFF" CACHE STRING "")

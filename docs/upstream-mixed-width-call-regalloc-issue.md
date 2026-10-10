@@ -1,5 +1,7 @@
 # [MOS] Register allocation fails for mixed byte/word updates across a call on mos6502
 
+**Current follow-up, October 10:** [canonical defect record](defects/twoaddr-physreg-reschedule-exhaustion.json) and [current standalone packet](pr-preparations/2026-10-10/0029/README.md) supersede submission-readiness claims below. Upstream `0f031168a7cc` reproduces the saved IR/MIR failure, and the standalone guard passes the same inputs and 140 MOS tests (one unsupported). The C matrix passes (24 full-driver and 24 candidate-backend checks); no PR is posted. All September counts and complete C-to-object results below remain dated evidence.
+
 **Local status, September 22:** diagnosed and fixed by
 [patch 0029](../patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch).
 The [fix PR draft](upstream-twoaddr-physreg-reschedule-pr.md) supersedes this

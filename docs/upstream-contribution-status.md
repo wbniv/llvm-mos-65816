@@ -1,5 +1,7 @@
 # Upstream contribution status — PR progress and submission queue
 
+**Keep the public tracker current:** after updating this document, `upstream-pending-work.md`, `TODO.md`, or other documentation feeding the compiler-work view, commit and push the compiler docs, then run `task open-source:publish` in `/home/will/wald3n.com` and verify https://wald3n.com/open-source. This publication has standing user authorization and belongs to the same update. Follow the [publication workflow](open-source-dashboard-publication.md); do not leave it as a suggested follow-up.
+
 **Compiler re-pin, October 10:** `task upstream:repin` published `0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63` after an isolated Release distribution build and MOS suites (204 passed, four unsupported, zero failures). All 51 active applications remain; none became wholly empty. Hashed historical artifacts 0013/0057/0058/0059 are preserved; bootstrap uses their rebased `-vendor` copies. Independent patch application reproduced the candidate tree. [Full validation](test-results/repin/2026-10-10/full-validation.json) and [publication receipt](upstream-status/repin-20261010T033430Z-ardhs7qy.json). Earlier pin, runtime measurements and submission packets remain dated evidence for their recorded builds; this does not advance SDK pins, validate runtime/performance, or change upstream review prerequisites.
 
 Update: OpenAI Codex 0.162.1; model `gpt-6.1-sol`; medium reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
@@ -339,7 +341,7 @@ This is the current unposted submission queue, reviewed October 10, 2026. Prepar
 
 | Destination | Prepared work | Remaining action or hold |
 |---|---|---|
-| llvm-mos compiler | `0011` scavenger live-P; `0029` register exhaustion; `0030` copy liveness; `0031` copy-destination reuse; `0032` register-named symbols; `0033` spill-hoisting scratch vregs; `0034` prefetch legalization; `0036` zero-page indexed globals | Prepare current upstream branches from the linked reviewed packets; `0031` follows `0030`. The generic portion of `0033` also needs its LLVM destination checked. |
+| llvm-mos compiler | `0011` scavenger live-P; `0029` register exhaustion; `0030` copy liveness; `0031` copy-destination reuse; `0032` register-named symbols; `0033` spill-hoisting scratch vregs; `0034` prefetch legalization; `0036` zero-page indexed globals | `0029` has a refreshed local branch and passing current-base backend/MOS checks; review its refreshed preview before posting. Prepare the other branches from the linked reviewed packets; `0031` follows `0030`. The generic portion of `0033` also needs its LLVM destination checked. |
 | llvm-mos compiler | `0038` return/frame address; `0039` explicit address width; `0040` spill coalescing; `0043`–`0047` MOS constraints, printers, metadata and directives; `0050` floating vectors; `0054` scavenger status-save range; `0060` parallel MIR reducer guard | Use the [MOS submission packet](pr-preparations/2026-09-26/mos-validation.md); `0044` depends on `0039`. `0060` is a backport of an existing LLVM fix, not a new LLVM report. |
 | llvm/llvm-project | `0037` indirect inline-asm outputs; `0041` multi-register inline asm; `0056` GlobalISel register bounds; `0057` SelectionDAG register bounds; `0058` AArch64 unknown inline-asm types; `0059` SelectionDAG vector parts | Use the [LLVM submission packet](pr-preparations/2026-09-26/llvm-validation.md); full regression coverage for `0058` and `0059` requires `0057`. |
 | llvm-mos compiler | `0028` undef register-lane verifier repair | Reviewed packet held until the #320/#321 presentation is ready. |
@@ -828,9 +830,7 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   found no actionable defect. An [independent review](pr-preparations/2026-09-22/0029-claude-review.md)
   then refined the guard (reserved class members are not counted as available)
   and ran the complete X86, ARM, AArch64 and MOS suites on the revised patch with
-  assertions: no codegen failures. Upstream `main` is identical to the pinned base,
-  so applicability is settled. Standalone branch preparation and posting remain.
-  Unposted.
+  assertions: no codegen failures. Those results remain scoped to September's revision. The [October 10 refresh](pr-preparations/2026-10-10/0029/README.md) uses exact upstream `0f031168a7cc`: the local standalone branch and matching-input IR/MIR red/green are complete, and 140 MOS tests pass with one unsupported. All 24 full-driver and 24 candidate-backend C checks pass; preview approval and posting remain. The [canonical record](defects/twoaddr-physreg-reschedule-exhaustion.json) migrates this existing defect. Unposted.
 
 - **Newton post-RA expansion — fix prepared September 22.**
   [Patch 0030](../patches/llvm-mos/0030-mos-copy-phys-reg-liveness.patch) clears
@@ -1123,3 +1123,5 @@ ls docs/32*upstream* docs/320-upstream*                            # drafted art
 
 Cross-check the drafted-artifacts list against the TODO **Upstream / Contribution** section; each `*upstream*`
 doc here should map to a TODO item, and vice-versa.
+
+October 10 standalone 0029 refresh: OpenAI Codex CLI 0.162.0; model `gpt-6.1-sol`; medium reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`. Earlier contributors and dated results retain their recorded credits.

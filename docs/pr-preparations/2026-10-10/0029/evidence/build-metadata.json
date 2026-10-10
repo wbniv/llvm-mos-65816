@@ -1,0 +1,26 @@
+{
+  "upstream_base": "0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63",
+  "candidate_commit": "367513ea6a79",
+  "candidate_branch": "mos-twoaddr-physreg-reschedule-20261010",
+  "source": ".scratch/0029-20261010/source",
+  "build": "build/0029-20261010/compiler",
+  "baseline_binaries": "build/0029-20261010/baseline/bin",
+  "clang_build_image": "sha256:5bcaeac0ab7a1f3498ee304b1149ea4365c9c1ae19c75ea415310c90babb455a",
+  "baseline_image_note": "Original baseline containers have exited and their individual image IDs were not retained; binary hashes, the CMake configuration, source diff and command logs identify that build. The current image and the preceding re-pin record resolve to the same digest; no additional image identity is inferred for a removed container.",
+  "build_type": "Release",
+  "assertions": false,
+  "lto": false,
+  "llvm_targets": [
+    "MOS"
+  ],
+  "source_adjustment": "MOS.cmake projects clang/lld; separate unstaged trim excluded from compiler commit",
+  "baseline_frontend_attempt": "Stopped during frontend compilation to finish and capture the unpatched backend first; retained baseline-build.log.gz is an interrupted preparation log, not a compiler failure.",
+  "candidate_frontend_attempt": "Two-job build stopped to resume with three jobs; then reconfigured CLANG_ENABLE_STATIC_ANALYZER=OFF. Final three-job build completed all 830 steps. The optional --analyze component is disabled; ordinary frontend/C compilation is validated by the retained matrix.",
+  "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919",
+  "clang_static_analyzer": false,
+  "candidate_binary_sha256": {
+    "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang": "37357ad99b837636785752353e4c913737142c8c242987863d51eab248e77e86",
+    "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc": "2b560a1d63e2afc00dbfcc0282108d14638a199718ba95453dbf14de6a255383",
+    "/work/build/0029-20261010/baseline/bin/llc": "a610bbdec61cc7ef573bf150155172f8e18ad5a74270cb5413a7900e8ff56f7b"
+  }
+}

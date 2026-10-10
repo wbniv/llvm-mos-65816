@@ -1,0 +1,156 @@
+diff --git a/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp b/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
+index aa1116a2e6f6138e48219ddcb176b9f11ab640c2..3f0dd5332080875cf018abd92501f482cd0f88fc 100644
+--- a/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
++++ b/llvm/lib/CodeGen/TwoAddressInstructionPass.cpp
+@@ -28,6 +28,7 @@
+ 
+ #include "llvm/CodeGen/TwoAddressInstructionPass.h"
+ #include "llvm/ADT/DenseMap.h"
++#include "llvm/ADT/STLExtras.h"
+ #include "llvm/ADT/SmallPtrSet.h"
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/ADT/Statistic.h"
+@@ -1197,6 +1198,16 @@ bool TwoAddressInstructionImpl::rescheduleKillAboveMI(
+       Register MOReg = MO.getReg();
+       if (!MOReg)
+         continue;
++      // Extending a physical definition across an instruction with a
++      // constrained virtual operand must leave that operand at least one
++      // allocatable register. Spilling cannot help when every unreserved
++      // member of its class overlaps a live definition.
++      if (MOReg.isVirtual() && !LiveDefs.empty() &&
++          llvm::all_of(*MRI->getRegClass(MOReg), [&](MCPhysReg PhysReg) {
++            return MRI->isReserved(PhysReg) ||
++                   regOverlapsSet(LiveDefs, PhysReg);
++          }))
++        return false;
+       if (MO.isUse()) {
+         if (regOverlapsSet(Defs, MOReg))
+           // Moving KillMI can clobber the physical register if the def has
+diff --git a/llvm/test/CodeGen/MOS/mixed-width-call.ll b/llvm/test/CodeGen/MOS/mixed-width-call.ll
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb69a1ebf347a03591151cd492fa68961183613a
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/mixed-width-call.ll
+@@ -0,0 +1,33 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O1 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O3 -verify-machineinstrs < %s | FileCheck %s
++
++; The first call argument also feeds folded arithmetic before the call. Keep
++; that value spillable until the call arguments are assigned to registers.
++; CHECK-LABEL: stage:
++; CHECK: jsr ext
++; CHECK: rts
++define void @stage(ptr %p, i16 %k) {
++  %first = load i16, ptr %p, align 1
++  %a = add i16 %first, %k
++  %p1 = getelementptr i8, ptr %p, i16 2
++  %second = load i16, ptr %p1, align 1
++  %b = xor i16 %second, %a
++  %p2 = getelementptr i8, ptr %p, i16 4
++  %byte = load i8, ptr %p2, align 1
++  %blo = trunc i16 %b to i8
++  %c = add i8 %byte, %blo
++  %call = call i16 @ext(i16 %a, i16 13849)
++  %sum = add i16 %call, %b
++  store i16 %sum, ptr %p, align 1
++  %wide = zext i8 %c to i16
++  %difference = sub i16 %b, %wide
++  store i16 %difference, ptr %p1, align 1
++  %shift = lshr i16 %a, 8
++  %ahi = trunc i16 %shift to i8
++  %last = xor i8 %c, %ahi
++  store i8 %last, ptr %p2, align 1
++  ret void
++}
++
++declare i16 @ext(i16, i16)
+diff --git a/llvm/test/CodeGen/MOS/twoaddr-reschedule-physreg.mir b/llvm/test/CodeGen/MOS/twoaddr-reschedule-physreg.mir
+new file mode 100644
+index 0000000000000000000000000000000000000000..90e77b38be41b7cb5b16e4ef9039aa5ebdc98bc5
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/twoaddr-reschedule-physreg.mir
+@@ -0,0 +1,82 @@
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=twoaddressinstruction -verify-machineinstrs -o - %s | FileCheck %s --check-prefixes=CHECK,NOSCHED
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=liveintervals,twoaddressinstruction -verify-machineinstrs -o %t.mir %s
++# RUN: FileCheck %s --check-prefixes=CHECK,LI < %t.mir
++# RUN: llc -mtriple=mos -mcpu=mos6502 -start-after=twoaddressinstruction -verify-machineinstrs -o /dev/null %t.mir
++
++# Rescheduling requires LiveIntervals. Without that analysis, the pass keeps
++# the instruction order. With it, a call argument must leave A available for
++# the folded arithmetic.
++---
++name: accumulator_argument
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $a, $rs1, $y
++
++    ; CHECK-LABEL: name: accumulator_argument
++    ; CHECK: EORIndirIdx
++    ; CHECK: STAbs
++    ; CHECK: $a = COPY
++    ; CHECK-NEXT: JSR
++    %0:ac = COPY $a
++    %1:imag16 = COPY $rs1
++    %2:yc = COPY $y
++    %3:ac = EORIndirIdx %0, %1, %2
++    STAbs killed %3, 1234
++    $a = COPY killed %0
++    JSR &ext, mos_csr, implicit $a
++    RTS
++...
++
++# A copy into X can move across arithmetic that only needs A and Y. A GPR
++# temporary still has A and Y available even though its class also contains X.
++---
++name: available_accumulator
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $a, $rs1, $y
++
++    ; CHECK-LABEL: name: available_accumulator
++    ; NOSCHED: EORIndirIdx
++    ; NOSCHED: STAbs
++    ; NOSCHED: $x = COPY
++    ; LI: $x = COPY
++    ; LI: EORIndirIdx
++    ; LI: STAbs
++    ; CHECK: JSR
++    %0:ac = COPY $a
++    %1:imag16 = COPY $rs1
++    %2:yc = COPY $y
++    %3:ac = EORIndirIdx %0, %1, %2
++    STAbs killed %3, 1234
++    %4:gpr = LDImm 42
++    $rc2 = COPY killed %4
++    $x = COPY killed %0
++    JSR &ext, mos_csr, implicit $x, implicit $rc2
++    RTS
++...
++
++# Every crossed instruction must have an available register, including the
++# indexed store between the folded arithmetic and the call argument copy.
++---
++name: intervening_index
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $a, $rs1
++
++    ; CHECK-LABEL: name: intervening_index
++    ; CHECK: EORAbs
++    ; CHECK: STIndirIdx
++    ; CHECK: $y = COPY
++    ; CHECK-NEXT: JSR
++    %0:ac = COPY $a
++    %1:imag16 = COPY $rs1
++    %2:ac = EORAbs %0, 1234
++    %3:yc = LDImm 4
++    STIndirIdx killed %2, %1, killed %3
++    $y = COPY killed %0
++    JSR &ext, mos_csr, implicit $y
++    RTS
++...

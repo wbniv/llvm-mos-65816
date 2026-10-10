@@ -1,0 +1,157 @@
+{
+  "phase": "baseline",
+  "source_base": "0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63",
+  "build": "Release",
+  "assertions": false,
+  "lto": false,
+  "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n",
+  "binary_sha256": {
+    "/work/build/0029-20261010/baseline/bin/opt": "db68916451d005024313fa0f40c400ed284e7972f33286e648acacd6ae9203dc",
+    "/work/build/0029-20261010/baseline/bin/llc": "a610bbdec61cc7ef573bf150155172f8e18ad5a74270cb5413a7900e8ff56f7b",
+    "/work/build/0029-20261010/baseline/bin/FileCheck": "fdef71d595c2bfd92c3b8f89855920c1ebad572a0ba5db60b33440a59109de88"
+  },
+  "runs": [
+    {
+      "name": "ir-O0",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/baseline-ir-O0.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "ir-O1",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/baseline-ir-O1.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "ir-O2",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/baseline-ir-O2.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "ir-O3",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/baseline-ir-O3.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "no-analysis",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=twoaddressinstruction",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/twoaddr-reschedule-physreg.mir"
+      ],
+      "exit_code": 0,
+      "check_command": [
+        "/work/build/0029-20261010/baseline/bin/FileCheck",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/twoaddr-reschedule-physreg.mir",
+        "--check-prefixes=CHECK,NOSCHED"
+      ],
+      "check_exit_code": 0
+    },
+    {
+      "name": "liveintervals",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=liveintervals,twoaddressinstruction",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/twoaddr-reschedule-physreg.mir"
+      ],
+      "exit_code": 0,
+      "check_command": [
+        "/work/build/0029-20261010/baseline/bin/FileCheck",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/twoaddr-reschedule-physreg.mir",
+        "--check-prefixes=CHECK,LI"
+      ],
+      "check_exit_code": 1
+    },
+    {
+      "name": "mir-full",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-start-before=twoaddressinstruction",
+        "-verify-machineinstrs",
+        "-o",
+        "/dev/null",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/twoaddr-reschedule-physreg.mir"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "twoaddr-before",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-stop-before=twoaddressinstruction",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/baseline-twoaddr-before.mir"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "twoaddr-after",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-stop-after=twoaddressinstruction",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/baseline-twoaddr-after.mir"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

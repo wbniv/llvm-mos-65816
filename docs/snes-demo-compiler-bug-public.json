@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "canonical_source": "docs/snes-compiler-contributions.json",
-  "records_sha256": "185e96d9e494171e3ba85b7397d0473353484ab07da6a08a39aee094216d95b7",
+  "records_sha256": "32d71c8977c476aa88383c6ee6b1941cf0fd3a091c505f9be6774d94bbea29e5",
   "records": [
     {
       "slug": "blossom",
@@ -286,6 +286,7 @@
       "evidence": "docs/upstream-mixed-width-call-regalloc-issue.md",
       "prs": [],
       "pr_simulations": [
+        "docs/pr-preparations/2026-10-10/0029-pr-preview.html",
         "docs/pr-preparations/2026-09-22/0029-pr-preview.html"
       ]
     },

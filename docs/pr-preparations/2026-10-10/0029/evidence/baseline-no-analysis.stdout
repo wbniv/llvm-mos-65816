@@ -1,0 +1,239 @@
+--- |
+  ; ModuleID = '/work/docs/pr-preparations/2026-10-10/0029/evidence/twoaddr-reschedule-physreg.mir'
+  source_filename = "/work/docs/pr-preparations/2026-10-10/0029/evidence/twoaddr-reschedule-physreg.mir"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  define void @accumulator_argument() #0 {
+  entry:
+    unreachable
+  }
+  
+  define void @available_accumulator() #0 {
+  entry:
+    unreachable
+  }
+  
+  define void @intervening_index() #0 {
+  entry:
+    unreachable
+  }
+  
+  attributes #0 = { "target-cpu"="mos6502" }
+...
+---
+name:            accumulator_argument
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 2, class: yc, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    liveins: $a, $rs1, $y
+  
+    %0:ac = COPY $a
+    %1:imag16 = COPY $rs1
+    %2:yc = COPY $y
+    %3:ac = COPY %0
+    %3:ac = EORIndirIdx %3, %1, %2
+    STAbs killed %3, 1234
+    $a = COPY killed %0
+    JSR &ext, mos_csr, implicit $a
+    RTS
+...
+---
+name:            available_accumulator
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 2, class: yc, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 4, class: gpr, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    liveins: $a, $rs1, $y
+  
+    %0:ac = COPY $a
+    %1:imag16 = COPY $rs1
+    %2:yc = COPY $y
+    %3:ac = COPY %0
+    %3:ac = EORIndirIdx %3, %1, %2
+    STAbs killed %3, 1234
+    %4:gpr = LDImm 42
+    $rc2 = COPY killed %4
+    $x = COPY killed %0
+    JSR &ext, mos_csr, implicit $x, implicit $rc2
+    RTS
+...
+---
+name:            intervening_index
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: yc, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    liveins: $a, $rs1
+  
+    %0:ac = COPY $a
+    %1:imag16 = COPY $rs1
+    %2:ac = COPY %0
+    %2:ac = EORAbs %2, 1234
+    %3:yc = LDImm 4
+    STIndirIdx killed %2, %1, killed %3
+    $y = COPY killed %0
+    JSR &ext, mos_csr, implicit $y
+    RTS
+...

@@ -1,0 +1,1277 @@
+{
+  "source_base": "0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63",
+  "compiler_commit": "367513ea6a79",
+  "clang_static_analyzer": false,
+  "baseline_pipeline": "Candidate frontend (unchanged by 0029) emits each input once, then both preserved current-base backends compile those identical bytes. This is not a separate pristine Clang driver build.",
+  "clang_version": "clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos.git 367513ea6a79a4a0e0f23894a43710c45f33135f)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin\n",
+  "binary_sha256": {
+    "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang": "37357ad99b837636785752353e4c913737142c8c242987863d51eab248e77e86",
+    "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc": "2b560a1d63e2afc00dbfcc0282108d14638a199718ba95453dbf14de6a255383",
+    "/work/build/0029-20261010/baseline/bin/llc": "a610bbdec61cc7ef573bf150155172f8e18ad5a74270cb5413a7900e8ff56f7b"
+  },
+  "input_sha256": {
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1.ll": "f013df041fb3e5143b5ef34f40b9fa84a331b00e76dd676437b190509a542460",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz.ll": "27321b276442bb4a69ee518f97ddcc74dedfa52e7fda614775e4e60e293d8b76",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os.ll": "6bc6e353f80b1bf9722913e353d51bb9d04926d946082923f5527fd2af1fbf89",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz.ll": "e17726d308c4af39d3298a213bf9066e27c8bf5b6258cafd40651300da7a8b5b",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2.ll": "44fcdd7bc2215a2bd5a718aca4e5fa701814a5743e22cbfb1f90890708901c47",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2.ll": "f013df041fb3e5143b5ef34f40b9fa84a331b00e76dd676437b190509a542460",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0.ll": "f408dd7992257893452f39033b5a4c21adbfd90c97582577eb11bad68263d392",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3.ll": "f013df041fb3e5143b5ef34f40b9fa84a331b00e76dd676437b190509a542460",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1.ll": "44fcdd7bc2215a2bd5a718aca4e5fa701814a5743e22cbfb1f90890708901c47",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0.ll": "2707be1343d4caf33a565c723d54a055547ac1cbaed5ada8c03a87495ce7a0a5",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3.ll": "44fcdd7bc2215a2bd5a718aca4e5fa701814a5743e22cbfb1f90890708901c47",
+    "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os.ll": "2139bf500903b67c716a5da5f229ca6bd12bef8075738442e3162540c97201a1"
+  },
+  "runs": [
+    {
+      "name": "current-preprocess",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-E",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.i"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O0-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O0-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0-baseline-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O0-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0-baseline-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O0-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O0-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O0-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O0-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O0-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O1-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O1-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-O1-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-O1-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O1-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O1-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O1-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O1-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O2-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O2-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-O2-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-O2-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O2-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O2-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O2-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O2-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O3-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O3-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-O3-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-O3-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O3-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O3-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-O3-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-O3-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Os-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Os",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Os-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-Os-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-Os-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Os-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Os-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Os",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Os-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Os",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Os-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Oz-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Oz",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Oz-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-Oz-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mos6502-Oz-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Oz-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Oz-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Oz",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mos6502-Oz-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Oz",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mos6502-Oz-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O0-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O0-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0-baseline-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O0-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0-baseline-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O0-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O0-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O0-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O0-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O0-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O1-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O1-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-O1-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-O1-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O1-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O1-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O1-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O1-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O2-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O2-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-O2-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-O2-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O2-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O2-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O2-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O2-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O3-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O3-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-O3-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-O3-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O3-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O3-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-O3-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-O3-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Os-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Os-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-Os-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-Os-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Os-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Os-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Os-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Os-driver-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Oz-emit-ir",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Oz",
+        "-S",
+        "-emit-llvm",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz.ll"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Oz-baseline-normal",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz-baseline-normal.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-Oz-baseline-verify",
+      "command": [
+        "/work/build/0029-20261010/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz-baseline-verify.o"
+      ],
+      "exit_code": 1
+    },
+    {
+      "name": "c-mosw65816-Oz-candidate-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz-candidate-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Oz-candidate-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz.ll",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz-candidate-verify.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Oz-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Oz",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz-driver-normal.o"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "c-mosw65816-Oz-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Oz",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+        "-o",
+        "/work/docs/pr-preparations/2026-10-10/0029/evidence/c-mosw65816-Oz-driver-verify.o"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

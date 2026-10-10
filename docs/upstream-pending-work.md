@@ -1,5 +1,7 @@
 # Pending upstream work and dependencies
 
+**Keep the public tracker current:** after updating this tracker, `upstream-contribution-status.md`, `TODO.md`, or other documentation feeding the compiler-work view, commit and push the compiler docs, then run `task open-source:publish` in `/home/will/wald3n.com` and verify https://wald3n.com/open-source. This publication has standing user authorization and belongs to the same update. Follow the [publication workflow](open-source-dashboard-publication.md); do not leave it as a suggested follow-up.
+
 **Compiler re-pin, October 10:** `task upstream:repin` published `0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63` after an isolated Release distribution build and MOS suites (204 passed, four unsupported, zero failures). All 51 active applications remain; none became wholly empty. Hashed historical artifacts 0013/0057/0058/0059 are preserved; bootstrap uses their rebased `-vendor` copies. Independent patch application reproduced the candidate tree. [Full validation](test-results/repin/2026-10-10/full-validation.json) and [publication receipt](upstream-status/repin-20261010T033430Z-ardhs7qy.json). Earlier pin, runtime measurements and submission packets remain dated evidence for their recorded builds; this does not advance SDK pins, validate runtime/performance, or change upstream review prerequisites.
 
 Update: OpenAI Codex 0.162.1; model `gpt-6.1-sol`; medium reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
@@ -159,6 +161,7 @@ remain in the linked records.
    29 ARM, and 33 AArch64 tests, plus both bundled MOS tests. No failures or skips
    in that focused run. The [coverage inventory](pr-preparations/2026-09-22/0029-cross-target-validation.md#backend-coverage-at-the-pinned-revision)
    lists the 22 remaining untested backends.
+   These counts are dated September evidence; the [October refresh](pr-preparations/2026-10-10/0029/README.md) records the current branch and backend checks, with 24 full-driver and 24 candidate-backend C checks passing.
 2. [Newton `-O0` post-RA verifier failure](upstream-newton-6502-postra-issue.md):
    [fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), with patch 0030.
    Copy expansion reuses Y without clearing an earlier kill. The fix passes
@@ -258,14 +261,18 @@ attribute report needs agreement on semantics before selecting a change.
 
 Patch 0029 submission status:
 
+The first five checks retain September preparation and review evidence. The October refresh below supplies the current-base branch and backend checks; its C matrix passes (24 full-driver and 24 candidate-backend checks).
+
 - [x] Reproduce the failure with stock `mos6502` C and validate the standalone fix.
 - [x] Complete the simulated review, including both liveness-analysis paths.
 - [x] Run focused X86/ARM/AArch64 regressions with assertions enabled.
 - [x] Review the final submission bundle; [no actionable defect found](pr-preparations/2026-09-22/0029-simulated-review.md#final-submission-review--september-22).
 - [x] Independent review: guard refined for reserved class members, comment reworded,
   complete X86/ARM/AArch64/MOS suites pass on the revised patch; [record](pr-preparations/2026-09-22/0029-claude-review.md).
-- [x] Current upstream applicability: llvm-mos `main` is identical to the pinned base (`gh api …/compare`).
-- [ ] Check current upstream applicability and prepare the standalone branch.
+- [x] October 10 applicability and local branch: exact upstream `0f031168a7cc`, standalone commit `367513ea6a79`; implementation unchanged, MIR coverage refreshed for LiveIntervals.
+- [x] Current-base matching-input IR/MIR red/green and complete MOS suites: 140 passed, one unsupported, zero failures.
+- [x] Current C matrix passes (24 full-driver and 24 candidate-backend checks).
+- [ ] Show the refreshed PR preview and obtain posting approval.
 - [ ] Publish the standalone fix PR.
 
 Patch 0030 submission status:
@@ -336,7 +343,7 @@ failure with the stock upstream frontend and backend.
 | SNES SDK contribution around #415 | Baseline checkout and [file inventory](415-snes-reconciliation-inventory.md) prepared; resolve provenance/review requirements, implement and validate the reconciled native platform and runtime |
 | 65816 simulator discussion | Separate [discussion draft](pr-preparations/2026-09-20/65816-simulator-discussion-body.md) prepared; unposted |
 | Reentrant attribute semantics | Report drafted; agree the intended contract before selecting a fix or documentation change |
-| Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass; final and independent reviews complete; current-upstream applicability, branch preparation, and publication remain |
+| Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; September full cross-target/final/independent reviews remain dated; October 10 current-base branch, IR/MIR red/green and 140 MOS passes / one unsupported are complete; 48 candidate C checks pass; preview approval and publication remain |
 | Newton `-O0` post-RA expansion | [Fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), patch 0030; six focused cases and MOS CodeGen/MC pass; review audited and attribution complete; check upstream applicability, prepare branch, and publish |
 | Physical-copy destination reuse | [Fix PR reviewed](pr-preparations/2026-09-22/0031-review-audit.md), patch 0031 on top of 0030; five regression cases, six extra probes, and MOS suites pass; prepare its submission after 0030 |
 | Spill-hoisting scratch vregs (`0033`) | [Audited](pr-preparations/2026-09-23/0033-review-audit.md); rollback statistic corrected and revalidated; [response](pr-preparations/2026-09-23/0033-validation.md); ready to post |
@@ -364,9 +371,7 @@ Older notes need a current-content review before publication.
 
 ## Recommended order
 
-1. Prepare the standalone branch for patch 0029 and publish its PR. The fix,
-   full-suite validation, final review and independent review are complete, and
-   upstream `main` is identical to the pinned base; it has no #320/#321 dependency.
+1. Review the [current-base 0029 packet](pr-preparations/2026-10-10/0029/README.md) and show its PR preview before posting. The local branch is refreshed on `0f031168a7cc`; matching-input IR/MIR red/green and the complete MOS suites pass (140 passed, one unsupported). The C matrix passes (24 full-driver and 24 candidate-backend checks). September independent review and cross-target results remain dated; publication is pending. It has no #320/#321 dependency.
 2. Check upstream applicability, prepare the branch, and publish
    [patch 0030](pr-preparations/2026-09-22/0030-pr-preview.html), whose code and
    evidence have been reviewed. Patch 0031's
@@ -436,7 +441,7 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | Undef register-lane verifier failure | Existing refactor selected; generic X86 MIR and companion tests independently reviewed and validated on current LLVM | **Held until #320/#321 are ready to open** | Use the selected packet once the user-presentation hold clears; two focused RUNs and 102 filtered X86 passes / one existing XFAIL | No technical SDK dependency; user presentation hold retained |
 | Scavenger live-P (`0011`) | Fix, draft, stock-6502 producer and upstream-runnable test | **Ready to post** | [Reachability record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md) | No SDK dependency; otherwise include with native compiler feature |
 | Call-clobbered coalescing guard (`0015`) | Recovered witness has matching-input 0028 red/green evidence; 0015 avoids its trigger | **Root fix already installed; standalone 0015 diagnosis superseded for this witness** | Route through 0028; stock MIR reproduces, ordinary stock C reachability remains unproven; [evidence](investigations/2026-09-25-coalescing-0015-revalidation.md) | Follow 0028's existing publication prerequisites |
-| Mixed-width pointer across call: RA exhausts registers | Patch 0029 validated, final and independent reviews complete; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
+| Mixed-width pointer across call: RA exhausts registers | September reviews remain dated; current-base branch, IR/MIR red/green and 140 MOS passes / one unsupported complete | **Fix PR prepared, unposted** | Show the refreshed preview, and publish when approved | No |
 | Post-RA physical-copy reuse: stale Y kill | Patch 0030 validated and review audited; six focused cases and MOS CodeGen/MC pass; original assembly unchanged at six levels | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
 | Physical-copy destination reuse | Patch 0031 independently reviewed against 0030 alone; MOS CodeGen 85 pass / one unsupported, MC 46 pass; net size saving with six small increases | **Fix PR prepared, unposted; depends on 0030** | Prepare submission after 0030 | No |
 | Register-named assembly symbols (`0032`) | Fix validated and review audited; full-corpus assembly failures repaired | **Fix PR prepared, unposted** | Prepare branch and publish | No |
@@ -503,7 +508,7 @@ flowchart TD
     UNDEF[Undef-lane fix 0028 validated] --> HOLD[Wait until 320 and 321 are ready to open]
     HOLD --> FINAL[Use selected and validated submission]
     FINAL --> UNDEFPR[Publish fix PR] --> MERGED
-    RA[Register-exhaustion fix 0029: reviewed, full suites] --> RAPR[Publish fix PR] --> MERGED
+    RA[Register-exhaustion fix 0029: branch and C matrix validated] --> RAPR[Review preview then publish fix PR] --> MERGED
     COPY[Physical-copy liveness fix 0030: reviewed and audited] --> COPYPR[Publish fix PR] --> MERGED
     COPYPR --> REUSEPR[Publish 0031 destination reuse on top of 0030] --> MERGED
     SCAV[Scavenger live-P fix 0011: stock-6502 producer, upstream-runnable test] --> SCAVPR[Publish fix PR] --> MERGED
@@ -644,3 +649,5 @@ fixed 20 pass. The compiler remains the local installed MOS compiler.
 **Dated publication update (October 9):** [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) is open, head `0f8ad11589f5`;
 changes were requested October 5 for test placement in llvm-test-suite. The posted head is unchanged; the submitted description and commit remain the reviewed bundle. Earlier no-publication
 statements describe the research stage. MVN/MVP is now also published as [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604), head `ae3108c31890`.
+
+October 10 standalone 0029 refresh: OpenAI Codex CLI 0.162.0; model `gpt-6.1-sol`; medium reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`. Earlier contributors and dated results retain their recorded credits.

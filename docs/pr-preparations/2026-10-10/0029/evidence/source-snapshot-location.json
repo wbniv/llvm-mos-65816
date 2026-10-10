@@ -1,0 +1,6 @@
+{
+  "original_audit_path": "docs/pr-preparations/2026-10-10/0029/evidence/upstream-TwoAddressInstructionPass.cpp",
+  "documentary_path": "docs/pr-preparations/2026-10-10/0029/evidence/upstream-TwoAddressInstructionPass.cpp.txt",
+  "sha256": "682a5eaccf8de6075cc221ec76cd792d31f119533504fbc65d282f28bf3c18a2",
+  "note": "Original audit capture is unchanged. The raw source snapshot is stored as documentary .cpp.txt evidence, preserving its source bytes and original upstream comments; it is not an additional compiler implementation."
+}

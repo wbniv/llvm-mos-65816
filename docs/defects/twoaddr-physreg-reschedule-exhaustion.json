@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "id": "twoaddr-physreg-reschedule-exhaustion",
+  "title": "Physical argument hoisting makes constrained virtual operands unallocatable",
+  "summary": "The two-address pass can extend a physical argument definition across an operand whose entire allocatable class overlaps it. Spilling cannot create an available register. This record migrates the existing September report and patch 0029; it is not a new discovery.",
+  "status": "fixed",
+  "report": "docs/investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md",
+  "reproducer_origin": "reduced",
+  "attribution": [
+    "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919: October 10 historical migration and exact-current standalone refresh.",
+    "OpenAI Codex CLI 0.155.1; model gpt-6-astra; xhigh reasoning effort: September diagnosis, implementation and validation, credit retained from the existing PR draft.",
+    "Claude Code CLI 2.1.278; model claude-fable-5-1; high reasoning effort: September independent review and reserved-register refinement, credit retained from the existing PR draft."
+  ],
+  "prior_work": {
+    "disposition": "historical_migration",
+    "search_terms": [
+      "mixed-width-call",
+      "rescheduleKillAboveMI",
+      "TwoAddressInstructionPass",
+      "register exhaustion"
+    ],
+    "related_records": [],
+    "related_reports": [
+      "docs/upstream-mixed-width-call-regalloc-issue.md",
+      "docs/pr-preparations/2026-09-22/0029-validation.md",
+      "docs/pr-preparations/2026-09-22/0029-claude-review.md"
+    ],
+    "related_changes": [
+      "e5d20bb6",
+      "2605f510",
+      "patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch"
+    ],
+    "source_assessment": "Existing 0029 supplies the guard; it is separate from carry scheduling and far-pointer ABI exhaustion. Destination 0f031168a7cc retains the physical-copy hoist and lacks the guard. Its entry gate and caller require LiveIntervals; upstream removed LiveVariables support.",
+    "binary_assessment": "A privately rebuilt unpatched current-base llc is retained at build/0029-20261010/baseline/bin/llc. It reproduces the original IR failure at O1/O2/O3 and the LiveIntervals ordering failure. Historical September binaries/results remain dated evidence.",
+    "decision": "First structured migration of the September causal defect, not a duplicate discovery. Current-base matching-input IR/MIR red/green and the MOS suites establish the existing guard on the refreshed standalone branch; September evidence retains its original scope.",
+    "evidence": {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/prior-work.json",
+      "sha256": "aa2bb1e847cc09f48b8be1a450d4b691d23306e6799c28ef1555745f9ed48f2e"
+    }
+  },
+  "observations": [
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-backend.json",
+      "sha256": "5d5d019e3f800100be7263be6dbebb59fa59f8e43302b94ec92090679bb46e06"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-coverage-backend.json",
+      "sha256": "6380ae34281fa17b8c26eefa2e1f6ea8b726cefca77913e0b44b41bef73ce3ad"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-twoaddr-before.mir",
+      "sha256": "6d326c98f0dfc093da0d3348b2ed49545ea5cde6f80a6807f61b357d15f504f5"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-twoaddr-after.mir",
+      "sha256": "c1bcfb865b99a1f652b88a5a63083a5820cd1159b38dcdb3cd726f57f546208f"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-liveintervals.stdout",
+      "sha256": "0b2c8ad3af623812906ef80be2fc6a882efee2e098f2ed410c4116877178a41f"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-liveintervals-check.log",
+      "sha256": "e3a5eb8d1ee09e760a541b8476580bd84c2324d473eb138c77ab92cd4f115615"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-source.diff",
+      "sha256": "44fde17fb5e3a8e5015224767a9094774635fe513487dfb9124f0b769b5fe384"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/upstream-TwoAddressInstructionPass.cpp.txt",
+      "sha256": "682a5eaccf8de6075cc221ec76cd792d31f119533504fbc65d282f28bf3c18a2"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c",
+      "sha256": "495f7cc46a28f50a8d31474695b8daf57cb9a6ea20b86281f0795a7524ad581e"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/coverage-twoaddr-reschedule-physreg.mir",
+      "sha256": "57caeeec20d0ce75ed81f027551243d1d19ea0720c0dee76d9221abfbfee60f3"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/candidate-backend.json",
+      "sha256": "c1bd614710a7ef61035ba3991fecf7c07340ba11b219ee4ec4d6c04b6872fbba"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/candidate-mos-lit.log",
+      "sha256": "7a3926c0bcb4deae9bda30cb5a886e31bf14c1a70d4be121fe6418dbf8e47fd6"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/candidate-liveintervals.stdout",
+      "sha256": "ef8ad1745caa3d20c11f66a6a084686441f980a3abd60b18298a46cb5fa39f2b"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/candidate-liveintervals-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-coverage-mir-allocated.log",
+      "sha256": "1e697d3d7b91479ba26eb1ccb0aaa8e8717bb40fba859d69ff9a9b64bd3b9978"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/candidate-mir-allocated.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/source-snapshot-location.json",
+      "sha256": "5aeaf6e9f66e2887fe1b9d8f6d8e81a2160905c02c92c0e158010eaddf60ec53"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/current-c-matrix.json",
+      "sha256": "2f89f4918f28e862515a4506e9ed1e6bf04058e2652765ca674f17b2dc63e2ef"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/build-metadata.json",
+      "sha256": "0e15bf0c29cc8197d0523ecfea6ac019eb219ffcca6cb28e4449dfdcf6705952"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/candidate-CMakeCache.txt",
+      "sha256": "9de298ccda1575b15cf24eb361c4defb3aa242a9958ed5be0ab794622cb847ee"
+    },
+    {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/upstream-final-recheck.json",
+      "sha256": "7ec370c6d7f96b24d3d6eb88e7623a703223a72438bf0bfa1916caabdbe1377b"
+    }
+  ],
+  "baseline": {
+    "command": "/work/build/0029-20261010/baseline/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -filetype=obj /work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll -o /work/docs/pr-preparations/2026-10-10/0029/evidence/baseline-ir-O2.o",
+    "working_directory": "/work",
+    "configuration": {
+      "cpu": "mos6502",
+      "optimization": "O2",
+      "verify_machineinstrs": true,
+      "filetype": "obj",
+      "lto": false,
+      "compiler_assertions": false
+    },
+    "toolchain_location": "build/0029-20261010/baseline/bin/llc; source 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63, only MOS.cmake project trim; build recipe and cache retained in the October 10 packet",
+    "toolchain_sha256": "a610bbdec61cc7ef573bf150155172f8e18ad5a74270cb5413a7900e8ff56f7b",
+    "input": {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+      "sha256": "ed50b7d0913619b506e08e5a4ccfda957188e34e15268b4b15da6d15d775994b"
+    },
+    "log": {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/baseline-ir-O2.log",
+      "sha256": "eb09f9c50986b7ca8dfcd5a0835b2f72656279c9de27165de6638a78761f5d64"
+    },
+    "exit_code": 1,
+    "failure_signature": "ran out of registers during register allocation in function 'stage'"
+  },
+  "historical_scope": "September 16 discovery and September 22 repair/review remain recorded in the original report and linked validation. The current refresh records a new exact-base baseline without replacing the earlier inputs, binary identities or full cross-target evidence.",
+  "resolution": {
+    "change": "docs/pr-preparations/2026-10-10/0029/0029-llvm-mos.patch; compiler commit 367513ea6a79",
+    "causal_explanation": "The guard refuses hoisting physical definitions when all unreserved registers of a crossed virtual operand class overlap those definitions. This preserves a legal assignment at the crossed instruction; spilling cannot create another physical register. Classes with a spare member still permit the move.",
+    "trigger_check": "The exact retained IR fails at O1/O2/O3 without the guard and passes with it. LiveIntervals ordering and allocation of that output fail for accumulator_argument and intervening_index before the guard; both pass afterward, while the spare-register move stays allowed. Current MOS CodeGen/MC: 140 passed, one unsupported, zero failures, Release assertions OFF. Current C matrix: 24 full-driver and 24 candidate-backend passes; identical emitted IR fails on the preserved unpatched backend in all 20 optimized runs and passes four O0 runs. The frontend is shared and unchanged by the backend patch, not a separately rebuilt pristine baseline Clang driver.",
+    "regression": {
+      "path": "docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+      "sha256": "ed50b7d0913619b506e08e5a4ccfda957188e34e15268b4b15da6d15d775994b"
+    },
+    "candidate": {
+      "command": "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -filetype=obj /work/docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll -o /work/docs/pr-preparations/2026-10-10/0029/evidence/candidate-ir-O2.o",
+      "working_directory": "/work",
+      "configuration": {
+        "cpu": "mos6502",
+        "optimization": "O2",
+        "verify_machineinstrs": true,
+        "filetype": "obj",
+        "lto": false,
+        "compiler_assertions": false
+      },
+      "toolchain_location": "build/0029-20261010/compiler/bin/llc; local compiler commit 367513ea6a79 on upstream 0f031168a7cc, only standalone 0029 and MOS.cmake project trim",
+      "toolchain_sha256": "2b560a1d63e2afc00dbfcc0282108d14638a199718ba95453dbf14de6a255383",
+      "input": {
+        "path": "docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll",
+        "sha256": "ed50b7d0913619b506e08e5a4ccfda957188e34e15268b4b15da6d15d775994b"
+      },
+      "log": {
+        "path": "docs/pr-preparations/2026-10-10/0029/evidence/candidate-ir-O2.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_code": 0
+    }
+  }
+}

@@ -286,6 +286,7 @@
       "evidence": "docs/upstream-mixed-width-call-regalloc-issue.md",
       "prs": [],
       "pr_simulations": [
+        "docs/pr-preparations/2026-10-10/0029-pr-preview.html",
         "docs/pr-preparations/2026-09-22/0029-pr-preview.html"
       ]
     },

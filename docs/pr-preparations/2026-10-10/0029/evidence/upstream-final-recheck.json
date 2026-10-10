@@ -1,0 +1,12 @@
+{
+  "upstream_main": "0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63",
+  "command": [
+    "gh",
+    "api",
+    "repos/llvm-mos/llvm-mos/commits/main",
+    "--jq",
+    ".sha"
+  ],
+  "date": "2026-10-10",
+  "result": "Matches standalone base after frontend build and C checks"
+}

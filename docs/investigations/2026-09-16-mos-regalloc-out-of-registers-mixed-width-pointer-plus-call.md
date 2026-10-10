@@ -1,5 +1,7 @@
 # MOS: "ran out of registers" on mixed-width accesses through one pointer across a call
 
+**Current follow-up, October 10:** [canonical defect record](../defects/twoaddr-physreg-reschedule-exhaustion.json) and [standalone refresh](../pr-preparations/2026-10-10/0029/README.md) retain matching-input red/green on upstream `0f031168a7cc`. The unchanged 0029 guard repairs the IR and LiveIntervals schedule; the refreshed MOS suites pass 140 tests with one unsupported. The C matrix is pending the candidate frontend build. No PR has been posted. The September evidence below retains its original compiler and review scope.
+
 **Fix completed September 22:**
 [patch 0029](../../patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch)
 guards physical-register-definition hoisting in the two-address pass. That pass
@@ -139,7 +141,9 @@ that is unchanged by removing it, so `bv_stage40` now derives its result with sh
 defect referenced from the header. The gate was **not weakened**: nothing about the `ByVal=false`
 call-site-copy check, the caller re-read, or the `-verify-machineinstrs` requirement was relaxed.
 
-## Status
+## Dated investigation status — September 16
+
+The following status is retained historical evidence; the repair and current submission status are linked above.
 
 - **OPEN.** Upstream `llvm-mos` register-allocation defect, reproduced on pristine `llc`.
 - No fix attempted; needs separate dispatch, at a tier that can work in the register allocator.

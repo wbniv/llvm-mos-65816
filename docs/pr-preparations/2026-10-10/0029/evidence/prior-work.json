@@ -1,0 +1,40 @@
+{
+  "disposition": "historical_migration",
+  "search_terms": [
+    "mixed-width-call",
+    "register exhaustion",
+    "rescheduleKillAboveMI",
+    "TwoAddressInstructionPass"
+  ],
+  "related_reports": [
+    "docs/upstream-mixed-width-call-regalloc-issue.md",
+    "docs/pr-preparations/2026-09-22/0029-validation.md",
+    "docs/pr-preparations/2026-09-22/0029-claude-review.md",
+    "docs/investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md"
+  ],
+  "related_changes": [
+    "e5d20bb6",
+    "2605f510",
+    "patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch"
+  ],
+  "destination": "0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63",
+  "history": [
+    "8068182dd6fb1a8efae0291db1d2462d29025cd1",
+    "a7f8ead8f959c0867993d64c0525f446d02d511f"
+  ],
+  "source_assessment": "The exact destination retains the copy-to-physical-register hoist and lacks class availability checks. Entry now requires LiveIntervals; LiveVariables support was removed. Crossed instruction operands and the call-site trigger are inspected. Baseline full-source private copy has no compiler patches. Existing downstream 0029 is the same guarded operation; it is separate from carry scheduling, far-pointer ABI exhaustion and coalescing guards.",
+  "binary_assessment": "Current-base standalone baseline/candidate build identities and reproduction results will be retained separately; old September binaries/results remain dated evidence.",
+  "decision": "Refresh the existing report and preserve its inputs and causal contract. Any structured record is the first migration of the historical defect, not a new discovery or a closure based only on a current pass.",
+  "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919",
+  "retained_input_sha256": {
+    "docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.c": "495f7cc46a28f50a8d31474695b8daf57cb9a6ea20b86281f0795a7524ad581e",
+    "docs/pr-preparations/2026-10-10/0029/evidence/twoaddr-reschedule-physreg.mir": "cecd9628d540da0fbe0976247b211e63011a2539289080f75b363fd0b5cd38ca",
+    "docs/pr-preparations/2026-10-10/0029/evidence/mixed-width-call.ll": "ed50b7d0913619b506e08e5a4ccfda957188e34e15268b4b15da6d15d775994b",
+    "docs/pr-preparations/2026-10-10/0029/evidence/upstream-TwoAddressInstructionPass.cpp": "682a5eaccf8de6075cc221ec76cd792d31f119533504fbc65d282f28bf3c18a2"
+  },
+  "historical_artifacts": {
+    "baseline_manifest": "build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/manifest.json",
+    "validation_matrix": "build/register-exhaustion/matrix.json",
+    "independent_review": "docs/pr-preparations/2026-09-22/0029-claude-review.md"
+  }
+}

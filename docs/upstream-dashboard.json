@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "reviewedAt": "2026-10-09",
-  "sourceHash": "618f3880b861bcd316108dc5fac16af88979eca40bc21726006e06dd8842cf54",
+  "reviewedAt": "2026-10-10",
+  "sourceHash": "946bb38a23e4a60c13befc108bf62f9c8b3c7b2e203c8fca442e0b58dfa5fe86",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -728,6 +728,26 @@
       "demoUrls": []
     },
     {
+      "id": "sub:0029",
+      "kind": "submission",
+      "title": "0029 mixed-width call register exhaustion",
+      "summary": "The existing two-address guard is revalidated on upstream 0f031168a7cc with matching-input IR/MIR red/green and 140 MOS passes (one unsupported).",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "nextStep": "Review the refreshed PR preview, then post when approved; current backend, C matrix and MOS checks pass.",
+      "demoUrls": [
+        "https://biohack.net/snes/byvaledge/"
+      ],
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/twoaddr-physreg-reschedule-exhaustion.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/0029/README.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-twoaddr-physreg-reschedule-pr.md"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null
+    },
+    {
       "id": "platform:320",
       "kind": "platform",
       "title": "#320 far-address-space compiler and ABI",
@@ -924,22 +944,6 @@
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
-      "upstreamUrl": null,
-      "demoUrls": []
-    },
-    {
-      "id": "sub:0029",
-      "kind": "submission",
-      "title": "0029 mixed-width call register exhaustion",
-      "summary": "The two-address register-pressure repair has standalone and cross-target validation.",
-      "localStatus": "ready",
-      "publicationStatus": "unposted",
-      "nextStep": "Refresh upstream applicability, prepare branch, and post.",
-      "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-twoaddr-physreg-reschedule-pr.md"
-      ],
-      "evidenceNote": "",
-      "dependsOn": [],
       "upstreamUrl": null,
       "demoUrls": []
     },

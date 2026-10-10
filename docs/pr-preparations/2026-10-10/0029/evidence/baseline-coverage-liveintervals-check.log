@@ -1,0 +1,66 @@
+/work/docs/pr-preparations/2026-10-10/0029/evidence/coverage-twoaddr-reschedule-physreg.mir:19:11: error: CHECK: expected string not found in input
+ ; CHECK: $a = COPY
+          ^
+<stdin>:91:7: note: scanning from here
+ STAbs %3, 1234
+      ^
+<stdin>:92:30: note: possible intended match here
+ JSR &ext, mos_csr, implicit $a
+                             ^
+/work/docs/pr-preparations/2026-10-10/0029/evidence/coverage-twoaddr-reschedule-physreg.mir:72:11: error: CHECK: expected string not found in input
+ ; CHECK: $y = COPY
+          ^
+<stdin>:236:12: note: scanning from here
+ STIndirIdx %2, %1, %3
+           ^
+<stdin>:237:30: note: possible intended match here
+ JSR &ext, mos_csr, implicit $y
+                             ^
+
+Input file: <stdin>
+Check file: /work/docs/pr-preparations/2026-10-10/0029/evidence/coverage-twoaddr-reschedule-physreg.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           86:  %1:imag16 = COPY $rs1 
+           87:  %2:yc = COPY $y 
+           88:  $a = COPY %0 
+           89:  %3:ac = COPY %0 
+           90:  %3:ac = EORIndirIdx %3, %1, %2 
+           91:  STAbs %3, 1234 
+check:19'0          {            search range start (exclusive)
+check:19'1                       error: no match found in search range
+           92:  JSR &ext, mos_csr, implicit $a 
+check:19'2                                  ?    possible intended match
+           93:  RTS 
+           94: ... 
+           95: --- 
+           96: name: available_accumulator 
+check:19'3                                }  search range end (exclusive)
+           97: alignment: 1 
+           98: exposesReturnsTwice: false 
+           99: legalized: false 
+          100: regBankSelected: false 
+          101: selected: false 
+            .
+            .
+            .
+          231:  %1:imag16 = COPY $rs1 
+          232:  $y = COPY %0 
+          233:  %2:ac = COPY %0 
+          234:  %2:ac = EORAbs %2, 1234 
+          235:  %3:yc = LDImm 4 
+          236:  STIndirIdx %2, %1, %3 
+check:72'0               {              search range start (exclusive)
+check:72'1                              error: no match found in search range
+          237:  JSR &ext, mos_csr, implicit $y 
+check:72'2                                  ?    possible intended match
+          238:  RTS 
+          239: ... 
+check:72'3         } search range end (exclusive)
+>>>>>>
