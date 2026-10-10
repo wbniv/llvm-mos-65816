@@ -1,0 +1,30 @@
+# docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll, -O2 -stop-before=greedy on p-321-00 (sha256 2f5c1768...); bb.59 of @main, where %420 (LDImm 95) reaches the SPC700 indirect-call thunk copy
+7738:    %420:anyi8 = LDImm 95
+  bb.59 (%ir-block.240):
+    successors: %bb.59(0x7c000000), %bb.60(0x04000000)
+  
+    %1778:ac = LDIndirIdx %3670, %3224 :: (load (s8) from %ir.lsr.iv27, !tbaa !26)
+    %1781:ac = LDIndirIdx %3670, %3187 :: (load (s8) from %ir.lsr.iv27 + 1, !tbaa !26)
+    undef %1777.sublo:imag16 = COPY %1778
+    %1777.subhi:imag16 = COPY %1781
+    %1767:ac = LDIndirIdx %1777, %3224 :: (load (s8) from %ir.242, !tbaa !73)
+    %1769:ac = LDIndirIdx %1777, %3187 :: (load (s8) from %ir.242 + 1, !tbaa !73)
+    undef %1772.sublo:imag16 = COPY %1767
+    %1772.subhi:imag16 = COPY %1769
+    %1770:cc = LDImm1 0
+    %1767:ac, %1770:cc, dead %3407:vc = ADCImm %1767, 2, %1770
+    %1769:ac, dead %1770:cc, dead %3406:vc = ADCImm %1769, 0, %1770
+    undef %1762.sublo:imag16 = COPY %1767
+    %1762.subhi:imag16 = COPY %1769
+    %1755:ac = LDIndirIdx %1772, %1760 :: (load (s8) from %ir.244, !tbaa !74)
+    undef %1754.sublo:imag16 = COPY %1755
+    %1758:ac = LDIndirIdx %1762, %3187 :: (load (s8) from %ir.244 + 1, !tbaa !74)
+    %1754.subhi:imag16 = COPY %1758
+    $rs9 = COPY %1754
+    $rc17 = COPY %420
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rs1 = COPY %1777
+    $rs2 = COPY %3165
+    JSR &__rc17, mos_csr, implicit killed $rs9, implicit $rc17, implicit killed $rs1, implicit killed $rs2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    %3671:gpr = nuw IncNMOS %3671, implicit-def dead $c, implicit-def dead $v

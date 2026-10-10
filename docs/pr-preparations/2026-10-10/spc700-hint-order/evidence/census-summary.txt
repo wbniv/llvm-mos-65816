@@ -1,0 +1,27 @@
+Corpus census on upstream main 0f031168a7cc: up-0f031168 (d8fa7201...) vs fix-0f031168 (9b17ce38...), EXTRA="-verify-machineinstrs -disable-spill-hoist", mosspc700; Os/Oz via optsize/minsize attribute copies at -O2.
+rows 312 312
+O0 up: {'crash rc=134 in Verify generated machine code': 9, 'legalize-far-p2': 5, 'ok': 38}
+O0 fix: {'crash rc=134 in Verify generated machine code': 9, 'legalize-far-p2': 5, 'ok': 38}
+O1 up: {'crash rc=134 in Loop Strength Reduction': 1, 'hint-outside-order': 18, 'legalize-far-p2': 5, 'ok': 28}
+O1 fix: {'crash rc=134 in Loop Strength Reduction': 1, 'legalize-far-p2': 5, 'ok': 46}
+O2 up: {'crash rc=134 in Loop Strength Reduction': 1, 'hint-outside-order': 18, 'legalize-far-p2': 5, 'ok': 28}
+O2 fix: {'crash rc=134 in Loop Strength Reduction': 1, 'legalize-far-p2': 5, 'ok': 46}
+O3 up: {'crash rc=134 in Loop Strength Reduction': 1, 'hint-outside-order': 18, 'legalize-far-p2': 5, 'ok': 28}
+O3 fix: {'crash rc=134 in Loop Strength Reduction': 1, 'legalize-far-p2': 5, 'ok': 46}
+Os up: {'crash rc=134 in Loop Strength Reduction': 1, 'hint-outside-order': 18, 'legalize-far-p2': 5, 'ok': 28}
+Os fix: {'crash rc=134 in Loop Strength Reduction': 1, 'legalize-far-p2': 5, 'ok': 46}
+Oz up: {'crash rc=134 in Loop Strength Reduction': 1, 'crash rc=134 in Verify generated machine code': 1, 'hint-outside-order': 18, 'legalize-far-p2': 5, 'ok': 27}
+Oz fix: {'crash rc=134 in Loop Strength Reduction': 1, 'crash rc=134 in Verify generated machine code': 1, 'legalize-far-p2': 5, 'ok': 45}
+changed outcomes:
+  18 x O1: hint-outside-order -> ok
+  18 x O2: hint-outside-order -> ok
+  18 x O3: hint-outside-order -> ok
+  18 x Os: hint-outside-order -> ok
+  18 x Oz: hint-outside-order -> ok
+inputs ok on both: 177 identical assembly, 0 different
+Cross-CPU (xcpu.sh, -O2 -disable-spill-hoist):
+  mos6502: exit codes identical=True; 19 compile; 0 with different assembly
+  mos65c02: exit codes identical=True; 19 compile; 0 with different assembly
+  mos65ce02: exit codes identical=True; 19 compile; 0 with different assembly
+  moshuc6280: exit codes identical=True; 19 compile; 0 with different assembly
+  mosw65816: exit codes identical=True; 46 compile; 0 with different assembly

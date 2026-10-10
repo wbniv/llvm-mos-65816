@@ -1,0 +1,35 @@
+$ /home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -disable-spill-hoist -verify-machineinstrs docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+# llc sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7
+up-06bc967d: /work/build/register-exhaustion-src/llvm/lib/CodeGen/AllocationOrder.cpp:49: static AllocationOrder llvm::AllocationOrder::create(Register, const VirtRegMap &, const RegisterClassInfo &, const LiveRegMatrix *): Assertion `all_of(Hints, [&](MCPhysReg Hint) { return is_contained(Order, Hint); }) && "Target hint is outside allocation order."' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -disable-spill-hoist -verify-machineinstrs docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll'.
+2.	Running pass 'Greedy Register Allocator' on function '@main'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  up-06bc967d 0x0000590624b7198b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  up-06bc967d 0x0000590624b6e811 llvm::sys::RunSignalHandlers() + 369
+2  up-06bc967d 0x0000590624b7279b
+3  libc.so.6   0x000076b522845cb0
+4  libc.so.6   0x000076b5228a61ac pthread_kill + 284
+5  libc.so.6   0x000076b522845b7e gsignal + 30
+6  libc.so.6   0x000076b5228288ec abort + 39
+7  libc.so.6   0x000076b522829979
+8  libc.so.6   0x000076b52283bf75 __assert_fail + 181
+9  up-06bc967d 0x0000590623a28211
+10 up-06bc967d 0x0000590623a59d26
+11 up-06bc967d 0x0000590623a5a5b7
+12 up-06bc967d 0x0000590623a23a0a llvm::RegAllocBase::allocatePhysRegs() + 714
+13 up-06bc967d 0x0000590623a4c237
+14 up-06bc967d 0x0000590623a5f2d9
+15 up-06bc967d 0x000059062380c379 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+16 up-06bc967d 0x0000590623d9e750 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+17 up-06bc967d 0x0000590623da6852 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+18 up-06bc967d 0x0000590623d9f514 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+19 up-06bc967d 0x000059062276fa8b
+20 up-06bc967d 0x000059062276cd53 main + 1443
+21 libc.so.6   0x000076b52282a601
+22 libc.so.6   0x000076b52282a718 __libc_start_main + 136
+23 up-06bc967d 0x000059062276bf65 _start + 37
+/home/will/llvm-mos-65816/.scratch/spc700-hint/runlog.sh: line 13: 1215091 Aborted                    (core dumped) "$@" 2>&1
+exit_code=134

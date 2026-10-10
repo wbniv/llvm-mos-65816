@@ -1,0 +1,24 @@
+$ /home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -disable-spill-hoist -verify-machineinstrs docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+# llc sha256 55e62f61a5e111a541a2543eb82e6f83884183f8ea197ec5a54eb44ea35a0978
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -disable-spill-hoist -verify-machineinstrs docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll'.
+2.	Running pass 'MOS Late Optimizations' on function '@main'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  fix-06bc967d 0x00005c0fa16aba2b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  fix-06bc967d 0x00005c0fa16a88b1 llvm::sys::RunSignalHandlers() + 369
+2  fix-06bc967d 0x00005c0fa16ac83b
+3  libc.so.6    0x000074e362045cb0
+4  fix-06bc967d 0x00005c0f9fcb1bad
+5  fix-06bc967d 0x00005c0fa0346419 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+6  fix-06bc967d 0x00005c0fa08d87f0 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+7  fix-06bc967d 0x00005c0fa08e08f2 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+8  fix-06bc967d 0x00005c0fa08d95b4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+9  fix-06bc967d 0x00005c0f9f2a9a8b
+10 fix-06bc967d 0x00005c0f9f2a6d53 main + 1443
+11 libc.so.6    0x000074e36202a601
+12 libc.so.6    0x000074e36202a718 __libc_start_main + 136
+13 fix-06bc967d 0x00005c0f9f2a5f65 _start + 37
+/home/will/llvm-mos-65816/.scratch/spc700-hint/runlog.sh: line 13: 1215529 Segmentation fault         (core dumped) "$@" 2>&1
+exit_code=139

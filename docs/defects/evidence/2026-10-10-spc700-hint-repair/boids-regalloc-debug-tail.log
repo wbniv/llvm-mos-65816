@@ -1,0 +1,16 @@
+$ build/split-320-321/llc/p-321-00 -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null -debug-only=regalloc
+# llc sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7 (identical to build/spc700-hint/llc/up-06bc967d)
+# last 12 lines before the assertion (full log: 25118 lines, not retained)
+
+selectOrSplit Yc:%3217 [31952r,34032r:0) 0@31952r  weight:1.631048e-01
+RS_Assign Cascade 0
+wait for second round
+queuing new interval: %3217 [31952r,34032r:0) 0@31952r  weight:1.631048e-01
+Enqueuing %3217
+
+selectOrSplit Yc:%3227 [22832r,23088B:0)[26016B,27840B:0) 0@22832r  weight:1.385795e-02
+assigning %3227 to $y: YLSB [22832r,23088B:0)[26016B,27840B:0) 0@22832r
+
+selectOrSplit Anyi8:%420 [18384r,20448B:0) 0@18384r  weight:8.136170e-02
+hints: $rc17
+p-321-00: /work/build/register-exhaustion-src/llvm/lib/CodeGen/AllocationOrder.cpp:49: static AllocationOrder llvm::AllocationOrder::create(Register, const VirtRegMap &, const RegisterClassInfo &, const LiveRegMatrix *): Assertion `all_of(Hints, [&](MCPhysReg Hint) { return is_contained(Order, Hint); }) && "Target hint is outside allocation order."' failed.

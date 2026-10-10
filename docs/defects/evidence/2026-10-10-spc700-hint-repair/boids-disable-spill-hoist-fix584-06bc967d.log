@@ -1,0 +1,3 @@
+$ /home/will/llvm-mos-65816/build/spc700-hint/llc/fix584-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -disable-spill-hoist -verify-machineinstrs docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+# llc sha256 8f3f3c1dfb46a4880d7ef73d6612089a18cd9752ad5b4a82e7a38f8202745369
+exit_code=0

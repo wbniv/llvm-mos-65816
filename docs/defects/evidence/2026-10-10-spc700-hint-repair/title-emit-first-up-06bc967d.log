@@ -1,0 +1,32 @@
+$ /home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 /home/will/llvm-mos-65816/build/spc700-hint/probe/boids-title-first.ll -o /dev/null
+# llc sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7
+Remaining virtual register %2480...
+...in instruction: dead early-clobber %2480:imag16 = STStk killed renamable $rs2, %stack.0, 0 :: (store (s16) into %stack.0, align 1)
+
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 /home/will/llvm-mos-65816/build/spc700-hint/probe/boids-title-first.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/spc700-hint/probe/boids-title-first.ll'.
+2.	Running pass 'Virtual Register Rewriter' on function '@_title_emit'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  up-06bc967d 0x000060aafe4ef98b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  up-06bc967d 0x000060aafe4ec811 llvm::sys::RunSignalHandlers() + 369
+2  up-06bc967d 0x000060aafe4f079b
+3  libc.so.6   0x00007fe649245cb0
+4  libc.so.6   0x00007fe6492a61ac pthread_kill + 284
+5  libc.so.6   0x00007fe649245b7e gsignal + 30
+6  libc.so.6   0x00007fe6492288ec abort + 39
+7  up-06bc967d 0x000060aafd24284d llvm::MachineRegisterInfo::clearVirtRegs() + 349
+8  up-06bc967d 0x000060aafd5114fe
+9  up-06bc967d 0x000060aafd51288e
+10 up-06bc967d 0x000060aafd18a379 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+11 up-06bc967d 0x000060aafd71c750 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+12 up-06bc967d 0x000060aafd724852 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+13 up-06bc967d 0x000060aafd71d514 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+14 up-06bc967d 0x000060aafc0eda8b
+15 up-06bc967d 0x000060aafc0ead53 main + 1443
+16 libc.so.6   0x00007fe64922a601
+17 libc.so.6   0x00007fe64922a718 __libc_start_main + 136
+18 up-06bc967d 0x000060aafc0e9f65 _start + 37
+/home/will/llvm-mos-65816/.scratch/spc700-hint/runlog.sh: line 13: 1217580 Aborted                    (core dumped) "$@" 2>&1
+exit_code=134

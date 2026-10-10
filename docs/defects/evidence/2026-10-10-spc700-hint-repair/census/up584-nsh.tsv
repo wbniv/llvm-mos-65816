@@ -1,0 +1,312 @@
+O0	examples_65816_a16abs	0	ok	
+O0	examples_65816_a16call	0	ok	
+O0	examples_65816_a16copy	0	ok	
+O0	examples_65816_a16frameidx	0	ok	
+O0	examples_65816_a16loadcall	0	ok	
+O0	examples_65816_a16loopred	0	ok	
+O0	examples_65816_a16scavnz	0	ok	
+O0	examples_65816_a16sunfold	0	ok	
+O0	examples_65816_farbank	1	legalize-far-p2	
+O0	examples_65816_far_fnptr	1	legalize-far-p2	
+O0	examples_65816_farptrcmp-natural	1	legalize-far-p2	
+O0	examples_65816_k_bits	0	ok	
+O0	examples_65816_k_mandel_far	1	legalize-far-p2	
+O0	examples_65816_mixedwidth-probe	0	ok	
+O0	examples_65816_xy16basic	0	ok	
+O0	examples_snes_1d-ca	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_bf-vm	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_boids	0	ok	
+O0	examples_snes_cardioid	0	ok	
+O0	examples_snes_corpus_avalanche_sim	0	ok	
+O0	examples_snes_corpus_boids_sim	0	ok	
+O0	examples_snes_corpus_cgrade_sim	0	ok	
+O0	examples_snes_corpus_critters_sim	0	ok	
+O0	examples_snes_corpus_domcol_sim	0	ok	
+O0	examples_snes_corpus_fenwick_sim	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_corpus_grid3d_sim	0	ok	
+O0	examples_snes_corpus_jt256_sim	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_corpus_lzdec_sim	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_corpus_montorbit_sim	0	ok	
+O0	examples_snes_corpus_nmitally_sim	0	ok	
+O0	examples_snes_corpus_perlin_sim	0	ok	
+O0	examples_snes_corpus_rangecode_sim	0	ok	
+O0	examples_snes_corpus_satcast_sim	0	ok	
+O0	examples_snes_corpus_sodo_sim	0	ok	
+O0	examples_snes_corpus_tea_sim	0	ok	
+O0	examples_snes_corpus_ulam_sim	0	ok	
+O0	examples_snes_crctex	0	ok	
+O0	examples_snes_dither	0	ok	
+O0	examples_snes_epicycles	0	ok	
+O0	examples_snes_funnelkal	0	ok	
+O0	examples_snes_huffman	0	ok	
+O0	examples_snes_jtsparse	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_lzss-gallery	1	legalize-far-p2	
+O0	examples_snes_metaball	0	ok	
+O0	examples_snes_mvscrl	0	ok	
+O0	examples_snes_packrec	0	ok	
+O0	examples_snes_qsortviz	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_rotozoom	0	ok	
+O0	examples_snes_shift64seam	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_sodo	0	ok	
+O0	examples_snes_trapguard	134	crash rc=134 in Verify generated machine code	
+O0	examples_snes_vaprintf	0	ok	
+O1	examples_65816_a16abs	0	ok	
+O1	examples_65816_a16call	0	ok	
+O1	examples_65816_a16copy	0	ok	
+O1	examples_65816_a16frameidx	0	ok	
+O1	examples_65816_a16loadcall	0	ok	
+O1	examples_65816_a16loopred	0	ok	
+O1	examples_65816_a16scavnz	0	ok	
+O1	examples_65816_a16sunfold	0	ok	
+O1	examples_65816_farbank	1	legalize-far-p2	
+O1	examples_65816_far_fnptr	1	legalize-far-p2	
+O1	examples_65816_farptrcmp-natural	1	legalize-far-p2	
+O1	examples_65816_k_bits	0	ok	
+O1	examples_65816_k_mandel_far	1	legalize-far-p2	
+O1	examples_65816_mixedwidth-probe	0	ok	
+O1	examples_65816_xy16basic	0	ok	
+O1	examples_snes_1d-ca	134	hint-outside-order	selectOrSplit Anyi8:%505 [20496r,25296B:0) 0@20496r  weight:6.033186e+00 hints: $rc17 
+O1	examples_snes_bf-vm	134	hint-outside-order	selectOrSplit Anyi8:%528 [28128r,30800B:0) 0@28128r  weight:1.334218e+01 hints: $rc17 
+O1	examples_snes_boids	134	hint-outside-order	selectOrSplit Anyi8:%420 [18384r,20448B:0) 0@18384r  weight:8.136170e-02 hints: $rc17 
+O1	examples_snes_cardioid	134	hint-outside-order	selectOrSplit Anyi8:%504 [25968r,29312B:0) 0@25968r  weight:1.094615e+01 hints: $rc17 
+O1	examples_snes_corpus_avalanche_sim	0	ok	
+O1	examples_snes_corpus_boids_sim	0	ok	
+O1	examples_snes_corpus_cgrade_sim	0	ok	
+O1	examples_snes_corpus_critters_sim	0	ok	
+O1	examples_snes_corpus_domcol_sim	0	ok	
+O1	examples_snes_corpus_fenwick_sim	0	ok	
+O1	examples_snes_corpus_grid3d_sim	0	ok	
+O1	examples_snes_corpus_jt256_sim	0	ok	
+O1	examples_snes_corpus_lzdec_sim	0	ok	
+O1	examples_snes_corpus_montorbit_sim	0	ok	
+O1	examples_snes_corpus_nmitally_sim	0	ok	
+O1	examples_snes_corpus_perlin_sim	0	ok	
+O1	examples_snes_corpus_rangecode_sim	0	ok	
+O1	examples_snes_corpus_satcast_sim	0	ok	
+O1	examples_snes_corpus_sodo_sim	0	ok	
+O1	examples_snes_corpus_tea_sim	0	ok	
+O1	examples_snes_corpus_ulam_sim	0	ok	
+O1	examples_snes_crctex	134	hint-outside-order	selectOrSplit Anyi8:%317 [11712r,13776B:0) 0@11712r  weight:8.136170e-02 hints: $rc17 
+O1	examples_snes_dither	134	hint-outside-order	selectOrSplit Anyi8:%315 [11776r,13840B:0) 0@11776r  weight:8.136170e-02 hints: $rc17 
+O1	examples_snes_epicycles	134	hint-outside-order	selectOrSplit Anyi8:%302 [11360r,13424B:0) 0@11360r  weight:8.136170e-02 hints: $rc17 
+O1	examples_snes_funnelkal	134	hint-outside-order	selectOrSplit Anyi8:%604 [26608r,31152B:0) 0@26608r  weight:8.288243e+00 hints: $rc17 
+O1	examples_snes_huffman	134	hint-outside-order	selectOrSplit Anyi8:%324 [11952r,14016B:0) 0@11952r  weight:8.136170e-02 hints: $rc17 
+O1	examples_snes_jtsparse	134	hint-outside-order	selectOrSplit Anyi8:%769 [34448r,39872B:0) 0@34448r  weight:7.035469e+00 hints: $rc17 
+O1	examples_snes_lzss-gallery	1	legalize-far-p2	
+O1	examples_snes_metaball	134	hint-outside-order	selectOrSplit Anyi8:%328 [12368r,14432B:0) 0@12368r  weight:8.136170e-02 hints: $rc17 
+O1	examples_snes_mvscrl	134	hint-outside-order	selectOrSplit Anyi8:%613 [27520r,32368B:0) 0@27520r  weight:7.807949e+00 hints: $rc17 
+O1	examples_snes_packrec	134	hint-outside-order	selectOrSplit Anyi8:%682 [30096r,36672B:0) 0@30096r  weight:5.873315e+00 hints: $rc17 
+O1	examples_snes_qsortviz	134	hint-outside-order	selectOrSplit Anyi8:%620 [25168r,31424B:0) 0@25168r  weight:6.155771e+00 hints: $rc17 
+O1	examples_snes_rotozoom	134	hint-outside-order	selectOrSplit Anyi8:%314 [11760r,13824B:0) 0@11760r  weight:8.136170e-02 hints: $rc17 
+O1	examples_snes_shift64seam	134	hint-outside-order	selectOrSplit Anyi8:%594 [24208r,29712B:0) 0@24208r  weight:6.940105e+00 hints: $rc17 
+O1	examples_snes_sodo	134	hint-outside-order	selectOrSplit Anyi8:%526 [25504r,34336B:0) 0@25504r  weight:4.437757e+00 hints: $rc17 
+O1	examples_snes_trapguard	134	crash rc=134 in Loop Strength Reduction	
+O1	examples_snes_vaprintf	134	hint-outside-order	selectOrSplit Anyi8:%578 [24624r,27392B:0) 0@24624r  weight:1.293762e+01 hints: $rc17 
+O2	examples_65816_a16abs	0	ok	
+O2	examples_65816_a16call	0	ok	
+O2	examples_65816_a16copy	0	ok	
+O2	examples_65816_a16frameidx	0	ok	
+O2	examples_65816_a16loadcall	0	ok	
+O2	examples_65816_a16loopred	0	ok	
+O2	examples_65816_a16scavnz	0	ok	
+O2	examples_65816_a16sunfold	0	ok	
+O2	examples_65816_farbank	1	legalize-far-p2	
+O2	examples_65816_far_fnptr	1	legalize-far-p2	
+O2	examples_65816_farptrcmp-natural	1	legalize-far-p2	
+O2	examples_65816_k_bits	0	ok	
+O2	examples_65816_k_mandel_far	1	legalize-far-p2	
+O2	examples_65816_mixedwidth-probe	0	ok	
+O2	examples_65816_xy16basic	0	ok	
+O2	examples_snes_1d-ca	134	hint-outside-order	selectOrSplit Anyi8:%505 [20496r,25296B:0) 0@20496r  weight:6.033186e+00 hints: $rc17 
+O2	examples_snes_bf-vm	134	hint-outside-order	selectOrSplit Anyi8:%528 [28128r,30800B:0) 0@28128r  weight:1.334218e+01 hints: $rc17 
+O2	examples_snes_boids	134	hint-outside-order	selectOrSplit Anyi8:%420 [18384r,20448B:0) 0@18384r  weight:8.136170e-02 hints: $rc17 
+O2	examples_snes_cardioid	134	hint-outside-order	selectOrSplit Anyi8:%504 [25968r,29312B:0) 0@25968r  weight:1.094615e+01 hints: $rc17 
+O2	examples_snes_corpus_avalanche_sim	0	ok	
+O2	examples_snes_corpus_boids_sim	0	ok	
+O2	examples_snes_corpus_cgrade_sim	0	ok	
+O2	examples_snes_corpus_critters_sim	0	ok	
+O2	examples_snes_corpus_domcol_sim	0	ok	
+O2	examples_snes_corpus_fenwick_sim	0	ok	
+O2	examples_snes_corpus_grid3d_sim	0	ok	
+O2	examples_snes_corpus_jt256_sim	0	ok	
+O2	examples_snes_corpus_lzdec_sim	0	ok	
+O2	examples_snes_corpus_montorbit_sim	0	ok	
+O2	examples_snes_corpus_nmitally_sim	0	ok	
+O2	examples_snes_corpus_perlin_sim	0	ok	
+O2	examples_snes_corpus_rangecode_sim	0	ok	
+O2	examples_snes_corpus_satcast_sim	0	ok	
+O2	examples_snes_corpus_sodo_sim	0	ok	
+O2	examples_snes_corpus_tea_sim	0	ok	
+O2	examples_snes_corpus_ulam_sim	0	ok	
+O2	examples_snes_crctex	134	hint-outside-order	selectOrSplit Anyi8:%317 [11712r,13776B:0) 0@11712r  weight:8.136170e-02 hints: $rc17 
+O2	examples_snes_dither	134	hint-outside-order	selectOrSplit Anyi8:%315 [11776r,13840B:0) 0@11776r  weight:8.136170e-02 hints: $rc17 
+O2	examples_snes_epicycles	134	hint-outside-order	selectOrSplit Anyi8:%302 [11360r,13424B:0) 0@11360r  weight:8.136170e-02 hints: $rc17 
+O2	examples_snes_funnelkal	134	hint-outside-order	selectOrSplit Anyi8:%604 [26608r,31152B:0) 0@26608r  weight:8.288243e+00 hints: $rc17 
+O2	examples_snes_huffman	134	hint-outside-order	selectOrSplit Anyi8:%324 [11952r,14016B:0) 0@11952r  weight:8.136170e-02 hints: $rc17 
+O2	examples_snes_jtsparse	134	hint-outside-order	selectOrSplit Anyi8:%769 [34448r,39872B:0) 0@34448r  weight:7.035469e+00 hints: $rc17 
+O2	examples_snes_lzss-gallery	1	legalize-far-p2	
+O2	examples_snes_metaball	134	hint-outside-order	selectOrSplit Anyi8:%328 [12368r,14432B:0) 0@12368r  weight:8.136170e-02 hints: $rc17 
+O2	examples_snes_mvscrl	134	hint-outside-order	selectOrSplit Anyi8:%613 [27520r,32368B:0) 0@27520r  weight:7.807949e+00 hints: $rc17 
+O2	examples_snes_packrec	134	hint-outside-order	selectOrSplit Anyi8:%682 [30096r,36672B:0) 0@30096r  weight:5.873315e+00 hints: $rc17 
+O2	examples_snes_qsortviz	134	hint-outside-order	selectOrSplit Anyi8:%620 [25168r,31424B:0) 0@25168r  weight:6.155771e+00 hints: $rc17 
+O2	examples_snes_rotozoom	134	hint-outside-order	selectOrSplit Anyi8:%314 [11760r,13824B:0) 0@11760r  weight:8.136170e-02 hints: $rc17 
+O2	examples_snes_shift64seam	134	hint-outside-order	selectOrSplit Anyi8:%594 [24208r,29712B:0) 0@24208r  weight:6.940105e+00 hints: $rc17 
+O2	examples_snes_sodo	134	hint-outside-order	selectOrSplit Anyi8:%526 [25504r,34336B:0) 0@25504r  weight:4.437757e+00 hints: $rc17 
+O2	examples_snes_trapguard	134	crash rc=134 in Loop Strength Reduction	
+O2	examples_snes_vaprintf	134	hint-outside-order	selectOrSplit Anyi8:%578 [24624r,27392B:0) 0@24624r  weight:1.293762e+01 hints: $rc17 
+O3	examples_65816_a16abs	0	ok	
+O3	examples_65816_a16call	0	ok	
+O3	examples_65816_a16copy	0	ok	
+O3	examples_65816_a16frameidx	0	ok	
+O3	examples_65816_a16loadcall	0	ok	
+O3	examples_65816_a16loopred	0	ok	
+O3	examples_65816_a16scavnz	0	ok	
+O3	examples_65816_a16sunfold	0	ok	
+O3	examples_65816_farbank	1	legalize-far-p2	
+O3	examples_65816_far_fnptr	1	legalize-far-p2	
+O3	examples_65816_farptrcmp-natural	1	legalize-far-p2	
+O3	examples_65816_k_bits	0	ok	
+O3	examples_65816_k_mandel_far	1	legalize-far-p2	
+O3	examples_65816_mixedwidth-probe	0	ok	
+O3	examples_65816_xy16basic	0	ok	
+O3	examples_snes_1d-ca	134	hint-outside-order	selectOrSplit Anyi8:%505 [20496r,25296B:0) 0@20496r  weight:6.033186e+00 hints: $rc17 
+O3	examples_snes_bf-vm	134	hint-outside-order	selectOrSplit Anyi8:%528 [28128r,30800B:0) 0@28128r  weight:1.334218e+01 hints: $rc17 
+O3	examples_snes_boids	134	hint-outside-order	selectOrSplit Anyi8:%420 [18384r,20448B:0) 0@18384r  weight:8.136170e-02 hints: $rc17 
+O3	examples_snes_cardioid	134	hint-outside-order	selectOrSplit Anyi8:%504 [25968r,29312B:0) 0@25968r  weight:1.094615e+01 hints: $rc17 
+O3	examples_snes_corpus_avalanche_sim	0	ok	
+O3	examples_snes_corpus_boids_sim	0	ok	
+O3	examples_snes_corpus_cgrade_sim	0	ok	
+O3	examples_snes_corpus_critters_sim	0	ok	
+O3	examples_snes_corpus_domcol_sim	0	ok	
+O3	examples_snes_corpus_fenwick_sim	0	ok	
+O3	examples_snes_corpus_grid3d_sim	0	ok	
+O3	examples_snes_corpus_jt256_sim	0	ok	
+O3	examples_snes_corpus_lzdec_sim	0	ok	
+O3	examples_snes_corpus_montorbit_sim	0	ok	
+O3	examples_snes_corpus_nmitally_sim	0	ok	
+O3	examples_snes_corpus_perlin_sim	0	ok	
+O3	examples_snes_corpus_rangecode_sim	0	ok	
+O3	examples_snes_corpus_satcast_sim	0	ok	
+O3	examples_snes_corpus_sodo_sim	0	ok	
+O3	examples_snes_corpus_tea_sim	0	ok	
+O3	examples_snes_corpus_ulam_sim	0	ok	
+O3	examples_snes_crctex	134	hint-outside-order	selectOrSplit Anyi8:%317 [11712r,13776B:0) 0@11712r  weight:8.136170e-02 hints: $rc17 
+O3	examples_snes_dither	134	hint-outside-order	selectOrSplit Anyi8:%315 [11776r,13840B:0) 0@11776r  weight:8.136170e-02 hints: $rc17 
+O3	examples_snes_epicycles	134	hint-outside-order	selectOrSplit Anyi8:%302 [11360r,13424B:0) 0@11360r  weight:8.136170e-02 hints: $rc17 
+O3	examples_snes_funnelkal	134	hint-outside-order	selectOrSplit Anyi8:%604 [26608r,31152B:0) 0@26608r  weight:8.288243e+00 hints: $rc17 
+O3	examples_snes_huffman	134	hint-outside-order	selectOrSplit Anyi8:%324 [11952r,14016B:0) 0@11952r  weight:8.136170e-02 hints: $rc17 
+O3	examples_snes_jtsparse	134	hint-outside-order	selectOrSplit Anyi8:%769 [34448r,39872B:0) 0@34448r  weight:7.035469e+00 hints: $rc17 
+O3	examples_snes_lzss-gallery	1	legalize-far-p2	
+O3	examples_snes_metaball	134	hint-outside-order	selectOrSplit Anyi8:%328 [12368r,14432B:0) 0@12368r  weight:8.136170e-02 hints: $rc17 
+O3	examples_snes_mvscrl	134	hint-outside-order	selectOrSplit Anyi8:%613 [27520r,32368B:0) 0@27520r  weight:7.807949e+00 hints: $rc17 
+O3	examples_snes_packrec	134	hint-outside-order	selectOrSplit Anyi8:%682 [30096r,36672B:0) 0@30096r  weight:5.873315e+00 hints: $rc17 
+O3	examples_snes_qsortviz	134	hint-outside-order	selectOrSplit Anyi8:%620 [25168r,31424B:0) 0@25168r  weight:6.155771e+00 hints: $rc17 
+O3	examples_snes_rotozoom	134	hint-outside-order	selectOrSplit Anyi8:%314 [11760r,13824B:0) 0@11760r  weight:8.136170e-02 hints: $rc17 
+O3	examples_snes_shift64seam	134	hint-outside-order	selectOrSplit Anyi8:%594 [24208r,29712B:0) 0@24208r  weight:6.940105e+00 hints: $rc17 
+O3	examples_snes_sodo	134	hint-outside-order	selectOrSplit Anyi8:%526 [25504r,34336B:0) 0@25504r  weight:4.437757e+00 hints: $rc17 
+O3	examples_snes_trapguard	134	crash rc=134 in Loop Strength Reduction	
+O3	examples_snes_vaprintf	134	hint-outside-order	selectOrSplit Anyi8:%578 [24624r,27392B:0) 0@24624r  weight:1.293762e+01 hints: $rc17 
+Os	examples_65816_a16abs	0	ok	
+Os	examples_65816_a16call	0	ok	
+Os	examples_65816_a16copy	0	ok	
+Os	examples_65816_a16frameidx	0	ok	
+Os	examples_65816_a16loadcall	0	ok	
+Os	examples_65816_a16loopred	0	ok	
+Os	examples_65816_a16scavnz	0	ok	
+Os	examples_65816_a16sunfold	0	ok	
+Os	examples_65816_farbank	1	legalize-far-p2	
+Os	examples_65816_far_fnptr	1	legalize-far-p2	
+Os	examples_65816_farptrcmp-natural	1	legalize-far-p2	
+Os	examples_65816_k_bits	0	ok	
+Os	examples_65816_k_mandel_far	1	legalize-far-p2	
+Os	examples_65816_mixedwidth-probe	0	ok	
+Os	examples_65816_xy16basic	0	ok	
+Os	examples_snes_1d-ca	134	hint-outside-order	selectOrSplit Anyi8:%505 [20496r,25296B:0) 0@20496r  weight:6.033186e+00 hints: $rc17 
+Os	examples_snes_bf-vm	134	hint-outside-order	selectOrSplit Anyi8:%528 [28128r,30800B:0) 0@28128r  weight:1.334218e+01 hints: $rc17 
+Os	examples_snes_boids	134	hint-outside-order	selectOrSplit Anyi8:%420 [18384r,20448B:0) 0@18384r  weight:8.136170e-02 hints: $rc17 
+Os	examples_snes_cardioid	134	hint-outside-order	selectOrSplit Anyi8:%504 [25968r,29312B:0) 0@25968r  weight:1.094615e+01 hints: $rc17 
+Os	examples_snes_corpus_avalanche_sim	0	ok	
+Os	examples_snes_corpus_boids_sim	0	ok	
+Os	examples_snes_corpus_cgrade_sim	0	ok	
+Os	examples_snes_corpus_critters_sim	0	ok	
+Os	examples_snes_corpus_domcol_sim	0	ok	
+Os	examples_snes_corpus_fenwick_sim	0	ok	
+Os	examples_snes_corpus_grid3d_sim	0	ok	
+Os	examples_snes_corpus_jt256_sim	0	ok	
+Os	examples_snes_corpus_lzdec_sim	0	ok	
+Os	examples_snes_corpus_montorbit_sim	0	ok	
+Os	examples_snes_corpus_nmitally_sim	0	ok	
+Os	examples_snes_corpus_perlin_sim	0	ok	
+Os	examples_snes_corpus_rangecode_sim	0	ok	
+Os	examples_snes_corpus_satcast_sim	0	ok	
+Os	examples_snes_corpus_sodo_sim	0	ok	
+Os	examples_snes_corpus_tea_sim	0	ok	
+Os	examples_snes_corpus_ulam_sim	0	ok	
+Os	examples_snes_crctex	134	hint-outside-order	selectOrSplit Anyi8:%317 [11712r,13776B:0) 0@11712r  weight:8.136170e-02 hints: $rc17 
+Os	examples_snes_dither	134	hint-outside-order	selectOrSplit Anyi8:%315 [11776r,13840B:0) 0@11776r  weight:8.136170e-02 hints: $rc17 
+Os	examples_snes_epicycles	134	hint-outside-order	selectOrSplit Anyi8:%302 [11360r,13424B:0) 0@11360r  weight:8.136170e-02 hints: $rc17 
+Os	examples_snes_funnelkal	134	hint-outside-order	selectOrSplit Anyi8:%604 [26608r,31152B:0) 0@26608r  weight:8.288243e+00 hints: $rc17 
+Os	examples_snes_huffman	134	hint-outside-order	selectOrSplit Anyi8:%324 [11952r,14016B:0) 0@11952r  weight:8.136170e-02 hints: $rc17 
+Os	examples_snes_jtsparse	134	hint-outside-order	selectOrSplit Anyi8:%769 [34448r,39872B:0) 0@34448r  weight:7.035469e+00 hints: $rc17 
+Os	examples_snes_lzss-gallery	1	legalize-far-p2	
+Os	examples_snes_metaball	134	hint-outside-order	selectOrSplit Anyi8:%328 [12368r,14432B:0) 0@12368r  weight:8.136170e-02 hints: $rc17 
+Os	examples_snes_mvscrl	134	hint-outside-order	selectOrSplit Anyi8:%613 [27520r,32368B:0) 0@27520r  weight:7.807949e+00 hints: $rc17 
+Os	examples_snes_packrec	134	hint-outside-order	selectOrSplit Anyi8:%682 [30096r,36672B:0) 0@30096r  weight:5.873315e+00 hints: $rc17 
+Os	examples_snes_qsortviz	134	hint-outside-order	selectOrSplit Anyi8:%620 [25168r,31424B:0) 0@25168r  weight:6.155771e+00 hints: $rc17 
+Os	examples_snes_rotozoom	134	hint-outside-order	selectOrSplit Anyi8:%314 [11760r,13824B:0) 0@11760r  weight:8.136170e-02 hints: $rc17 
+Os	examples_snes_shift64seam	134	hint-outside-order	selectOrSplit Anyi8:%594 [24208r,29712B:0) 0@24208r  weight:6.940105e+00 hints: $rc17 
+Os	examples_snes_sodo	134	hint-outside-order	selectOrSplit Anyi8:%526 [25504r,34336B:0) 0@25504r  weight:4.437757e+00 hints: $rc17 
+Os	examples_snes_trapguard	134	crash rc=134 in Loop Strength Reduction	
+Os	examples_snes_vaprintf	134	hint-outside-order	selectOrSplit Anyi8:%578 [24624r,27392B:0) 0@24624r  weight:1.293762e+01 hints: $rc17 
+Oz	examples_65816_a16abs	0	ok	
+Oz	examples_65816_a16call	0	ok	
+Oz	examples_65816_a16copy	0	ok	
+Oz	examples_65816_a16frameidx	0	ok	
+Oz	examples_65816_a16loadcall	0	ok	
+Oz	examples_65816_a16loopred	0	ok	
+Oz	examples_65816_a16scavnz	0	ok	
+Oz	examples_65816_a16sunfold	0	ok	
+Oz	examples_65816_farbank	1	legalize-far-p2	
+Oz	examples_65816_far_fnptr	1	legalize-far-p2	
+Oz	examples_65816_farptrcmp-natural	1	legalize-far-p2	
+Oz	examples_65816_k_bits	0	ok	
+Oz	examples_65816_k_mandel_far	1	legalize-far-p2	
+Oz	examples_65816_mixedwidth-probe	0	ok	
+Oz	examples_65816_xy16basic	0	ok	
+Oz	examples_snes_1d-ca	134	hint-outside-order	selectOrSplit Anyi8:%505 [20496r,25296B:0) 0@20496r  weight:6.033186e+00 hints: $rc17 
+Oz	examples_snes_bf-vm	134	hint-outside-order	selectOrSplit Anyi8:%528 [28128r,30800B:0) 0@28128r  weight:1.334218e+01 hints: $rc17 
+Oz	examples_snes_boids	134	hint-outside-order	selectOrSplit Anyi8:%420 [18384r,20448B:0) 0@18384r  weight:8.136170e-02 hints: $rc17 
+Oz	examples_snes_cardioid	134	hint-outside-order	selectOrSplit Anyi8:%504 [25968r,29312B:0) 0@25968r  weight:1.094615e+01 hints: $rc17 
+Oz	examples_snes_corpus_avalanche_sim	0	ok	
+Oz	examples_snes_corpus_boids_sim	0	ok	
+Oz	examples_snes_corpus_cgrade_sim	0	ok	
+Oz	examples_snes_corpus_critters_sim	0	ok	
+Oz	examples_snes_corpus_domcol_sim	0	ok	
+Oz	examples_snes_corpus_fenwick_sim	0	ok	
+Oz	examples_snes_corpus_grid3d_sim	0	ok	
+Oz	examples_snes_corpus_jt256_sim	0	ok	
+Oz	examples_snes_corpus_lzdec_sim	134	crash rc=134 in Verify generated machine code	
+Oz	examples_snes_corpus_montorbit_sim	0	ok	
+Oz	examples_snes_corpus_nmitally_sim	0	ok	
+Oz	examples_snes_corpus_perlin_sim	0	ok	
+Oz	examples_snes_corpus_rangecode_sim	0	ok	
+Oz	examples_snes_corpus_satcast_sim	0	ok	
+Oz	examples_snes_corpus_sodo_sim	0	ok	
+Oz	examples_snes_corpus_tea_sim	0	ok	
+Oz	examples_snes_corpus_ulam_sim	0	ok	
+Oz	examples_snes_crctex	134	hint-outside-order	selectOrSplit Anyi8:%317 [11712r,13776B:0) 0@11712r  weight:8.136170e-02 hints: $rc17 
+Oz	examples_snes_dither	134	hint-outside-order	selectOrSplit Anyi8:%315 [11776r,13840B:0) 0@11776r  weight:8.136170e-02 hints: $rc17 
+Oz	examples_snes_epicycles	134	hint-outside-order	selectOrSplit Anyi8:%302 [11360r,13424B:0) 0@11360r  weight:8.136170e-02 hints: $rc17 
+Oz	examples_snes_funnelkal	134	hint-outside-order	selectOrSplit Anyi8:%604 [26608r,31152B:0) 0@26608r  weight:8.288243e+00 hints: $rc17 
+Oz	examples_snes_huffman	134	hint-outside-order	selectOrSplit Anyi8:%324 [11952r,14016B:0) 0@11952r  weight:8.136170e-02 hints: $rc17 
+Oz	examples_snes_jtsparse	134	hint-outside-order	selectOrSplit Anyi8:%769 [34448r,39872B:0) 0@34448r  weight:7.035469e+00 hints: $rc17 
+Oz	examples_snes_lzss-gallery	1	legalize-far-p2	
+Oz	examples_snes_metaball	134	hint-outside-order	selectOrSplit Anyi8:%328 [12368r,14432B:0) 0@12368r  weight:8.136170e-02 hints: $rc17 
+Oz	examples_snes_mvscrl	134	hint-outside-order	selectOrSplit Anyi8:%613 [27520r,32368B:0) 0@27520r  weight:7.807949e+00 hints: $rc17 
+Oz	examples_snes_packrec	134	hint-outside-order	selectOrSplit Anyi8:%682 [30096r,36672B:0) 0@30096r  weight:5.873315e+00 hints: $rc17 
+Oz	examples_snes_qsortviz	134	hint-outside-order	selectOrSplit Anyi8:%620 [25168r,31424B:0) 0@25168r  weight:6.155771e+00 hints: $rc17 
+Oz	examples_snes_rotozoom	134	hint-outside-order	selectOrSplit Anyi8:%314 [11760r,13824B:0) 0@11760r  weight:8.136170e-02 hints: $rc17 
+Oz	examples_snes_shift64seam	134	hint-outside-order	selectOrSplit Anyi8:%594 [24208r,29712B:0) 0@24208r  weight:6.940105e+00 hints: $rc17 
+Oz	examples_snes_sodo	134	hint-outside-order	selectOrSplit Anyi8:%526 [25504r,34320B:0) 0@25504r  weight:4.445464e+00 hints: $rc17 
+Oz	examples_snes_trapguard	134	crash rc=134 in Loop Strength Reduction	
+Oz	examples_snes_vaprintf	134	hint-outside-order	selectOrSplit Anyi8:%578 [24624r,27392B:0) 0@24624r  weight:1.293762e+01 hints: $rc17 

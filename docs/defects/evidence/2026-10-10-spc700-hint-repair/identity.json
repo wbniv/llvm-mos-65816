@@ -1,0 +1,25 @@
+{
+ "note": "Assertions-enabled Release llc builds, MOS plus X86/ARM/AArch64 targets. Source: sparse worktree build/spc700-hint/source at upstream 06bc967d2668 (llvm-mos main, 2026-09-28), built incrementally in build/spc700-hint/build, a copy of build/split-320-321/build. In dev/container.sh the source is mounted at /work/build/register-exhaustion-src and the build at /work/build/0029-cross-target-build, the paths baked into that cache. Each llc is frozen under build/spc700-hint/llc/.",
+ "up-06bc967d": {
+  "host_path": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d",
+  "source": "06bc967d2668 (upstream main), clean",
+  "sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+  "identical_to": "build/split-320-321/llc/p-321-00 (the record's preserved baseline)"
+ },
+ "fix-06bc967d": {
+  "host_path": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d",
+  "source": "06bc967d2668 + repair-06bc967d.diff",
+  "sha256": "55e62f61a5e111a541a2543eb82e6f83884183f8ea197ec5a54eb44ea35a0978"
+ },
+ "up584-06bc967d": {
+  "host_path": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up584-06bc967d",
+  "source": "06bc967d2668 + upstream-584.diff (git diff 06bc967d2668 95e066056667, llvm-mos#584)",
+  "sha256": "c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03",
+  "identical_to": "build/split-320-321/llc/r3-584-up"
+ },
+ "fix584-06bc967d": {
+  "host_path": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix584-06bc967d",
+  "source": "06bc967d2668 + upstream-584.diff + repair-06bc967d.diff",
+  "sha256": "8f3f3c1dfb46a4880d7ef73d6612089a18cd9752ad5b4a82e7a38f8202745369"
+ }
+}

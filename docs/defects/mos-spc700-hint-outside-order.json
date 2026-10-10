@@ -5,14 +5,22 @@
  "status": "confirmed",
  "reproducer_origin": "original",
  "report": "docs/plans/2026-10-01-far-prerequisite-split-carry.md",
- "summary": "On upstream main 06bc967d2668 with assertions, -mcpu=mosspc700 -O2 aborts in the Greedy Register Allocator with \"Target hint is outside allocation order\" on 18 of the 52 corpus IRs of the series' default-mode set (boids, bf-vm, cardioid, mvscrl, ...). MOSRegisterInfo::getRegAllocationHints offers a strong copy hint that the SPC700 allocation order of the class does not contain. Upstream plus #584 still aborts the same way. The #320 split's 1c commit filters a strong hint that is not in the order (added for the empty Imag32 order on non-65816 CPUs); on SPC700 that turns this assertion into \"ran out of registers during register allocation\" followed by an abort in the Virtual Register Rewriter, so the inputs still fail. Not fixed; root cause in the SPC700 orders not traced.",
+ "summary": "Current status (2026-10-10): root-caused; a standalone upstream repair is prepared, not posted, and not integrated into the local compiler, so the status stays confirmed. SPC700 call lowering copies the JMP opcode $5F into the reserved RC17 for each indirect call. On SPC700, LDImm may define an imaginary register, so that constant's class is Anyi8, which contains RC17. When MachineLICM or MachineCSE hoists or shares the constant, getStrongCopyHint names RC17, and MOSRegisterInfo::getRegAllocationHints returns it as a hard hint. RC17 is reserved and outside the allocation order, so AllocationOrder::create asserts. Release builds assign the virtual register to the reserved RC17. The repair takes the strong hint only when it is in the order and otherwise falls back to the cost-based hints. Red/green on the same inputs: the MIR regression and the reduced boids input fail on upstream 06bc967d (and + #584) and pass with the repair. The record's own boids.ll then stops at a separate, pre-existing spill-hoist abort in @_title_emit (local patch 0033). Clang's driver avoids that abort by passing -disable-spill-hoist, and with that flag boids.ll compiles on 06bc967d + #584 + repair. A fixed closure needs a green run on the unchanged baseline command, so it waits for that separate defect. Plan: docs/plans/2026-10-10-spc700-hint-outside-order.md. 2026-10-01 report (dated): On upstream main 06bc967d2668 with assertions, -mcpu=mosspc700 -O2 aborts in the Greedy Register Allocator with \"Target hint is outside allocation order\" on 18 of the 52 corpus IRs of the series' default-mode set (boids, bf-vm, cardioid, mvscrl, ...). MOSRegisterInfo::getRegAllocationHints offers a strong copy hint that the SPC700 allocation order of the class does not contain. Upstream plus #584 still aborts the same way. The #320 split's 1c commit filters a strong hint that is not in the order (added for the empty Imag32 order on non-65816 CPUs); on SPC700 that turns this assertion into \"ran out of registers during register allocation\" followed by an abort in the Virtual Register Rewriter, so the inputs still fail. Not fixed; root cause in the SPC700 orders not traced. (2026-10-10 correction: the rewriter abort is in @_title_emit and is the spill-hoist defect, not a consequence of the 1c filter.)",
  "attribution": [
-  "Found by the third-round all-CPU default-mode gate of the #320/#321 split; evidence and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
+  "Found by the third-round all-CPU default-mode gate of the #320/#321 split; evidence and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F).",
+  "Root cause, reduction, repair, red/green and upstream packet (2026-10-10): Claude Code 2.1.296 t4-opus-high agent, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx."
  ],
  "unknowns": [
-  "Not reduced; which register class and hint trigger it is not traced.",
-  "Release builds were not examined; without the assertion the allocator may proceed with an out-of-order hint."
+  "2026-10-01: Not reduced; which register class and hint trigger it is not traced. Resolved 2026-10-10: boids-reduced.ll and the RC17 thunk-opcode trigger.",
+  "2026-10-01: Release builds were not examined. 2026-10-10: the installed release compiler (pin 0f031168a7cc plus local patches, which do not touch this code) assigns the virtual register to the reserved RC17 (renamable $rc17 = LDImm 95 after the rewriter). The repair's code-size effect against that release output is not measured.",
+  "The upstream commit that made the constant Anyi8 (93d338b079d4, part of llvm-mos#448) was identified by reading its diff, not by bisection."
  ],
+ "repair": {
+  "status": "prepared upstream patch, not posted; not integrated locally",
+  "plan": "docs/plans/2026-10-10-spc700-hint-outside-order.md",
+  "evidence": "docs/defects/evidence/2026-10-10-spc700-hint-repair/README.md",
+  "packet": "docs/pr-preparations/2026-10-10/spc700-hint-order/README.md"
+ },
  "prior_work": {
   "disposition": "new_defect",
   "search_terms": [
@@ -91,6 +99,190 @@
   {
    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/r3-fw-14.log",
    "sha256": "0d5471d1378d4d7fb3fef206469c488fa64ccc0cc026690bebcd991479039236"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/README.md",
+   "sha256": "31af138473b0ebeb68a430239e8406f0320029b99de5fe8a3ea4af1c6eba6219"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-disable-spill-hoist-fix-06bc967d.log",
+   "sha256": "dbe1d31e1ca9e9d70331df82cf3d7537f19e1539384ddbaa10249dd69a4e25f5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-disable-spill-hoist-fix584-06bc967d.log",
+   "sha256": "5dade9860f5d4c166b17fd9c8bccd9b65567e34db3058ff32342fc32450b9bc9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-disable-spill-hoist-up-06bc967d.log",
+   "sha256": "085ad9bf1c3286999ed71169f941f1bb6a3ec16507f8c98f3b6d916069c41fe2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-disable-spill-hoist-up584-06bc967d.log",
+   "sha256": "c13d7ba25aa226c7c6b28b3e446122f76ef6f8463e15bf3bb55f937e1fa98adb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-fix-06bc967d.log",
+   "sha256": "c554c507ede79189f901035ab8f271b394877a1f5c11122fbcec5659c3368369"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-fix584-06bc967d.log",
+   "sha256": "6766dfc3274d6cb88a5e04dd96f30103ee5d07105d77319fa9556cc8743e4f14"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-pre-greedy-main-excerpt.mir",
+   "sha256": "c1b35fdce96fb676d091e8465cbeedbd52d2b929229419bf486860af9032cf7f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll",
+   "sha256": "afdd548a3ca9c4772308e1728080287f3f1557618ca214deebe7b04e0e551b1f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-regalloc-debug-tail.log",
+   "sha256": "f496ee8904ba8305c18912ff82acdaf60ab5a630fabe1e945d63b3b34ff4e451"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-up-06bc967d.log",
+   "sha256": "0ccba65b51e37231325cc9ba7bad5bdece63ace05ccacc8ebb1e5f86e527191b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-up584-06bc967d.log",
+   "sha256": "8a300766180eab79c559ffb318545d7ff9e981de408217bf77604e3fdc4a2e87"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/census/census.sh",
+   "sha256": "eab42d7ae62818f4e7d4d9efcbdfaef85d37ccb96d4ec1695befacec093bde9a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/census/fix584-nsh.tsv",
+   "sha256": "0be41aa383562a188b34202ac764c69325dc1fe080a5f826d4ad9974ab5c85e3"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/census/fix584.tsv",
+   "sha256": "b760f90079b31eba046ac1ee2b671edd124825fb139e2ee66ea1c017e35d6611"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/census/summary.txt",
+   "sha256": "af77ee23347e9c4b118a751e310f255dc0f24472a944f68a79c50fdaf0545342"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/census/up584-nsh.tsv",
+   "sha256": "4c2b62efbbf2e014b9c5ce7994c2ca070507426268f2a4a32e2a9ab1ea213fbb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/census/up584.tsv",
+   "sha256": "457cba875f23ce745bed4e81481f6b14999aff576691aac95c30e51ecf09bd05"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/census/xcpu.sh",
+   "sha256": "a1c2d4b4a003f8d0737311f3947cb39c125668a67afab61f1e84cfaabf4468ac"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "sha256": "5e270827908d4ef4cf1c4864b9fd6130a3fc08e4ff5930c82eaf93fe668feecd"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/interesting.sh",
+   "sha256": "d2d490bab6a76176a9eb1d8eb750be8711b094855988227ecd42b0553ffaf11b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/lit-fix-06bc967d.log",
+   "sha256": "2fd4bb9f6e41bc60b347fdbf647d382b5366c768ff660c8a94ee9a50e8e82b3c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/lit-fix584-06bc967d.log",
+   "sha256": "99aae0d6b8ac9d097d3bedfc6b2124c16452ceaf909baa1e8351e6bb95959932"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/lit-up-06bc967d.log",
+   "sha256": "88b3c8af4d38352053fdf7bf4805a38891bb7a65e5ad94010504454f51a60e13"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/llvm-reduce.log",
+   "sha256": "7428e8c4e8345a8e133c0bcbdeb085524396e89891f1dc595a8651e82a7602e4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/mir-fix-06bc967d.log",
+   "sha256": "45cda8dbfb60ca5f4e76b60da19e80cbe10852ade7fb1c88a024c47858c9f791"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/mir-fix584-06bc967d.log",
+   "sha256": "9aa59fc7d938388a4f9e9111e4558dd575d16bf15bb79c4d4d2082a4f9d3acbb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/mir-up-06bc967d.log",
+   "sha256": "40817974f2a58a61d5f245ce8bc68f14711e361c9cb21bdfaa64ef77f5ce41dd"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/mir-up584-06bc967d.log",
+   "sha256": "a656973c0ff9d480ae5b5deb6dc319b02913a33b20b3156a0b14b55ce59f62db"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-asm-fix584-06bc967d.log",
+   "sha256": "018bd043b56a95c73199f40e53dd50bdebef1c6ba550180c94e432c0e8ffc256"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-fix-06bc967d.log",
+   "sha256": "f675b0788374b00bbdec338d7c79639478635b89ba5f8f02d28ea06f0d7927b5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-fix584-06bc967d.log",
+   "sha256": "ef76162230e4e74d60ce76153ccb79ab49868f656699058d0dd83b09dc004403"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-fix584.s",
+   "sha256": "def518ac82c48ca68cd7a4cd9cdd3f2cda4e1eb7816c2e756f93f6c70a2c2794"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-post-rewriter-fix584-06bc967d.mir.log",
+   "sha256": "62c769d8437af1f9392aec816daffb5155b5825b0cee0c0882be4188ce0c9f67"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-post-rewriter-fix584.mir",
+   "sha256": "262bc69a851810fd0751cd8db9b708f01758ad9e089d33c358510c01891afe22"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-pre-greedy-up584-06bc967d.mir.log",
+   "sha256": "f0afce751cfb39754c6d8f9a10a64678edd0d71d5311d6e7ba093bc34ea2e7c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-pre-greedy.mir",
+   "sha256": "3f9674aa0b935fb5ff743802fc5748d344e7aa310a0cb28c1f727e02a05adec3"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-up-06bc967d.log",
+   "sha256": "58674bb160f60dbd12cf9ed5ec1a2465fe87e0a6887d16a765a9c430561bf9d2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-up584-06bc967d.log",
+   "sha256": "7948e4dfb0f8ff6fed4e02968f3c8052a562a54e6de9807a5bb61b3b86d263b3"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/regalloc-spc700.mir",
+   "sha256": "e33dc3913a44366100cc3989ab107842339dadc89dcab03bb42fd9aee7cc62d6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/repair-06bc967d.diff",
+   "sha256": "97d612b24927367ac25123d61f453402cfc00c80e7ec4a4f2a6d2c3b8fe2f028"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/title-emit-first-fix584-06bc967d.log",
+   "sha256": "aded43b1fc5dfc958f219df7ef9729c25d05d36d31b389d42bdd85bdbcfd43ec"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/title-emit-first-up-06bc967d.log",
+   "sha256": "29d08dd2f7e6b88b8a4409fe3507c3036bb491ffed0614c0cc94897ab6970126"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/title-emit-first-up584-06bc967d.log",
+   "sha256": "c7b1c96624554394943bc7aa130fbbb87eafa6436184558dc95f7eab79e039f0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/title-emit-first.py",
+   "sha256": "bdfb7a41b101b493b91f076b525f62c2eec20702d17f2df5dae69b47bdab1ec8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/upstream-584.diff",
+   "sha256": "ec999fcd313604c513e40358f6d64ebf186b8280ee5a07476c5387be4bd7d06b"
   }
  ],
  "additional_runs": [
@@ -193,6 +385,235 @@
    "exit_code": 134,
    "label": "series top",
    "observed": "fails as at #320-1c"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d -mtriple=mos -mcpu=mosspc700 -run-pass=greedy,virtregrewriter -verify-machineinstrs docs/defects/evidence/2026-10-10-spc700-hint-repair/regalloc-spc700.mir -o -",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "none (single pass)",
+    "lto": false,
+    "verifier": true,
+    "expected": "allocates outside RC17",
+    "passes": "greedy,virtregrewriter"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d (06bc967d2668 (upstream main), clean); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/regalloc-spc700.mir",
+    "sha256": "e33dc3913a44366100cc3989ab107842339dadc89dcab03bb42fd9aee7cc62d6"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/mir-up-06bc967d.log",
+    "sha256": "40817974f2a58a61d5f245ce8bc68f14711e361c9cb21bdfaa64ef77f5ce41dd"
+   },
+   "exit_code": 134,
+   "label": "upstream 06bc967d, MIR regression",
+   "observed": "fails with the signature"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d -mtriple=mos -mcpu=mosspc700 -run-pass=greedy,virtregrewriter -verify-machineinstrs docs/defects/evidence/2026-10-10-spc700-hint-repair/regalloc-spc700.mir -o -",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "none (single pass)",
+    "lto": false,
+    "verifier": true,
+    "expected": "allocates outside RC17",
+    "passes": "greedy,virtregrewriter"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d (06bc967d2668 + repair-06bc967d.diff); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "55e62f61a5e111a541a2543eb82e6f83884183f8ea197ec5a54eb44ea35a0978",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/regalloc-spc700.mir",
+    "sha256": "e33dc3913a44366100cc3989ab107842339dadc89dcab03bb42fd9aee7cc62d6"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/mir-fix-06bc967d.log",
+    "sha256": "45cda8dbfb60ca5f4e76b60da19e80cbe10852ade7fb1c88a024c47858c9f791"
+   },
+   "exit_code": 0,
+   "label": "06bc967d + repair, MIR regression",
+   "observed": "passes; the constant is allocated to $x and $rc20"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up584-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up584-06bc967d (06bc967d2668 + upstream-584.diff (git diff 06bc967d2668 95e066056667, llvm-mos#584)); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll",
+    "sha256": "afdd548a3ca9c4772308e1728080287f3f1557618ca214deebe7b04e0e551b1f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-up584-06bc967d.log",
+    "sha256": "7948e4dfb0f8ff6fed4e02968f3c8052a562a54e6de9807a5bb61b3b86d263b3"
+   },
+   "exit_code": 134,
+   "label": "upstream 06bc967d + #584, reduced input",
+   "observed": "fails with the signature"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix584-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix584-06bc967d (06bc967d2668 + upstream-584.diff + repair-06bc967d.diff); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "8f3f3c1dfb46a4880d7ef73d6612089a18cd9752ad5b4a82e7a38f8202745369",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll",
+    "sha256": "afdd548a3ca9c4772308e1728080287f3f1557618ca214deebe7b04e0e551b1f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-fix584-06bc967d.log",
+    "sha256": "ef76162230e4e74d60ce76153ccb79ab49868f656699058d0dd83b09dc004403"
+   },
+   "exit_code": 0,
+   "label": "06bc967d + #584 + repair, reduced input",
+   "observed": "compiles; machine verifier clean"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up-06bc967d (06bc967d2668 (upstream main), clean); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll",
+    "sha256": "afdd548a3ca9c4772308e1728080287f3f1557618ca214deebe7b04e0e551b1f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-up-06bc967d.log",
+    "sha256": "58674bb160f60dbd12cf9ed5ec1a2465fe87e0a6887d16a765a9c430561bf9d2"
+   },
+   "exit_code": 134,
+   "label": "upstream 06bc967d, reduced input",
+   "observed": "fails with the signature"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d (06bc967d2668 + repair-06bc967d.diff); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "55e62f61a5e111a541a2543eb82e6f83884183f8ea197ec5a54eb44ea35a0978",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-reduced.ll",
+    "sha256": "afdd548a3ca9c4772308e1728080287f3f1557618ca214deebe7b04e0e551b1f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/reduced-fix-06bc967d.log",
+    "sha256": "f675b0788374b00bbdec338d7c79639478635b89ba5f8f02d28ea06f0d7927b5"
+   },
+   "exit_code": 139,
+   "label": "06bc967d + repair, reduced input",
+   "observed": "allocation succeeds; then the MOS late-optimization crash that llvm-mos#584 fixed"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix584-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": false,
+    "expected": "compiles"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix584-06bc967d (06bc967d2668 + upstream-584.diff + repair-06bc967d.diff); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "8f3f3c1dfb46a4880d7ef73d6612089a18cd9752ad5b4a82e7a38f8202745369",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+    "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-fix584-06bc967d.log",
+    "sha256": "6766dfc3274d6cb88a5e04dd96f30103ee5d07105d77319fa9556cc8743e4f14"
+   },
+   "exit_code": 134,
+   "label": "06bc967d + #584 + repair, record input and command",
+   "observed": "@main allocates; separate spill-hoist abort (\"Remaining virtual register\", STStk scratch) in @_title_emit"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up584-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -disable-spill-hoist -verify-machineinstrs docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles",
+    "disable_spill_hoist": true
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/up584-06bc967d (06bc967d2668 + upstream-584.diff (git diff 06bc967d2668 95e066056667, llvm-mos#584)); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "c3878a98df57c15b15bdf0caf701216a5816683012a80e8b5c70653fadc50f03",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+    "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-disable-spill-hoist-up584-06bc967d.log",
+    "sha256": "c13d7ba25aa226c7c6b28b3e446122f76ef6f8463e15bf3bb55f937e1fa98adb"
+   },
+   "exit_code": 134,
+   "label": "upstream 06bc967d + #584, record input with -disable-spill-hoist (as clang passes)",
+   "observed": "fails with the signature"
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix584-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 -disable-spill-hoist -verify-machineinstrs docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-spc700hint (worktree root; compilers frozen under /home/will/llvm-mos-65816/build/spc700-hint/llc)",
+   "configuration": {
+    "cpu": "mosspc700",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles",
+    "disable_spill_hoist": true
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/spc700-hint/llc/fix584-06bc967d (06bc967d2668 + upstream-584.diff + repair-06bc967d.diff); identity in docs/defects/evidence/2026-10-10-spc700-hint-repair/identity.json",
+   "toolchain_sha256": "8f3f3c1dfb46a4880d7ef73d6612089a18cd9752ad5b4a82e7a38f8202745369",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll",
+    "sha256": "0576da6b5fa0ece7329508fab79df133a1b3f254b1c91bc429401bb83f6f554e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-10-spc700-hint-repair/boids-disable-spill-hoist-fix584-06bc967d.log",
+    "sha256": "5dade9860f5d4c166b17fd9c8bccd9b65567e34db3058ff32342fc32450b9bc9"
+   },
+   "exit_code": 0,
+   "label": "06bc967d + #584 + repair, record input with -disable-spill-hoist (as clang passes)",
+   "observed": "compiles; machine verifier clean"
   }
  ]
 }

@@ -1,0 +1,32 @@
+$ /home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+# llc sha256 55e62f61a5e111a541a2543eb82e6f83884183f8ea197ec5a54eb44ea35a0978
+Remaining virtual register %2480...
+...in instruction: dead early-clobber %2480:imag16 = STStk killed renamable $rs2, %stack.0, 0 :: (store (s16) into %stack.0, align 1)
+
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/spc700-hint/llc/fix-06bc967d -mtriple=mos -mcpu=mosspc700 -O2 docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-spc700-hint-outside-order/boids.ll'.
+2.	Running pass 'Virtual Register Rewriter' on function '@_title_emit'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  fix-06bc967d 0x000060009c1a4a2b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  fix-06bc967d 0x000060009c1a18b1 llvm::sys::RunSignalHandlers() + 369
+2  fix-06bc967d 0x000060009c1a583b
+3  libc.so.6    0x00007e2352845cb0
+4  libc.so.6    0x00007e23528a61ac pthread_kill + 284
+5  libc.so.6    0x00007e2352845b7e gsignal + 30
+6  libc.so.6    0x00007e23528288ec abort + 39
+7  fix-06bc967d 0x000060009aef78ed llvm::MachineRegisterInfo::clearVirtRegs() + 349
+8  fix-06bc967d 0x000060009b1c659e
+9  fix-06bc967d 0x000060009b1c792e
+10 fix-06bc967d 0x000060009ae3f419 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+11 fix-06bc967d 0x000060009b3d17f0 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+12 fix-06bc967d 0x000060009b3d98f2 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+13 fix-06bc967d 0x000060009b3d25b4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+14 fix-06bc967d 0x0000600099da2a8b
+15 fix-06bc967d 0x0000600099d9fd53 main + 1443
+16 libc.so.6    0x00007e235282a601
+17 libc.so.6    0x00007e235282a718 __libc_start_main + 136
+18 fix-06bc967d 0x0000600099d9ef65 _start + 37
+/home/will/llvm-mos-65816/.scratch/spc700-hint/runlog.sh: line 13: 1215454 Aborted                    (core dumped) "$@" 2>&1
+exit_code=134

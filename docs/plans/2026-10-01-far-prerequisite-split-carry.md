@@ -435,6 +435,8 @@ Per-commit build with assertions and MOS CodeGen+MC; red on parent and green on 
 
     PASS. New: mos-late-opt-nongpr-ldimm (confirmed upstream, fix is #584), mos-huc-blockmove-frameindex-offset (confirmed upstream), mos-spc700-hint-outside-order (confirmed upstream). Closed as fixed: mos-far-fold-dangling-dbg-sites.
 
+    **Current status, 2026‑10‑10:** `mos-spc700-hint-outside-order` is root-caused, and a standalone upstream repair is prepared but not posted. See the [repair plan](2026-10-10-spc700-hint-outside-order.md). The `@main` "ran out of registers" error under 1c comes from that hint. The rewriter abort that follows it is the separate spill-hoist defect (`0033`) in `@_title_emit`.
+
 Levels (lesson 4): no third-round change alters the output of an input that compiled before. The third-round tops produce the same assembly and objects as the second-round tops on every CPU, so the second round's per-level table still applies.
 
 
