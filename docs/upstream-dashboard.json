@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-10-10",
-  "sourceHash": "946bb38a23e4a60c13befc108bf62f9c8b3c7b2e203c8fca442e0b58dfa5fe86",
+  "sourceHash": "c523491f925b83c3c7fd9061c2fc73db4c689421c0ae3e60f3e03941c4fb2c22",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -565,12 +565,12 @@
       "kind": "defect",
       "title": "XY16 X preservation saves $p as defined after a call clobbered its flags",
       "summary": "MOSInsertREPSEP::preserveX decides whether its PH $p reads a defined status register from backward liveness. A scavenger status-register save elsewhere in the loop makes N/Z look live across blocks, so after a JSR that clobbered them preserveX emits PH $p without undef and the machine verifier rejects it. Found as the one candidate-only failure of the near-index proof replay on the extracted upstream series (boids.c, XY16). Given the IR carrying the recovered nuw flags, the prerequisite alone, the candidate and the downstream compiler all fail identically; the same source compiles on the downstream compiler because its earlier passes produce different IR. Only machine verification rejects it; without -verify-machineinstrs the object is emitted.",
-      "localStatus": "qualified",
+      "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:321"
       ],
-      "nextStep": "Repair preserveX so it saves $p as undefined when no status flag is defined, in 0002 and the #321 prerequisite; red/green on the retained boids.c XY16 IR.",
+      "nextStep": "Fixed in 0002 and folded into #321-4 (split-series round seven, b393bb94db76); it ships with the #321 series.",
       "demoUrls": [
         "https://biohack.net/snes/boids/"
       ],

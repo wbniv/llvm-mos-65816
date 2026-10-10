@@ -1,0 +1,3 @@
+2026-10-10T15:44:48Z COMMAND: build/xy16px/pin2-fixed/llc -O3 -verify-machineinstrs -filetype=obj /tmp/claude-1000/-home-will-llvm-mos-65816/72f6d6de-6687-477a-bb4c-b186f9d1ba7f/scratchpad/truchet.ll -o /dev/null
+llc sha256: a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b
+EXIT: 0

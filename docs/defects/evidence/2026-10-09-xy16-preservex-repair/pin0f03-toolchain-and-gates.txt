@@ -1,0 +1,42 @@
+Pin 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63 (main 0910a44b/95d122f1). Source vendor/llvm-mos-0f031168a7cc, bootstrapped by dev/toolchain.sh in the dev container (shallow fetch of the pin + the committed patch stack); build dir build/llvm-mos-0f031168a7cc; install prefix LLVM_MOS_INSTALL=/work/build/llvm-mos-0f031168a7cc-install; BUILD_JOBS=3; heavy-build lock held inside the container.
+unfixed (cold):
+2026-10-10T14:12:16Z start pin 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63; free: 10Gi avail; disk 18G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+==> done in 88m 16s: clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos.git 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63)
+rc=0 2026-10-10T15:40:38Z; free: 9.1Gi avail; disk 11G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+  frozen unfixed llc build/xy16px/pin2-unfixed/llc sha256 e8dcef6480b04aa1a3e85697deaa25236a5d223af07372a42b66abc39dcb022d
+fixed (two files copied into the checkout; dev/regen-patch.sh then reproduced the committed 0002 content, see below):
+2026-10-10T15:43:32Z start pin 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63; free: 8.7Gi avail; disk 13G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+==> done in 1m 1s: clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos.git 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63)
+rc=0 2026-10-10T15:44:38Z; free: 9.2Gi avail; disk 13G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+  compiled: MOSInsertREPSEP.cpp.o
+  installed llc sha256 a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b mtime 2026-10-10T15:44:34Z
+  installed clang-24 sha256 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989 mtime 2026-10-10T15:44:28Z
+  installed lld sha256 fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287 mtime 2026-10-10T15:44:27Z
+  build-tree llc build/llvm-mos-0f031168a7cc/bin/llc sha256 a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b
+  frozen fixed llc build/xy16px/pin2-fixed/llc sha256 a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b
+shared install unchanged: build/llvm-mos-install/bin/llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+
+0002: dev/regen-patch.sh (LLVM_MOS_SOURCE=vendor/llvm-mos-0f031168a7cc) after the change: RESULT: PASS — 0002 round-trips (MOS dir + focused tests == live vendor)
+  Its output equals the committed 0002 except for format: regen writes 9-character index abbreviations and empty blank-context lines, the committed file (from task upstream:repin) uses full 40-character indexes and ' ' blank-context lines. The committed 0002 keeps main's format and differs from main only in the MOSInsertREPSEP.cpp and insert-rep-sep-cloned-kills.mir sections (index ..98c349c371cf, ..1c6b2f9947aa); grep -c live_undefined_nz = 2.
+
+MOS lit (dev/lit.sh in the container, build-tree llc above):
+==> llvm-lit -s /work/vendor/llvm-mos-0f031168a7cc/llvm/test/CodeGen/MOS /work/vendor/llvm-mos-0f031168a7cc/llvm/test/MC/MOS
+Total Discovered Tests: 208
+  Unsupported:   4 (1.92%)
+  Passed     : 204 (98.08%)
+
+SDK (worktree build/install, MOS_TOOLCHAIN=/work/build/llvm-mos-install = hardlink of the fixed prefix):
+==> built 296 program(s)
+==> FAILED (3): ascast ascast_sim lzss-gallery
+
+xy16xreload:
+2026-10-10T15:50:00Z xy16xreload MOS_TOOLCHAIN=/work/build/llvm-mos-install llc a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b (hardlink of /home/will/llvm-mos-65816/build/llvm-mos-0f031168a7cc-install); stack MIR blob c421564b55aa33b1e52103b5cb10b1d50cd79c67
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E0200 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x200 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+rc=0 2026-10-10T15:51:11Z

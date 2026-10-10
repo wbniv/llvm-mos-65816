@@ -19,7 +19,28 @@ defined before it (forward availability, the verifier's own criterion and the
 one the scavenger's `hasNoAvailableValue` already uses). It decides the `undef`
 flags on `PH $p` and `PHA16 $a16` and the `PLX` shortcut.
 
-## October 10: container build at the new pin (closing evidence)
+## October 10, later: pin `0f031168a7cc` (current closing evidence)
+
+Main re-pinned to `0f031168a7cc`, where both files are again unchanged. The
+repair was rebased onto it and copied into the bootstrapped checkout
+`vendor/llvm-mos-0f031168a7cc`; `dev/toolchain.sh` built it in the container into
+`build/llvm-mos-0f031168a7cc-install` (shared install untouched). Details, hashes,
+lit, SDK and `xy16xreload`: [`pin0f03-toolchain-and-gates.txt`](pin0f03-toolchain-and-gates.txt).
+
+| Check | Unfixed `e8dcef64…` | Fixed `a78958b0…` |
+|---|---|---|
+| Record input `boids.xy16.ll`, baseline configuration | [134](pin0f03-boids-original-red.log) | [0](pin0f03-boids-original-green.log) |
+| Recovered IR | [134](pin0f03-recovered-ir-red.log) | [0](pin0f03-recovered-ir-green.log) |
+| truchet `-O3` XY16 | [134](pin0f03-truchet-o3-red.log) | [0](pin0f03-truchet-o3-green.log) |
+| MIR regression | [`llc` 134](pin0f03-mir-regression-red.log) | [`llc` 0, FileCheck 0](pin0f03-mir-regression-green.log) |
+
+MOS lit 204 passed, 4 unsupported; `xy16xreload` 8/8. `dev/regen-patch.sh`
+reproduces the committed `0002` content; it writes abbreviated index lines and
+empty blank-context lines, so the committed file keeps the re-pin tool's format
+and changes only the two repair sections. The census and the boids/truchet
+runtime checks below were run at `f24948c7d1a4`.
+
+## October 10: container build at the new pin (previous pin)
 
 Main moved to pin `f24948c7d1a4`, where `MOSInsertREPSEP.cpp` and the test file
 are unchanged. The selected checkout (`vendor/llvm-mos-f24948c7d1a4` →

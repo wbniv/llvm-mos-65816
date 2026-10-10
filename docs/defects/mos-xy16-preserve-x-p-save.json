@@ -12,9 +12,10 @@
     "Repair, validation and closure: Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f."
   ],
   "unknowns": [
-    "The shared install build/llvm-mos-install is still the old-pin compiler 6f303945, which retains the defect; the fixed new-pin toolchain is installed at the separate prefix build/llvm-mos-f24948c7d1a4-install. Swapping the shared install to the new pin is a separate decision.",
-    "The record baseline (c8fb18cb) is the near-proof upstream candidate; the green candidate is the downstream compiler at the October 10 pin with the repair. The same-source pair at that pin is the unfixed f24948c7d1a4 build (2acf2f54, exit 134 on the identical input and configuration) and the fixed build (f68dae29, exit 0).",
-    "The October 9 green toolchains were host g++ rebuilds of one translation unit; they were removed after the container-built toolchain reproduced every result."
+    "The shared install build/llvm-mos-install is still the pre-re-pin compiler 6f303945, which retains the defect; the fixed toolchain for the current pin is installed at the separate prefix build/llvm-mos-0f031168a7cc-install. Swapping the shared install is a separate decision.",
+    "The record baseline (c8fb18cb) is the near-proof upstream candidate; the green candidate is the downstream compiler at pin 0f031168a7cc with the repair. The same-source pair at that pin is the unfixed build e8dcef64 (exit 134 on the identical input and configuration) and the fixed build a78958b0 (exit 0).",
+    "The 5,088-configuration census and the boids/truchet runtime checks were run at pin f24948c7d1a4; at 0f031168a7cc only the targeted inputs, MOS lit and xy16xreload were rerun.",
+    "The October 9 green toolchains were host g++ rebuilds of one translation unit; they were removed after the container-built toolchains reproduced every result."
   ],
   "prior_work": {
     "disposition": "distinct_from_related",
@@ -130,7 +131,7 @@
     },
     {
       "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/README.md",
-      "sha256": "c6cffd792896b9805028bc2897f7d1d493e4884922bc656f039c53aa84225633"
+      "sha256": "49e922e83b8dd9846a2973337497e4fb0ef978a5ff105662eb8a492f8a6fa813"
     },
     {
       "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/baseline-replay.log",
@@ -291,6 +292,42 @@
     {
       "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/sparse-after.txt",
       "sha256": "22e7db478075b9a650772d2d4deefb4b6d613db05d128abec14ecbcc94ae1b3b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-boids-original-red.log",
+      "sha256": "d0f152bbad75542099840b23b1eaa22cc42c594dfb136f9a38ec5d0683e802c1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-boids-original-green.log",
+      "sha256": "294d9d459b5a66291808d955c43f06ad3fc34de892aa31d40767b7d0138bcb13"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-recovered-ir-red.log",
+      "sha256": "2ff41ea57291e9a5b47aee8605b06345c5f6ab96d1df1b41ad6d4cb4219fe187"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-recovered-ir-green.log",
+      "sha256": "be43b779ec9a6d8db8fd93d0dc500a131b7ff8b9d494bb898344b6a5df2f66fb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-truchet-o3-red.log",
+      "sha256": "5fbba6a405f6895d4e7ce3928540f64b67a12a51c0e64d6ed8dd362f58946b44"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-truchet-o3-green.log",
+      "sha256": "2a929438e7045a47ecb703110b016a449028decdc2a09ff71e79eea740bbd1f7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-mir-regression-red.log",
+      "sha256": "9d80aba19e212129dc40c5911e989cd3c394f54fd9c7368e5efcc7687fdc81a6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-mir-regression-green.log",
+      "sha256": "cd43f5fbdc847e2fc9050d1d2070ec55a6ecaa81e96bde2b7a2f9b211ef51e2b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-toolchain-and-gates.txt",
+      "sha256": "eeeed9423b49ed0bb94a8b8cf4aab5fffd74f8b044e9037cbd00d8bccfcbb1de"
     }
   ],
   "additional_runs": [
@@ -478,18 +515,76 @@
       },
       "result": "At the October 10 pin the unfixed container-built compiler fails the original record input with the recorded signature (no recovery replay needed), and the fixed build passes; recovered IR, truchet and the MIR regression flip the same way. Census at the pin, clang-built before/after llc on frozen IR: 5,088 configurations, objects byte-identical except boids.c XY16 -Os (-19 B) and truchet.c XY16 -O3 (-59 B), the only two that failed the verifier before. Both ROMs, rebuilt from each llc's object, return their host oracle (boids 0xA8AB, truchet 0xB3E6) on bsnes-jg and MAME before and after.",
       "attribution": "Repair, validation and closure: Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f."
+    },
+    {
+      "kind": "repair_on_pin_0f031168",
+      "date": "2026-10-10",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll",
+        "sha256": "2a5fef2fb4a75ae3153ef0b4f8acd3a77c08c7e9e3d294b7ce181ad7f52737d9"
+      },
+      "runs": {
+        "unfixed_original_input": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-boids-original-red.log",
+          "sha256": "d0f152bbad75542099840b23b1eaa22cc42c594dfb136f9a38ec5d0683e802c1"
+        },
+        "fixed_original_input": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-boids-original-green.log",
+          "sha256": "294d9d459b5a66291808d955c43f06ad3fc34de892aa31d40767b7d0138bcb13"
+        },
+        "unfixed_recovered_ir": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-recovered-ir-red.log",
+          "sha256": "2ff41ea57291e9a5b47aee8605b06345c5f6ab96d1df1b41ad6d4cb4219fe187"
+        },
+        "fixed_recovered_ir": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-recovered-ir-green.log",
+          "sha256": "be43b779ec9a6d8db8fd93d0dc500a131b7ff8b9d494bb898344b6a5df2f66fb"
+        },
+        "unfixed_truchet": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-truchet-o3-red.log",
+          "sha256": "5fbba6a405f6895d4e7ce3928540f64b67a12a51c0e64d6ed8dd362f58946b44"
+        },
+        "fixed_truchet": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-truchet-o3-green.log",
+          "sha256": "2a929438e7045a47ecb703110b016a449028decdc2a09ff71e79eea740bbd1f7"
+        },
+        "mir_regression_red": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-mir-regression-red.log",
+          "sha256": "9d80aba19e212129dc40c5911e989cd3c394f54fd9c7368e5efcc7687fdc81a6"
+        },
+        "mir_regression_green": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-mir-regression-green.log",
+          "sha256": "cd43f5fbdc847e2fc9050d1d2070ec55a6ecaa81e96bde2b7a2f9b211ef51e2b"
+        },
+        "toolchain_and_gates": {
+          "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-toolchain-and-gates.txt",
+          "sha256": "eeeed9423b49ed0bb94a8b8cf4aab5fffd74f8b044e9037cbd00d8bccfcbb1de"
+        }
+      },
+      "toolchains": {
+        "unfixed": {
+          "path": "build/xy16px/pin2-unfixed/llc",
+          "sha256": "e8dcef6480b04aa1a3e85697deaa25236a5d223af07372a42b66abc39dcb022d"
+        },
+        "fixed": {
+          "path": "build/xy16px/pin2-fixed/llc",
+          "sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b"
+        }
+      },
+      "result": "At pin 0f031168a7cc the unfixed container-built compiler fails the original record input, the recovered IR and truchet -O3 with the recorded signature, and the fixed build passes all three; the MIR regression flips; MOS lit 204 passed, 4 unsupported; xy16xreload 8/8 on MAME and bsnes-jg.",
+      "attribution": "Repair, validation and closure: Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f."
     }
   ],
   "resolution": {
-    "change": "patches/llvm-mos/0002-321-accum16.patch: MOSInsertREPSEP::preserveX needed-value test (live after the save point and defined before it) for the PH $p and PHA16 $a16 undef flags and the PLX shortcut, with live_undefined_nz and live_undefined_p in insert-rep-sep-cloned-kills.mir; folded into split-series #321-4 by round seven (b393bb94db76).",
+    "change": "patches/llvm-mos/0002-321-accum16.patch at pin 0f031168a7cc: MOSInsertREPSEP::preserveX needed-value test (live after the save point and defined before it) for the PH $p and PHA16 $a16 undef flags and the PLX shortcut, with live_undefined_nz and live_undefined_p in insert-rep-sep-cloned-kills.mir; folded into split-series #321-4 by round seven (b393bb94db76).",
     "causal_explanation": "preserveX decided whether its A/P courier saves read defined values from backward liveness alone. A later push of all of P (the scavenger PHP, valid because carry is defined there) keeps N, Z and V live back through a JSR that clobbered them, so after the call preserveX emitted PH $p without undef and took the shuffle instead of PLX. The machine verifier walks forward, finds no defined part of P, and rejects the push. Requiring forward availability, the verifier's own criterion, marks the push undef and lets PLX restore X; it never fires where N/Z hold a defined value.",
-    "trigger_check": "The record input reaches the failing PH $p in main %bb.25: the baseline and the unfixed October 10 build both report it there and exit 134, and the fixed build exits 0. Two MIR functions exercise the operation directly (live-but-undefined N/Z with and without a stack byte in the region); they fail on #321-4, the old installed llc, the near-proof candidate and the unfixed new-pin llc, and pass with the repair. The recovered IR and the truchet -O3 XY16 sighting fail before and pass after on the new pin. MOS lit 202 pass, 4 unsupported; corpus-a16 83/83; xy16xreload 8/8 MAME+bsnes-jg. Census at the pin, clang-built before/after llc on frozen IR: 5,088 configurations, objects byte-identical except boids.c XY16 -Os (-19 B) and truchet.c XY16 -O3 (-59 B), the only two that failed the verifier before. Both ROMs, rebuilt from each llc's object, return their host oracle (boids 0xA8AB, truchet 0xB3E6) on bsnes-jg and MAME before and after.",
+    "trigger_check": "The record input reaches the failing PH $p in main %bb.25: the baseline and the unfixed October 10 build both report it there and exit 134, and the fixed build exits 0. Two MIR functions exercise the operation directly (live-but-undefined N/Z with and without a stack byte in the region); they fail on #321-4, the old installed llc, the near-proof candidate and the unfixed new-pin llc, and pass with the repair. The recovered IR and the truchet -O3 XY16 sighting fail before and pass after on the new pin. At pin f24948c7d1a4: MOS lit 202 pass, 4 unsupported; corpus-a16 83/83; xy16xreload 8/8 MAME+bsnes-jg. Census at the pin, clang-built before/after llc on frozen IR: 5,088 configurations, objects byte-identical except boids.c XY16 -Os (-19 B) and truchet.c XY16 -O3 (-59 B), the only two that failed the verifier before. Both ROMs, rebuilt from each llc's object, return their host oracle (boids 0xA8AB, truchet 0xB3E6) on bsnes-jg and MAME before and after. At pin 0f031168a7cc (container builds, unfixed e8dcef64 / fixed a78958b0): the record input, the recovered IR and truchet -O3 exit 134 then 0, the MIR regression flips, MOS lit 204 passed / 4 unsupported, and xy16xreload passes 8/8 on MAME and bsnes-jg.",
     "regression": {
       "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll",
       "sha256": "2a5fef2fb4a75ae3153ef0b4f8acd3a77c08c7e9e3d294b7ce181ad7f52737d9"
     },
     "candidate": {
-      "command": "build/xy16px/newpin-fixed/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null",
+      "command": "build/xy16px/pin2-fixed/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null",
       "working_directory": "/home/will/llvm-mos-65816",
       "configuration": {
         "cpu": "mosw65816",
@@ -502,15 +597,15 @@
         "verifier": true,
         "expected": "object emitted with machine verification"
       },
-      "toolchain_location": "build/xy16px/newpin-fixed/llc (frozen copy of build/llvm-mos-f24948c7d1a4-install/bin/llc; container build at pin f24948c7d1a4 with 0002 from this change); identity in docs/defects/evidence/2026-10-09-xy16-preservex-repair/newpin-toolchain-and-lit.txt",
-      "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+      "toolchain_location": "build/xy16px/pin2-fixed/llc (frozen copy of build/llvm-mos-0f031168a7cc-install/bin/llc; container build at pin 0f031168a7cc with 0002 from this change); identity in docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-toolchain-and-gates.txt",
+      "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
       "input": {
         "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll",
         "sha256": "2a5fef2fb4a75ae3153ef0b4f8acd3a77c08c7e9e3d294b7ce181ad7f52737d9"
       },
       "log": {
-        "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/newpin-boids-original-green.log",
-        "sha256": "ad30e7e0b1509f20dc9283b97e46ceedc65780b08fc0ae2a46c00cf97f3f24b9"
+        "path": "docs/defects/evidence/2026-10-09-xy16-preservex-repair/pin0f03-boids-original-green.log",
+        "sha256": "294d9d459b5a66291808d955c43f06ad3fc34de892aa31d40767b7d0138bcb13"
       },
       "exit_code": 0
     }

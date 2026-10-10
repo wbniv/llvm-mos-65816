@@ -1,0 +1,3 @@
+2026-10-10T15:44:46Z COMMAND: build/xy16px/pin2-fixed/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null
+llc sha256: a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b
+EXIT: 0

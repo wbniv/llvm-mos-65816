@@ -78,7 +78,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "b9c6a65f1486792c942bb8303a5c0c60bb2524e15bce524d1ed2e25dcd4ce2dc",
+          "docs/upstream-dashboard-curation.json": "8599f910e8ca16db98db3ac114b4b62c16596c148aada49ebbcbec7d94459724",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -110,7 +110,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
-          "docs/defects/mos-xy16-preserve-x-p-save.json": "2ef845beb221866329de3bab055b5f8b78e0e4ba89ebcd52677a4ec37b2aeb8e",
+          "docs/defects/mos-xy16-preserve-x-p-save.json": "81083421e5c9d52104db479315bcf2fedf0dbe64c67efb26f01780debc95f595",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "5e5d75c0c4494e7d0f10b7bbd0053751e025e041259f27786ede5984e3c1a123",
           "docs/defects/mos-zp-index-same-width-trunc.json": "cdbe44541ce1abc9cdfe7d3e0cb666cb1d7cb8865d29b378aa146c55941f7640",
           "docs/defects/reentrant-attribute-contract.json": "15e8272f46879514803da4effd45251fec86befccfc553341f16cbcbad1827ad",
@@ -123,7 +123,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "1c8b043663be978cd4b13a3a4d7c7b5729b6c7859a1b8ea6753b865473de8f25"
+          "docs/upstream-dashboard.json": "f2c3e99dce13fdedafa2d9b2df030519057b7ffb3941fcd40ea24d63b2735723"
         }
       }
     },
@@ -144,13 +144,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "7bdf5a74492b521b923a339370568b80fc5a07ab2d7be7625d01c395f910c5f6",
+          "docs/upstream-pending-work.md": "be9b6902bd9ed5affb79ff2db976d8a1f77060ea26da5e54cd4640bb4e0d0dd1",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "1c8b043663be978cd4b13a3a4d7c7b5729b6c7859a1b8ea6753b865473de8f25",
+          "docs/upstream-dashboard.json": "f2c3e99dce13fdedafa2d9b2df030519057b7ffb3941fcd40ea24d63b2735723",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "8025aa69e1fa4ac952ccc6e9f4f0fadc1f38f7c7ef335e14bf6a80c211cd2c79"
+          "docs/upstream-dashboard-graph.json": "9a47554f6bb6679f7df1edc4468d093beb500f2da5c1eeba807a2980354102c0"
         }
       }
     },
@@ -408,7 +408,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
-          "docs/defects/mos-xy16-preserve-x-p-save.json": "2d0fdeb854addc4e0a4f3e604cef6ebdef0cc94551aa9047cefd0d0d26f80afe",
+          "docs/defects/mos-xy16-preserve-x-p-save.json": "765e5f0a977f8ae1492dc784ae11c4569f732d3e1e72b5393a2ec83b01abea3d",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "e6b7375ebd803455cbca7a2b699f00d05b69b37827d5b81d88e9993ec9eb138d",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
@@ -433,7 +433,7 @@
           "docs/plans/2026-09-27-0064-competing-carry-gate.md": "c1aabd8329cde2cbbd9bed51afe3938f87a773e66ebc68a62ee6473dd7cd27eb",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1b562f8004ad77c8a04db0e1e40c13f804cba0541076d81940dbfb81c28969e7",
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
           "docs/plans/2026-09-28-farblit-payoff.md": "a29f2fa74aa769dbd2d987983bead2344cc3f9413020462036b6bc69c5723ace",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
@@ -456,9 +456,9 @@
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
           "docs/upstream-twoaddr-physreg-reschedule-pr.md": "a6597fe5631ec613d45e40b249e82a0eba5a1c4e2b31fb2e039a82c635c904b7"
         },
-        "reviewed_at": "2026-10-10T13:26:43.639564+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:56:09.912102+00:00",
+        "note": "mos-xy16-preserve-x-p-save is fixed (red/green at pin 0f031168a7cc): the finished TODO item is dropped (this file keeps only remaining actions); the trackers, the feature-held packet, the handoff and the near-index report say the preserveX defect is fixed in 0002 and folded into #321-4 by round seven. No publication status changed: nothing is posted.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -541,7 +541,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
-          "docs/defects/mos-xy16-preserve-x-p-save.json": "2d0fdeb854addc4e0a4f3e604cef6ebdef0cc94551aa9047cefd0d0d26f80afe",
+          "docs/defects/mos-xy16-preserve-x-p-save.json": "765e5f0a977f8ae1492dc784ae11c4569f732d3e1e72b5393a2ec83b01abea3d",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "e6b7375ebd803455cbca7a2b699f00d05b69b37827d5b81d88e9993ec9eb138d",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
@@ -561,7 +561,7 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1b562f8004ad77c8a04db0e1e40c13f804cba0541076d81940dbfb81c28969e7",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
@@ -584,9 +584,9 @@
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621",
           "docs/open-source-dashboard-publication.md": "42dcb93d18dd6abd407a9c8c9834afa2312f72568166cdd851c159a2d499a102"
         },
-        "reviewed_at": "2026-10-10T13:26:44.269066+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:56:10.356444+00:00",
+        "note": "mos-xy16-preserve-x-p-save is fixed (red/green at pin 0f031168a7cc): the finished TODO item is dropped (this file keeps only remaining actions); the trackers, the feature-held packet, the handoff and the near-index report say the preserveX defect is fixed in 0002 and folded into #321-4 by round seven. No publication status changed: nothing is posted.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -670,7 +670,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
-          "docs/defects/mos-xy16-preserve-x-p-save.json": "2d0fdeb854addc4e0a4f3e604cef6ebdef0cc94551aa9047cefd0d0d26f80afe",
+          "docs/defects/mos-xy16-preserve-x-p-save.json": "765e5f0a977f8ae1492dc784ae11c4569f732d3e1e72b5393a2ec83b01abea3d",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "e6b7375ebd803455cbca7a2b699f00d05b69b37827d5b81d88e9993ec9eb138d",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
@@ -690,7 +690,7 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1b562f8004ad77c8a04db0e1e40c13f804cba0541076d81940dbfb81c28969e7",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
@@ -705,7 +705,7 @@
           "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "efbf5e5c0f045a429fd744c0d7fe675abe0809015ecb1b4948766e39ced7c262",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28",
-          "docs/upstream-pending-work.md": "7bdf5a74492b521b923a339370568b80fc5a07ab2d7be7625d01c395f910c5f6",
+          "docs/upstream-pending-work.md": "be9b6902bd9ed5affb79ff2db976d8a1f77060ea26da5e54cd4640bb4e0d0dd1",
           "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7",
           "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
           "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9",
@@ -714,9 +714,9 @@
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621",
           "docs/open-source-dashboard-publication.md": "42dcb93d18dd6abd407a9c8c9834afa2312f72568166cdd851c159a2d499a102"
         },
-        "reviewed_at": "2026-10-10T13:26:44.488046+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:56:10.487880+00:00",
+        "note": "mos-xy16-preserve-x-p-save is fixed (red/green at pin 0f031168a7cc): the finished TODO item is dropped (this file keeps only remaining actions); the trackers, the feature-held packet, the handoff and the near-index report say the preserveX defect is fixed in 0002 and folded into #321-4 by round seven. No publication status changed: nothing is posted.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -882,7 +882,7 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1b562f8004ad77c8a04db0e1e40c13f804cba0541076d81940dbfb81c28969e7",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
@@ -893,9 +893,9 @@
           "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
           "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9"
         },
-        "reviewed_at": "2026-10-10T08:44:59.351669+00:00",
-        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
-        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:56:10.949997+00:00",
+        "note": "mos-xy16-preserve-x-p-save is fixed (red/green at pin 0f031168a7cc): the finished TODO item is dropped (this file keeps only remaining actions); the trackers, the feature-held packet, the handoff and the near-index report say the preserveX defect is fixed in 0002 and folded into #321-4 by round seven. No publication status changed: nothing is posted.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -937,7 +937,7 @@
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "36337397c1d7b44b6f377307e0249a7c1949824b1c32e6f7bd5ac327e530c043",
-          "patches/llvm-mos/0002-321-accum16.patch": "caabe329fa98cfccbf7729bcd7a8ee5a6d0a9a83a133f9a9ab8e3a7f82f48f99",
+          "patches/llvm-mos/0002-321-accum16.patch": "353879dd989cbf778372d85a7d1010f6c72129d7e37acdc9685dd0d371de31ee",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "ad27cbec6a8aeb9151188026a82338eecfef1886ea42723528fcf424a25261d3",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "8b4d7da832d13e88b678d3e97593727d46fe820fd24250acd381f78a312f5b06",
           "patches/llvm-mos/0063-mos-near-shared-store.patch": "e7039fa70defd5376bc34fa1cbc596d690a9f2baa1663ce9f2302bada775b9d7",
@@ -969,9 +969,9 @@
           "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-10T08:45:05.757462+00:00",
-        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
-        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:57:39.813683+00:00",
+        "note": "Checked after 0002 gained the preserveX repair and the defect moved to fixed: these documents do not mention the defect, and the change leaves every object they measure byte-identical (5,088-configuration census at f24948c7d1a4; only boids.c XY16 -Os and truchet.c XY16 -O3 change), so their claims stand.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -1160,7 +1160,7 @@
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "03385c2cf36db1ee200677f7c620f16a0e49cab33a28457d8846c6e2836337b3",
           "docs/pr-preparations/2026-09-26/0028-pr-body.md": "f30af1f6fab15e952f894936eb1c78be08b7d6f42d4a75248e3a3ca5250e772f",
           "docs/pr-preparations/2026-09-26/0037-pr-body.md": "dc640b31f51578e6bc5b469d58553dcd67c45f0a21bdb36459fc3fc9d8c1c27e",
           "docs/pr-preparations/2026-09-26/0038-pr-body.md": "4028d7c8b88af655e2be7315c36bb53c111c3cd6bbb95950264126d02abd8f5c",
@@ -1182,7 +1182,7 @@
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1b562f8004ad77c8a04db0e1e40c13f804cba0541076d81940dbfb81c28969e7",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce",
@@ -1190,9 +1190,9 @@
           "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907"
         },
-        "reviewed_at": "2026-10-10T13:26:51.508479+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:57:42.253401+00:00",
+        "note": "Checked after 0002 gained the preserveX repair and the defect moved to fixed: these documents do not mention the defect, and the change leaves every object they measure byte-identical (5,088-configuration census at f24948c7d1a4; only boids.c XY16 -Os and truchet.c XY16 -O3 change), so their claims stand.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -1674,13 +1674,13 @@
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ae5904450f77e82d70048c10eac3529e2fe3595d4bdab649416aa443eddb3665",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1b562f8004ad77c8a04db0e1e40c13f804cba0541076d81940dbfb81c28969e7",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce"
         },
-        "reviewed_at": "2026-10-09T23:03:33.695376+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:56:11.836865+00:00",
+        "note": "mos-xy16-preserve-x-p-save is fixed (red/green at pin 0f031168a7cc): the finished TODO item is dropped (this file keeps only remaining actions); the trackers, the feature-held packet, the handoff and the near-index report say the preserveX defect is fixed in 0002 and folded into #321-4 by round seven. No publication status changed: nothing is posted.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -1701,7 +1701,7 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/README.md": "91c2ccb804247cd027e9c13b82a83219fba19b8ae16c08db436bd94ad7d8d03a",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "03385c2cf36db1ee200677f7c620f16a0e49cab33a28457d8846c6e2836337b3",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "2ceb221c9eaed92a1158ab8c3035231573e0d95af67654b968a5569c9a65c829",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
@@ -1712,9 +1712,9 @@
           "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907"
         },
-        "reviewed_at": "2026-10-10T08:45:13.510825+00:00",
-        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
-        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:57:36.503482+00:00",
+        "note": "Checked after 0002 gained the preserveX repair and the defect moved to fixed: these documents do not mention the defect, and the change leaves every object they measure byte-identical (5,088-configuration census at f24948c7d1a4; only boids.c XY16 -Os and truchet.c XY16 -O3 change), so their claims stand.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -1742,11 +1742,11 @@
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
           "docs/upstream-late-opt-nongpr-ldimm-pr.md": "21daa88239609e10c3e047eaecefa7b064b8365363b707beff121c85acf10620",
           "docs/upstream-zp-alloc-deterministic-pr.md": "d17cc42b2f454700c831fde9d9ed66fcb3375e18b0172006aa471a129ce0c1d8",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1b562f8004ad77c8a04db0e1e40c13f804cba0541076d81940dbfb81c28969e7"
         },
-        "reviewed_at": "2026-10-09T14:21:16.159225+00:00",
-        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:57:34.688438+00:00",
+        "note": "Checked after 0002 gained the preserveX repair and the defect moved to fixed: these documents do not mention the defect, and the change leaves every object they measure byte-identical (5,088-configuration census at f24948c7d1a4; only boids.c XY16 -Os and truchet.c XY16 -O3 change), so their claims stand.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -1765,16 +1765,16 @@
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "patches/llvm-mos/0002-321-accum16.patch": "caabe329fa98cfccbf7729bcd7a8ee5a6d0a9a83a133f9a9ab8e3a7f82f48f99",
+          "patches/llvm-mos/0002-321-accum16.patch": "353879dd989cbf778372d85a7d1010f6c72129d7e37acdc9685dd0d371de31ee",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1b562f8004ad77c8a04db0e1e40c13f804cba0541076d81940dbfb81c28969e7",
           "dev/llvm-mos-pin": "0f4b5fb7147ba494fda95bc0dd2b738703b5d3ba5e39e18b46a746b9ac2cdfe6",
           "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-10T08:45:14.011298+00:00",
-        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
-        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:57:42.254207+00:00",
+        "note": "Checked after 0002 gained the preserveX repair and the defect moved to fixed: these documents do not mention the defect, and the change leaves every object they measure byte-identical (5,088-configuration census at f24948c7d1a4; only boids.c XY16 -Os and truchet.c XY16 -O3 change), so their claims stand.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -2198,7 +2198,7 @@
       "receipt": {
         "sources": {
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
-          "patches/llvm-mos/0002-321-accum16.patch": "caabe329fa98cfccbf7729bcd7a8ee5a6d0a9a83a133f9a9ab8e3a7f82f48f99",
+          "patches/llvm-mos/0002-321-accum16.patch": "353879dd989cbf778372d85a7d1010f6c72129d7e37acdc9685dd0d371de31ee",
           "dev/check-near-index-proofs.py": "8f514c4c8625bb8fdc08447deb44dd027a32090c37dc4176399eab0f427d498e",
           "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
           "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f",
@@ -2206,9 +2206,9 @@
           "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "e8b7917826c616c91f749752be33700d334c4414f0be632ccb605918dbf00080",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-10T08:45:24.995205+00:00",
-        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
-        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:56:12.399412+00:00",
+        "note": "mos-xy16-preserve-x-p-save is fixed (red/green at pin 0f031168a7cc): the finished TODO item is dropped (this file keeps only remaining actions); the trackers, the feature-held packet, the handoff and the near-index report say the preserveX defect is fixed in 0002 and folded into #321-4 by round seven. No publication status changed: nothing is posted.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -2562,7 +2562,7 @@
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "03385c2cf36db1ee200677f7c620f16a0e49cab33a28457d8846c6e2836337b3",
           "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
           "docs/defects/evidence/2026-09-28-far-word-policy/trace.json": "ef5faa521845e918a467e762a86dc1fe08a63928cdfc479b07f394ad6f247734",
           "docs/defects/evidence/2026-09-28-far-word-policy/identity.json": "7782dd8ee661d14ed63b44ca5b0931c79ba40f46059ee910c9c17ee23480f215",
@@ -2584,9 +2584,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce"
         },
-        "reviewed_at": "2026-10-10T08:45:32.346205+00:00",
-        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
-        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:57:44.810036+00:00",
+        "note": "Checked after 0002 gained the preserveX repair and the defect moved to fixed: these documents do not mention the defect, and the change leaves every object they measure byte-identical (5,088-configuration census at f24948c7d1a4; only boids.c XY16 -Os and truchet.c XY16 -O3 change), so their claims stand.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -2886,12 +2886,12 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "e9d9b5d3f6cc0ffea34c6626aed700068bf3756ffcd14433d87b98bd6be3cbc1",
+          "TODO.md": "9c599f1cf947aea94f7d2f6d5dd3b1aea967cb9c7bc963a9e970280bed4405f2",
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621"
         },
-        "reviewed_at": "2026-10-10T13:26:45.752831+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:57:34.892456+00:00",
+        "note": "Checked after 0002 gained the preserveX repair and the defect moved to fixed: these documents do not mention the defect, and the change leaves every object they measure byte-identical (5,088-configuration census at f24948c7d1a4; only boids.c XY16 -Os and truchet.c XY16 -O3 change), so their claims stand.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -2926,7 +2926,7 @@
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907",
           "docs/defects/evidence/2026-09-25-coalescing-0015/original/patches/llvm-mos/0015-321-coalesce-rc-undef.patch": "99207f659449ae85f9dbb73a42f81940d110ee6f381468177661769d2a2f5ec4",
           "patches/llvm-mos/0001-320-far-addrspace.patch": "ba876bff2a0eec80d4a3bed03227f0199b9dd3c7b1b09e207647893d7a7aee8d",
-          "patches/llvm-mos/0002-321-accum16.patch": "caabe329fa98cfccbf7729bcd7a8ee5a6d0a9a83a133f9a9ab8e3a7f82f48f99",
+          "patches/llvm-mos/0002-321-accum16.patch": "353879dd989cbf778372d85a7d1010f6c72129d7e37acdc9685dd0d371de31ee",
           "patches/llvm-mos/0004-320-far-cc.patch": "7a244194670ca9461572890ec5aabc30025b224001092e7928d1568625034b5a",
           "patches/llvm-mos/0005-320-far-ptr-value-legalize.patch": "0ded5ab8f371543c42178065d0da5c206b6e47ae156fe85d139747413a7eb763",
           "patches/llvm-mos/0006-320-packed24.patch": "52c2420941cab8a471df5e5591c3cd7bdac9319749ad18207826699b7964dde2",
@@ -3036,9 +3036,9 @@
           "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
           "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9"
         },
-        "reviewed_at": "2026-10-10T08:45:37.141475+00:00",
-        "note": "Reviewed the published 0f031168a7cc replay, all 51 retained applications, exact-tree independent application, Release compiler identities and 204 passing/four unsupported MOS results, and 17 workflow fixtures. Hashed 0013/0057/0058/0059 originals are now preserved; vendor twins are selected and final bootstrap replay equals the tested compiler tree. Current pin summaries and the repeatable-command plan now link separate full-validation evidence; initial preparation and October 9 evidence stay dated. Reviewed carry, near-index, farblit and far-word policy/contracts and retained source reviews: source/index/context and expectation rebase does not extend their recorded runtime, profitability, defect-closure or extracted-destination results. Prefetch remains superseded; symbolic directive submission still requires destination refresh. No new whole retirement, defect status, upstream review or SNES readiness is inferred. TODO adds a completed local validation notice and leaves the public pending queue unchanged, so the website publication workflow remains applicable without a new deployment.",
-        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T15:59:09.420262+00:00",
+        "note": "0002 now differs from the artifact the re-pin published only by the preserveX repair sections (MOSInsertREPSEP.cpp and insert-rep-sep-cloned-kills.mir), in the same full-index format. These pin records describe the dated publication and remain accurate as history; the pin, the retired carries and the build statements are unaffected.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {
@@ -3221,7 +3221,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
-          "docs/defects/mos-xy16-preserve-x-p-save.json": "2ef845beb221866329de3bab055b5f8b78e0e4ba89ebcd52677a4ec37b2aeb8e",
+          "docs/defects/mos-xy16-preserve-x-p-save.json": "81083421e5c9d52104db479315bcf2fedf0dbe64c67efb26f01780debc95f595",
           "docs/defects/mos-xy16-stale-x-writer-reload.json": "5e5d75c0c4494e7d0f10b7bbd0053751e025e041259f27786ede5984e3c1a123",
           "docs/defects/mos-zp-index-same-width-trunc.json": "cdbe44541ce1abc9cdfe7d3e0cb666cb1d7cb8865d29b378aa146c55941f7640",
           "docs/defects/reentrant-attribute-contract.json": "15e8272f46879514803da4effd45251fec86befccfc553341f16cbcbad1827ad",
@@ -3232,9 +3232,9 @@
           "docs/defects/snes-soft-stack-static-data-collision.json": "f271d6cb0cfeb0da676a4e59e4a647a0d0f1b82e6a59b8a64acfee824858afe8",
           "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886"
         },
-        "reviewed_at": "2026-10-10T13:26:47.266361+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T16:10:25.861180+00:00",
+        "note": "Its sources changed by the preserveX repair: 0002 gained the two repair sections and the defect record moved to fixed. The plan records the dated re-pin publication and needs no change.",
+        "attribution": "Claude Code 2.1.295 (t4-opus-high agent a469d5bd6fc11cf09), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f"
       }
     },
     {

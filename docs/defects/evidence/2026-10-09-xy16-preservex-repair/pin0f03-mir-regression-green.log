@@ -1,0 +1,3 @@
+2026-10-10T15:44:50Z COMMAND: build/xy16px/pin2-fixed/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs /home/will/llvm-mos-65816-xy16pm/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir -o - | FileCheck /home/will/llvm-mos-65816-xy16pm/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir
+llc sha256: a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b
+LLC_EXIT: 0 FILECHECK_EXIT: 0

@@ -71,27 +71,27 @@ changes liveness for every scavenger P save in all CPU modes, and leaves
 
 ## Verification
 
-1. Replay the record's baseline: `c8fb18cb` on `boids.xy16.ll` exits 134 with
-   `Using an undefined physical register`.
-2. Red on the current downstream `llc` (`6f303945`): the recovered IR with
+1. ~~Replay the record's baseline: `c8fb18cb` on `boids.xy16.ll` exits 134 with
+   `Using an undefined physical register`.~~ Done at pin `0f031168a7cc`; see the current results below.
+2. ~~Red on the current downstream `llc` (`6f303945`): the recovered IR with
    `-start-after=loop-reduce`, and the new MIR regression, both fail with that
-   signature.
-3. Series: the new MIR regression fails on the unfixed #321-4 `llc` and passes
+   signature.~~ Done at pin `0f031168a7cc`; see the current results below.
+3. ~~Series: the new MIR regression fails on the unfixed #321-4 `llc` and passes
    on the fixed one; MOS CodeGen + MC lit pass at fixed #321-4, fixed #321-16
-   and the fixed near-index packet.
-4. Green on the record input: the fixed near-index packet `llc` compiles
+   and the fixed near-index packet.~~ Done by round seven's fold (`b393bb94db76`); its frozen `llc` binaries pass the regression and the record input.
+4. ~~Green on the record input: the fixed near-index packet `llc` compiles
    `boids.xy16.ll` with the baseline configuration (exit 0), and the recovered
-   IR and the truchet `-O3` repeat sighting.
-5. Downstream: the rebuilt toolchain compiles the recovered IR and truchet with
-   the verifier; the full MOS lit suites pass (`dev/run.sh lit`).
-6. Code effect: `llc` before/after over frozen IR of every corpus program and
+   IR and the truchet `-O3` repeat sighting.~~ Done at pin `0f031168a7cc`; see the current results below.
+5. ~~Downstream: the rebuilt toolchain compiles the recovered IR and truchet with
+   the verifier; the full MOS lit suites pass (`dev/run.sh lit`).~~ Done at pin `0f031168a7cc`; see the current results below.
+6. ~~Code effect: `llc` before/after over frozen IR of every corpus program and
    demo, default/A16/XY16 at `-Os`, `-Oz`, `-O2`, `-O3`; objects identical
-   except where the `PLX` shortcut fires, which must only shrink.
-7. Differential: `dev/run.sh corpus-a16` (host == default@MAME == +mos-a16@MAME
+   except where the `PLX` shortcut fires, which must only shrink.~~ Done at pin `f24948c7d1a4` (5,088 configurations, both changed objects shrink); not rerun at `0f031168a7cc`.
+7. ~~Differential: `dev/run.sh corpus-a16` (host == default@MAME == +mos-a16@MAME
    == +mos-a16@bsnes-jg, plus XY16) and the hard-stack gate that runs
-   `insert-rep-sep-stack.mir`.
-8. The regenerated `0002` differs from `HEAD` only in `MOSInsertREPSEP.cpp`
-   and `insert-rep-sep-stack.mir`.
+   `insert-rep-sep-stack.mir`.~~ `corpus-a16` 83/83 at `f24948c7d1a4`; `xy16xreload` 8/8 at both pins.
+8. ~~The regenerated `0002` differs from `HEAD` only in `MOSInsertREPSEP.cpp`
+   and `insert-rep-sep-stack.mir`.~~ Done at pin `0f031168a7cc`; see the current results below.
 
 ### Results (2026-10-09)
 
@@ -248,7 +248,7 @@ repair cannot apply. Logs and tools:
     sections byte for byte from the current vendor files, and each new section
     applies to reproduce the fixed file exactly.
 
-### Results (2026-10-10, container build at pin `f24948c7d1a4`)
+### Results (2026-10-10, container build at pin `f24948c7d1a4`, superseded by the next section)
 
 The dev container was usable again. `runtimes/` was added to the sparse pin
 checkout, and `dev/toolchain.sh` built it in the container into the separate
@@ -378,6 +378,102 @@ shared `build/llvm-mos-install/bin/llc` stayed
    to main's `0002` byte for byte, and after the two-file change produced
    exactly the committed spliced `0002` (`RESULT: PASS — 0002 round-trips`, no
    diff). PASS.
+
+### Results (2026-10-10, pin `0f031168a7cc`, current)
+
+Main re-pinned again (`0910a44b`). The branch was rebased onto `95d122f1`, the
+two `0002` sections re-spliced in the re-pin tool's full-index format, the two
+files copied into the bootstrapped `vendor/llvm-mos-0f031168a7cc`, and the
+toolchain built in the container into `build/llvm-mos-0f031168a7cc-install`
+(cold unfixed build 88m16s, then the fixed incremental build). Shared
+`build/llvm-mos-install/bin/llc` stayed `6f303945…`.
+
+1. ~~Baseline replay~~: unchanged (PASS).
+
+2. ~~Red on the downstream `llc`~~ (unfixed pin build `build/xy16px/pin2-unfixed/llc`):
+
+    ```
+    2026-10-10T15:41:36Z COMMAND: build/xy16px/pin2-unfixed/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null
+    llc sha256: e8dcef6480b04aa1a3e85697deaa25236a5d223af07372a42b66abc39dcb022d
+    *** Bad machine code: Using an undefined physical register ***
+    - function:    main
+    - instruction: PH $p
+         1054080 Done                       | grep -E 'Bad machine code|^- function|^- basic block|^- instruction|^- operand|LLVM ERROR'
+    EXIT: 134
+    EXIT: 134
+    EXIT: 134
+    - function:    live_undefined_nz
+    LLC_EXIT: 134 FILECHECK_EXIT: 2
+    ```
+
+    PASS.
+
+3. ~~Series~~: unchanged; round seven carries the fold (PASS).
+
+4. ~~Green on the record input~~ (`build/xy16px/pin2-fixed/llc`):
+
+    ```
+    2026-10-10T15:44:46Z COMMAND: build/xy16px/pin2-fixed/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null
+    llc sha256: a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b
+    EXIT: 0
+    EXIT: 0
+    EXIT: 0
+    LLC_EXIT: 0 FILECHECK_EXIT: 0
+    ```
+
+    PASS.
+
+5. ~~Downstream~~ (`pin0f03-toolchain-and-gates.txt`):
+
+    ```
+    ==> done in 88m 16s: clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos.git 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63)
+    rc=0 2026-10-10T15:40:38Z; free: 9.1Gi avail; disk 11G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+    ==> done in 1m 1s: clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos.git 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63)
+    rc=0 2026-10-10T15:44:38Z; free: 9.2Gi avail; disk 13G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+      installed llc sha256 a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b mtime 2026-10-10T15:44:34Z
+      build-tree llc build/llvm-mos-0f031168a7cc/bin/llc sha256 a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b
+    shared install unchanged: build/llvm-mos-install/bin/llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+    MOS lit (dev/lit.sh in the container, build-tree llc above):
+    ==> llvm-lit -s /work/vendor/llvm-mos-0f031168a7cc/llvm/test/CodeGen/MOS /work/vendor/llvm-mos-0f031168a7cc/llvm/test/MC/MOS
+    Total Discovered Tests: 208
+      Unsupported:   4 (1.92%)
+      Passed     : 204 (98.08%)
+    rc=0 2026-10-10T15:51:11Z
+    ```
+
+    PASS at the separate prefix; the shared install was not swapped.
+
+6. Code effect: not rerun at this pin; the `f24948c7d1a4` census above stands
+   (the pass is unchanged between the two pins).
+
+7. ~~Differential~~ (`pin0f03-toolchain-and-gates.txt`):
+
+    ```
+    ==> built 296 program(s)
+    ==> FAILED (3): ascast ascast_sim lzss-gallery
+    xy16xreload:
+    2026-10-10T15:50:00Z xy16xreload MOS_TOOLCHAIN=/work/build/llvm-mos-install llc a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b (hardlink of /home/will/llvm-mos-65816/build/llvm-mos-0f031168a7cc-install); stack MIR blob c421564b55aa33b1e52103b5cb10b1d50cd79c67
+    SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+    SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+    SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+    SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+    SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+    SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+    SMOKE: PASS addr=0x7E0200 len=2 got=0xD77B (ran 1200 ticks)
+    SMOKE: PASS off=0x200 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+    rc=0 2026-10-10T15:51:11Z
+    ```
+
+    PASS for `xy16xreload` 8/8. `corpus-a16` was not rerun at this pin.
+
+8. ~~`0002` scope~~:
+
+    ```
+    0002: dev/regen-patch.sh (LLVM_MOS_SOURCE=vendor/llvm-mos-0f031168a7cc) after the change: RESULT: PASS — 0002 round-trips (MOS dir + focused tests == live vendor)
+      Its output equals the committed 0002 except for format: regen writes 9-character index abbreviations and empty blank-context lines, the committed file (from task upstream:repin) uses full 40-character indexes and ' ' blank-context lines. The committed 0002 keeps main's format and differs from main only in the MOSInsertREPSEP.cpp and insert-rep-sep-cloned-kills.mir sections (index ..98c349c371cf, ..1c6b2f9947aa); grep -c live_undefined_nz = 2.
+    ```
+
+    PASS.
 
 Plan and results: Claude Code 2.1.295 (t4-opus-high agent
 `a469d5bd6fc11cf09`), model Claude Opus 5.5 (`claude-opus-5-5`), high
