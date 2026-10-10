@@ -1,0 +1,40 @@
+-- Testing: 1 tests, 1 workers --
+FAIL: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test (1 of 1)
+******************** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test' FAILED ********************
+
+/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/tools/timeit-target --timeout 7200 --limit-core 0 --limit-cpu 7200 --limit-file-size 209715200 --limit-rss-size 838860800 --append-exitstatus --redirect-output /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/FarJump.test.out --redirect-input /dev/null --chdir /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C --summary /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/FarJump.test.time /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/FarJump
+/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/tools/fpcmp-target /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/FarJump.test.out /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.reference_output
+
++ /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/tools/fpcmp-target /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/FarJump.test.out /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.reference_output
+/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/tools/fpcmp-target: Comparison failed, textual difference between '0' and '1'
+
+Input 1:
+Inside foo
+Inside bar
+Inside baz
+Inside qux
+Inside quux
+Longjmping from quux: 927
+Returning from longjmp into foo
+exit 0
+
+Input 2:
+Inside foo
+Inside bar
+Inside baz
+Inside qux
+Inside quux
+Longjmping from quux: 927
+Returning from longjmp into foo
+exit 1
+
+********************
+********************
+Failed Tests (1):
+  test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test
+
+
+Testing Time: 0.29s
+
+Total Discovered Tests: 1
+  Failed: 1 (100.00%)

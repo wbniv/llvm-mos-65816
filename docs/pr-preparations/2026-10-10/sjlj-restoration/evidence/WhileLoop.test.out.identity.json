@@ -1,0 +1,6 @@
+{
+  "path": "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-unfixed-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/WhileLoop.test.out",
+  "sha256": "27524edd2b807d24832b30f3ad279142281ceae158a2ff6afc2b13fa0075edb2",
+  "bytes": 251161,
+  "excerpt": "First 2048 bytes; full captured output retained at the scratch path."
+}

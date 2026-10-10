@@ -1,0 +1,50 @@
+[
+  {
+    "kind": "unfixed SDK",
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-lit",
+      "-v",
+      "--timeout=5",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-unfixed-O3/SingleSource/UnitTests/SetjmpLongjmp",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-unfixed-O3/SingleSource/UnitTests/longjmp-zero.test"
+    ],
+    "exit_code": 1,
+    "passed": 4,
+    "failed": 2
+  },
+  {
+    "kind": "wrong exit oracle",
+    "test": "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test",
+    "exit_code": 1
+  },
+  {
+    "kind": "wrong exit oracle",
+    "test": "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Looping.test",
+    "exit_code": 1
+  },
+  {
+    "kind": "wrong exit oracle",
+    "test": "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test",
+    "exit_code": 1
+  },
+  {
+    "kind": "wrong exit oracle",
+    "test": "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.test",
+    "exit_code": 1
+  },
+  {
+    "kind": "wrong exit oracle",
+    "test": "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.test",
+    "exit_code": 1
+  },
+  {
+    "kind": "wrong exit oracle",
+    "test": "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.test",
+    "exit_code": 1
+  },
+  {
+    "kind": "wrong exit oracle",
+    "test": "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/longjmp-zero.test",
+    "exit_code": 1
+  }
+]

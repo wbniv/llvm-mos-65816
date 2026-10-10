@@ -1,0 +1,56 @@
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/main.py:74: note: The test suite configuration requested an individual test timeout of 0 seconds but a timeout of 10 seconds was requested on the command line. Forcing timeout to be 10 seconds.
+-- Testing: 7 tests, 7 workers --
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.test (1 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.test' RESULTS **********
+compile_time: 0.0686 
+exec_time: 0.0012 
+hash: "bbd929da6a554f1add8309a3c4746349" 
+link_time: 0.1082 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test (2 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test' RESULTS **********
+compile_time: 0.0722 
+exec_time: 0.0000 
+hash: "8fc9b9ca850d4f6c73ca1d43f6a305f1" 
+link_time: 0.0325 
+********************
+PASS: test-suite :: SingleSource/UnitTests/longjmp-zero.test (3 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/longjmp-zero.test' RESULTS **********
+compile_time: 0.0608 
+exec_time: 0.0000 
+hash: "58a2a1385117a9a8aef5f7e0a5296013" 
+link_time: 0.0292 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/Looping.test (4 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/Looping.test' RESULTS **********
+compile_time: 0.0475 
+exec_time: 0.0000 
+hash: "67a1aba4bc92d983fd8988e1245bf0e9" 
+link_time: 0.0328 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.test (5 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.test' RESULTS **********
+compile_time: 0.0530 
+exec_time: 0.0000 
+hash: "7953cdb9bd179cb496ba5f88ff9cf085" 
+link_time: 0.0301 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test (6 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test' RESULTS **********
+compile_time: 0.0511 
+exec_time: 0.0000 
+hash: "e74b751f690d5aa818d5c7f35d3cd01f" 
+link_time: 0.0310 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.test (7 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.test' RESULTS **********
+compile_time: 0.0567 
+exec_time: 0.0000 
+hash: "c220e5b245882ab3275f049dad471076" 
+link_time: 0.0303 
+********************
+
+Testing Time: 0.33s
+
+Total Discovered Tests: 7
+  Passed: 7 (100.00%)

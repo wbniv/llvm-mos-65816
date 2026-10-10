@@ -1,0 +1,56 @@
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/main.py:74: note: The test suite configuration requested an individual test timeout of 0 seconds but a timeout of 10 seconds was requested on the command line. Forcing timeout to be 10 seconds.
+-- Testing: 7 tests, 7 workers --
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.test (1 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.test' RESULTS **********
+compile_time: 0.0747 
+exec_time: 0.0028 
+hash: "51c195f77d04e4d3dd71ec2f8007c4a0" 
+link_time: 0.1295 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test (2 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test' RESULTS **********
+compile_time: 0.0727 
+exec_time: 0.0000 
+hash: "5a9c9a7fe955667355a16bdffc699cc0" 
+link_time: 0.0335 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test (3 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test' RESULTS **********
+compile_time: 0.0555 
+exec_time: 0.0000 
+hash: "07472e99fc1d4d85d7d5a6479678f106" 
+link_time: 0.0329 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.test (4 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.test' RESULTS **********
+compile_time: 0.0592 
+exec_time: 0.0000 
+hash: "a541b0fc1f51da8eff4a89f61e1d9432" 
+link_time: 0.0376 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/Looping.test (5 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/Looping.test' RESULTS **********
+compile_time: 0.0462 
+exec_time: 0.0008 
+hash: "ab1daebb64bf94158921dbebfa335a44" 
+link_time: 0.0388 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.test (6 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.test' RESULTS **********
+compile_time: 0.0702 
+exec_time: 0.0000 
+hash: "03046d16bf5cbb3f054e2b268e5e9da0" 
+link_time: 0.0275 
+********************
+PASS: test-suite :: SingleSource/UnitTests/longjmp-zero.test (7 of 7)
+********** TEST 'test-suite :: SingleSource/UnitTests/longjmp-zero.test' RESULTS **********
+compile_time: 0.0723 
+exec_time: 0.0000 
+hash: "26b13d90f1384443b0e76c935c87391f" 
+link_time: 0.0304 
+********************
+
+Testing Time: 0.36s
+
+Total Discovered Tests: 7
+  Passed: 7 (100.00%)

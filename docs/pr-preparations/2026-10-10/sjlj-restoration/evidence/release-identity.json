@@ -1,0 +1,5 @@
+{
+  "version": "clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin\n",
+  "archive_sha256": "b3b00856df56f5a3c4a91a4c2398b977273919e13ef9a04228aefe05eceaf0f2",
+  "clang_sha256": "8968d9dffc6d7bcec36149e47b9ec15d451c0ce12813f16861ab1d43046ebedf"
+}

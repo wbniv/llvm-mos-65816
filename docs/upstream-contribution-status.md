@@ -1,5 +1,9 @@
 # Upstream contribution status — PR progress and submission queue
 
+**SJLJ suite restoration published October 10:** existing [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20) now includes the repaired and re-enabled battery at `28bfe7e74d8e`. The [follow-up packet](pr-preparations/2026-10-10/sjlj-restoration/README.md) records valid C fixtures, output oracles and a repaired C++ case gated on exception support. With #450’s runtime fix, 24 MOS and 28 host llvm-lit checks pass; the unfixed SDK still fails WhileLoop and longjmp-zero. The existing SDK #450 reply was edited to explain the disable history and the published repair. [Verified publication receipt](pr-preparations/2026-10-10/sjlj-restoration/publication.json). Review/CI remain pending; land the tests once CI uses a fixed SDK. No historical compiler defect is marked fixed.
+
+**Initial SDK review response published October 10 (dated evidence; suite-restoration update above supersedes the original test-suite head and reply):** existing [#450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) is narrowed to the one-file `setjmp.S` fix at `3cf8d11d71f6`. The regression is posted as [llvm-test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20), head `4ac8bccdeb43`. The [review reply](https://github.com/llvm-mos/llvm-mos-sdk/pull/450#issuecomment-6091769549) proposes landing the test once its CI uses an SDK containing the fix. Initial new CI/review remain pending; the prior changes-requested review is not automatically cleared. [Verified publication receipt](pr-preparations/2026-10-10/sdk450-publication/publication.json).
+
 **Windows test repair appended to #604, October 10:** [commit `bece1fc9`](https://github.com/wbniv/llvm-mos/commit/bece1fc91204e8a2a89903a96183e62a90f18f44) accepts MSVC template-argument spacing in both AMDGPU analysis-preservation checks. Seven focused checks pass; new full Windows CI and review remain pending. [Update comment](https://github.com/llvm-mos/llvm-mos/pull/604#issuecomment-6091475796). The standalone #617 submission was closed at the user's request; its posted body remains dated evidence. Downstream carry 0072 also removes the newer pin's Windows skip. [Receipt](pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json). Our compiler PR total is 15: 12 merged, #604 open, #609 withdrawn, #617 closed unmerged.
 
 **Dated GitHub snapshot, October 9:** compiler #578 merged September 25, #586 September 29, and #584/#588/#589 October 5. Of our 14 compiler PRs, 12 are merged, #604 is open and #609 is withdrawn. SDK #450 remains open with changes requested October 5: mysterymath accepts the code in principle but asks for the regression in `llvm-test-suite`, checking for an existing disabled test first. #320/#321/#594 have no new replies; #594 and SDK #415 remain open. [GitHub receipt](upstream-status/2026-10-09.json).
@@ -277,7 +281,7 @@ in `mos-validation.md`.
 
 | Open SDK PR | Current head | Review / next step | GitHub CI |
 |---|---|---|---|
-| [#450 — Make longjmp(env, 0) return one from setjmp](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) | `0f8ad11589f5` | **Changes requested October 5:** inspect existing `llvm-test-suite` coverage; enable or add the regression there and remove the SDK test when revising the PR. Code looks fine to mysterymath. **Revision prepared locally October 9, not posted:** one-commit `setjmp.S`-only branch plus a `llvm-test-suite` test that fails on the unfixed SDK and passes on the fixed one at `-O0`, `-O2`, `-O3`, `-Os` and `-Oz` ([validation and user-triggered post commands](pr-preparations/2026-10-09/validation.md)). | No checks reported |
+| [#450 — Make longjmp(env, 0) return one from setjmp](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) | `3cf8d11d71f6` | October 5 request addressed October 10: SDK test removed, regression posted as [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20). Await maintainer re-review. [Publication receipt](pr-preparations/2026-10-10/sdk450-publication/publication.json). | Pending / not verified in this publication pass |
 
 CI is the latest check rollup returned for each PR on the verification date, not a new local test run.
 **Windows CI infrastructure blocker (Will, 2026-09-20):** upstream has not updated its
@@ -321,6 +325,23 @@ this refresh — no review activity yet.
 
 The #320/#321 feature series remains separate from these PRs; #321 is an issue, not an existing
 native-width PR. The submission queue below records drafts and dependencies. The October 9 pin supplies these merged repairs directly; their duplicate aggregate hunks and standalone carries are retired.
+
+## To be posted
+
+This is the current unposted submission queue, reviewed October 10, 2026. Prepared patches still require checking applicability against the destination revision and preparing the submission branch. Posting remains user-triggered. SDK #450, test-suite #20 and compiler #604 are already posted and belong in [current PR progress](#current-pr-progress).
+
+| Destination | Prepared work | Remaining action or hold |
+|---|---|---|
+| llvm-mos compiler | `0011` scavenger live-P; `0029` register exhaustion; `0030` copy liveness; `0031` copy-destination reuse; `0032` register-named symbols; `0033` spill-hoisting scratch vregs; `0034` prefetch legalization; `0036` zero-page indexed globals | Prepare current upstream branches from the linked reviewed packets; `0031` follows `0030`. The generic portion of `0033` also needs its LLVM destination checked. |
+| llvm-mos compiler | `0038` return/frame address; `0039` explicit address width; `0040` spill coalescing; `0043`–`0047` MOS constraints, printers, metadata and directives; `0050` floating vectors; `0054` scavenger status-save range; `0060` parallel MIR reducer guard | Use the [MOS submission packet](pr-preparations/2026-09-26/mos-validation.md); `0044` depends on `0039`. `0060` is a backport of an existing LLVM fix, not a new LLVM report. |
+| llvm/llvm-project | `0037` indirect inline-asm outputs; `0041` multi-register inline asm; `0056` GlobalISel register bounds; `0057` SelectionDAG register bounds; `0058` AArch64 unknown inline-asm types; `0059` SelectionDAG vector parts | Use the [LLVM submission packet](pr-preparations/2026-09-26/llvm-validation.md); full regression coverage for `0058` and `0059` requires `0057`. |
+| llvm-mos compiler | `0028` undef register-lane verifier repair | Reviewed packet held until the #320/#321 presentation is ready. |
+| llvm-mos compiler | #320 far-address-space and #321 native-width series; dependent far/near access and Farblit policies | Await #594 coordination and complete remaining series reviewability work. Feature-dependent patches travel with their recorded prerequisites. |
+| llvm-mos discussion / SDK platform | 65816 simulator discussion; SNES platform reconciliation with SDK #415 | Simulator discussion draft is prepared. SNES implementation submission waits for the compiler, ABI and runtime prerequisites; follow the [separate platform track](upstream-pending-work.md#snes--separate-platform-track). |
+
+The [detailed readiness table](upstream-pending-work.md#research-notes-and-evidence) owns validation qualifications and prerequisites. The prepared-submission links above and the contribution queue below retain individual drafts. Reentrant-attribute semantics and unresolved compiler investigations remain future work rather than ready submissions. Merged and superseded repairs are excluded from this queue.
+
+Tracking update: OpenAI Codex 0.162.1, model `gpt-6.1-sol`, medium reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`. Earlier implementation and validation credits remain in their linked records.
 
 ## Historical updates
 

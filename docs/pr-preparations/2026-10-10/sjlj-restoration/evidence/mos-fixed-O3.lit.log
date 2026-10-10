@@ -1,0 +1,55 @@
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/main.py:74: note: The test suite configuration requested an individual test timeout of 0 seconds but a timeout of 10 seconds was requested on the command line. Forcing timeout to be 10 seconds.
+-- Testing: 6 tests, 6 workers --
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/Looping.test (1 of 6)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/Looping.test' RESULTS **********
+compile_time: 0.0000 
+exec_time: 0.0015 
+hash: "" 
+link_time: 0.8299 
+size: 4371 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test (2 of 6)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test' RESULTS **********
+compile_time: 0.0000 
+exec_time: 0.0008 
+hash: "" 
+link_time: 1.0912 
+size: 4599 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.test (3 of 6)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.test' RESULTS **********
+compile_time: 0.0000 
+exec_time: 0.0106 
+hash: "" 
+link_time: 0.8424 
+size: 6341 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test (4 of 6)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.test' RESULTS **********
+compile_time: 0.0000 
+exec_time: 0.0009 
+hash: "" 
+link_time: 0.9898 
+size: 856 
+********************
+PASS: test-suite :: SingleSource/UnitTests/longjmp-zero.test (5 of 6)
+********** TEST 'test-suite :: SingleSource/UnitTests/longjmp-zero.test' RESULTS **********
+compile_time: 0.0000 
+exec_time: 0.0006 
+hash: "" 
+link_time: 1.0691 
+size: 4844 
+********************
+PASS: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.test (6 of 6)
+********** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.test' RESULTS **********
+compile_time: 0.0000 
+exec_time: 0.0000 
+hash: "" 
+link_time: 0.9854 
+size: 548 
+********************
+
+Testing Time: 0.39s
+
+Total Discovered Tests: 6
+  Passed: 6 (100.00%)

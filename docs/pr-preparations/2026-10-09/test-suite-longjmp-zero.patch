@@ -1,0 +1,75 @@
+From 4ac8bccdeb434481754b96251aabca055f7de1a5 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Fri, 9 Oct 2026 19:33:47 +0700
+Subject: [PATCH] Add a test for longjmp(env, 0) returning one from setjmp
+
+C requires longjmp(env, 0) to make setjmp return 1. The test jumps with 0, 1,
+7, 256 and -1, and exits nonzero on the first value whose setjmp result is
+wrong.
+
+The existing SetjmpLongjmp tests are disabled for every target, so this is a
+standalone file picked up by the UnitTests glob.
+
+AI attribution: Claude Code 2.1.295, model Claude Sonnet 5.5
+(claude-sonnet-5-5), reasoning effort high.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx
+---
+ SingleSource/UnitTests/longjmp-zero.c         | 35 +++++++++++++++++++
+ .../UnitTests/longjmp-zero.reference_output   |  1 +
+ 2 files changed, 36 insertions(+)
+ create mode 100644 SingleSource/UnitTests/longjmp-zero.c
+ create mode 100644 SingleSource/UnitTests/longjmp-zero.reference_output
+
+diff --git a/SingleSource/UnitTests/longjmp-zero.c b/SingleSource/UnitTests/longjmp-zero.c
+new file mode 100644
+index 000000000..c279cba01
+--- /dev/null
++++ b/SingleSource/UnitTests/longjmp-zero.c
+@@ -0,0 +1,35 @@
++#include <setjmp.h>
++#include <stdio.h>
++
++// longjmp(env, val) makes setjmp return val, except that val == 0 makes it
++// return 1. The values cover zero, small, a value needing the high byte of a
++// 16-bit int, and all bits set.
++
++static jmp_buf env;
++
++// Returns what setjmp returns on the non-local return. The flag is volatile
++// because it changes between setjmp and longjmp.
++static int jump(int val) {
++  volatile int jumped = 0;
++  int ret = setjmp(env);
++  if (!jumped) {
++    jumped = 1;
++    longjmp(env, val);
++  }
++  return ret;
++}
++
++int main(void) {
++  static const int values[] = {0, 1, 7, 256, -1};
++  for (unsigned i = 0; i < sizeof values / sizeof values[0]; i++) {
++    int val = values[i];
++    int expected = val ? val : 1;
++    int got = jump(val);
++    if (got != expected) {
++      printf("longjmp(env, %d): setjmp returned %d, expected %d\n", val, got,
++             expected);
++      return 1;
++    }
++  }
++  return 0;
++}
+diff --git a/SingleSource/UnitTests/longjmp-zero.reference_output b/SingleSource/UnitTests/longjmp-zero.reference_output
+new file mode 100644
+index 000000000..ca916d098
+--- /dev/null
++++ b/SingleSource/UnitTests/longjmp-zero.reference_output
+@@ -0,0 +1 @@
++exit 0
+-- 
+2.53.0
+

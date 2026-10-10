@@ -1,0 +1,482 @@
+[
+  {
+    "test": "FarJump",
+    "opt": "O0",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O0",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.O0.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "FarJump",
+    "opt": "O1",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O1",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.O1.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "FarJump",
+    "opt": "O2",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O2",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.O2.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "FarJump",
+    "opt": "O3",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O3",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.O3.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "FarJump",
+    "opt": "Os",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Os",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.Os.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "FarJump",
+    "opt": "Oz",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Oz",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.Oz.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "Looping",
+    "opt": "O0",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O0",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.O0.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "Looping",
+    "opt": "O1",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O1",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.O1.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "Looping",
+    "opt": "O2",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O2",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.O2.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "Looping",
+    "opt": "O3",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O3",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.O3.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "Looping",
+    "opt": "Os",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Os",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.Os.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "Looping",
+    "opt": "Oz",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Oz",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.Oz.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "MultipleSetjmp",
+    "opt": "O0",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O0",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.O0.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "MultipleSetjmp",
+    "opt": "O1",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O1",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.O1.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "MultipleSetjmp",
+    "opt": "O2",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O2",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.O2.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "MultipleSetjmp",
+    "opt": "O3",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O3",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.O3.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "MultipleSetjmp",
+    "opt": "Os",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Os",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.Os.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "MultipleSetjmp",
+    "opt": "Oz",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Oz",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.Oz.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "SimpleCTest",
+    "opt": "O0",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O0",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.O0.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "SimpleCTest",
+    "opt": "O1",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O1",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.O1.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "SimpleCTest",
+    "opt": "O2",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O2",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.O2.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "SimpleCTest",
+    "opt": "O3",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O3",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.O3.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "SimpleCTest",
+    "opt": "Os",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Os",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.Os.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "SimpleCTest",
+    "opt": "Oz",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Oz",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.Oz.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "WhileLoop",
+    "opt": "O0",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O0",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.O0.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "WhileLoop",
+    "opt": "O1",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O1",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.O1.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "WhileLoop",
+    "opt": "O2",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O2",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.O2.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "WhileLoop",
+    "opt": "O3",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-O3",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.O3.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "WhileLoop",
+    "opt": "Os",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Os",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.Os.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "WhileLoop",
+    "opt": "Oz",
+    "command": [
+      "/home/will/tmp/sdk450/prefix-fixed/bin/mos-sim-clang",
+      "-include",
+      "stdio.h",
+      "-Oz",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.Oz.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  }
+]

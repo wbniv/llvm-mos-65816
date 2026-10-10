@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-10",
+  "test_suite": {
+    "pr": "https://github.com/llvm-mos/llvm-test-suite/pull/20",
+    "old_head": "4ac8bccdeb434481754b96251aabca055f7de1a5",
+    "head": "28bfe7e74d8eceec0a4ef963ce6d63c2ccb0620e",
+    "base": "9f5e9987ba6dcb99294e26aa62425edf299a97b5",
+    "title": "Restore setjmp/longjmp tests and check zero return values",
+    "changed_files": 14,
+    "additions": 201,
+    "deletions": 20,
+    "updated_at": "2026-10-10T01:23:45Z",
+    "followup_files": [
+      {
+        "filename": "SingleSource/UnitTests/CMakeLists.txt",
+        "sha": "e0a881be806d92f6260fec3f51bfdc63e203226c",
+        "status": "modified"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.cpp",
+        "sha": "42e7f3634d329a0c06bfc71f4161303285665372",
+        "status": "modified"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.reference_output",
+        "sha": "678de50c81fd383f49e0fe19e73b7175cf2d0e01",
+        "status": "added"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.reference_output",
+        "sha": "f8fe3e4204e0225342334810ab74ffe8c6594fd9",
+        "status": "added"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C/Looping.reference_output",
+        "sha": "409c6c28e13f03b0cba747aa339c0a76fca26969",
+        "status": "added"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.c",
+        "sha": "68651916f11d7d46f2cbfbc2d858c841f4657524",
+        "status": "modified"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.reference_output",
+        "sha": "79747d5df6a005e68a2662421d7d1b7d07bbb948",
+        "status": "added"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.c",
+        "sha": "9a62f4d0248fa4c6be8a7c21da907b3aff5d284d",
+        "status": "modified"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.reference_output",
+        "sha": "b597b237a4942b9e91d8ec076cf6e0d8d0b02926",
+        "status": "added"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.c",
+        "sha": "fbaa0d0a2e6a2ce88d240cdc8b314f63080c33ed",
+        "status": "modified"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.reference_output",
+        "sha": "a6e1b6c0fcd7d27c8892f68e8519fbec996c7f4e",
+        "status": "added"
+      },
+      {
+        "filename": "SingleSource/UnitTests/SetjmpLongjmp/CMakeLists.txt",
+        "sha": "42985e385cedacdf1a79dfeca35cd46ef0e39bb1",
+        "status": "modified"
+      },
+      {
+        "filename": "SingleSource/UnitTests/longjmp-zero.c",
+        "sha": "223208757f65ca60d3e52a1de4667d30e92bcd9d",
+        "status": "modified"
+      }
+    ]
+  },
+  "sdk_reply": {
+    "url": "https://github.com/llvm-mos/llvm-mos-sdk/pull/450#issuecomment-6091769549",
+    "comment_id": 6091769549,
+    "updated_at": "2026-10-10T01:23:47Z",
+    "action": "Edited existing reply; prior posted copy retained in ../sdk450-publication/."
+  },
+  "publication": "Appended one commit to existing test-suite #20 through GitHub Git Data API; fast-forward branch update with force=false. Remote parent, 13 changed-file blob hashes, final head/title/body and edited reply verified.",
+  "validation": "Retained October 10 validation in evidence/: 24 MOS + 28 host passes, two expected unfixed-SDK failures and seven incorrect-oracle rejections. No new runtime run during publication.",
+  "merge_order": "Land tests once test-suite CI uses an SDK containing #450. Neither PR merged.",
+  "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919. Original regression and October 9 validation credits remain preserved in the parent commit and posted description/reply."
+}

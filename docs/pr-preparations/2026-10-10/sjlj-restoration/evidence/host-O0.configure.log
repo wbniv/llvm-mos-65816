@@ -1,0 +1,10 @@
+loading initial cache file /home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/O0.cmake
+-- Check target operating system - Linux
+-- Check target system architecture: x86
+-- Check target system architecture: unknown
+-- Adding directory SingleSource
+-- Looking for mmap
+-- Looking for mmap - found
+-- Configuring done (3.3s)
+-- Generating done (2.5s)
+-- Build files have been written to: /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O0

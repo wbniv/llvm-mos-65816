@@ -1,0 +1,12 @@
+loading initial cache file /home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/Os.cmake
+loading initial cache file /home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/target-mos.cmake
+-- Could NOT find OpenMP_C (missing: OpenMP_C_FLAGS OpenMP_C_LIB_NAMES) 
+-- Could NOT find OpenMP_CXX (missing: OpenMP_CXX_FLAGS OpenMP_CXX_LIB_NAMES) 
+-- Could NOT find OpenMP (missing: OpenMP_C_FOUND OpenMP_CXX_FOUND) 
+-- Check target operating system - Generic
+-- Adding directory SingleSource
+-- Looking for mmap
+-- Looking for mmap - not found
+-- Configuring done (3.1s)
+-- Generating done (1.6s)
+-- Build files have been written to: /home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-Os

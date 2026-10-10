@@ -1,0 +1,110 @@
+[
+  {
+    "opt": "O0",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite",
+      "-B",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-O0",
+      "-G",
+      "Ninja",
+      "-DLLVM_MOS=/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos",
+      "-C",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/O0.cmake",
+      "-C",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/target-mos.cmake",
+      "-DTEST_SUITE_SUBDIRS=SingleSource",
+      "-DCMAKE_EXE_LINKER_FLAGS=/home/will/llvm-mos-65816/.scratch/sjlj-restoration/setjmp-fixed.o"
+    ],
+    "lit": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-lit",
+      "-v",
+      "--timeout=10",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-O0/SingleSource/UnitTests/SetjmpLongjmp",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-O0/SingleSource/UnitTests/longjmp-zero.test"
+    ],
+    "exit_code": 0
+  },
+  {
+    "opt": "O3",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite",
+      "-B",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-O3",
+      "-G",
+      "Ninja",
+      "-DLLVM_MOS=/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos",
+      "-C",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/O3.cmake",
+      "-C",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/target-mos.cmake",
+      "-DTEST_SUITE_SUBDIRS=SingleSource",
+      "-DCMAKE_EXE_LINKER_FLAGS=/home/will/llvm-mos-65816/.scratch/sjlj-restoration/setjmp-fixed.o"
+    ],
+    "lit": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-lit",
+      "-v",
+      "--timeout=10",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-O3/SingleSource/UnitTests/SetjmpLongjmp",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-O3/SingleSource/UnitTests/longjmp-zero.test"
+    ],
+    "exit_code": 0
+  },
+  {
+    "opt": "Os",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite",
+      "-B",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-Os",
+      "-G",
+      "Ninja",
+      "-DLLVM_MOS=/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos",
+      "-C",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/Os.cmake",
+      "-C",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/target-mos.cmake",
+      "-DTEST_SUITE_SUBDIRS=SingleSource",
+      "-DCMAKE_EXE_LINKER_FLAGS=/home/will/llvm-mos-65816/.scratch/sjlj-restoration/setjmp-fixed.o"
+    ],
+    "lit": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-lit",
+      "-v",
+      "--timeout=10",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-Os/SingleSource/UnitTests/SetjmpLongjmp",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-Os/SingleSource/UnitTests/longjmp-zero.test"
+    ],
+    "exit_code": 0
+  },
+  {
+    "opt": "Oz",
+    "configure": [
+      "cmake",
+      "-S",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite",
+      "-B",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-Oz",
+      "-G",
+      "Ninja",
+      "-DLLVM_MOS=/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos",
+      "-C",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/Oz.cmake",
+      "-C",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/cmake/caches/target-mos.cmake",
+      "-DTEST_SUITE_SUBDIRS=SingleSource",
+      "-DCMAKE_EXE_LINKER_FLAGS=/home/will/llvm-mos-65816/.scratch/sjlj-restoration/setjmp-fixed.o"
+    ],
+    "lit": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-lit",
+      "-v",
+      "--timeout=10",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-Oz/SingleSource/UnitTests/SetjmpLongjmp",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/mos-fixed-Oz/SingleSource/UnitTests/longjmp-zero.test"
+    ],
+    "exit_code": 0
+  }
+]

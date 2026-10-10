@@ -1,5 +1,9 @@
 # Pending upstream work and dependencies
 
+**SJLJ suite restoration published October 10:** existing [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20) now includes the repaired and re-enabled battery at `28bfe7e74d8e`. The [follow-up packet](pr-preparations/2026-10-10/sjlj-restoration/README.md) records valid C fixtures, output oracles and a repaired C++ case gated on exception support. With #450’s runtime fix, 24 MOS and 28 host llvm-lit checks pass; the unfixed SDK still fails WhileLoop and longjmp-zero. The existing SDK #450 reply was edited to explain the disable history and the published repair. [Verified publication receipt](pr-preparations/2026-10-10/sjlj-restoration/publication.json). Review/CI remain pending; land the tests once CI uses a fixed SDK. No historical compiler defect is marked fixed.
+
+**October 10 SDK review response:** [#450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) now carries only `setjmp.S` at `3cf8d11d71f6`; the collected regression is posted in [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20). Follow re-review and CI; land the test once CI uses a fixed SDK. [Publication receipt](pr-preparations/2026-10-10/sdk450-publication/publication.json).
+
 **October 10 Windows CI follow-up:** the AMDGPU template-spacing fix is appended directly to [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604) at `bece1fc91204`; standalone #617 is closed. Seven focused FileCheck checks pass; new Windows CI and review remain pending. Downstream carry 0072 also restores the newer pin's skipped coverage. [Receipt](pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json).
 
 **October 9 upstream refresh:** #578, #586, #584, #588 and #589 are merged; #584's prerequisite for the #320/#321 series is satisfied and its follow-up comment is superseded. Compiler #604 remains open without review. SDK #450 has changes requested: move regression coverage to `llvm-test-suite`, checking existing coverage first. #594 has no replies and its coordination hold remains. The compiler pin is advanced to `f24948c7d1a4`, and merged carries are removed from the aggregates and standalone stack; see the [current tracker](upstream-contribution-status.md#current-pr-progress) and [GitHub receipt](upstream-status/2026-10-09.json).
@@ -350,7 +354,7 @@ The ABI notes are discussion contributions, separate from publishing the compile
 series. The far calling-convention evidence follows the #320 design discussion.
 Older notes need a current-content review before publication.
 
-**Current posted work (October 9):** compiler #604 remains open with no reviews or comments; Ubuntu/macOS CI pass and Windows fails. The September 25 diagnosis below is retained as dated evidence. SDK #450 is open with changes requested October 5 for test placement. The other five compiler fixes in the former open queue are merged. See the [current tracker](upstream-contribution-status.md#current-pr-progress).
+**Dated posted-work snapshot (October 9):** compiler #604 remains open with no reviews or comments; Ubuntu/macOS CI pass and Windows fails. The September 25 diagnosis below is retained as dated evidence. SDK #450 is open with changes requested October 5 for test placement. The other five compiler fixes in the former open queue are merged. See the [current tracker](upstream-contribution-status.md#current-pr-progress).
 
 ## Recommended order
 
@@ -365,7 +369,7 @@ Older notes need a current-content review before publication.
 3. Prepare the #320/#321 presentation before publishing `0028`; use the selected,
    reviewed and validated refactor. The alternative remains comparison history,
    not an outstanding implementation-choice gate.
-4. Follow review/CI of compiler #604. Address SDK #450's test-placement request in a reviewed revision: check existing llvm-test-suite coverage before adding or enabling the regression there.
+4. Follow review/CI of compiler #604. Follow the posted SDK #450 revision and companion test-suite #20; coordinate test landing after CI picks up the fixed SDK.
 5. In parallel, make **SNES platform reconciliation with SDK #415** the platform
    priority. Prepare a coherent contribution including the runtime requirements of
    whichever CPU mode it enables.
@@ -421,7 +425,7 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | #588 | Published repair merged October 5 | **Merged upstream** | Supplied by new upstream pin; local COP carry removed | No |
 | #589 | Published repair merged October 5 | **Merged upstream** | Supplied by new upstream pin; local carry removed | No |
 | MVN/MVP bank order (`0020`) | Complete fix validated, including symbolic relocations | **Posted: [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604)** | Maintainer review / CI follow-up | No |
-| Common SDK `longjmp(env, 0)` | **Fix tested**, 20/20 simulator cases | **Posted: [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450)** | Address October 5 request: enable or add regression in llvm-test-suite; remove SDK test in the reviewed revision | **No; plain 6502 bug** |
+| Common SDK `longjmp(env, 0)` | **Fix tested**, 20/20 simulator cases | **Posted: [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450)** | October 10 revision posted; regression in test-suite #20. Await re-review and SDK pickup by test-suite CI | **No; plain 6502 bug** |
 | Reentrant attribute contract | Source behavior confirmed; no agreed semantic fix | **Unposted question/report** | Decide whether attribute only cancels `-fnonreentrant` or must force reentrant allocation; then fix/docs + tests | No |
 | Undef register-lane verifier failure | Existing refactor selected; generic X86 MIR and companion tests independently reviewed and validated on current LLVM | **Held until #320/#321 are ready to open** | Use the selected packet once the user-presentation hold clears; two focused RUNs and 102 filtered X86 passes / one existing XFAIL | No technical SDK dependency; user presentation hold retained |
 | Scavenger live-P (`0011`) | Fix, draft, stock-6502 producer and upstream-runnable test | **Ready to post** | [Reachability record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md) | No SDK dependency; otherwise include with native compiler feature |
@@ -631,6 +635,6 @@ run the 20 cases through `test-sim`/CTest: baseline 16 pass / four zero failures
 fixed 20 pass. The compiler remains the local installed MOS compiler.
 [Commands and evidence](pr-preparations/2026-09-20/sdk-longjmp-validation.md).
 
-**Publication update (October 9):** [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) is open, head `0f8ad11589f5`;
+**Dated publication update (October 9):** [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) is open, head `0f8ad11589f5`;
 changes were requested October 5 for test placement in llvm-test-suite. The posted head is unchanged; the submitted description and commit remain the reviewed bundle. Earlier no-publication
 statements describe the research stage. MVN/MVP is now also published as [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604), head `ae3108c31890`.

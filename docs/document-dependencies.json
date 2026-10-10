@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "c553d0d60ff34e93cb30f2363f2752148681fbadefbbdb510c60fa2122c3e447",
+          "docs/upstream-dashboard-curation.json": "3394cd2869f1db9bdcf1e0f28b8b9763ec046c99ecb6714bee8d2fef69f04b61",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -121,7 +121,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "4f5e36d252558e650e05aef223a3c59be06875d2dcf78cf823f11f67560d12f7"
+          "docs/upstream-dashboard.json": "15d9664091eaa925e17e3003840f8e8ed9ed33c4650f6bea824466fb66df571e"
         }
       }
     },
@@ -142,13 +142,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "e6423966aab97239b8192a20c95cba20ef1aca0a8fcc476c6e56e230f7c500e9",
+          "docs/upstream-pending-work.md": "7af5e913a9d2f0048fa4f06d7e2d53381c33c3067012066c896cd3f08e05160e",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "4f5e36d252558e650e05aef223a3c59be06875d2dcf78cf823f11f67560d12f7",
+          "docs/upstream-dashboard.json": "15d9664091eaa925e17e3003840f8e8ed9ed33c4650f6bea824466fb66df571e",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "ece5f8d91e752c801f5870b2749fbc59f4757b0710bbe140dcd82a8469d78dc6"
+          "docs/upstream-dashboard-graph.json": "bdc17dec8af77995567b01ffe7493b78b7d2a1878bef781bad637226240febd0"
         }
       }
     },
@@ -307,7 +307,10 @@
         "dev/llvm-mos-pin",
         "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
         "docs/pr-preparations/2026-10-09/pin-rebase/validation.json",
-        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json"
+        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json",
+        "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json"
       ],
       "receipt": {
         "sources": {
@@ -381,10 +384,13 @@
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
           "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
-          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669"
+          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669",
+          "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "2a776f74ca0f00dfb5e0384236b4161ef7b356e00d3e4c8d5d50e3ca168218d6",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28"
         },
-        "reviewed_at": "2026-10-10T00:15:30.312598+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T01:27:16.752976+00:00",
+        "note": "Reviewed live publication receipt and exact posted texts: existing test-suite #20 is at 28bfe7e74d8e with 13 byte-verified follow-up files, 14 cumulative files and revised title/body; the existing SDK #450 reply is edited to state the disabled-test repair is published. Current trackers reflect publication and retain fixed-SDK CI pickup as the merge prerequisite. Recorded 24 MOS and 28 host passes remain focused validation; no new runtime run or historical compiler-defect closure is claimed. Preparation drafts, original posted copies and original credits remain dated evidence; the final reply changes only publication status from its approved draft. Dashboard publication workflow remains applicable after a compiler tracking commit reaches origin/main; no website deployment occurred.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -422,7 +428,10 @@
         "dev/llvm-mos-pin",
         "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
         "docs/pr-preparations/2026-10-09/pin-rebase/validation.json",
-        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json"
+        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json",
+        "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json"
       ],
       "receipt": {
         "sources": {
@@ -487,10 +496,13 @@
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
           "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
-          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669"
+          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669",
+          "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "2a776f74ca0f00dfb5e0384236b4161ef7b356e00d3e4c8d5d50e3ca168218d6",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28"
         },
-        "reviewed_at": "2026-10-10T00:15:30.585068+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T01:27:17.067868+00:00",
+        "note": "Reviewed live publication receipt and exact posted texts: existing test-suite #20 is at 28bfe7e74d8e with 13 byte-verified follow-up files, 14 cumulative files and revised title/body; the existing SDK #450 reply is edited to state the disabled-test repair is published. Current trackers reflect publication and retain fixed-SDK CI pickup as the merge prerequisite. Recorded 24 MOS and 28 host passes remain focused validation; no new runtime run or historical compiler-defect closure is claimed. Preparation drafts, original posted copies and original credits remain dated evidence; the final reply changes only publication status from its approved draft. Dashboard publication workflow remains applicable after a compiler tracking commit reaches origin/main; no website deployment occurred.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -528,7 +540,11 @@
         "dev/llvm-mos-pin",
         "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
         "docs/pr-preparations/2026-10-09/pin-rebase/validation.json",
-        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json"
+        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json",
+        "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json",
+        "docs/upstream-pending-work.md"
       ],
       "receipt": {
         "sources": {
@@ -593,10 +609,14 @@
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
           "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
-          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669"
+          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669",
+          "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "2a776f74ca0f00dfb5e0384236b4161ef7b356e00d3e4c8d5d50e3ca168218d6",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28",
+          "docs/upstream-pending-work.md": "7af5e913a9d2f0048fa4f06d7e2d53381c33c3067012066c896cd3f08e05160e"
         },
-        "reviewed_at": "2026-10-10T00:15:30.577675+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T01:51:56.268879+00:00",
+        "note": "Reviewed the new To be posted section against the detailed pending-work readiness table and linked MOS/LLVM packets: it separates already-posted 450/20/604 from prepared independent submissions, records 0031/0030, 0044/0039 and 0058/0059/0057 dependencies, retains the 0028 presentation hold and 594 coordination hold, and distinguishes simulator discussion readiness from SNES compiler/ABI/runtime prerequisites. Current trackers and guide links still point to the maintained queue. Historical evidence and earlier credits are preserved.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -1798,7 +1818,10 @@
         "docs/pr-preparations/2026-09-28/0065/README.md",
         "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
         "docs/defects/mos-native-index-copy-cost.json",
-        "docs/upstream-status/2026-10-09.json"
+        "docs/upstream-status/2026-10-09.json",
+        "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json"
       ],
       "receipt": {
         "sources": {
@@ -1814,10 +1837,13 @@
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce",
           "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
-          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981"
+          "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
+          "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "2a776f74ca0f00dfb5e0384236b4161ef7b356e00d3e4c8d5d50e3ca168218d6",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28"
         },
-        "reviewed_at": "2026-10-10T00:15:35.116376+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T01:27:18.086263+00:00",
+        "note": "Reviewed live publication receipt and exact posted texts: existing test-suite #20 is at 28bfe7e74d8e with 13 byte-verified follow-up files, 14 cumulative files and revised title/body; the existing SDK #450 reply is edited to state the disabled-test repair is published. Current trackers reflect publication and retain fixed-SDK CI pickup as the merge prerequisite. Recorded 24 MOS and 28 host passes remain focused validation; no new runtime run or historical compiler-defect closure is claimed. Preparation drafts, original posted copies and original credits remain dated evidence; the final reply changes only publication status from its approved draft. Dashboard publication workflow remains applicable after a compiler tracking commit reaches origin/main; no website deployment occurred.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -2738,10 +2764,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "41cbfc4c5eded5e362b26ffddf9835163f0f1415018b309a3583013d73385707"
+          "TODO.md": "df47bfe511cf7cebefc9d860dc270a6ddbf69a5de7d4cfe084523839fa64fe7e"
         },
-        "reviewed_at": "2026-10-10T00:15:30.947111+00:00",
-        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "reviewed_at": "2026-10-10T01:27:18.595600+00:00",
+        "note": "Reviewed live publication receipt and exact posted texts: existing test-suite #20 is at 28bfe7e74d8e with 13 byte-verified follow-up files, 14 cumulative files and revised title/body; the existing SDK #450 reply is edited to state the disabled-test repair is published. Current trackers reflect publication and retain fixed-SDK CI pickup as the merge prerequisite. Recorded 24 MOS and 28 host passes remain focused validation; no new runtime run or historical compiler-defect closure is claimed. Preparation drafts, original posted copies and original credits remain dated evidence; the final reply changes only publication status from its approved draft. Dashboard publication workflow remains applicable after a compiler tracking commit reaches origin/main; no website deployment occurred.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
@@ -2935,6 +2961,58 @@
         },
         "reviewed_at": "2026-10-10T00:15:43.319357+00:00",
         "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
+      "sources": [
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/test-suite-followup.patch",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/source-hashes.json",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/evidence-sha256.json",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/test-suite-followup.patch": "1d6b4742d97426b3a443feffec671bc19662c83d9fdca92066eaf55cbe40f791",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/source-hashes.json": "d67bfdd3b80f582d679cdfb2b8bc12350cc263070313b44e540e75b031d18170",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/evidence-sha256.json": "271d75654116584fc9fa5a99be51111a59c86d9fa3bc823ef12f7b1efe72f1bb",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28"
+        },
+        "reviewed_at": "2026-10-10T01:27:18.478053+00:00",
+        "note": "Reviewed live publication receipt and exact posted texts: existing test-suite #20 is at 28bfe7e74d8e with 13 byte-verified follow-up files, 14 cumulative files and revised title/body; the existing SDK #450 reply is edited to state the disabled-test repair is published. Current trackers reflect publication and retain fixed-SDK CI pickup as the merge prerequisite. Recorded 24 MOS and 28 host passes remain focused validation; no new runtime run or historical compiler-defect closure is claimed. Preparation drafts, original posted copies and original credits remain dated evidence; the final reply changes only publication status from its approved draft. Dashboard publication workflow remains applicable after a compiler tracking commit reaches origin/main; no website deployment occurred.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-10-10/sjlj-restoration/test-suite-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/test-suite-followup.patch"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "2a776f74ca0f00dfb5e0384236b4161ef7b356e00d3e4c8d5d50e3ca168218d6",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/test-suite-followup.patch": "1d6b4742d97426b3a443feffec671bc19662c83d9fdca92066eaf55cbe40f791"
+        },
+        "reviewed_at": "2026-10-10T01:27:18.478121+00:00",
+        "note": "Reviewed live publication receipt and exact posted texts: existing test-suite #20 is at 28bfe7e74d8e with 13 byte-verified follow-up files, 14 cumulative files and revised title/body; the existing SDK #450 reply is edited to state the disabled-test repair is published. Current trackers reflect publication and retain fixed-SDK CI pickup as the merge prerequisite. Recorded 24 MOS and 28 host passes remain focused validation; no new runtime run or historical compiler-defect closure is claimed. Preparation drafts, original posted copies and original credits remain dated evidence; the final reply changes only publication status from its approved draft. Dashboard publication workflow remains applicable after a compiler tracking commit reaches origin/main; no website deployment occurred.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-10-10/sjlj-restoration/sdk450-reply.md",
+      "sources": [
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
+        "docs/pr-preparations/2026-10-10/sjlj-restoration/test-suite-followup.patch"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "2a776f74ca0f00dfb5e0384236b4161ef7b356e00d3e4c8d5d50e3ca168218d6",
+          "docs/pr-preparations/2026-10-10/sjlj-restoration/test-suite-followup.patch": "1d6b4742d97426b3a443feffec671bc19662c83d9fdca92066eaf55cbe40f791"
+        },
+        "reviewed_at": "2026-10-10T01:27:18.478160+00:00",
+        "note": "Reviewed live publication receipt and exact posted texts: existing test-suite #20 is at 28bfe7e74d8e with 13 byte-verified follow-up files, 14 cumulative files and revised title/body; the existing SDK #450 reply is edited to state the disabled-test repair is published. Current trackers reflect publication and retain fixed-SDK CI pickup as the merge prerequisite. Recorded 24 MOS and 28 host passes remain focused validation; no new runtime run or historical compiler-defect closure is claimed. Preparation drafts, original posted copies and original credits remain dated evidence; the final reply changes only publication status from its approved draft. Dashboard publication workflow remains applicable after a compiler tracking commit reaches origin/main; no website deployment occurred.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     }

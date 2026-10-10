@@ -1,0 +1,2 @@
+longjmp(env, 0): setjmp returned 0, expected 1
+exit 1

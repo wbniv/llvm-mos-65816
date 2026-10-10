@@ -1,0 +1,157 @@
+[
+  {
+    "test": "FarJump",
+    "sdk_fix": false,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.release-False.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "FarJump",
+    "sdk_fix": true,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.c",
+      "/home/will/tmp/sdk450/sdk-fixed/mos-platform/common/c/setjmp.S",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/FarJump.release-True.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "Looping",
+    "sdk_fix": false,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/Looping.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.release-False.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "Looping",
+    "sdk_fix": true,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/Looping.c",
+      "/home/will/tmp/sdk450/sdk-fixed/mos-platform/common/c/setjmp.S",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/Looping.release-True.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "MultipleSetjmp",
+    "sdk_fix": false,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.release-False.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "MultipleSetjmp",
+    "sdk_fix": true,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.c",
+      "/home/will/tmp/sdk450/sdk-fixed/mos-platform/common/c/setjmp.S",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/MultipleSetjmp.release-True.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "SimpleCTest",
+    "sdk_fix": false,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.release-False.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "SimpleCTest",
+    "sdk_fix": true,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.c",
+      "/home/will/tmp/sdk450/sdk-fixed/mos-platform/common/c/setjmp.S",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/SimpleCTest.release-True.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  },
+  {
+    "test": "WhileLoop",
+    "sdk_fix": false,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.release-False.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 124,
+    "matches_host": false
+  },
+  {
+    "test": "WhileLoop",
+    "sdk_fix": true,
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/llvm-mos/bin/mos-sim-clang",
+      "-Os",
+      "-Wno-implicit-function-declaration",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/test-suite/SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.c",
+      "/home/will/tmp/sdk450/sdk-fixed/mos-platform/common/c/setjmp.S",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/sjlj-restoration/WhileLoop.release-True.elf"
+    ],
+    "build_exit": 0,
+    "run_exit": 0,
+    "matches_host": true
+  }
+]

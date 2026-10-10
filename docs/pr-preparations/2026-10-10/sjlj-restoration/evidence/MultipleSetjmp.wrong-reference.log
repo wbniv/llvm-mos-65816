@@ -1,0 +1,34 @@
+-- Testing: 1 tests, 1 workers --
+FAIL: test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test (1 of 1)
+******************** TEST 'test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test' FAILED ********************
+
+/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/tools/timeit-target --timeout 7200 --limit-core 0 --limit-cpu 7200 --limit-file-size 209715200 --limit-rss-size 838860800 --append-exitstatus --redirect-output /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/MultipleSetjmp.test.out --redirect-input /dev/null --chdir /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C --summary /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/MultipleSetjmp.test.time /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp
+/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/tools/fpcmp-target /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/MultipleSetjmp.test.out /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.reference_output
+
++ /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/tools/fpcmp-target /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/Output/MultipleSetjmp.test.out /home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.reference_output
+/home/will/llvm-mos-65816/.scratch/sjlj-restoration/host-O3/tools/fpcmp-target: Comparison failed, textual difference between '0' and '1'
+
+Input 1:
+Inside bar 37
+returning from bar == 37
+Inside bar 927
+returning from bar == 927
+exit 0
+
+Input 2:
+Inside bar 37
+returning from bar == 37
+Inside bar 927
+returning from bar == 927
+exit 1
+
+********************
+********************
+Failed Tests (1):
+  test-suite :: SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.test
+
+
+Testing Time: 0.34s
+
+Total Discovered Tests: 1
+  Failed: 1 (100.00%)

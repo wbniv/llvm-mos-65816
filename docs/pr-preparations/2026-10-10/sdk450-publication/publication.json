@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-10",
+  "sdk": {
+    "pr": "https://github.com/llvm-mos/llvm-mos-sdk/pull/450",
+    "old_head": "0f8ad11589f556daa8b4c02707c53a17db1cadb0",
+    "head": "3cf8d11d71f63fc0b17f6089a3301c9611230cfe",
+    "base": "3f6968bbc156ff9a63102a8e158db868819bd61c",
+    "files": [
+      {
+        "path": "mos-platform/common/c/setjmp.S",
+        "additions": 8,
+        "deletions": 2
+      }
+    ],
+    "reply": "https://github.com/llvm-mos/llvm-mos-sdk/pull/450#issuecomment-6091769549",
+    "publication": "Existing #450 revised with a lease pinned to its verified old head; body and reply verified after posting."
+  },
+  "test_suite": {
+    "pr": "https://github.com/llvm-mos/llvm-test-suite/pull/20",
+    "head": "4ac8bccdeb434481754b96251aabca055f7de1a5",
+    "base": "9f5e9987ba6dcb99294e26aa62425edf299a97b5",
+    "files": [
+      {
+        "path": "SingleSource/UnitTests/longjmp-zero.c",
+        "additions": 35,
+        "deletions": 0
+      },
+      {
+        "path": "SingleSource/UnitTests/longjmp-zero.reference_output",
+        "additions": 1,
+        "deletions": 0
+      }
+    ],
+    "publication": "Companion #20 opened; published body verified."
+  },
+  "validation": "docs/pr-preparations/2026-10-09/validation.md",
+  "merge_order": "Review test-suite #20 alongside SDK #450; land the regression once test-suite CI uses an SDK containing the fix. No merge performed.",
+  "limitations": "No new compiler/runtime validation in this publication pass. The October 9 red/green evidence uses the recorded installed LLVM 23 compiler, not the new LLVM 24 pin. Existing SetjmpLongjmp tests remain disabled; the standalone regression is collected separately.",
+  "attribution": "Publication and merge-sequencing edits: OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919. Implementation, original drafts and validation credits remain preserved in the October 9 artifacts and posted bodies.",
+  "sha256": {
+    "sdk450-posted-body.md": "5c70dd71fe21aeee06f6cbc89d884d43f56d7b78b2ce1515e8843abe828ef5be",
+    "sdk450-posted-reply.md": "96e3f9ba5131323c29f40c42db99d4d82b085e958ab643e5236e08ba0ecf57aa",
+    "test-suite20-posted-body.md": "2009928b7266a61b894e628a18abb734958a9d6964c2c8804a92f25881a84d68"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "base_commit": "4ac8bccdeb434481754b96251aabca055f7de1a5",
+  "files": {
+    "SingleSource/UnitTests/CMakeLists.txt": {
+      "base": "26f0d87f1727e6246cb8147d7b964e7525a7accb465a3189c12a9c4d6ad1e42e",
+      "candidate": "4f8ab23b588ee390baaa4d93407bcd257f5a3eccc0c6cdff3ce667943685b8a9"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/CMakeLists.txt": {
+      "base": "51c51d36f330be6cdc0f8285d498cc5417182172748c56e07becbfc2cad2c1c6",
+      "candidate": "3ebe24a93a8172edb767c888e015903e5359eed1bd406c1511e44de9a8a7154a"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.cpp": {
+      "base": "e21f1a8a6ef12bf6835cab022e81fae4cd464d487f50d69c6dcfb373abe6e4cb",
+      "candidate": "58b7693d63815e8ded7848aad7e9fe5fa787d12de881467c30c97a0daec1bc39"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.c": {
+      "base": "08076de5fd63a0f11d78edaadd8e149cc23260cc2c82d1befa53fc70869aa6cb",
+      "candidate": "7baf182328a6ac049767480e28becafabab66d219c1da029975bfa0a29005ca8"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.c": {
+      "base": "d059087817eb6fbcfa2607f3c05c0cacc80cda94e9ccebd359a6bffb630c233e",
+      "candidate": "a9918810352759198a71225180397565e11e22670d7e8e0aaf7537a4d75f8ae3"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.c": {
+      "base": "a95ff662102f2e0e57ef66924a15adffa75981add07296adb19256bd9b486d16",
+      "candidate": "bf05079bbdd0a322e447b72885aafa38afabb33d667d38d5f2ff5885d79ada1a"
+    },
+    "SingleSource/UnitTests/longjmp-zero.c": {
+      "base": "aa0929a2926abd986871a6fa2b08af38a4d34cb7c8f8012978378f90546fe70b",
+      "candidate": "0ff10adf2dd91a00d70aedb93ad565ea5ec676d3cf211d30e0d37b919471e173"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C/FarJump.reference_output": {
+      "base": null,
+      "candidate": "9f170b2d1b962baa7affc58ac04a86ec1394960350ac5054c0aeb21c2483818b"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C/Looping.reference_output": {
+      "base": null,
+      "candidate": "b536a0e6f3fb4ac1d1a5defc29c8bd3720362bb093e2e2b254c777c8c4ea0ab5"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C/MultipleSetjmp.reference_output": {
+      "base": null,
+      "candidate": "02718ebcb97a1045023e68aaf3d5333cdca3a470364dffe8c6f803f2c8496b03"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C/SimpleCTest.reference_output": {
+      "base": null,
+      "candidate": "35ac482f651874b2d88215357b5684f6a94cdf1875a70b256ed093f30f8b582c"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C/WhileLoop.reference_output": {
+      "base": null,
+      "candidate": "87533e003aeda4a5b49fb78a1c02f1231deef3b1cce57f55d3410f66a7884472"
+    },
+    "SingleSource/UnitTests/SetjmpLongjmp/C++/C++Catch.reference_output": {
+      "base": null,
+      "candidate": "203f7d88322312a086d8c08e48f3b0687af2f332d43f5b8330a9c99030eb144d"
+    }
+  }
+}

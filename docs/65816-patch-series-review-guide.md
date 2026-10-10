@@ -1,6 +1,6 @@
 # 65816 C codegen for llvm-mos — patch-series review guide
 
-**Current patch/status qualification, October 9:** #578/#586/#584/#588/#589 are merged. Standalone 0003/0010/0016/0019/0021/0022/0024/0025 are retired; the pin is advanced to `f24948c7d1a4` and those repairs are removed from 0001/0002. Backport 0049 is also redundant at the new pin. The patch numbers and submission labels below preserve earlier evidence. Use the [current tracker](upstream-contribution-status.md#current-pr-progress) for current review state, including SDK #450's test-placement request.
+**Current patch/status qualification, October 9:** #578/#586/#584/#588/#589 are merged. Standalone 0003/0010/0016/0019/0021/0022/0024/0025 are retired; the pin is advanced to `f24948c7d1a4` and those repairs are removed from 0001/0002. Backport 0049 is also redundant at the new pin. The patch numbers and submission labels below preserve earlier evidence. Use the [current tracker](upstream-contribution-status.md#current-pr-progress) for current review state, including the posted SDK #450 revision and companion test-suite #20.
 
 OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
 

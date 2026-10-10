@@ -1,0 +1,42 @@
+From 3cf8d11d71f63fc0b17f6089a3301c9611230cfe Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Fri, 9 Oct 2026 19:21:06 +0700
+Subject: [PATCH] [common] Make longjmp(env, 0) return one from setjmp
+
+Normalize an all-zero return value to one in the longjmp epilogue while
+preserving every nonzero 16-bit value, as POSIX.1-2024 (aligned with
+ISO C) requires.
+
+AI attribution: Claude Code 2.1.295, model Claude Sonnet 5.5
+(claude-sonnet-5-5), reasoning effort high.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx
+---
+ mos-platform/common/c/setjmp.S | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/mos-platform/common/c/setjmp.S b/mos-platform/common/c/setjmp.S
+index ecf98095..62274305 100644
+--- a/mos-platform/common/c/setjmp.S
++++ b/mos-platform/common/c/setjmp.S
+@@ -147,8 +147,14 @@ longjmp:
+   lda (__rc2),y
+   sta $101,x
+ 
+-  ; Restore return value
++  ; Return the supplied value, mapping zero to one as required by longjmp.
++  ; POSIX.1-2024, RETURN VALUE (aligned with ISO C):
++  ; https://pubs.opengroup.org/onlinepubs/9799919799/functions/longjmp.html
+   lda __rc16
+   ldx __rc17
+-
++  bne 1f
++  cmp #0
++  bne 1f
++  lda #1
++1:
+   rts
+-- 
+2.53.0
+
