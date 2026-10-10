@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-10-09",
-  "sourceHash": "3c8f4535188530790439ab014e4ada15c4f9537a819eebd0e188794de46df92c",
+  "sourceHash": "618f3880b861bcd316108dc5fac16af88979eca40bc21726006e06dd8842cf54",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -1267,13 +1267,14 @@
       "id": "sub:sdk450",
       "kind": "submission",
       "title": "Common SDK longjmp zero return (#450)",
-      "summary": "Existing SDK #450 is narrowed to setjmp.S; regression coverage is posted in llvm-test-suite #20. Recorded five-level simulator red/green evidence is retained.",
+      "summary": "SDK #450 runtime fix merged October 10 at b2b09b72dfca; companion test-suite #20 also merged. Recorded validation remains dated evidence.",
       "localStatus": "fixed",
-      "publicationStatus": "posted",
+      "publicationStatus": "merged",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos-sdk/pull/450",
-      "nextStep": "Follow re-review of SDK #450 and test-suite #20; land the test once its CI uses the repaired SDK.",
+      "nextStep": "Merged October 10; review/landing follow-up complete.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sdk450-publication/publication.json"
       ],
       "evidenceNote": "Detailed evidence awaits publication.",
       "dependsOn": [],
@@ -1471,15 +1472,20 @@
       "id": "sub:testsuite20",
       "kind": "submission",
       "title": "Restore setjmp/longjmp tests and check zero return values (test-suite #20)",
-      "summary": "Existing #20 includes repaired and re-enabled C/C++ fixtures, output oracles and the zero-return regression at 28bfe7e74d8e; 52 focused MOS/host checks pass with the fixed runtime.",
-      "localStatus": "ready",
-      "publicationStatus": "posted",
+      "summary": "Restored SetjmpLongjmp tests and zero-return regression merged in test-suite #20 on October 10 at 5f38e99463eb; 52 focused MOS/host checks are recorded.",
+      "localStatus": "fixed",
+      "publicationStatus": "merged",
       "dependsOn": [
         "sub:sdk450"
       ],
       "upstreamUrl": "https://github.com/llvm-mos/llvm-test-suite/pull/20",
-      "nextStep": "Follow review and CI; land once test-suite CI uses an SDK containing #450’s runtime fix.",
-      "evidenceUrls": [],
+      "nextStep": "Merged October 10; review/landing follow-up complete.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sdk450-publication/publication.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-09/validation.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sjlj-restoration/README.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json"
+      ],
       "evidenceNote": "Detailed evidence awaits publication.",
       "demoUrls": []
     }

@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-10",
+  "sdk": {
+    "head": "3cf8d11d71f63fc0b17f6089a3301c9611230cfe",
+    "merge_commit_sha": "b2b09b72dfca4f8f6fbf1bc3f0ff6c2ccbd9b232",
+    "merged": true,
+    "merged_at": "2026-10-10T02:09:41Z",
+    "merged_by": "mysterymath",
+    "state": "closed",
+    "title": "[common] Make longjmp(env, 0) return one from setjmp",
+    "url": "https://github.com/llvm-mos/llvm-mos-sdk/pull/450"
+  },
+  "test_suite": {
+    "head": "28bfe7e74d8eceec0a4ef963ce6d63c2ccb0620e",
+    "merge_commit_sha": "5f38e99463eb6024176e985d733787160b16cee9",
+    "merged": true,
+    "merged_at": "2026-10-10T02:10:09Z",
+    "merged_by": "mysterymath",
+    "state": "closed",
+    "title": "Restore setjmp/longjmp tests and check zero return values",
+    "url": "https://github.com/llvm-mos/llvm-test-suite/pull/20"
+  },
+  "reply_link_correction": {
+    "url": "https://github.com/llvm-mos/llvm-mos-sdk/pull/450#issuecomment-6091769549",
+    "updated_at": "2026-10-10T03:09:21Z",
+    "change": "Both bare #20 references changed to explicit llvm-test-suite PR links; read back and verified. Earlier posted copies remain dated evidence."
+  },
+  "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+}

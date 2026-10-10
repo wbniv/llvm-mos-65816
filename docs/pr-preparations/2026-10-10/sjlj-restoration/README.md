@@ -1,5 +1,7 @@
 # Restore the setjmp/longjmp test battery
 
+**Merged October 10:** SDK #450 and test-suite #20 are both merged; review/landing follow-up is complete. The existing SDK reply’s cross-repository #20 links are corrected. [Current merge receipt](../../../upstream-status/2026-10-10-sjlj-merges.json). The publication and validation sections below retain their pre-merge evidence.
+
 **Published October 10, 2026:** the follow-up is appended to existing [llvm-test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20) at `28bfe7e74d8eceec0a4ef963ce6d63c2ccb0620e`. Its title and description are updated, and the existing [SDK #450 reply](https://github.com/llvm-mos/llvm-mos-sdk/pull/450#issuecomment-6091769549) now states that the disabled tests have been repaired and restored. [Verified publication receipt](publication.json) · [posted #20 description](test-suite20-posted-body.md) · [posted SDK reply](sdk450-posted-reply.md). #450 remains the runtime prerequisite; land the tests once test-suite CI uses its fixed SDK.
 
 The following preparation and validation evidence was captured before publication. [The patch](test-suite-followup.patch) applies after the original published head `4ac8bccdeb434481754b96251aabca055f7de1a5`; the [initial publication receipt](../sdk450-publication/publication.json) and the draft texts remain dated evidence.
@@ -48,6 +50,6 @@ For the fixed-runtime tests, the published #450 assembly was assembled by the cl
 
 The tested checkout and builds are in `.scratch/sjlj-restoration/`. The original external clone's shared object store disappeared during validation; Git fetch attempts did not restore it. Patch verification therefore uses the seven changed original files downloaded directly at #20's immutable commit, plus six new references, rather than claiming a working Git checkout. The test sources, compiler and captured runs used for the final results are retained locally.
 
-## Next step
+## Dated next step before the merges
 
 Follow review and CI on existing #20 and #450. The follow-up, replacement description and revised existing reply are published, as recorded in [publication.json](publication.json). The retained [body draft](test-suite-body.md) and [reply draft](sdk450-reply.md) show the approved preparation; exact posted copies above record the final publication wording. Keep #450 as the one-file runtime fix; land the tests only once test-suite CI uses an SDK containing #450.

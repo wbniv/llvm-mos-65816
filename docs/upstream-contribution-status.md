@@ -1,6 +1,8 @@
 # Upstream contribution status — PR progress and submission queue
 
-**SJLJ suite restoration published October 10:** existing [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20) now includes the repaired and re-enabled battery at `28bfe7e74d8e`. The [follow-up packet](pr-preparations/2026-10-10/sjlj-restoration/README.md) records valid C fixtures, output oracles and a repaired C++ case gated on exception support. With #450’s runtime fix, 24 MOS and 28 host llvm-lit checks pass; the unfixed SDK still fails WhileLoop and longjmp-zero. The existing SDK #450 reply was edited to explain the disable history and the published repair. [Verified publication receipt](pr-preparations/2026-10-10/sjlj-restoration/publication.json). Review/CI remain pending; land the tests once CI uses a fixed SDK. No historical compiler defect is marked fixed.
+**SDK #450 and test-suite #20 merged October 10:** mysterymath merged the [runtime fix](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) at `02:09:41 UTC` (`b2b09b72dfca`) and the [restored tests](https://github.com/llvm-mos/llvm-test-suite/pull/20) at `02:10:09 UTC` (`5f38e99463eb`). Their review/landing follow-up is complete. The existing SDK reply’s two cross-repository #20 references were corrected to explicit test-suite links. [Verified merge and link-correction receipt](upstream-status/2026-10-10-sjlj-merges.json). Earlier October 10 publication notices below describe the pre-merge state; retained validation and posted copies remain dated evidence.
+
+**Dated suite-restoration publication notice, before the October 10 merges:** existing [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20) now includes the repaired and re-enabled battery at `28bfe7e74d8e`. The [follow-up packet](pr-preparations/2026-10-10/sjlj-restoration/README.md) records valid C fixtures, output oracles and a repaired C++ case gated on exception support. With #450’s runtime fix, 24 MOS and 28 host llvm-lit checks pass; the unfixed SDK still fails WhileLoop and longjmp-zero. The existing SDK #450 reply was edited to explain the disable history and the published repair. [Verified publication receipt](pr-preparations/2026-10-10/sjlj-restoration/publication.json). Review/CI remain pending; land the tests once CI uses a fixed SDK. No historical compiler defect is marked fixed.
 
 **Initial SDK review response published October 10 (dated evidence; suite-restoration update above supersedes the original test-suite head and reply):** existing [#450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) is narrowed to the one-file `setjmp.S` fix at `3cf8d11d71f6`. The regression is posted as [llvm-test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20), head `4ac8bccdeb43`. The [review reply](https://github.com/llvm-mos/llvm-mos-sdk/pull/450#issuecomment-6091769549) proposes landing the test once its CI uses an SDK containing the fix. Initial new CI/review remain pending; the prior changes-requested review is not automatically cleared. [Verified publication receipt](pr-preparations/2026-10-10/sdk450-publication/publication.json).
 
@@ -279,9 +281,10 @@ in `mos-validation.md`.
 |---|---|---|---|
 | [#604 — Correct MVN/MVP bank order and symbolic fixups](https://github.com/llvm-mos/llvm-mos/pull/604) | `bece1fc91204` | Windows AMDGPU test matcher repaired October 10; await new CI and initial maintainer review. | Pending |
 
-| Open SDK PR | Current head | Review / next step | GitHub CI |
+| SDK / test-suite PR | Head / merge | Review / next step | GitHub CI |
 |---|---|---|---|
-| [#450 — Make longjmp(env, 0) return one from setjmp](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) | `3cf8d11d71f6` | October 5 request addressed October 10: SDK test removed, regression posted as [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20). Await maintainer re-review. [Publication receipt](pr-preparations/2026-10-10/sdk450-publication/publication.json). | Pending / not verified in this publication pass |
+| [#450 — Make longjmp(env, 0) return one from setjmp](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) | Merged as `b2b09b72dfca` | **Merged October 10, 02:09:41 UTC.** Companion [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20) merged at 02:10:09 UTC as `5f38e99463eb`; no remaining review/landing action. [Receipt](upstream-status/2026-10-10-sjlj-merges.json). | Merge verified; no new CI run claimed |
+| [test-suite #20 — Restore setjmp/longjmp tests and check zero return values](https://github.com/llvm-mos/llvm-test-suite/pull/20) | Merged as `5f38e99463eb` | **Merged October 10, 02:10:09 UTC.** Review/landing complete. [Receipt](upstream-status/2026-10-10-sjlj-merges.json). | Merge verified; no new CI run claimed |
 
 CI is the latest check rollup returned for each PR on the verification date, not a new local test run.
 **Windows CI infrastructure blocker (Will, 2026-09-20):** upstream has not updated its
@@ -328,7 +331,7 @@ native-width PR. The submission queue below records drafts and dependencies. The
 
 ## To be posted
 
-This is the current unposted submission queue, reviewed October 10, 2026. Prepared patches still require checking applicability against the destination revision and preparing the submission branch. Posting remains user-triggered. SDK #450, test-suite #20 and compiler #604 are already posted and belong in [current PR progress](#current-pr-progress).
+This is the current unposted submission queue, reviewed October 10, 2026. Prepared patches still require checking applicability against the destination revision and preparing the submission branch. Posting remains user-triggered. SDK #450 and test-suite #20 are merged; compiler #604 is posted. Their status belongs in [current PR progress](#current-pr-progress).
 
 | Destination | Prepared work | Remaining action or hold |
 |---|---|---|
