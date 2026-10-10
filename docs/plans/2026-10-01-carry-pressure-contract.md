@@ -265,6 +265,34 @@ L7. SDK rebuild, `corpus` and `corpus-a16`.
 
     PASS. These ran in the worktree, not the shared `build/`. The shared SDK (`build/install`) was **not** rebuilt. Its libraries were built by the previous compiler, and a `dev/run.sh build` there would not rebuild them: its toolchain stamp is unchanged, and ninja does not track the compiler binary. Wiping the shared SDK build under the agents now using it is the coordinator's call.
 
+## Profitability on held-out inputs (recovered draft, 2026‑10‑01)
+
+Recovered during workspace reconciliation on October 10. This October 1 plan was left uncommitted in `wt/carry-pressure-contract`; its reference compiler hashes describe that date. The October 9 pin rebase does not validate these proposed measurements. The held-out comparison remains pending in the TODO, and the default remains `always`.
+
+The accompanying [IR generator](../defects/evidence/2026-10-01-carry-pressure-contract/tools/gen-torture-ir.sh), [size summary](../defects/evidence/2026-10-01-carry-pressure-contract/tools/policy-summary.py) and [clock runner](../defects/evidence/2026-10-01-carry-pressure-contract/tools/torture-clocks.py) are recovered measurement prototypes. Syntax/help and a bounded size-table fixture were checked during reconciliation; the generator and clock runner have not been exercised against the current pin. Before running clocks, replace the threaded runner's `preexec_fn` resource limits with a process-safe invocation and handle compiler timeouts while retaining failure rows. The size summary requires at least one successful common input with nonzero total size. These helpers do not establish a policy improvement or a correctness result.
+
+Original draft author/tool attribution is not independently recovered for these uncommitted files; the existing plan attribution above is preserved. Reconciliation and review: Codex CLI 0.162.1, gpt-6.1-sol, medium reasoning effort; session `01a11e9e-a386-7462-b3f4-86364e106ee0`.
+
+The user approved this follow-up on 2026‑10‑01. It is the remaining half of the TODO item "Choose the carry-scheduling profitability policy on unseen inputs" (T4). Measurements run on top of `0071`, with the installed `build/llvm-mos/bin/llc` `6f303945…` as the reference. The stale `build/llvm-mos-install/bin/llc` (`cf5355d3`, 2026‑09‑28) is not used.
+
+**Candidates.**
+
+- **Measured policies:** `-mos-carry-sched=always` (the default), `off`, and `gated` (0067).
+- **Cheaper in-scheduler predictors:** the three models of the [profitability report](../investigations/2026-09-27-carry-profitability-model.md), ported unchanged (`tradeoff-model.patch`) onto the current stack as `-mos-carry-cost=pressure-first|weighted|tradeoff`. They are re-tested because `0071` now gives the generic pressure estimate an accumulator dimension, which those models lacked on 2026‑09‑27.
+- **Shared-frontend selection:** emit IR once, run the backend per policy, and keep the smallest object (`off`, `always`, `gated`). Its cost is backend-only time against a single `always` backend.
+- **Level gating:** per level, the policy that wins there, derived from the same runs.
+
+**Held-out inputs** are sources used by neither the 2026‑09‑27 census and screens (409 sources from `examples/`) nor this plan's 277 corpus and demo sources. They are the gcc c-torture/execute in-scope tests (`examples/65816/torture/inscope.tsv`, 1,299 tests from gcc 14.2.0), built the way `tools/torture_run.py` builds them, in all three modes at `-Os`/`-Oz`/`-O2`/`-O3`.
+
+- Size is measured at all four levels.
+- Cycles are measured at `-O2`/`-O3` with the bsnes-jg probe, from the shim's `main` to its `0x600D` PASS write. They are measured only where the objects differ between policies.
+
+The 277 tuning sources are reported alongside, but as seen data.
+
+**Decision rule.** Keep `always` unless a candidate beats it on the held-out set in total, at the level where it would apply: bytes at `-Os`/`-Oz`, clocks at `-O2`/`-O3`. The candidate must also have no new failure and no new verifier error. If one wins, land it like `0071` and gate it by level.
+
+**Residues, if cheap:** the `fenwick_sim` `-O2` +0.16%, and the 375 B native residue.
+
 ## Verification
 
 Evidence: [`docs/defects/evidence/2026-10-01-carry-pressure-contract/`](../defects/evidence/2026-10-01-carry-pressure-contract/README.md). The per-input tables of every run are in its `sizes.tar.gz`.

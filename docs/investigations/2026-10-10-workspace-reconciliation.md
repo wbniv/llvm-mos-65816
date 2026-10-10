@@ -1,0 +1,24 @@
+# LLVM worktree reconciliation — 2026-10-10
+
+Will requested disk cleanup after recent merges, then specified reviewing pending edits and checking in useful work or discarding superseded copies rather than leaving the edits unresolved in archives. This review covers the four largest proposed retirement worktrees. Their outer repository heads are ancestors of `main` at `5c68aa5e`; that ancestry alone does not establish that pending files or nested compiler modifications are merged.
+
+- [x] Review the pending outer-repository files against current source, evidence and Git history.
+- [x] Recover the held-out carry-pressure draft and its three measurement helpers for check-in.
+- [x] Validate helper syntax/help and a size-table fixture covering failures, the common successful subset and minimum-object selection.
+- [x] Retire identical files and stale versions in favor of the identified current records.
+- [ ] Complete retirement of the remaining expanded copies, preserving compiler baselines and dated evidence.
+
+| Worktree | Reviewed local files | Decision |
+|---|---|---|
+| `.scratch/near-proofs` | Measurement runner and untracked initial plan | Superseded by `6c5907b4`: the current [runner](../../dev/measure-near-index-proofs.py) and [completed investigation](2026-09-27-near-index-overflow-proofs.md) replace the initial generic trace/census draft. Do not restore the old runner over the completed one. |
+| `.scratch/carry-profitability` | Five helpers, TODO, plan, report and evidence directory | All five helpers and 52 evidence files match `main` byte-for-byte. Current plan/report include completed validation and timing qualifications missing in the copy. The receipt replaces the old `screen-artifacts.tar.gz` entry with corrected always/gated archives. The old 52 MiB screen archive is not restored as current evidence. |
+| `.scratch/carry-scheduling` | Five modified development files; measurement helper, 0064 patch, two defect records, plan and evidence | `farindex.sh`, `rcundef.sh`, the measurement helper and 0064 patch match current files. Regeneration/toolchain and fuzz files are older versions, superseded by pin support, later patch carries and soft-stack checks. Current defect records retain later timing/profitability and farblit-resolution evidence. Preserve the failing TableGen baseline and historical compiler identities separately; do not call the generic pressure contract fixed. |
+| `llvm-mos-65816-carrypress` | Held-out plan section and three untracked helpers | Recovered in the [plan](../plans/2026-10-01-carry-pressure-contract.md). These are measurement prototypes; held-out execution and the default-policy decision remain pending. No candidate compiler is installed. |
+
+Nested compiler source review also matters. Of 173 modified/untracked compiler files in `carrypress`, 170 match the preserved July vendor checkout. The remaining scheduler source matches the committed `tradeoff-scheduler.cpp.txt` snapshot exactly; the spill-hoist fixture differs only in explanatory comments, and `.git_archival.txt` is repository-export metadata. The experimental scheduler is already represented by the [profitability evidence](../defects/evidence/2026-09-27-carry-profitability/tradeoff-scheduler.cpp.txt); it is not a new default-policy implementation. The older scheduling source differs where later native-width design and regression work supersede it; its failing fine-grained pressure-set input is retained in the canonical [pressure record](../defects/mos-carry-scheduling-pressure.json).
+
+The three recovered helper files retain their original bytes. Their original tool/model attribution could not be independently recovered, so it is not guessed. This review identifies two outstanding runner issues before current-pin execution: `torture-clocks.py` applies resource limits through `preexec_fn` while launching subprocesses from worker threads and does not retain failure rows for uncaught timeouts. `policy-summary.py` requires a nonempty successful intersection and nonzero reference byte total. Check-in preserves the unfinished experiment; syntax and fixture results are not compiler/runtime acceptance.
+
+Whole-directory private archives of `near-proofs` and `carry-profitability` were created and compared against their originals before the user's refinement. Changed files were extracted for this review. These archives retain source/build baselines and evidence, but do not substitute for reconciliation. They remain ignored private build artifacts, separate from this checked-in result. Unmerged or otherwise unrelated worktrees, the active vendor checkouts, installed compiler and current pin build remain intact.
+
+Reconciliation and checks: Codex CLI 0.162.1, model `gpt-6.1-sol`, medium reasoning effort; verified environment/session `01a11e9e-a386-7462-b3f4-86364e106ee0`. Existing contributors' credits and immutable evidence are preserved.
