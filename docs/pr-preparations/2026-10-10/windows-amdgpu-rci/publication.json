@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-10",
+  "pr": "https://github.com/llvm-mos/llvm-mos/pull/604",
+  "state": "OPEN",
+  "base": "ae3108c3189076607b12fd5ff514a21678df8c8b",
+  "head": "bece1fc91204e8a2a89903a96183e62a90f18f44",
+  "branch": "wbniv:mos-65816-mvn-bank-order",
+  "patch": "patches/llvm-mos/0072-amdgpu-rci-test-template-spacing.patch",
+  "failing_job": "https://github.com/llvm-mos/llvm-mos/actions/runs/35482415048/job/106002472158?pr=604",
+  "prior_work": "The same mismatch was already recorded on main run 34793262107 and in the contribution tracker. Current main skips the test on Windows. PR #604 predates that skip and requires only the two matcher edits. This follow-up repairs the test rather than a compiler defect; the original MOS fix is unchanged.",
+  "validation": {
+    "focused_checks_passed": 7,
+    "captured_prefix": "Actual MSVC input dump lines 1-8 from the failing job.",
+    "complete_traces": "Reconstructed because the job log abbreviates its middle. Both spacing forms accepted; wrong or recomputed analysis rejected.",
+    "patch_application": "Checked downstream patch application at the compiler pin. The #604 follow-up changes only two CHECK lines on exact parent ae3108c31890; its resulting test is byte-identical to the seven-check validation input.",
+    "full_windows_run": "Not performed locally; upstream CI pending."
+  },
+  "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; session 01a1208b-91e0-7e33-b5bf-8787d2a9c919",
+  "sha256": {
+    "604-comment.md": "f43eb55d3a426ede261d069754ba1f69bb9326d9f06514a98176c394d3a55e68",
+    "604-original.mir": "b059820003885007ea700af55a8086280a273e49d7ab135e5dd6c0647814b956",
+    "captured-windows-prefix.txt": "57f442e2aaabba3ccf70bfead2fe699d5561f84b15862e997780089c0e959e1a",
+    "fixed-accepts-captured-windows.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "fixed-accepts-spaced-trace.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "fixed-accepts-windows-shaped-complete-trace.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "fixed-prefix.check": "8e9c8a0c4540637d677fa000409ba945a50792d80af9f18091c9f45c184ed3b6",
+    "fixed-rejects-recomputed-analysis.log.gz": "e3e09607e012dc6fb448a9f835aff60d861fab90a442ee2fdb41a58d8381483c",
+    "fixed-rejects-wrong-analysis.log.gz": "95a144621810a14df42b7eaed21e72f28ee608ede2a71089f808111b13a6c446",
+    "fixed.mir": "8c1edd2bcc22f15bc32c7cbd2fa45c205b58a113995697e97c993860a37805d5",
+    "original-accepts-spaced-trace.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+    "original-prefix.check": "cb59b9e7a47acf5cff55c6a3b007654bc7a0d6652a11a0de88d47cbc45a999c2",
+    "original-rejects-captured-windows.log.gz": "fdda37d0a3833105ce6808ac9a9e74d6d04f7bc54df1b80120361f86c3761cee",
+    "original.mir": "84e7dddbf82bd6e049ca9b7023ecffc41fd38ba653069f856faa6da161610e30",
+    "posted-body.md": "893e94330a2d72a8915914ad660d3363ebf047ffc8db15ca6d7695d6817cd6ce",
+    "validate.py": "612f7ebc25f824ea7b3454534ae7c5e43412dd38df41c26ba838202567566af6"
+  },
+  "comment": "https://github.com/llvm-mos/llvm-mos/pull/604#issuecomment-6091475796",
+  "standalone_submission": {
+    "pr": "https://github.com/llvm-mos/llvm-mos/pull/617",
+    "head": "88541e76dc4487ce1a5db3c593dd0f7640aa8eff",
+    "state": "CLOSED",
+    "reason": "User requested the test fix on the existing #604 branch. The posted body is retained as dated evidence.",
+    "attribution_correction": "The retained #617 body names Codex 0.162.0; runtime metadata for this test-fix work identifies Codex 0.162.1. Model gpt-6.1-sol and medium reasoning effort are verified from the session turn context."
+  }
+}

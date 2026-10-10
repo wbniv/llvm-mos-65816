@@ -251,6 +251,7 @@ if [ ! -e "$SRC/.git" ]; then
   # The computed-carry scheduling of 0064/0067 relies on it; see
   # docs/plans/2026-10-01-carry-pressure-contract.md.
   apply_patch 0071-mos-accumulator-pressure-set
+  apply_patch 0072-amdgpu-rci-test-template-spacing
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # Existing source trees can carry unpublished work. Require the recorded base

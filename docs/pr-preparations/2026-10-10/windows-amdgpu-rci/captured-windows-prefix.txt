@@ -1,0 +1,8 @@
+Running analysis: MachineModuleAnalysis on [module]
+Running analysis: InnerAnalysisManagerProxy<class llvm::AnalysisManager<class llvm::Function>,class llvm::Module> on [module]
+Running analysis: MachineFunctionAnalysis on test_wwm_reserved
+Running analysis: OuterAnalysisManagerProxy<class llvm::AnalysisManager<class llvm::Module>,class llvm::Function> on test_wwm_reserved
+Running analysis: InnerAnalysisManagerProxy<class llvm::AnalysisManager<class llvm::MachineFunction>,class llvm::Function> on test_wwm_reserved
+Running pass: RequireAnalysisPass<class llvm::MachineRegisterClassAnalysis,class llvm::MachineFunction,class llvm::AnalysisManager<class llvm::MachineFunction> > on test_wwm_reserved
+Running analysis: MachineRegisterClassAnalysis on test_wwm_reserved
+Running pass: SIPreAllocateWWMRegsPass on test_wwm_reserved

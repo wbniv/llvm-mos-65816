@@ -1,0 +1,3 @@
+# CHECK:      Running pass: RequireAnalysisPass<{{.*}}MachineRegisterClassAnalysis,{{.*}}MachineFunction{{.*}}> on test_wwm_reserved
+# CHECK-NEXT: Running analysis: MachineRegisterClassAnalysis on test_wwm_reserved
+# CHECK-NEXT: Running pass: SIPreAllocateWWMRegsPass on test_wwm_reserved

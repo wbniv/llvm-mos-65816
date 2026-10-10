@@ -1,6 +1,8 @@
 # Upstream contribution status — PR progress and submission queue
 
-**Live status, October 9:** compiler #578 merged September 25, #586 September 29, and #584/#588/#589 October 5. Of our 14 compiler PRs, 12 are merged, #604 is open and #609 is withdrawn. SDK #450 remains open with changes requested October 5: mysterymath accepts the code in principle but asks for the regression in `llvm-test-suite`, checking for an existing disabled test first. #320/#321/#594 have no new replies; #594 and SDK #415 remain open. [GitHub receipt](upstream-status/2026-10-09.json).
+**Windows test repair appended to #604, October 10:** [commit `bece1fc9`](https://github.com/wbniv/llvm-mos/commit/bece1fc91204e8a2a89903a96183e62a90f18f44) accepts MSVC template-argument spacing in both AMDGPU analysis-preservation checks. Seven focused checks pass; new full Windows CI and review remain pending. [Update comment](https://github.com/llvm-mos/llvm-mos/pull/604#issuecomment-6091475796). The standalone #617 submission was closed at the user's request; its posted body remains dated evidence. Downstream carry 0072 also removes the newer pin's Windows skip. [Receipt](pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json). Our compiler PR total is 15: 12 merged, #604 open, #609 withdrawn, #617 closed unmerged.
+
+**Dated GitHub snapshot, October 9:** compiler #578 merged September 25, #586 September 29, and #584/#588/#589 October 5. Of our 14 compiler PRs, 12 are merged, #604 is open and #609 is withdrawn. SDK #450 remains open with changes requested October 5: mysterymath accepts the code in principle but asks for the regression in `llvm-test-suite`, checking for an existing disabled test first. #320/#321/#594 have no new replies; #594 and SDK #415 remain open. [GitHub receipt](upstream-status/2026-10-09.json).
 
 **Pin rebase and patch retirement, October 9:** the bootstrap pin is now `f24948c7d1a4b9f162d4d0192ccceecab1e441ff`, immediately after #589 merged. Merged fixes and their upstream tests come from this revision; they are removed from `0001`/`0002`. Standalone 0003, 0010, 0016, 0019, 0021, 0022, 0024 and 0025 are retired, and upstream vector scalarization makes backport 0049 redundant. Clang 0035 is superseded by LLVM [#221477](https://github.com/llvm/llvm-project/pull/221477), merged September 16; both local artifacts are retired. The remaining stack is rebased; [validation and retained prior aggregates](pr-preparations/2026-10-09/pin-rebase/README.md) distinguish bootstrap checks from compiler testing. Historical standalone artifacts remain available in Git at `dfeb5c9b`. #584's merge prerequisite is satisfied; its parked follow-up is superseded. The #594 coordination hold remains. Earlier patch-retention statements below are dated evidence for their recorded revisions.
 
@@ -271,7 +273,7 @@ in `mos-validation.md`.
 
 | Open PR | Current head | Review / next step | Latest GitHub CI (Ubuntu / Windows / macOS) |
 |---|---|---|---|
-| [#604 — Correct MVN/MVP bank order and symbolic fixups](https://github.com/llvm-mos/llvm-mos/pull/604) | `ae3108c31890` | No comments or reviews as of October 9; await initial review. | Pass / **fail** / pass |
+| [#604 — Correct MVN/MVP bank order and symbolic fixups](https://github.com/llvm-mos/llvm-mos/pull/604) | `bece1fc91204` | Windows AMDGPU test matcher repaired October 10; await new CI and initial maintainer review. | Pending |
 
 | Open SDK PR | Current head | Review / next step | GitHub CI |
 |---|---|---|---|

@@ -142,13 +142,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "920032cb4c4f367c66236f3d58e203924eb5072f50e3c01b57213c2fd3e8e83b",
+          "docs/upstream-pending-work.md": "e6423966aab97239b8192a20c95cba20ef1aca0a8fcc476c6e56e230f7c500e9",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
           "docs/upstream-dashboard.json": "4f5e36d252558e650e05aef223a3c59be06875d2dcf78cf823f11f67560d12f7",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "2c0091450e4396ec7f0efeb6f5da2c86a9847e01a0c3b9b83d1bb691fad7ace3"
+          "docs/upstream-dashboard-graph.json": "ece5f8d91e752c801f5870b2749fbc59f4757b0710bbe140dcd82a8469d78dc6"
         }
       }
     },
@@ -306,7 +306,8 @@
         "docs/upstream-status/2026-10-09.json",
         "dev/llvm-mos-pin",
         "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
-        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json",
+        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json"
       ],
       "receipt": {
         "sources": {
@@ -378,12 +379,13 @@
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
-          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
+          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669"
         },
-        "reviewed_at": "2026-10-09T23:03:25.342565+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:30.312598+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -419,7 +421,8 @@
         "docs/upstream-status/patch-retirement-2026-10-09.json",
         "dev/llvm-mos-pin",
         "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
-        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json",
+        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json"
       ],
       "receipt": {
         "sources": {
@@ -482,12 +485,13 @@
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
           "docs/upstream-status/patch-retirement-2026-10-09.json": "0f2bb5c1d79956b52c04214a53dc77563d430f9b41b683b2a2a8b9b393bae9c5",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
-          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
+          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669"
         },
-        "reviewed_at": "2026-10-09T23:03:25.572846+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:30.585068+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -523,7 +527,8 @@
         "docs/upstream-status/patch-retirement-2026-10-09.json",
         "dev/llvm-mos-pin",
         "docs/pr-preparations/2026-10-09/pin-rebase/README.md",
-        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json"
+        "docs/pr-preparations/2026-10-09/pin-rebase/validation.json",
+        "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json"
       ],
       "receipt": {
         "sources": {
@@ -586,12 +591,13 @@
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
           "docs/upstream-status/patch-retirement-2026-10-09.json": "0f2bb5c1d79956b52c04214a53dc77563d430f9b41b683b2a2a8b9b393bae9c5",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
-          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
+          "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
+          "docs/pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json": "05ec81ad7c91fb06cd678fba36b06d6c2d4ce7eabeed3d628b51c1f43e6e4669"
         },
-        "reviewed_at": "2026-10-09T23:03:25.580288+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:30.577675+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -647,9 +653,9 @@
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/howto-document-dependencies.md": "b0f704d2c1d2669e9a38c71574ca09d00604f8c8fcb1cf3b3404a6af06518198"
         },
-        "reviewed_at": "2026-10-09T12:21:52.393380+00:00",
-        "note": "Reviewed live October 9 PR receipt and historical baseline qualification. #578/#586/#584/#588/#589 are merged; #604 unchanged; SDK #450 needs llvm-test-suite regression coverage; #594 hold retained. The 171-file bootstrap equivalence preserves fixes in pinned aggregates after standalone retirement. Historical/compiler evidence and posted PR bodies remain unchanged; website publication requires the separate publication workflow. Scratch reconstructions are excluded from repository inputs.",
-        "attribution": "OpenAI Codex 0.162.0, model gpt-6.1-sol, medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:30.821958+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -683,11 +689,11 @@
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549"
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644"
         },
-        "reviewed_at": "2026-10-09T23:03:25.691625+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:30.702405+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -760,11 +766,11 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549"
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644"
         },
-        "reviewed_at": "2026-10-09T23:03:26.295878+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:37.044112+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -835,12 +841,12 @@
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-09T23:03:29.590795+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:39.987519+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1056,12 +1062,12 @@
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "95cc4c8dee3113b9a2c45bd919f3bf30f8d84e6df29a85b89229544f80ba99ce",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907"
         },
-        "reviewed_at": "2026-10-09T23:03:32.911001+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:42.585756+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1578,12 +1584,12 @@
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "09e3fe9647ee287cf81c3615db6bae78ce770a249f3b600d3a536b7846925bda",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/upstream-prefetch.json": "6e5f66d9c3cdf34cdeb83b0b56f8102e6fd2bf44c0d3fa26bf608045ebd1a907"
         },
-        "reviewed_at": "2026-10-09T23:03:33.833247+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:33.846620+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1638,12 +1644,12 @@
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "1bf244ec15e611408fce710aa70e6524d732222e4816110bec9c231c0b7a7c7e",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-09T23:03:34.100081+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:42.832789+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1734,12 +1740,12 @@
           "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
           "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-09T23:03:36.432393+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:33.231944+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -1810,9 +1816,9 @@
           "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981"
         },
-        "reviewed_at": "2026-10-09T23:03:36.909038+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:35.116376+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2054,12 +2060,12 @@
           "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
           "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-09T23:03:37.304841+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:43.201311+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2254,9 +2260,9 @@
           "docs/investigations/2026-09-28-farblit-range-integration.md": "4a25aa30bf26fa4e53768168ab938d9fd1cb5f90d01fca1a72256468f2e39caa",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-10-09T14:21:41.719854+00:00",
-        "note": "Reviewed the pin-rebase qualifications against the dated compiler identities, emulator and object measurements, defect closure inputs, original extracted packets and publication holds. The changed inputs qualify the new pin without extending the historical results. Retained those results and earlier credits; reviewed curation and registries against the recorded October 9 merges and the separately superseded Clang prefetch proposal. Website publication remains a separate action.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:33.232099+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2295,19 +2301,19 @@
           "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
           "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
           "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
-          "dev/toolchain.sh": "7cb7f135b050288aee42c2b5a0abff09ed0e734b962e30c3b20564d452f1bc27",
+          "dev/toolchain.sh": "09d5750e135026594f2ef4e0e7db5220bb131dc56e3322821848833f4343d65e",
           "dev/regen-patch.sh": "784cac0cde97003c1196750ed5b507ef1538b1f0c9ec3a42248d8085688c1141",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e"
         },
-        "reviewed_at": "2026-10-09T23:03:38.323803+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:36.170287+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2365,9 +2371,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-09-30T00:21:10.222284+00:00",
-        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
-        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
+        "reviewed_at": "2026-10-10T00:15:33.232029+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2475,9 +2481,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/0069-pr-body.md": "f3f54a14aaf4aff017c3d0d983d006a4e0378c19d933623e2348ad1a70b1ee22",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/REPRODUCE.md": "979aa213fe3f43ef8f279beacc53d712a3bd11528cf6c2422fd453538d590214"
         },
-        "reviewed_at": "2026-10-09T23:03:41.304251+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:34.589739+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2732,11 +2738,11 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "c87c4e10ebd13bb9aef80f7ff7b1e03feff3faccdb8ebdc8e4e0a99e0dcae044"
+          "TODO.md": "41cbfc4c5eded5e362b26ffddf9835163f0f1415018b309a3583013d73385707"
         },
-        "reviewed_at": "2026-10-09T23:03:43.397093+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:30.947111+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2761,7 +2767,7 @@
       "receipt": {
         "sources": {
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "dev/toolchain.sh": "7cb7f135b050288aee42c2b5a0abff09ed0e734b962e30c3b20564d452f1bc27",
+          "dev/toolchain.sh": "09d5750e135026594f2ef4e0e7db5220bb131dc56e3322821848833f4343d65e",
           "dev/regen-patch.sh": "784cac0cde97003c1196750ed5b507ef1538b1f0c9ec3a42248d8085688c1141",
           "dev/lit.sh": "84ca574f032b6280b4c4a395cbca1757a95d4d3a417f8bbd460bd8da20e9a67e",
           "docs/pr-preparations/2026-10-09/pin-rebase/validation.json": "426fb9e5384dd560e936053e8ad899e24168c297e3c5d816198c24635643d54e",
@@ -2832,6 +2838,7 @@
           "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
           "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
           "patches/llvm-mos/0071-mos-accumulator-pressure-set.patch": "2a50f8e119dc0ac68cd736cbf1562842b909354853163a62b7c27a65b82f82c6",
+          "patches/llvm-mos/0072-amdgpu-rci-test-template-spacing.patch": "7a8a69e99a81c66d2a30e30bad0eb018cc8d6c124dbed64729dde301d6aa7dea",
           "docs/defects/mos-packed-layout-pin-rebase.json": "3483e6afa8380faf6cb52f006fd006eeea3121a85a52325198ac242337d94f51",
           "docs/defects/mos-native-index-copy-cost.json": "009cefea83049fcb7c7127098aa346bff8918537b8d742544894e76654286aa6",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/bootstrap.log": "a2f9922e7ebe1a987b87c518eb923f4ad010321b17c131a53be05888683dc938",
@@ -2872,9 +2879,9 @@
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/validate.py": "5421bbeb441deab86ed178278c7546dc1c3cdf687553c61db7364fd181e347c1",
           "docs/pr-preparations/2026-10-09/pin-rebase/evidence/verify-stack.py": "654d9c9f7106af08f8158df3535a3d1682672d39034004c1a4e8b60d00a3c04e"
         },
-        "reviewed_at": "2026-10-09T23:03:43.911954+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:36.646240+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2905,12 +2912,12 @@
       "receipt": {
         "sources": {
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549",
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644",
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981"
         },
-        "reviewed_at": "2026-10-09T23:03:43.912055+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:30.822069+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     },
     {
@@ -2924,11 +2931,11 @@
         "sources": {
           "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
           "patches/llvm-mos/0047-mos-mc-addr-asciz-symbolic-crash.patch": "b641d19787bcf09329b8535190f09c0d924d51177a4273cb258bacd211dd9d61",
-          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "84bcdf39282ab5693fc142b04a8c4ba6518ef4f23ba823bcbe320d3411848549"
+          "docs/pr-preparations/2026-10-09/pin-rebase/README.md": "ca21f8ffecdcc4d5475352baf3660afb330f6159b165a3dede42b984b8bc5644"
         },
-        "reviewed_at": "2026-10-09T23:03:44.037860+00:00",
-        "note": "Reviewed October 9 live merges, SDK #450 test-placement request, #604 open state and unchanged #594 coordination hold; checked compiler pin f24948c7d1a4, removal of merged standalone/aggregate carries, upstream prefetch supersession and 0049 retirement. Reviewed isolated assertions-build validation (50-patch exact replay, 205 MOS passes plus one unsupported, 56 C objects and prefetch checks), the packed-layout integration closure and existing native-index copy-cost backport. Checked selected source/build paths and preserved old shared installation. Dated near-store/carry/far-word plans, review packets and extracted bodies retain their exact bases, runtime/performance measurements, credits and publication holds; these results are not extended to the new pin. The near-global LSR output qualification and backend fixture scope are explicit. Separate public-site publication remains pending; no remote posts or website deployment performed. Generated tracking exports were refreshed from canonical records.",
-        "attribution": "OpenAI Codex 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-10T00:15:43.319357+00:00",
+        "note": "Reviewed Windows AMDGPU matcher-only follow-up on existing #604 at bece1fc91204; #617 closed at user request and its posted body retained. Seven focused FileCheck checks pass; full upstream CI remains pending. Current tracker/TODO reflect #604 head and comment. Bootstrap now has 51 patches; the original 50-patch rebase, compiler identity and runtime/performance receipts remain dated and unchanged. Test-only 0072 removes the newer pin skip; #604 predates the skip and adds only the two CHECK edits. Compiler/ABI/SNES feature packet dependencies, posting holds and independent fixes remain unchanged. Reviewed affected carry/near/far investigation qualifiers and preparation summaries for this scope; no compiler repair, new closure or runtime result inferred. Separate website publication is not part of this PR update.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
     }
   ]

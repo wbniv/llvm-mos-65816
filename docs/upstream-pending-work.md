@@ -1,5 +1,7 @@
 # Pending upstream work and dependencies
 
+**October 10 Windows CI follow-up:** the AMDGPU template-spacing fix is appended directly to [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604) at `bece1fc91204`; standalone #617 is closed. Seven focused FileCheck checks pass; new Windows CI and review remain pending. Downstream carry 0072 also restores the newer pin's skipped coverage. [Receipt](pr-preparations/2026-10-10/windows-amdgpu-rci/publication.json).
+
 **October 9 upstream refresh:** #578, #586, #584, #588 and #589 are merged; #584's prerequisite for the #320/#321 series is satisfied and its follow-up comment is superseded. Compiler #604 remains open without review. SDK #450 has changes requested: move regression coverage to `llvm-test-suite`, checking existing coverage first. #594 has no replies and its coordination hold remains. The compiler pin is advanced to `f24948c7d1a4`, and merged carries are removed from the aggregates and standalone stack; see the [current tracker](upstream-contribution-status.md#current-pr-progress) and [GitHub receipt](upstream-status/2026-10-09.json).
 
 OpenAI Codex 0.162.0, model `gpt-6.1-sol`, `medium` reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`.
