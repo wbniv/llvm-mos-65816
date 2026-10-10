@@ -1,0 +1,8 @@
+# toolchain=/opt/llvm-mos clang=8968d9dffc6d7bcec36149e47b9ec15d451c0ce12813f16861ab1d43046ebedf (clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos 0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63))
+$ /opt/llvm-mos/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c -o /dev/null /work/docs/defects/evidence/2026-10-11-demo-build-failures/gallery/record-result-reduced.c
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+rc=0

@@ -1,0 +1,1598 @@
+{
+ "schema": 1,
+ "id": "mos-default-mode-far-cast-legalization",
+ "title": "Near-to-far casts without +mos-a16 abort in the legalizer; ascast and ascast_sim lack the mos-a16-only marker",
+ "status": "contract_clarification",
+ "reproducer_origin": "original",
+ "report": "docs/plans/2026-10-11-demo-build-failures.md",
+ "summary": "examples/snes/ascast.c and examples/snes/corpus/ascast_sim.c (added in 083d8d00) cast a near pointer to address_space(2) in ac_to_far but carry no 'mos-a16-only' marker, so dev/build.sh builds them in default mode. There the #320 custom lowering of G_ADDRSPACE_CAST p0->p2 emits a 4 x s8 -> s32 G_MERGE_VALUES that is legal or custom only under hasAccum16(), and the legalizer aborts with 'unable to legalize ... G_MERGE_VALUES ... (in function: ac_to_far)' at every level -O0 to -Oz, on mosw65816 and mos6502. With -mcpu=mosw65816 +mos-a16, the flags the marker adds, both programs build on every tested toolchain; the demo's plan and gate (dev/round8d-demo.sh) already treat it as a16-only. Identical on the 0f031168 install, the 6f303945 rollback and the f24948c7 pin install, and on the #320 and far-word split tops. Upstream llvm-mos has no far address space and fails earlier, on G_LOAD p2. The repository documents default-mode far pointers as unsupported, but whether the compiler should diagnose them, keep the fatal legalizer error, or legalize the cast is undecided, hence a contract clarification rather than a defect claim.",
+ "attribution": [
+  "Captured, reduced and recorded: Claude Code 2.1.295, t4-opus-high agent a4b2414005f3ae41c, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 72f6d6de-6687-477a-bb4c-b186f9d1ba7f (https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx). The original sighting (preexisting-demo-build-failures.log) belongs to the 2026-10-01 soft-stack link-reserve work; see that record for its attribution."
+ ],
+ "unknowns": [
+  "The intended default-mode contract for address_space(2) (diagnostic, fatal legalizer error, or legal lowering) is not decided; it is a #320 design question for the user and upstream review.",
+  "The pre-0071 clang-23 254624ba toolchain of the original log is not on disk; its leg is retained only as that log."
+ ],
+ "prior_work": {
+  "disposition": "distinct_from_related",
+  "search_terms": [
+   "mos-a16-only",
+   "ascast",
+   "ac_to_far",
+   "G_MERGE_VALUES",
+   "G_ADDRSPACE_CAST",
+   "address_space(2)",
+   "default 8-bit far",
+   "plain-mode limit"
+  ],
+  "related_records": [
+   "docs/defects/mos-far-pointer-arg-exhaustion.json",
+   "docs/defects/mos-far-access-non-65816.json"
+  ],
+  "related_reports": [
+   "docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md",
+   "docs/plans/2026-09-28-round8-cluster-d-abi-and-memory-widths.md",
+   "docs/plans/2026-09-30-far-prerequisite-defects.md",
+   "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/preexisting-demo-build-failures.log"
+  ],
+  "related_changes": [
+   "083d8d00 (Add Round 8 Cluster D compiler demos; ascast without the marker)",
+   "patches/llvm-mos/0002-321-accum16.patch (G_MERGE_VALUES s32 rules gated on hasAccum16)"
+  ],
+  "source_assessment": "vendor/llvm-mos-0f031168a7cc MOSLegalizerInfo.cpp: G_ADDRSPACE_CAST is customForCartesianProduct({P, PZ, PF, PFP}) in all modes; G_MERGE_VALUES {S32,S16} is legal and {S32,S8} custom only when STI.hasAccum16(), otherwise unsupported.",
+  "binary_assessment": "Every tested binary (llc a78958b0..., 6f303945..., f68dae29...; split r7-320-4 and r7-fw-12) fails on ac_to_far in default mode and passes with +mos-a16; r7-321-16, p-321-00 and /opt/llvm-mos (no #320) fail earlier on G_LOAD p2 in ac_read.",
+  "decision": "New record for an unowned, documented limit. mos-far-pointer-arg-exhaustion mentions the same plain-mode s32 merge failure only as a side observation of a calling-convention defect (fixed), and mos-far-access-non-65816 is about far opcodes on non-65816 CPUs (fixed); neither owns default-mode far casts. The battery failure itself is a missing demo marker, not a compiler regression.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/prior-work.json",
+   "sha256": "89c5d9ccdac3df6f0ccc1826812324bc2177da33e26483b6c67afaee1dd6b66a"
+  }
+ },
+ "baseline": {
+  "command": "build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+  "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+  "configuration": {
+   "cpu": "mosw65816",
+   "features": [],
+   "optimization": "Os",
+   "lto": false,
+   "verifier": false,
+   "runner": "mos-clang exit status (compile only)",
+   "expected": "the object compiles, or a diagnostic names the missing +mos-a16"
+  },
+  "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+  "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+  "input": {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-default-Os.log",
+   "sha256": "82aa211ad668b194cde69dfa5c403623001909d9ddbd5267e3da9cfd8b6423cc"
+  },
+  "exit_code": 1,
+  "failure_signature": "unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %4:_(s8), %5:_(s8), %6:_(s8), %6:_(s8) (in function: ac_to_far)"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.c",
+   "sha256": "c2e38fd0cc0248fda37d59e12b7430abd6f5f7969ebb4af8a967413d6c616b00"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.h",
+   "sha256": "526ce94fd568bfe95b3fd4d15301eff979d402f22340e9690ab996b4a702e4da"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.c",
+   "sha256": "d036dd0fa312e69e46408bef4be5ed388541776811ace9f065c0c7f579916309"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+   "sha256": "ad03ab42e12a18d4c3c422fdcf9f2cac4e9b2384ca5ddde140885405705b47ee"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+   "sha256": "4f828fab4698bef650f886e8b6ecc5bff762f9e758ebc7c46ca609cd9fffd49c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/prior-work.json",
+   "sha256": "89c5d9ccdac3df6f0ccc1826812324bc2177da33e26483b6c67afaee1dd6b66a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/identity.json",
+   "sha256": "a469db02a5c7f90c90bf1613d7e3f4fd2a4442335570d81eae0e81439fcedc56"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/probe.sh",
+   "sha256": "f04cd3582d113a4e23e4495b162556157c765f6be1d20aa7bdf29168e772b48b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/probe-llc.sh",
+   "sha256": "6da6ad1518b6dd8f486ac47c3413943afa6fbcefc9ed0d2cc5567e2a04acb836"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/link-reserve/preexisting-demo-build-failures.log",
+   "sha256": "239cd07b5285ad7f2b09e3c5a827cb448cffa10519ea9261da5da0ba06e85268"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/summary.tsv",
+   "sha256": "cd64d75eb695b55da22993d007f1666d7ee77b9ea6bdd4d450e750fba5ba3695"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/summary.tsv",
+   "sha256": "cd64d75eb695b55da22993d007f1666d7ee77b9ea6bdd4d450e750fba5ba3695"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/summary.tsv",
+   "sha256": "cd64d75eb695b55da22993d007f1666d7ee77b9ea6bdd4d450e750fba5ba3695"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/split-p-321-00/summary.tsv",
+   "sha256": "cd8d0c0f9e2d21f956322692349d18dbec4435843d4554957735cd0d054a605b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/split-r7-320-4/summary.tsv",
+   "sha256": "edb7083399ad6d07e3516241ba3c195941bcdf0120cc7cf03a09584f31794363"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/split-r7-321-16/summary.tsv",
+   "sha256": "edb7083399ad6d07e3516241ba3c195941bcdf0120cc7cf03a09584f31794363"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/split-r7-fw-12/summary.tsv",
+   "sha256": "edb7083399ad6d07e3516241ba3c195941bcdf0120cc7cf03a09584f31794363"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/upstream-opt-llvm-mos/summary.tsv",
+   "sha256": "d0654dbcabf90129977f14f4acdda6724264b4c70fd0fb614471964aab356328"
+  }
+ ],
+ "additional_runs": [
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -O0 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O0",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-default-O0.log",
+    "sha256": "e924b645c1996679cff011c19f46eecb72930a0bd92e54c8b21cc6a374a088c3"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -O1 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O1",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-default-O1.log",
+    "sha256": "fe6fd2c7155ac2ce21bbcd765a8dae97c2e64957534c584b1c3d72140aefb8f9"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -O2 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-default-O2.log",
+    "sha256": "a12534bcfc4a23a02a908e639cd48cb96a4506a165158ebae4c88b7589cea1c5"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -O3 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O3",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-default-O3.log",
+    "sha256": "8db2cfe1b01cf6c50b6ad407d4953c699e8e0bcd52d8f75a31a74ec89e1c25ed"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Oz -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Oz",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-default-Oz.log",
+    "sha256": "4631fe32c2467ace737d02ac61363519420def6477a857164f4a1834de354ec2"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O0 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O0",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-a16-O0.log",
+    "sha256": "c464553c9d870a26f84f22961df0130a6f670caf8bb7a742ea8c3df9718da5f7"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O1 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O1",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-a16-O1.log",
+    "sha256": "8311d925d39f6c83bdece145a31a6eb0ce01e2f5b8bb4f716effd538602add97"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O2 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-a16-O2.log",
+    "sha256": "65e69337e8705ca5e297eca57b3d8a8bc247460df167f6196ae8a447bc7a8c5c"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O3 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O3",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-a16-O3.log",
+    "sha256": "6e486a01194e8236765374fd8b9cd4c7a5bfe1f063c0e86edbd02377fa6390ca"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-a16-Os.log",
+    "sha256": "5dbd8e00b3fe77a4d5b7ab22d17c0a1bf5cdadad2dcfb837986209fb7ca335ee"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Oz -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Oz",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-a16-Oz.log",
+    "sha256": "617370750d91379931c6b54aa02aac280aaeeb3c579b76f2c2b1c2ad073920c5"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mos6502 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mos6502",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-mos6502-Os.log",
+    "sha256": "93d969df901fa88497b7bb2e865ae4e559b497746b49054ebea351fb900f24f3"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+    "sha256": "ad03ab42e12a18d4c3c422fdcf9f2cac4e9b2384ca5ddde140885405705b47ee"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-demo-default-Os.log",
+    "sha256": "53dbac00222a5b6a017b592e41f0f09f268218185ee09e153debd509153ca1a1"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+    "sha256": "ad03ab42e12a18d4c3c422fdcf9f2cac4e9b2384ca5ddde140885405705b47ee"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-demo-a16-Os.log",
+    "sha256": "34a84c9a18b7e7b34dae7b8d0563c6edaa903f5c17f667f3856396b07d5e2c82"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -I examples/snes -Os -o SCRATCH/ascast.sfc examples/snes/ascast.c (dev/build.sh shape, no marker)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816 (from mos-snes.cfg)",
+    "features": [],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.c",
+    "sha256": "c2e38fd0cc0248fda37d59e12b7430abd6f5f7969ebb4af8a967413d6c616b00"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-battery-link-Os.log",
+    "sha256": "ad42f870665713e1db912ac2d950428acbe56709dd72d5652298c376c832bd82"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -I examples/snes -Os -o SCRATCH/ascast_sim.sfc examples/snes/corpus/ascast_sim.c (dev/build.sh shape, no marker)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816 (from mos-snes.cfg)",
+    "features": [],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.c",
+    "sha256": "d036dd0fa312e69e46408bef4be5ed388541776811ace9f065c0c7f579916309"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-battery-link-Os.log",
+    "sha256": "c2d1078bd8e32f8dcb1ec2741ff7df39c84333aef37e963150c72be75a1d0aae"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -I examples/snes -Os -o SCRATCH/ascast-a16.sfc examples/snes/ascast.c (dev/build.sh shape with the marker's flags)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.c",
+    "sha256": "c2e38fd0cc0248fda37d59e12b7430abd6f5f7969ebb4af8a967413d6c616b00"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-marker-link-Os.log",
+    "sha256": "5addc6b8b9a9de5a45405b9a44e4e97bc9494ccb1e46325806a2e0b362df2680"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -I examples/snes -Os -o SCRATCH/ascast_sim-a16.sfc examples/snes/corpus/ascast_sim.c (dev/build.sh shape with the marker's flags)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.c",
+    "sha256": "d036dd0fa312e69e46408bef4be5ed388541776811ace9f065c0c7f579916309"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-marker-link-Os.log",
+    "sha256": "8f67ee7c5833cf98a982ecd2411c4b7ca2770fbb32d020691add3fc878ed40dc"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null -mllvm -print-before=legalizer -mllvm -filter-print-funcs=ac_to_far docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false,
+    "dump": "before legalizer, ac_to_far"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install (shared install swapped on 2026-10-10 to the 0f031168a7cc build carrying the XY16 preserveX repair; clang-24 ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989, lld fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287; identity in docs/defects/evidence/2026-10-11-demo-build-failures/identity.json)",
+   "toolchain_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/0f031168-a78958b0/ascast-sim-default-Os-before-legalizer.log",
+    "sha256": "ac0309a709cf5691d105937a0e643572340714fd92d871fe02544992a9aae4a5"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -O0 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O0",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-default-O0.log",
+    "sha256": "1c42671219ed011d91e78125160ff9d1632ad97ab274c5124ec299792e187c47"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -O1 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O1",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-default-O1.log",
+    "sha256": "92359576c5b39a6f6421cd67878ddc16ff9b90f8ef291746e2c26a9d3bc3aa55"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -O2 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-default-O2.log",
+    "sha256": "8e0204cbabc3796b91127989a916bc07a27900a91da878ee17be17635cfc8137"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -O3 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O3",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-default-O3.log",
+    "sha256": "cdcc2cc0f278efc660e419ff91c5f673f2c14bed25fbc0e1d68e65c534ce1ac0"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-default-Os.log",
+    "sha256": "75c598e43a2ac076ed7eb1d0a762fdd5973e0de90dcb0e355757b465a5a40c84"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Oz -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Oz",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-default-Oz.log",
+    "sha256": "e9a2e9d2b2669a7762e6f9ea711b1d779e725512a242d50cd86c6b989a2e22a0"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O0 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O0",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-a16-O0.log",
+    "sha256": "a8f22077369456de5f5d873aab78b1192a78f7290616bb1ff3c8f85651e1c12c"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O1 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O1",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-a16-O1.log",
+    "sha256": "f1e9e81a56686276cc35dcf47693a2a9b2e3cbf96e5fc4dd7080daa269c61fcf"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O2 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-a16-O2.log",
+    "sha256": "1fa3836c298dbed2403f20d255f90eb83ef37172fd9ea3a30b20e8661db93fcb"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O3 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O3",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-a16-O3.log",
+    "sha256": "17443553f12154178b9cbf04eb355b1f84488a8c35baba9cd3b1cd43c7249373"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-a16-Os.log",
+    "sha256": "6ddeda1aac3588be10325ae8042f7e6a6e899582af0b321e86dc6908c8e81925"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Oz -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Oz",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-a16-Oz.log",
+    "sha256": "1988a3021ef46945620fcb16df00e36f54251d19ae6fe79933cf7d8aaf84cf2f"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mos6502 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mos6502",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-mos6502-Os.log",
+    "sha256": "cc4a8fea9c33795c0656685f14076aa34df1a931b7266c52c63a88b2e577259d"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+    "sha256": "ad03ab42e12a18d4c3c422fdcf9f2cac4e9b2384ca5ddde140885405705b47ee"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-demo-default-Os.log",
+    "sha256": "90931cbcbb2a39a8e7137ce38efb6b0041ca4e368b982a4c10bc2d06e98c35ef"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+    "sha256": "ad03ab42e12a18d4c3c422fdcf9f2cac4e9b2384ca5ddde140885405705b47ee"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-demo-a16-Os.log",
+    "sha256": "8639bc95dd8dd62c16cdb0ab5c0937686a842cdf8437cd07feb2cf12c9f743b5"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --config build/install/bin/mos-snes.cfg -I examples/snes -Os -o SCRATCH/ascast.sfc examples/snes/ascast.c (dev/build.sh shape, no marker)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816 (from mos-snes.cfg)",
+    "features": [],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.c",
+    "sha256": "c2e38fd0cc0248fda37d59e12b7430abd6f5f7969ebb4af8a967413d6c616b00"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-battery-link-Os.log",
+    "sha256": "ac7c96e0eb79f98f73d0fc74687829e6640a9d8661d2cb385b42f8e5df373aa8"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --config build/install/bin/mos-snes.cfg -I examples/snes -Os -o SCRATCH/ascast_sim.sfc examples/snes/corpus/ascast_sim.c (dev/build.sh shape, no marker)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816 (from mos-snes.cfg)",
+    "features": [],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.c",
+    "sha256": "d036dd0fa312e69e46408bef4be5ed388541776811ace9f065c0c7f579916309"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-battery-link-Os.log",
+    "sha256": "2d23e958d8389789e8179d2900abfdf68830c977b17fb96eaf5f8afc8ab30394"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -I examples/snes -Os -o SCRATCH/ascast-a16.sfc examples/snes/ascast.c (dev/build.sh shape with the marker's flags)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.c",
+    "sha256": "c2e38fd0cc0248fda37d59e12b7430abd6f5f7969ebb4af8a967413d6c616b00"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-marker-link-Os.log",
+    "sha256": "1326e33aff849eb874574115fd0fec9b2e0b9583a68089cdc49cba948507bc0f"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -I examples/snes -Os -o SCRATCH/ascast_sim-a16.sfc examples/snes/corpus/ascast_sim.c (dev/build.sh shape with the marker's flags)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.c",
+    "sha256": "d036dd0fa312e69e46408bef4be5ed388541776811ace9f065c0c7f579916309"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-marker-link-Os.log",
+    "sha256": "6112f2af200a9d969599c12ac365266d7a49573949243de9dd9e663db111a817"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null -mllvm -print-before=legalizer -mllvm -filter-print-funcs=ac_to_far docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false,
+    "dump": "before legalizer, ac_to_far"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 (previous shared install kept as rollback; clang-23 e532fbee..., the 'new' toolchain of the original log)",
+   "toolchain_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/6f303945-pre-xy16-repair/ascast-sim-default-Os-before-legalizer.log",
+    "sha256": "d89b3a211709b705609f1761a8ced391f6d90899e1b865e7a68389d49b8b787e"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -O0 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O0",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-default-O0.log",
+    "sha256": "6db396ae97a343a60f2bdd92c75d5bc86422a290e7f4b4af9eb8a1d4d43b62ad"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -O1 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O1",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-default-O1.log",
+    "sha256": "c33be9f4ba05dfc2d8193a769497a57cf9c8e78772937eda438cf15dd862ad3b"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -O2 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-default-O2.log",
+    "sha256": "e7d7a71e2237aec91be806ca1447319ca9f9b911d3acd882056ba55285495c08"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -O3 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O3",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-default-O3.log",
+    "sha256": "26fbd129b4600b1a126c5977ed5b3e79521f0552315d516215cdb9b1feaae62f"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-default-Os.log",
+    "sha256": "b368dd7f3c94cdf605d9d7f2464be325139f2f0fd9223012500707039a90830e"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Oz -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Oz",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-default-Oz.log",
+    "sha256": "c3b276af7143054111f534914671a1739676f7b69dd28ca2f29304955353568a"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O0 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O0",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-a16-O0.log",
+    "sha256": "1100acb0e566e573aebb017d4e0f69b5dba26dd7b7846ed69b496d40b0035e0e"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O1 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O1",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-a16-O1.log",
+    "sha256": "7e4649465ef0c9b571c72a2f82c13ef4afe0e2ba87f58b01cf3fa4d7e4c59ea8"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O2 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-a16-O2.log",
+    "sha256": "5f07cacad9c3bc656a9daffd1b39b45e6e6eb1e1b7f19a72350a30234943f405"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O3 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O3",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-a16-O3.log",
+    "sha256": "382b8617d937293ae32ee6bb47f3b0ceac211e280819df938135e36cf217f656"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-a16-Os.log",
+    "sha256": "3d02223c3d6f746b4a6947c79d8d292da5ff1691876ec2768e6d0aef7cae22aa"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Oz -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Oz",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-a16-Oz.log",
+    "sha256": "3fd026fb6b7fa6429a7a2acc18e965a757ff3429e15ec91c12aa26f60462280c"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mos6502 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mos6502",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-mos6502-Os.log",
+    "sha256": "3d9fab786ece5444eef2f99435828fc3641ef7e6c4b01a1207591d4ab9c2dbff"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+    "sha256": "ad03ab42e12a18d4c3c422fdcf9f2cac4e9b2384ca5ddde140885405705b47ee"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-demo-default-Os.log",
+    "sha256": "849ec0c74ecca7bfcc28a26a1f06d58543e4455701fdb89d38a9fc6a1590c7f2"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.i",
+    "sha256": "ad03ab42e12a18d4c3c422fdcf9f2cac4e9b2384ca5ddde140885405705b47ee"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-demo-a16-Os.log",
+    "sha256": "086fb8a590b4d69697e541efac5592e53b3d58e30a8c6307c5ae8b9c50695b4c"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -I examples/snes -Os -o SCRATCH/ascast.sfc examples/snes/ascast.c (dev/build.sh shape, no marker)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816 (from mos-snes.cfg)",
+    "features": [],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.c",
+    "sha256": "c2e38fd0cc0248fda37d59e12b7430abd6f5f7969ebb4af8a967413d6c616b00"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-battery-link-Os.log",
+    "sha256": "3829e596bd0d448b61bfeeee689e1f95031ed1425efa15962260ba6ed2fa3bdf"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -I examples/snes -Os -o SCRATCH/ascast_sim.sfc examples/snes/corpus/ascast_sim.c (dev/build.sh shape, no marker)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816 (from mos-snes.cfg)",
+    "features": [],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.c",
+    "sha256": "d036dd0fa312e69e46408bef4be5ed388541776811ace9f065c0c7f579916309"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-battery-link-Os.log",
+    "sha256": "2fdd10cdca3ccbbf2e1337d642089fd4ab26f90e569e311cbb86482a864dd78d"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -I examples/snes -Os -o SCRATCH/ascast-a16.sfc examples/snes/ascast.c (dev/build.sh shape with the marker's flags)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast.c",
+    "sha256": "c2e38fd0cc0248fda37d59e12b7430abd6f5f7969ebb4af8a967413d6c616b00"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-marker-link-Os.log",
+    "sha256": "89768b392c7150c80a0e85f1acadd945300d6f52c77511430dea901e41f09264"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -I examples/snes -Os -o SCRATCH/ascast_sim-a16.sfc examples/snes/corpus/ascast_sim.c (dev/build.sh shape with the marker's flags)",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "Os",
+    "lto": true,
+    "sdk": "build/install (identity.json)"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.c",
+    "sha256": "d036dd0fa312e69e46408bef4be5ed388541776811ace9f065c0c7f579916309"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-marker-link-Os.log",
+    "sha256": "5b26f631bb337d5e549e8288f1b3f0c1b44c7eb668365d8007ce15f12bcc5a7c"
+   },
+   "exit_code": 0
+  },
+  {
+   "command": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null -mllvm -print-before=legalizer -mllvm -filter-print-funcs=ac_to_far docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false,
+    "dump": "before legalizer, ac_to_far"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install (October 9 pin f24948c7d1a4; clang-24 da3fe645...)",
+   "toolchain_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/f24948c7-f68dae29/ascast-sim-default-Os-before-legalizer.log",
+    "sha256": "01133ca1e4ec1e90b5b6301130b2d562d53df7c447b224259e773fef03183ade"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "build/split-320-321/llc/r7-320-4 -O2 -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2 (llc; IR from -Os)",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r7-320-4 (round-seven frozen container build, #320 split top (on #321); read only)",
+   "toolchain_sha256": "650d32e1bab7d5de76b120d8ccdb4adeda36f7fddb9fcd139eb0e8b7330f566d",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+    "sha256": "4f828fab4698bef650f886e8b6ecc5bff762f9e758ebc7c46ca609cd9fffd49c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/split-r7-320-4/ascast-sim-default-ir-llc.log",
+    "sha256": "6f79006240cc47e01647ce499e4c3ddd8d82db04a84cca6628a7d9d5ef6c4fed"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "build/split-320-321/llc/r7-fw-12 -O2 -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2 (llc; IR from -Os)",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r7-fw-12 (round-seven frozen container build, far-word series top; read only)",
+   "toolchain_sha256": "701e97b84cd2f6b80543b9c50f4f351916196bbb9a12c842c356fa3333bd2064",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+    "sha256": "4f828fab4698bef650f886e8b6ecc5bff762f9e758ebc7c46ca609cd9fffd49c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/split-r7-fw-12/ascast-sim-default-ir-llc.log",
+    "sha256": "178f8495ad6ecd82b25e699876b61e00894652a8a548d42ce00e7e1644d153dc"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "build/split-320-321/llc/r7-321-16 -O2 -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2 (llc; IR from -Os)",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r7-321-16 (round-seven frozen container build, #321 split top, no #320; read only)",
+   "toolchain_sha256": "52f69f0483678d0924108a57b42c80f00f1931ae7a9a294dc0f8e6fcdad08197",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+    "sha256": "4f828fab4698bef650f886e8b6ecc5bff762f9e758ebc7c46ca609cd9fffd49c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/split-r7-321-16/ascast-sim-default-ir-llc.log",
+    "sha256": "e881dff45e06f9407b1d6b3ddd229c4a497dd943a641a49bb7542dcd8e901417"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "build/split-320-321/llc/p-321-00 -O2 -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+   "working_directory": "/home/will/llvm-mos-65816 (repository root, main checkout, host side)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2 (llc; IR from -Os)",
+    "lto": false
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00 (round-seven frozen container build, split base, upstream 06bc967d2668; read only)",
+   "toolchain_sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll",
+    "sha256": "4f828fab4698bef650f886e8b6ecc5bff762f9e758ebc7c46ca609cd9fffd49c"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/split-p-321-00/ascast-sim-default-ir-llc.log",
+    "sha256": "76f4e39ea897b80a6b5e0b8d48a6059235e1a6b136cd9f5261d25cbeb713826d"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "dev/container.sh -- /opt/llvm-mos/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -c -o /dev/null /work/docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/work in the dev container (dev/container.sh)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/opt/llvm-mos in the dev container: upstream llvm-mos 0f031168a7cc, clang-24",
+   "toolchain_sha256": "8968d9dffc6d7bcec36149e47b9ec15d451c0ce12813f16861ab1d43046ebedf",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/upstream-opt-llvm-mos/ascast-sim-default-mosw65816-Os.log",
+    "sha256": "777effa96e628764c2c447af1485f51567511b9eca1fafc6de85406b6a1023f9"
+   },
+   "exit_code": 1
+  },
+  {
+   "command": "dev/container.sh -- /opt/llvm-mos/bin/mos-clang --target=mos -mcpu=mos6502 -Os -c -o /dev/null /work/docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+   "working_directory": "/work in the dev container (dev/container.sh)",
+   "configuration": {
+    "cpu": "mos6502",
+    "features": [],
+    "optimization": "Os",
+    "lto": false
+   },
+   "toolchain_location": "/opt/llvm-mos in the dev container: upstream llvm-mos 0f031168a7cc, clang-24",
+   "toolchain_sha256": "8968d9dffc6d7bcec36149e47b9ec15d451c0ce12813f16861ab1d43046ebedf",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i",
+    "sha256": "4ef87337f018d35f94845edc9b5796d853b20e1fa52e074eadc8aa42ea6714d0"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-11-demo-build-failures/runs/upstream-opt-llvm-mos/ascast-sim-default-mos6502-Os.log",
+    "sha256": "2203bd622e10c14b9379e5ba71530160e2d48e879519aa5fb62cd3d8f7a042a1"
+   },
+   "exit_code": 1
+  }
+ ],
+ "proposed_fixes": {
+  "note": "Not implemented.",
+  "candidates": [
+   "Demo (recommended, no compiler change): add a '// mos-a16-only: ...' line to examples/snes/ascast.c and examples/snes/corpus/ascast_sim.c; verified by the *-marker-link-Os runs.",
+   "Compiler contract option A: keep the default-mode limit but replace the fatal legalizer error with a diagnostic that names +mos-a16 (for example, custom-lower G_ADDRSPACE_CAST only under hasAccum16() and report it from the target).",
+   "Compiler contract option B: legalize {S32,S8} merges in default mode into the Imag32 quad that default-mode far loads and returns already use (a #320 design change)."
+  ],
+  "optimization_level": "The failure is identical at -O0 through -Oz; the marker and both contract options are correctness or diagnostic changes, so none is level-gated."
+ }
+}

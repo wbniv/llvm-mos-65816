@@ -1,0 +1,6 @@
+# toolchain=/home/will/llvm-mos-65816/build/llvm-mos-install clang=ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989 (clang-24) llc=a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b lld=fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287
+# cwd=/home/will/llvm-mos-65816
+$ /home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang --config /home/will/llvm-mos-65816/build/install/bin/mos-snes-gallery.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -I examples/snes -Os -o /home/will/llvm-mos-65816/build/demo-build-failures-20261010/probe-0f031168-a78958b0/gallery-Os.sfc examples/snes/lzss-gallery.c
+ld.lld: error: <unknown>:0:0: ran out of registers during register allocation in function 'record_result'
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+rc=1

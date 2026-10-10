@@ -1,0 +1,54 @@
+# toolchain=/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install clang=da3fe645bd57bc628ae457ef3f23f3e2d2bda5c045eb865f109b6ccd865d7d37 (clang-24) llc=f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4 lld=f436eea8572cf4fa9d90da3836d92656a3fc796c192b20979f41c2f1e093c86a
+# cwd=/home/will/llvm-mos-65816
+$ /home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mos6502 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i
+In file included from examples/snes/corpus/ascast_sim.c:2:
+examples/snes/corpus/../../65816/ascast.h:26:42: error: far (address space 2) memory access requires 65816 long addressing; the target CPU has none
+   26 | __attribute__((noinline)) static uint8_t ac_read(uintptr_t address) {
+      |                                          ^
+fatal error: error in backend: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %4:_(s8), %5:_(s8), %6:_(s8), %6:_(s8) (in function: ac_to_far)
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and dumped files.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mos6502 -Os -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i
+1.	<eof> parser at end of file
+2.	Code generation
+3.	Running pass 'Function Pass Manager' on module 'examples/snes/corpus/ascast_sim.c'.
+4.	Running pass 'Legalizer' on function '@ac_to_far'
+ #0 0x00005efac9ea1f8b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2629f8b)
+ #1 0x00005efac9e9f1e5 llvm::sys::RunSignalHandlers() (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x26271e5)
+ #2 0x00005efac9e118be (anonymous namespace)::CrashRecoveryContextImpl::HandleCrash(int, unsigned long) CrashRecoveryContext.cpp:0:0
+ #3 0x00005efac9e1187b (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x259987b)
+ #4 0x00005efac9e9bcf7 llvm::sys::Process::Exit(int, bool) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2623cf7)
+ #5 0x00005efac912c796 (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x18b4796)
+ #6 0x00005efac9e180e6 llvm::report_fatal_error(llvm::Twine const&, bool) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x25a00e6)
+ #7 0x00005efac9e182c8 (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x25a02c8)
+ #8 0x00005efacb5f8e7c (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x3d80e7c)
+ #9 0x00005efacb5f91c8 llvm::reportGISelFailure(llvm::MachineFunction&, llvm::MachineOptimizationRemarkEmitter&, char const*, llvm::StringRef, llvm::MachineInstr const&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x3d811c8)
+#10 0x00005efacb59808d runLegalizerOnMachineFunction(llvm::MachineFunction&, llvm::function_ref<llvm::GISelCSEInfo* ()>, llvm::function_ref<llvm::GISelValueTracking* ()>, llvm::LibcallLoweringInfo const*) Legalizer.cpp:0:0
+#11 0x00005efacb597e0d llvm::LegalizerLegacy::runOnMachineFunction(llvm::MachineFunction&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x3d1fe0d)
+#12 0x00005efac94daff2 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x1c62ff2)
+#13 0x00005efac99d5cc4 llvm::FPPassManager::runOnFunction(llvm::Function&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x215dcc4)
+#14 0x00005efac99dbfec llvm::FPPassManager::runOnModule(llvm::Module&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2163fec)
+#15 0x00005efac99d6a4e llvm::legacy::PassManagerImpl::run(llvm::Module&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x215ea4e)
+#16 0x00005efacb453efd llvm::runCodeGenPipeline(llvm::TargetMachine&, llvm::Module&, llvm::raw_pwrite_stream&, std::unique_ptr<llvm::ToolOutputFile, std::default_delete<llvm::ToolOutputFile>>&, llvm::CodeGenFileType, bool, bool, bool, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x3bdbefd)
+#17 0x00005efaca540d39 (anonymous namespace)::EmitAssemblyHelper::emitAssembly(clang::BackendAction, std::unique_ptr<llvm::raw_pwrite_stream, std::default_delete<llvm::raw_pwrite_stream>>, clang::BackendConsumer*) BackendUtil.cpp:0:0
+#18 0x00005efaca54046b clang::emitBackendOutput(clang::CompilerInstance&, clang::CodeGenOptions&, llvm::Module*, clang::BackendAction, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>, std::unique_ptr<llvm::raw_pwrite_stream, std::default_delete<llvm::raw_pwrite_stream>>, clang::BackendConsumer*) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2cc846b)
+#19 0x00005efaca55b5c0 clang::BackendConsumer::HandleTranslationUnit(clang::ASTContext&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2ce35c0)
+#20 0x00005efacbe7b059 clang::ParseAST(clang::Sema&, bool, bool) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x4603059)
+#21 0x00005efacaa72a6d clang::FrontendAction::Execute() (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x31faa6d)
+#22 0x00005efaca9f037d clang::CompilerInstance::ExecuteAction(clang::FrontendAction&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x317837d)
+#23 0x00005efacab20441 clang::ExecuteCompilerInvocation(clang::CompilerInstance*) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x32a8441)
+#24 0x00005efac912c0a9 cc1_main(llvm::ArrayRef<char const*>, char const*, void*) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x18b40a9)
+#25 0x00005efac9128c4c ExecuteCC1Tool(llvm::SmallVectorImpl<char const*>&, llvm::ToolContext const&, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>) driver.cpp:0:0
+#26 0x00005efac912a5e3 int llvm::function_ref<int (llvm::SmallVectorImpl<char const*>&)>::callback_fn<clang_main(int, char**, llvm::ToolContext const&)::$_0>(long, llvm::SmallVectorImpl<char const*>&) driver.cpp:0:0
+#27 0x00005efaca838779 void llvm::function_ref<void ()>::callback_fn<clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const::$_0>(long) Job.cpp:0:0
+#28 0x00005efac9e11858 llvm::CrashRecoveryContext::RunSafely(llvm::function_ref<void ()>) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2599858)
+#29 0x00005efaca83812d clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2fc012d)
+#30 0x00005efaca7f6f2f clang::driver::Compilation::ExecuteCommand(clang::driver::Command const&, clang::driver::Command const*&, bool) const (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2f7ef2f)
+#31 0x00005efaca7f7898 clang::driver::Compilation::ExecuteJobs(clang::driver::JobList const&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&, bool) const (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2f7f898)
+#32 0x00005efaca817add clang::driver::Driver::ExecuteCompilation(clang::driver::Compilation&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x2f9fadd)
+#33 0x00005efac912862c clang_main(int, char**, llvm::ToolContext const&) (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x18b062c)
+#34 0x00005efac91366e6 main (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x18be6e6)
+#35 0x00007a1cff22a601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#36 0x00007a1cff22a718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#37 0x00005efac9126865 _start (/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang+0x18ae865)
+rc=1

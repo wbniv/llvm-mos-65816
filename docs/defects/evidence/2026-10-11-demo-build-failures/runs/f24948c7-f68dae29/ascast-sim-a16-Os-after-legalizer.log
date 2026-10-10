@@ -1,0 +1,20 @@
+# toolchain=/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install clang=da3fe645bd57bc628ae457ef3f23f3e2d2bda5c045eb865f109b6ccd865d7d37 (clang-24) llc=f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4 lld=f436eea8572cf4fa9d90da3836d92656a3fc796c192b20979f41c2f1e093c86a
+# cwd=/home/will/llvm-mos-65816
+$ /home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -c -o /dev/null -mllvm -print-after=legalizer -mllvm -filter-print-funcs=ac_to_far docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.i
+# *** IR Dump After Legalizer (legalizer) ***:
+# Machine code for function ac_to_far: IsSSA, TracksLiveness, Legalized
+
+bb.1 (%ir-block.1):
+  liveins: $rs1
+  %0:_(p0) = COPY $rs1
+  %2:_(s16) = G_PTRTOINT %0:_(p0)
+  %6:_(s8) = G_CONSTANT i8 0
+  %8:_(s16) = G_MERGE_VALUES %6:_(s8), %6:_(s8)
+  %3:_(s32) = G_MERGE_VALUES %2:_(s16), %8:_(s16)
+  %1:_(p2) = G_INTTOPTR %3:_(s32)
+  $rl1 = COPY %1:_(p2)
+  RTS implicit $rl1
+
+# End machine code for function ac_to_far.
+
+rc=0

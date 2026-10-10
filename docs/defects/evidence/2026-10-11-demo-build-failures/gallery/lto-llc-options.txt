@@ -1,0 +1,1 @@
+-O2 -function-sections -data-sections -force-precise-rotation-cost -jump-inst-cost=6 -force-loop-cold-block -phi-node-folding-threshold=0 -speculate-blocks=0 -align-large-globals=false -lsr-complexity-limit=10000000 -zp-avail=224

@@ -1,0 +1,6 @@
+# toolchain=/home/will/llvm-mos-65816/build/llvm-mos-install.6f303945 clang=e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9 (clang-23) llc=6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19 lld=0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1
+# cwd=/home/will/llvm-mos-65816
+$ /home/will/llvm-mos-65816/build/llvm-mos-install.6f303945/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -O1 -c -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/gallery/record-result-reduced.c
+error: <unknown>:0:0: ran out of registers during register allocation in function 'record_result'
+1 error generated.
+rc=1

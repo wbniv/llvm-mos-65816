@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-10-10",
-  "sourceHash": "c523491f925b83c3c7fd9061c2fc73db4c689421c0ae3e60f3e03941c4fb2c22",
+  "sourceHash": "5a5bf8edc1ba1987cc772c0d68b8d2e57e8175a988b1574adc365ed149b44a82",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -58,6 +58,22 @@
       "demoUrls": []
     },
     {
+      "id": "defect:mos-a16-return-byte-ac16-transit-exhaustion",
+      "kind": "defect",
+      "title": "+mos-a16 greedy allocation fails when an A-hinted return byte spans a single-instruction Ac16 transit (lzss-gallery record_result)",
+      "summary": "Under +mos-a16 (and +mos-a16 +mos-xy16) at -O1 through -Oz, the Greedy Register Allocator reports 'ran out of registers' in lzss-gallery's record_result, which returns an i16 that is either its argument or a select of 0x9512/0x1512 that it also stores volatile to corpus_result. The two constants share the low byte 0x12, so the return value's low byte becomes one gpr virtual register (incoming $x byte or LDImm 18) that cross-block coalescing stretches from entry to RTS, hinted to $a by the return copy. Greedy keeps it in $a across the single-instruction Ac16 transit of the 16-bit store (LDAImag16 -> STAbs16) instead of moving it to the free $x/$y, so the unspillable transit cannot get $a16. The failed register is that transit (its use becomes 'STAbs16 undef $a16'). regalloc=basic, -join-globalcopies=false, or returning the byte through $y avoid it. Default mode is unaffected; -O0 (fast allocator) passes. The dev/build.sh battery build (-Os) fails; the gate and published ROM build (dev/lzss-gallery.sh, -Oz) links, but the reduced input fails at -Oz as well. Same family as the a16regpress exhaustion fixed by patch 0009 (an A-pinned add counter), with a different squatter; 0009's source is in both pin checkouts and its regression input compiles on every tested install. Reproduces identically on the 0f031168 install, the 6f303945 rollback and the f24948c7 pin install, and on the round-seven #321, #320 and far-word split-series tops. Not in upstream llvm-mos, which has no +mos-a16.",
+      "localStatus": "qualified",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-a16-return-byte-ac16-transit-exhaustion.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
+      "demoUrls": []
+    },
+    {
       "id": "defect:mos-bank-relax-section-offset",
       "kind": "defect",
       "title": "65816 bank relaxation ignores a section offset above 65535",
@@ -100,6 +116,22 @@
       "publicationStatus": "unknown",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-coalescing-rc-undef.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-default-mode-far-cast-legalization",
+      "kind": "defect",
+      "title": "Near-to-far casts without +mos-a16 abort in the legalizer; ascast and ascast_sim lack the mos-a16-only marker",
+      "summary": "examples/snes/ascast.c and examples/snes/corpus/ascast_sim.c (added in 083d8d00) cast a near pointer to address_space(2) in ac_to_far but carry no 'mos-a16-only' marker, so dev/build.sh builds them in default mode. There the #320 custom lowering of G_ADDRSPACE_CAST p0->p2 emits a 4 x s8 -> s32 G_MERGE_VALUES that is legal or custom only under hasAccum16(), and the legalizer aborts with 'unable to legalize ... G_MERGE_VALUES ... (in function: ac_to_far)' at every level -O0 to -Oz, on mosw65816 and mos6502. With -mcpu=mosw65816 +mos-a16, the flags the marker adds, both programs build on every tested toolchain; the demo's plan and gate (dev/round8d-demo.sh) already treat it as a16-only. Identical on the 0f031168 install, the 6f303945 rollback and the f24948c7 pin install, and on the #320 and far-word split tops. Upstream llvm-mos has no far address space and fails earlier, on G_LOAD p2. The repository documents default-mode far pointers as unsupported, but whether the compiler should diagnose them, keep the fatal legalizer error, or legalize the cast is undecided, hence a contract clarification rather than a defect claim.",
+      "localStatus": "qualified",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-default-mode-far-cast-legalization.json"
       ],
       "evidenceNote": "",
       "dependsOn": [],

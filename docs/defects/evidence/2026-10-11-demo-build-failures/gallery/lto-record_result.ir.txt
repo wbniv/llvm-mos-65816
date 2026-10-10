@@ -1,0 +1,77 @@
+; record_result as it reaches instruction selection in the battery-shaped LTO link (-Os, +mos-a16).
+; Extracted from llc -print-after-all -filter-print-funcs=record_result on the link's
+; 0.5.precodegen.bc (toolchain build/llvm-mos-install, llc a78958b0...). Not a standalone module.
+define internal fastcc range(i16 -1, -27373) i16 @record_result(i8 noundef zeroext range(i8 0, 62) %0, i16 noundef %1, i16 noundef range(i16 -1, -27373) %2, i8 noundef zeroext range(i8 0, 2) %3) unnamed_addr #5 !guid !538 {
+  store volatile i16 %1, ptr @gallery_last_z, align 1, !tbaa !21
+  store volatile i8 %0, ptr @gallery_last_work, align 1, !tbaa !414
+  store volatile i8 %3, ptr @gallery_last_ok, align 1, !tbaa !414
+  store volatile i8 0, ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 4), align 1, !tbaa !426
+  store volatile i16 %1, ptr @gallery_shown, align 1, !tbaa !427
+  store volatile i8 %0, ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 2), align 1, !tbaa !429
+  store volatile i8 %3, ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 3), align 1, !tbaa !428
+  store volatile i8 2, ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 4), align 1, !tbaa !426
+  %5 = icmp eq i8 %3, 0
+  br i1 %5, label %6, label %7
+
+6:                                                ; preds = %4
+  store volatile i8 63, ptr inttoptr (i16 8498 to ptr), align 2, !tbaa !414
+  br label %7
+
+7:                                                ; preds = %6, %4
+  %8 = phi i8 [ 1, %6 ], [ 0, %4 ]
+  %9 = zext nneg i8 %0 to i16
+  %10 = getelementptr inbounds nuw i8, ptr @gallery_failed, i16 %9
+  store i8 %8, ptr %10, align 1, !tbaa !414
+  %11 = getelementptr inbounds nuw i8, ptr @gallery_done, i16 %9
+  %12 = load i8, ptr %11, align 1, !tbaa !414
+  %13 = icmp eq i8 %12, 0
+  br i1 %13, label %14, label %17
+
+14:                                               ; preds = %7
+  store i8 1, ptr %11, align 1, !tbaa !414
+  %15 = load i8, ptr @gallery_completed_count, align 1, !tbaa !414
+  %16 = add i8 %15, 1
+  store i8 %16, ptr @gallery_completed_count, align 1, !tbaa !414
+  br label %19
+
+17:                                               ; preds = %7
+  %18 = load i8, ptr @gallery_completed_count, align 1, !tbaa !414
+  br label %19
+
+19:                                               ; preds = %17, %14
+  %20 = phi i8 [ %18, %17 ], [ %16, %14 ]
+  store volatile i8 %20, ptr @gallery_progress, align 1, !tbaa !414
+  %21 = icmp eq i8 %20, 62
+  br i1 %21, label %.preheader.preheader, label %32
+
+.preheader.preheader:                             ; preds = %19
+  br label %.preheader
+
+22:                                               ; preds = %.preheader
+  %.frozen = freeze i8 %29
+  %23 = icmp eq i8 %.frozen, 0
+  br i1 %23, label %select.end, label %select.false
+
+select.false:                                     ; preds = %22
+  br label %select.end
+
+select.end:                                       ; preds = %22, %select.false
+  %24 = phi i16 [ -27374, %22 ], [ 5394, %select.false ]
+  store volatile i16 %24, ptr @corpus_result, align 1, !tbaa !21
+  br label %32
+
+.preheader:                                       ; preds = %.preheader.preheader, %.preheader
+  %25 = phi i8 [ %30, %.preheader ], [ 0, %.preheader.preheader ]
+  %26 = phi i8 [ %29, %.preheader ], [ 0, %.preheader.preheader ]
+  %27 = zext nneg i8 %25 to i16
+  %scevgep = getelementptr i8, ptr @gallery_failed, i16 %27
+  %28 = load i8, ptr %scevgep, align 1, !tbaa !414
+  %29 = or i8 %28, %26
+  %30 = add nuw nsw i8 %25, 1
+  %31 = icmp eq i8 %30, 62
+  br i1 %31, label %22, label %.preheader, !llvm.loop !537
+
+32:                                               ; preds = %select.end, %19
+  %33 = phi i16 [ %24, %select.end ], [ %2, %19 ]
+  ret i16 %33
+}

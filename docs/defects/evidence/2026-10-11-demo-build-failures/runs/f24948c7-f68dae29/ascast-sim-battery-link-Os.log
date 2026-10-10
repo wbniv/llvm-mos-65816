@@ -1,0 +1,6 @@
+# toolchain=/home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install clang=da3fe645bd57bc628ae457ef3f23f3e2d2bda5c045eb865f109b6ccd865d7d37 (clang-24) llc=f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4 lld=f436eea8572cf4fa9d90da3836d92656a3fc796c192b20979f41c2f1e093c86a
+# cwd=/home/will/llvm-mos-65816
+$ /home/will/llvm-mos-65816/build/llvm-mos-f24948c7d1a4-install/bin/mos-clang --config /home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -I examples/snes -Os -o /home/will/llvm-mos-65816/build/demo-build-failures-20261010/probe-f24948c7-f68dae29/ascast_sim.sfc examples/snes/corpus/ascast_sim.c
+LLVM ERROR: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %4:_(s8), %5:_(s8), %6:_(s8), %6:_(s8) (in function: ac_to_far)
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+rc=1

@@ -1,0 +1,5 @@
+# llc=/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00 sha256=2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7
+# cwd=/home/will/llvm-mos-65816
+$ /home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00 -O2 -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/ascast/ascast_sim.default.Os.ll
+LLVM ERROR: unable to legalize instruction: %7:_(s8) = G_LOAD %6:_(p2) :: (load (s8) from %ir.5, !tbaa !11, addrspace 2) (in function: ac_read)
+rc=1

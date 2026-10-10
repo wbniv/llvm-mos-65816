@@ -1,0 +1,101 @@
+{
+ "captured": "2026-10-10T17:14:50Z",
+ "repository_head": "d127d005da2dba2ee430bf638a862f4831fc357b",
+ "source_blobs": {
+  "examples/snes/lzss-gallery.c": "f546da073553263a94321951bc526164a7a55246",
+  "examples/snes/lzss-gallery-assets.h": "cc8b1d88a196d07748b0ae39bbb4dba193f8cec9",
+  "examples/snes/lzss-gallery-layout.h": "ffb59c2af6058a2712402f77d88521b017b89c56",
+  "examples/snes/ascast.c": "1b28ee9ddd3ed8b589c4f29bf4077a85405a8884",
+  "examples/snes/corpus/ascast_sim.c": "840073795f0850b43d400072481175e63ffe5eac",
+  "examples/65816/ascast.h": "88dd706a9cd234da65500e6e452568ad46182114",
+  "dev/build.sh": "b884db424283d9dee65044ce7b3ac03e43c2c63e",
+  "dev/lzss-gallery.sh": "6a0e3019e1b28afcdbd72badae39ab4358f869e5",
+  "dev/round8d-demo.sh": "bc46c0f126e3b4d52242bd1bf75ef8b87d91ee62"
+ },
+ "lzss_gallery_preprocessed_Os_sha256": "b140258d70ef24f2704b2394863b8bd60e63d6beba8867dad716413bdffc6485",
+ "toolchains": {
+  "build/llvm-mos-install": {
+   "description": "shared install on 2026-10-11: the 0f031168a7cc build carrying the XY16 preserveX repair",
+   "clang": "clang-24",
+   "clang_sha256": "ceff21dd020e3bd121a7b000482fa7ae024044080c1833a087c1a51107841989",
+   "llc_sha256": "a78958b0194092f58a62c779b5059330a31a6c365620343cb4031f24a9fad16b",
+   "lld_sha256": "fcbcca66684b13cb80b3eb4b5cb6e536caf10ae14ac151226f4bb80934b55287"
+  },
+  "build/llvm-mos-install.6f303945": {
+   "description": "previous shared install kept as rollback (pre-XY16-repair, pre-0f031168 pin)",
+   "clang": "clang-23",
+   "clang_sha256": "e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9",
+   "llc_sha256": "6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19",
+   "lld_sha256": "0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1"
+  },
+  "build/llvm-mos-f24948c7d1a4-install": {
+   "description": "pin f24948c7d1a4 install (October 9 dated pin)",
+   "clang": "clang-24",
+   "clang_sha256": "da3fe645bd57bc628ae457ef3f23f3e2d2bda5c045eb865f109b6ccd865d7d37",
+   "llc_sha256": "f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4",
+   "lld_sha256": "f436eea8572cf4fa9d90da3836d92656a3fc796c192b20979f41c2f1e093c86a"
+  }
+ },
+ "split_series_llc": {
+  "build/split-320-321/llc/r7-320-4": "650d32e1bab7d5de76b120d8ccdb4adeda36f7fddb9fcd139eb0e8b7330f566d",
+  "build/split-320-321/llc/r7-321-16": "52f69f0483678d0924108a57b42c80f00f1931ae7a9a294dc0f8e6fcdad08197",
+  "build/split-320-321/llc/r7-fw-12": "701e97b84cd2f6b80543b9c50f4f351916196bbb9a12c842c356fa3333bd2064",
+  "build/split-320-321/llc/p-321-00": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7"
+ },
+ "upstream_container": "/opt/llvm-mos in the dev container (dev/container.sh): clang-24 8968d9dffc6d7bcec36149e47b9ec15d451c0ce12813f16861ab1d43046ebedf, llvm-mos 0f031168a7cc",
+ "sdk": {
+  "location": "build/install (shared SDK; stamp build/.mos-toolchain names the compiler that built it)",
+  "stamp": "/work/build/llvm-mos-install clang=e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9 llc=cf5355d392bd37cdce2606c6bb19465db68a63e8ffa911613fabc474ffa2d5f7 lld=0d74dddcab805faf5e2848e9667af5af8b58bae2a66284099c1f63738e6094e1",
+  "files": {
+   "build/install/bin/mos-common.cfg": "bc1174409cd1a5c76f5bb290f673bfa53b4023456b8e93cd264e4772190c0ea8",
+   "build/install/bin/mos-snes-cart-battery-lorom512k.cfg": "366e8e976787154b699e202b2f405f5f86498484452558206da8ed57f0581863",
+   "build/install/bin/mos-snes-cart-seamdemo.cfg": "48020d7cb957bd16af7c97fc4853bd4496a2cdb0e97c622739ed01cfdbb7149a",
+   "build/install/bin/mos-snes-exhirom.cfg": "dbd578c84bdf78c46861fec2347463ed9274c176c7260fa9b1e35ced896a8cf4",
+   "build/install/bin/mos-snes-far.cfg": "96efa0dd6c0c2e3e3c1c2aca81c5f0fa573dc3d0313bdd40a52144e5f26f6a7b",
+   "build/install/bin/mos-snes-gallery.cfg": "e4230e485211cdf96f6646e9b530d6925d4f680e36158317f87462dcbadad186",
+   "build/install/bin/mos-snes-hirom.cfg": "fc179e80886d7b49a000e6c6dbe2da42066d42568bce5045ac2498fecb03b818",
+   "build/install/bin/mos-snes.cfg": "f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205",
+   "build/install/mos-platform/common/lib/bss-sections.ld": "1d513a5cd848f174b0fadfabd96f0c03ce204b42091924985ca5ba4f630ddf75",
+   "build/install/mos-platform/common/lib/bss-symbols.ld": "3edb897b042ec3f9b0a17ee151e5452a5b3da94c50e981991bdaa63523dca75f",
+   "build/install/mos-platform/common/lib/bss.ld": "4e8309ea24595f84ec7797762ad227bc5f2218e6a6b1ce3743e40eab104f5f9d",
+   "build/install/mos-platform/common/lib/c.ld": "e05e74327ed0a461f10ba48c60ff6ed65d6a0d575580a19314a2d304efe82f55",
+   "build/install/mos-platform/common/lib/crt0.o": "237b1cb332ca62323082e8fd268f4782d38ad4073e5962ea7b8e47bff6bc0ac8",
+   "build/install/mos-platform/common/lib/data-sections.ld": "fd7f367a557ee967dc22c9d70122f6a265e6d767396fe47ca28a85a13557ce04",
+   "build/install/mos-platform/common/lib/data-symbols.ld": "0712b91f1c8f9e98c21f1e2642ce8f99d66ee30c1c332a3117fabea72ba199ea",
+   "build/install/mos-platform/common/lib/data.ld": "b51944c15a5c10f48da48b3215552a70daeded739c5b29bf13c9d4b9f6f2d6eb",
+   "build/install/mos-platform/common/lib/imag-regs.ld": "cfc97aaf676e0bc1b3375f51ccd76fda6b4956916aa7f6420a22a39b8ed32a2c",
+   "build/install/mos-platform/common/lib/libc.a": "ecca49941eaa7442804b451f1777f627005590587bcc74265f84a556ef29f1a3",
+   "build/install/mos-platform/common/lib/libcopy-data.a": "80dae577891d55bed1bef545887125b1108db4a613e5cf5e6fe41e6bc2d2dd9f",
+   "build/install/mos-platform/common/lib/libcopy-zp-data.a": "baf01dfc7e90653f0845f4b7461416d8a559f43e4e64ad11f8d7c27f483c073e",
+   "build/install/mos-platform/common/lib/libcrt.a": "0b480285ea001f50c0ce80e1abc75937212787b94a63832dfc8490c1dbece337",
+   "build/install/mos-platform/common/lib/libcrt0.a": "71f131122b36fb52dc387ca895b554b7445fc553804985a2a85b3713deb07059",
+   "build/install/mos-platform/common/lib/libexit-custom.a": "c8a1891b47f464984e2b597cd9cb67ea18cab58f86604f0b6de23fead8146408",
+   "build/install/mos-platform/common/lib/libexit-loop.a": "7d8cf558328325c1ca21ceedc4c68d135f50961d623a34b6cef1fc648766e410",
+   "build/install/mos-platform/common/lib/libexit-return.a": "d17945fe24ed03f847e2b013e341af6a6197e370c4cc8253e5c3cc7dfb7a4f7a",
+   "build/install/mos-platform/common/lib/libinit-stack.a": "116c745c61d81ad3d219794a546f0c1bb2765d2251b2094c2346f8beed612050",
+   "build/install/mos-platform/common/lib/libm.a": "3a8a7de7f0c6b4d38bd67256a7823254a95752c891aa10cbf59b2b94abe8611c",
+   "build/install/mos-platform/common/lib/libprintf_flt.a": "7e8ee22ef324dfbb75b2c8e1e37e9912b2e7e4e6ae68e9ca50e13c7ad9301ee6",
+   "build/install/mos-platform/common/lib/libzero-bss.a": "e9820cdf11762c619e316a154880d5ae918fed190b4bc002fdf3344915a3fbad",
+   "build/install/mos-platform/common/lib/noinit-sections.ld": "6b53ee087a1d6c8f1f6e2ddb5e1504bf3a04cc3265382fbd1acec132a5417f88",
+   "build/install/mos-platform/common/lib/noinit.ld": "76b28b5e3a93bff81dcca4c50955ca72df620dbc5c816d8a35171d00972a34b9",
+   "build/install/mos-platform/common/lib/rodata-sections.ld": "6e4cfa0c1708e76a22312ae6b2654f317c2e8381eb7d768e0ee0abe0f0a54f37",
+   "build/install/mos-platform/common/lib/rodata.ld": "0e2323eea5b4bc04301c837d1fd98652482766b60d09d8679b4d95fb0e01f3b9",
+   "build/install/mos-platform/common/lib/text-sections.ld": "bb3424a1c4805da7bfd7e1bdc6951f47f64faafecdbf374bc396ff8663311676",
+   "build/install/mos-platform/common/lib/text.ld": "400035867f485470dafb0b0baca3b76c554345c7e9825c77263a6d89b2d02d91",
+   "build/install/mos-platform/common/lib/zp-bss-sections.ld": "f100712eed5ca3665b310e8b0d4a5c30639058343739d2e2648dadcbb22996a0",
+   "build/install/mos-platform/common/lib/zp-bss-symbols.ld": "4840a6bada7104b039f8339cf249809465feb18aac800b4ffce2edb4e3da0159",
+   "build/install/mos-platform/common/lib/zp-bss.ld": "2d91ae712e998be8f58fdf855da58a9883dde5c70321cf2a0d78e29787d4f6fb",
+   "build/install/mos-platform/common/lib/zp-data-sections.ld": "8d7a4a40eb72f0fac014e5155dd86d14ecfed84bbd65525cb68a7ae237c50a14",
+   "build/install/mos-platform/common/lib/zp-data-symbols.ld": "3ea0fff3b1b7e4826f0610a05217bbbfbedf0780953fc2c2e42747078bc76880",
+   "build/install/mos-platform/common/lib/zp-data.ld": "877ce1056532d74e7a026d5b178cf4c44c79cedcb845505d07270303ca7dfb0e",
+   "build/install/mos-platform/common/lib/zp-noinit-sections.ld": "9f82b0591e95dad79b3d10968934eed89c456991eda9cbf54c102133ac7cc7eb",
+   "build/install/mos-platform/common/lib/zp-noinit.ld": "2ff13ee50f03bf4d9ec91902f4f9e30bff5171c08d609dd70d9a80786685b216",
+   "build/install/mos-platform/common/lib/zp.ld": "5d88dfc34fd9d46bcef9735d083433c48878fab5e391b8026a21b6e6db830f18",
+   "build/install/mos-platform/snes-gallery/lib/link.ld": "9e40d964d9d3cd101da14941cc0615087cabb110c9e36e99bcea8f8b3be0ccba",
+   "build/install/mos-platform/snes/lib/crt0.o": "42ea570ec44fbfe42a7386f1c546a13476a17ae4be886e69916a7de9292019bd",
+   "build/install/mos-platform/snes/lib/libc.a": "78b6040a322cd0ab1d97782f9c84c2aeb94d4f2126cf3ddc48756bd8586ca91b",
+   "build/install/mos-platform/snes/lib/libcrt0.a": "8d3e55f6a9baf06cdc08a2a6d726ab55d3209d32fb14671f35a1f435e2dfd68f",
+   "build/install/mos-platform/snes/lib/link.ld": "f7648ebf372e5fdc0a55aadccaa464f80f4e8cec0d647ec2bd574b2ae489b817"
+  }
+ }
+}

@@ -1,0 +1,5 @@
+# llc=/home/will/llvm-mos-65816/build/split-320-321/llc/r7-320-4 sha256=650d32e1bab7d5de76b120d8ccdb4adeda36f7fddb9fcd139eb0e8b7330f566d
+# cwd=/home/will/llvm-mos-65816
+$ /home/will/llvm-mos-65816/build/split-320-321/llc/r7-320-4 -O2 -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/gallery/record-result-reduced.ll
+error: <unknown>:0:0: ran out of registers during register allocation in function 'record_result'
+rc=1

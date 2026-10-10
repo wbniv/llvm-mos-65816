@@ -1,0 +1,279 @@
+# record_result MIR after machine-scheduler (the greedy allocator's input), then after greedy;
+# same LTO link and llc as lto-record_result.ir.txt. The error line marks where greedy reports.
+# *** IR Dump After Machine Instruction Scheduler (machine-scheduler) ***:
+# Machine code for function record_result: NoPHIs, TracksLiveness, Legalized, RegBankSelected, Selected, TiedOpsRewritten
+
+0B	bb.0 (%ir-block.4):
+	  successors: %bb.1(0x30000000), %bb.2(0x50000000); %bb.1(37.50%), %bb.2(62.50%)
+	  liveins: $a, $x, $rc2, $rc3, $rc4, $rc5
+16B	  %0:xy = COPY $a
+32B	  %4:gpr = COPY $x
+48B	  %5:gpr = COPY $rc2
+64B	  %155:gpr = COPY $rc3
+80B	  undef %51.subhi:imag16 = COPY $rc4
+96B	  %3:gpr = COPY $rc5
+112B	  STAbs %4:gpr, @gallery_last_z :: (volatile store (s8) into @gallery_last_z, !tbaa !21)
+128B	  STAbs %5:gpr, @gallery_last_z + 1 :: (volatile store (s8) into @gallery_last_z + 1, !tbaa !21)
+144B	  STAbs %0:xy, @gallery_last_work :: (volatile store (s8) into @gallery_last_work, !tbaa !414)
+160B	  STAbs %3:gpr, @gallery_last_ok :: (volatile store (s8) into @gallery_last_ok, !tbaa !414)
+176B	  %149:ac = LDZ
+192B	  STZAbs @gallery_shown + 4 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 4)`, !tbaa !426)
+208B	  STAbs %4:gpr, @gallery_shown :: (volatile store (s8) into @gallery_shown, !tbaa !427)
+224B	  STAbs %5:gpr, @gallery_shown + 1 :: (volatile store (s8) into @gallery_shown + 1, !tbaa !427)
+240B	  STAbs %0:xy, @gallery_shown + 2 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 2)`, !tbaa !429)
+256B	  STAbs %3:gpr, @gallery_shown + 3 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 3)`, !tbaa !428)
+272B	  %19:gpr = LDImm 2
+288B	  STAbs %19:gpr, @gallery_shown + 4 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 4)`, !tbaa !426)
+320B	  CmpBrZero %bb.2, undef $z, 0, %3:gpr, implicit-def dead $c
+336B	  BRA %bb.1
+
+352B	bb.1 (%ir-block.6):
+	; predecessors: %bb.0
+	  successors: %bb.2(0x80000000); %bb.2(100.00%)
+
+368B	  %136:gpr = LDImm 63
+384B	  STAbs %136:gpr, 8498 :: (volatile store (s8) into `ptr inttoptr (i16 8498 to ptr)`, align 2, !tbaa !414)
+400B	  %149:ac = LDImm 1
+
+432B	bb.2 (%ir-block.7):
+	; predecessors: %bb.0, %bb.1
+	  successors: %bb.3(0x30000000), %bb.4(0x50000000); %bb.3(37.50%), %bb.4(62.50%)
+
+464B	  STAbsIdx %149:ac, @gallery_failed, %0:xy :: (store (s8) into %ir.10, !tbaa !414)
+480B	  %30:gpr = LDAbsIdx @gallery_done, %0:xy :: (load (s8) from %ir.11, !tbaa !414)
+496B	  CmpBrZero %bb.4, undef $z, 0, %30:gpr, implicit-def dead $c
+512B	  BRA %bb.3
+
+528B	bb.3 (%ir-block.14):
+	; predecessors: %bb.2
+	  successors: %bb.5(0x80000000); %bb.5(100.00%)
+
+544B	  %132:ac = LDImm 1
+560B	  STAbsIdx %132:ac, @gallery_done, %0:xy :: (store (s8) into %ir.11, !tbaa !414)
+576B	  %150:gpr = LDAbs @gallery_completed_count :: (dereferenceable load (s8) from @gallery_completed_count, !tbaa !414)
+608B	  %150:gpr = INC %150:gpr(tied-def 0)
+624B	  INCAbs @gallery_completed_count :: (store (s8) into @gallery_completed_count, !tbaa !414), (dereferenceable load (s8) from @gallery_completed_count, !tbaa !414)
+656B	  BRA %bb.5
+
+672B	bb.4 (%ir-block.17):
+	; predecessors: %bb.2
+	  successors: %bb.5(0x80000000); %bb.5(100.00%)
+
+688B	  %150:gpr = LDAbs @gallery_completed_count :: (dereferenceable load (s8) from @gallery_completed_count, !tbaa !414)
+
+720B	bb.5 (%ir-block.19):
+	; predecessors: %bb.4, %bb.3
+	  successors: %bb.6(0x40000000), %bb.12(0x40000000); %bb.6(50.00%), %bb.12(50.00%)
+
+752B	  STAbs %150:gpr, @gallery_progress :: (volatile store (s8) into @gallery_progress, !tbaa !414)
+800B	  CmpBrImm %bb.12, undef $z, 0, %150:gpr, 62, implicit-def dead $c
+816B	  BRA %bb.6
+
+832B	bb.6..preheader.preheader:
+	; predecessors: %bb.5
+	  successors: %bb.11(0x80000000); %bb.11(100.00%)
+
+848B	  undef %43.subhi:imag16 = LDZ
+864B	  %142:cc = LDImm1 0
+880B	  %43.sublo:imag16 = COPY %43.subhi:imag16
+896B	  %154:ac = COPY %43.subhi:imag16
+912B	  BRA %bb.11
+
+928B	bb.7 (%ir-block.22):
+	; predecessors: %bb.11
+	  successors: %bb.8(0x30000000), %bb.9(0x50000000); %bb.8(37.50%), %bb.9(62.50%)
+
+944B	  %155:gpr = LDImm 18
+960B	  CmpBrZero %bb.9, undef $z, 0, %154:ac, implicit-def dead $c
+
+976B	bb.8:
+	; predecessors: %bb.7
+	  successors: %bb.10(0x80000000); %bb.10(100.00%)
+
+992B	  %127:gpr = LDImm -107
+1024B	  undef %51.subhi:imag16 = COPY %127:gpr
+1040B	  BRA %bb.10
+
+1056B	bb.9.select.false:
+	; predecessors: %bb.7
+	  successors: %bb.10(0x80000000); %bb.10(100.00%)
+
+1072B	  %126:gpr = LDImm 21
+1104B	  undef %51.subhi:imag16 = COPY %126:gpr
+
+1120B	bb.10.select.end:
+	; predecessors: %bb.9, %bb.8
+	  successors: %bb.12(0x80000000); %bb.12(100.00%)
+
+1160B	  %51.sublo:imag16 = COPY %155:gpr
+1200B	  %140:ac16 = LDAImag16 %51:imag16
+1208B	  STAbs16 %140:ac16, @corpus_result :: (volatile store (s16) into @corpus_result, align 1, !tbaa !21)
+1248B	  BRA %bb.12
+
+1264B	bb.11..preheader:
+	; predecessors: %bb.6, %bb.11
+	  successors: %bb.7(0x04000000), %bb.11(0x7c000000); %bb.7(3.12%), %bb.11(96.88%)
+
+1344B	  %135:imag16, dead early-clobber %146:gpr = LDImm16 @gallery_failed
+1352B	  %143:ac16 = LDAImag16 %135:imag16
+1360B	  %143:ac16, dead %144:cc, dead %145:vc = ADCImag16 %143:ac16(tied-def 0), %43:imag16, %142:cc
+1376B	  %89:imag16 = STAImag16 %143:ac16
+1392B	  %154:ac = ORAIndir %154:ac(tied-def 0), %89:imag16 :: (load (s8) from %ir.scevgep, !tbaa !414)
+1400B	  %148:gpr = COPY %43.sublo:imag16
+1408B	  %148:gpr = nuw nsw INC %148:gpr(tied-def 0)
+1440B	  %43.sublo:imag16 = COPY %148:gpr
+1472B	  CmpBrImm %bb.7, undef $z, 1, %148:gpr, 62, implicit-def dead $c
+1488B	  BRA %bb.11
+
+1504B	bb.12 (%ir-block.32):
+	; predecessors: %bb.5, %bb.10
+
+1568B	  $x = COPY %51.subhi:imag16
+1576B	  $a = COPY %155:gpr
+1584B	  RTS implicit $a, implicit $x
+
+# End machine code for function record_result.
+
+error: <unknown>:0:0: ran out of registers during register allocation in function 'record_result'
+# *** IR Dump After Greedy Register Allocator (greedy) ***:
+# Machine code for function record_result: NoPHIs, TracksLiveness, Legalized, RegBankSelected, Selected, TiedOpsRewritten, FailedRegAlloc, TracksDebugUserValues
+
+0B	bb.0 (%ir-block.4):
+	  successors: %bb.1(0x30000000), %bb.2(0x50000000); %bb.1(37.50%), %bb.2(62.50%)
+	  liveins: $a, $x, $rc2, $rc3, $rc4, $rc5
+16B	  %175:anyi8 = COPY undef $a
+32B	  %4:gpr = COPY $x
+48B	  %171:gpr = COPY $rc2
+64B	  %157:anyi8 = COPY $rc3
+80B	  undef %51.subhi:imag16 = COPY $rc4
+96B	  %3:gpr = COPY $rc5
+112B	  STAbs %4:gpr, @gallery_last_z :: (volatile store (s8) into @gallery_last_z, !tbaa !21)
+128B	  STAbs %171:gpr, @gallery_last_z + 1 :: (volatile store (s8) into @gallery_last_z + 1, !tbaa !21)
+136B	  %177:anyi8 = lr-split COPY %171:gpr
+140B	  %176:gpr = lr-split COPY %175:anyi8
+144B	  STAbs %176:gpr, @gallery_last_work :: (volatile store (s8) into @gallery_last_work, !tbaa !414)
+160B	  STAbs %3:gpr, @gallery_last_ok :: (volatile store (s8) into @gallery_last_ok, !tbaa !414)
+192B	  STZAbs @gallery_shown + 4 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 4)`, !tbaa !426)
+208B	  STAbs %4:gpr, @gallery_shown :: (volatile store (s8) into @gallery_shown, !tbaa !427)
+216B	  %178:gpr = lr-split COPY %177:anyi8
+224B	  STAbs %178:gpr, @gallery_shown + 1 :: (volatile store (s8) into @gallery_shown + 1, !tbaa !427)
+232B	  %173:xy = lr-split COPY %176:gpr
+240B	  STAbs %173:xy, @gallery_shown + 2 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 2)`, !tbaa !429)
+256B	  STAbs %3:gpr, @gallery_shown + 3 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 3)`, !tbaa !428)
+272B	  %19:gpr = LDImm 2
+288B	  STAbs %19:gpr, @gallery_shown + 4 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @gallery_shown, i16 4)`, !tbaa !426)
+312B	  %167:ac = LDZ
+320B	  CmpBrZero %bb.2, undef $z, 0, %3:gpr, implicit-def dead $c
+336B	  BRA %bb.1
+
+352B	bb.1 (%ir-block.6):
+	; predecessors: %bb.0
+	  successors: %bb.2(0x80000000); %bb.2(100.00%)
+
+368B	  %136:gpr = LDImm 63
+384B	  STAbs %136:gpr, 8498 :: (volatile store (s8) into `ptr inttoptr (i16 8498 to ptr)`, align 2, !tbaa !414)
+400B	  %167:ac = LDImm 1
+
+432B	bb.2 (%ir-block.7):
+	; predecessors: %bb.0, %bb.1
+	  successors: %bb.3(0x30000000), %bb.4(0x50000000); %bb.3(37.50%), %bb.4(62.50%)
+
+464B	  STAbsIdx %167:ac, @gallery_failed, %173:xy :: (store (s8) into %ir.10, !tbaa !414)
+480B	  %30:gpr = LDAbsIdx @gallery_done, %173:xy :: (load (s8) from %ir.11, !tbaa !414)
+496B	  CmpBrZero %bb.4, undef $z, 0, %30:gpr, implicit-def dead $c
+512B	  BRA %bb.3
+
+528B	bb.3 (%ir-block.14):
+	; predecessors: %bb.2
+	  successors: %bb.5(0x80000000); %bb.5(100.00%)
+
+544B	  %132:ac = LDImm 1
+560B	  STAbsIdx %132:ac, @gallery_done, %173:xy :: (store (s8) into %ir.11, !tbaa !414)
+576B	  %150:gpr = LDAbs @gallery_completed_count :: (dereferenceable load (s8) from @gallery_completed_count, !tbaa !414)
+624B	  %150:gpr = INC %150:gpr(tied-def 0)
+640B	  INCAbs @gallery_completed_count :: (store (s8) into @gallery_completed_count, !tbaa !414), (dereferenceable load (s8) from @gallery_completed_count, !tbaa !414)
+664B	  %158:gpr = lr-split COPY %157:anyi8
+672B	  BRA %bb.5
+
+688B	bb.4 (%ir-block.17):
+	; predecessors: %bb.2
+	  successors: %bb.5(0x80000000); %bb.5(100.00%)
+
+704B	  %150:gpr = LDAbs @gallery_completed_count :: (dereferenceable load (s8) from @gallery_completed_count, !tbaa !414)
+728B	  %158:gpr = lr-split COPY %157:anyi8
+
+736B	bb.5 (%ir-block.19):
+	; predecessors: %bb.4, %bb.3
+	  successors: %bb.6(0x40000000), %bb.12(0x40000000); %bb.6(50.00%), %bb.12(50.00%)
+
+768B	  STAbs %150:gpr, @gallery_progress :: (volatile store (s8) into @gallery_progress, !tbaa !414)
+816B	  CmpBrImm %bb.12, undef $z, 0, %150:gpr, 62, implicit-def dead $c
+832B	  BRA %bb.6
+
+848B	bb.6..preheader.preheader:
+	; predecessors: %bb.5
+	  successors: %bb.11(0x80000000); %bb.11(100.00%)
+
+864B	  undef %43.subhi:imag16 = LDZ
+896B	  %43.sublo:imag16 = COPY %43.subhi:imag16
+912B	  %159:anyi8 = COPY %43.subhi:imag16
+928B	  BRA %bb.11
+
+944B	bb.7 (%ir-block.22):
+	; predecessors: %bb.11
+	  successors: %bb.8(0x30000000), %bb.9(0x50000000); %bb.8(37.50%), %bb.9(62.50%)
+
+960B	  %158:gpr = LDImm 18
+968B	  %160:anyi8 = lr-split COPY %159:anyi8
+976B	  CmpBrZero %bb.9, undef $z, 0, %160:anyi8, implicit-def dead $c
+
+992B	bb.8:
+	; predecessors: %bb.7
+	  successors: %bb.10(0x80000000); %bb.10(100.00%)
+
+1008B	  %127:gpr = LDImm -107
+1040B	  undef %51.subhi:imag16 = COPY %127:gpr
+1056B	  BRA %bb.10
+
+1072B	bb.9.select.false:
+	; predecessors: %bb.7
+	  successors: %bb.10(0x80000000); %bb.10(100.00%)
+
+1088B	  %126:gpr = LDImm 21
+1120B	  undef %51.subhi:imag16 = COPY %126:gpr
+
+1136B	bb.10.select.end:
+	; predecessors: %bb.9, %bb.8
+	  successors: %bb.12(0x80000000); %bb.12(100.00%)
+
+1184B	  %51.sublo:imag16 = COPY %158:gpr
+1264B	  $a16 = LDAImag16 %51:imag16
+1280B	  STAbs16 undef $a16, @corpus_result :: (volatile store (s16) into @corpus_result, align 1, !tbaa !21)
+1328B	  BRA %bb.12
+
+1344B	bb.11..preheader:
+	; predecessors: %bb.6, %bb.11
+	  successors: %bb.7(0x04000000), %bb.11(0x7c000000); %bb.7(3.12%), %bb.11(96.88%)
+
+1472B	  %135:imag16, dead early-clobber %146:gpr = LDImm16 @gallery_failed
+1488B	  %143:ac16 = LDAImag16 %135:imag16
+1512B	  %164:cc = LDImm1 0
+1520B	  %143:ac16, dead %144:cc, dead %145:vc = ADCImag16 %143:ac16(tied-def 0), %43:imag16, %164:cc
+1536B	  %89:imag16 = STAImag16 %143:ac16
+1560B	  %161:ac = lr-split COPY %159:anyi8
+1568B	  %161:ac = ORAIndir %161:ac(tied-def 0), %89:imag16 :: (load (s8) from %ir.scevgep, !tbaa !414)
+1576B	  %159:anyi8 = lr-split COPY %161:ac
+1584B	  %148:gpr = COPY %43.sublo:imag16
+1600B	  %148:gpr = nuw nsw INC %148:gpr(tied-def 0)
+1632B	  %43.sublo:imag16 = COPY %148:gpr
+1664B	  CmpBrImm %bb.7, undef $z, 1, %148:gpr, 62, implicit-def dead $c
+1680B	  BRA %bb.11
+
+1696B	bb.12 (%ir-block.32):
+	; predecessors: %bb.5, %bb.10
+
+1760B	  $x = COPY %51.subhi:imag16
+1776B	  $a = COPY %158:gpr
+1792B	  RTS implicit undef $a, implicit $x
+
+# End machine code for function record_result.

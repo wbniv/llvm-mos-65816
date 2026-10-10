@@ -1,0 +1,4 @@
+# llc=/home/will/llvm-mos-65816/build/split-320-321/llc/r7-321-16 sha256=52f69f0483678d0924108a57b42c80f00f1931ae7a9a294dc0f8e6fcdad08197
+# cwd=/home/will/llvm-mos-65816
+$ /home/will/llvm-mos-65816/build/split-320-321/llc/r7-321-16 -O2 -regalloc=basic -o /dev/null docs/defects/evidence/2026-10-11-demo-build-failures/gallery/record-result-reduced.ll
+rc=0
