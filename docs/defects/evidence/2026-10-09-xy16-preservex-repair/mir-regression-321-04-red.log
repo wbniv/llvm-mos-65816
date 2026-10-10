@@ -1,0 +1,9 @@
+2026-10-09T12:59:13Z COMMAND: build/split-320-321/llc/r3-321-04 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs /home/will/llvm-mos-65816-xy16px/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir -o - | FileCheck /home/will/llvm-mos-65816-xy16px/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir
+llc sha256: 7cb9426a2de329bf2e203cd5287784ae74d66e9e6125a97926f6f1487dc0cf31
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  build/llvm-mos/bin/FileCheck /home/will/llvm-mos-65816-xy16px/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir
+*** Bad machine code: Using an undefined physical register ***
+- function:    live_undefined_nz
+- instruction: PH $p
+LLVM ERROR: Found 1 machine code errors.
+LLC_EXIT: 134 FILECHECK_EXIT: 2

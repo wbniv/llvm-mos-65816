@@ -1,0 +1,212 @@
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs %s -o - | FileCheck %s
+
+---
+name:            restore_x16_preserves_value
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    liveins: $rs1
+
+    ; Each narrowing preserves X itself; the killed load source stays dead.
+    ; CHECK-LABEL: name: restore_x16_preserves_value
+    ; CHECK: $x16 = LDXImag16 killed $rs1
+    ; CHECK-NEXT: PHX_Implied implicit $x16
+    ; CHECK-NEXT: SEP_Immediate 16
+    ; CHECK-NEXT: $y = LDImm 1
+    ; CHECK-NEXT: REP_Immediate 48
+    ; CHECK-NEXT: PLX_Implied implicit-def $x16
+    ; CHECK-NEXT: dead $a16 = TXA16 $x16
+    ; CHECK-NEXT: PHX_Implied implicit $x16
+    ; CHECK-NEXT: SEP_Immediate 48
+    ; CHECK-NEXT: $y = LDImm 2
+    ; CHECK-NEXT: REP_Immediate 48
+    ; CHECK-NEXT: PLX_Implied implicit-def $x16
+    ; CHECK-NEXT: $a16 = TXA16 killed $x16
+    $x16 = LDXImag16 killed $rs1
+    $y = LDImm 1
+    dead $a16 = TXA16 $x16
+    $y = LDImm 2
+    $a16 = TXA16 killed $x16
+    RTS implicit $a16
+...
+---
+name:            overwritten_source
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    liveins: $rs1
+
+    ; The byte stores replace both aliases of the original index source.
+    ; CHECK-LABEL: name: overwritten_source
+    ; CHECK: $x16 = LDXImag16 killed $rs1
+    ; CHECK-NEXT: PHX_Implied implicit $x16
+    ; CHECK-NEXT: SEP_Immediate 16
+    ; CHECK: $rc3 = STImag8 killed $y
+    ; CHECK-NEXT: REP_Immediate 16
+    ; CHECK-NEXT: PLX_Implied implicit-def $x16
+    ; CHECK-NEXT: $a = LDAbsXIdx 2048, killed $x16
+    $x16 = LDXImag16 killed $rs1
+    $y = LDImm 4
+    $rc2 = STImag8 $y
+    $y = LDImm 2
+    $rc3 = STImag8 killed $y
+    $a = LDAbsXIdx 2048, killed $x16
+    RTS implicit $a
+...
+---
+name:            arithmetic_writer
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    ; An increment's result must be preserved without executing it twice.
+    ; CHECK-LABEL: name: arithmetic_writer
+    ; CHECK: $x16 = INX16 $x16
+    ; CHECK-NEXT: PHX_Implied implicit $x16
+    ; CHECK: PLX_Implied implicit-def $x16
+    ; CHECK-NEXT: $a = LDAbsXIdx 2048, killed $x16
+    $x16 = LDXImm16 511
+    $x16 = INX16 $x16
+    $y = LDImm 1
+    $a = LDAbsXIdx 2048, killed $x16
+    RTS implicit $a
+...
+---
+name:            y_widens_before_x_reader
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    ; Restoring the width for Y does not restore X's saved high byte.
+    ; CHECK-LABEL: name: y_widens_before_x_reader
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: $y16 = LDYImm16 513
+    ; CHECK-NEXT: PLX_Implied implicit-def $x16
+    ; CHECK-NEXT: $a = LDAbsXIdx 2048, killed $x16
+    $x16 = LDXImm16 511
+    $y = LDImm 1
+    $y16 = LDYImm16 513
+    $a = LDAbsXIdx 2048, killed $x16
+    RTS implicit $a
+...
+---
+name:            byte_definition_ends_value
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    ; A byte write replaces X, including its zeroed high byte.
+    ; CHECK-LABEL: name: byte_definition_ends_value
+    ; CHECK-NOT: PHX_Implied
+    ; CHECK-NOT: PLX_Implied
+    ; CHECK: RTS
+    $x16 = LDXImm16 511
+    $x = LDImm 42
+    $a = LDAbsXIdx 2048, killed $x16
+    RTS implicit $a
+...
+---
+name:            nested_stack
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    liveins: $a
+
+    ; The saved X word sits beneath a balanced byte push/pull pair.
+    ; CHECK-LABEL: name: nested_stack
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: PH $y
+    ; CHECK-NEXT: $y = PL
+    ; CHECK-NEXT: REP_Immediate 16
+    ; CHECK-NEXT: PLX_Implied implicit-def $x16
+    ; CHECK-NEXT: STAbsXIdx $a, 2048, killed $x16
+    $x16 = LDXImm16 511
+    $y = LDImm 1
+    PH $y
+    $y = PL
+    STAbsXIdx $a, 2048, killed $x16
+    RTS
+...
+---
+name:            live_nz
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    liveins: $a
+
+    ; A store keeps the comparison's Z live. Restore X, A, and P while
+    ; consuming the saved word, so the caller sees the original hard stack.
+    ; CHECK-LABEL: name: live_nz
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: $c = CMPImm $y, 1, implicit-def $z
+    ; CHECK-NEXT: REP_Immediate 16
+    ; CHECK-NEXT: PH $p
+    ; CHECK-NEXT: REP_Immediate 32
+    ; CHECK-NEXT: PHA16 $a16
+    ; CHECK-NEXT: LDA_StackRelative 4, implicit-def $a16
+    ; CHECK-NEXT: $x16 = TAX16 $a16
+    ; CHECK-NEXT: LDA_StackRelative 2, implicit-def $a16
+    ; CHECK-NEXT: STA_StackRelative 4, implicit $a16
+    ; CHECK-NEXT: SEP_Immediate 32
+    ; CHECK-NEXT: LDA_StackRelative 1, implicit-def $a
+    ; CHECK-NEXT: STA_StackRelative 3, implicit $a
+    ; CHECK-NEXT: REP_Immediate 32
+    ; CHECK-NEXT: $a16 = PLA16
+    ; CHECK-NEXT: $a16 = PLA16
+    ; CHECK-NEXT: $p = PL
+    ; CHECK-NEXT: STAbsXIdx $a, 2048, killed $x16
+    $x16 = LDXImm16 511
+    $y = LDImm 1
+    $c = CMPImm $y, 1, implicit-def $z
+    STAbsXIdx $a, 2048, killed $x16
+    RTS implicit $z
+...
+---
+name:            live_undefined_nz
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    liveins: $a
+
+    ; The later push of all of P keeps N and Z live, but nothing defines
+    ; them, so a plain PLX restores X.
+    ; CHECK-LABEL: name: live_undefined_nz
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: $y = LDImm 1
+    ; CHECK-NEXT: REP_Immediate 16
+    ; CHECK-NEXT: PLX_Implied implicit-def $x16
+    ; CHECK-NEXT: STAbsXIdx $a, 2048, killed $x16
+    ; CHECK: PH killed $p
+    $x16 = LDXImm16 511
+    $y = LDImm 1
+    STAbsXIdx $a, 2048, killed $x16
+    $c = LDCImm -1
+    PH killed $p
+    $p = PL
+    RTS
+...
+---
+name:            live_undefined_p
+tracksRegLiveness: true
+body:             |
+  bb.0:
+    liveins: $a
+
+    ; A byte pushed in the region forces the A/P shuffle. No flag is defined
+    ; there, so the P save reads an undefined register.
+    ; CHECK-LABEL: name: live_undefined_p
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: PH killed $y
+    ; CHECK-NEXT: REP_Immediate 16
+    ; CHECK-NEXT: PH undef $p
+    ; CHECK-NEXT: REP_Immediate 32
+    ; CHECK-NEXT: PHA16 $a16
+    ; CHECK: $p = PL
+    ; CHECK-NEXT: STAbsXIdx $a, 2048, killed $x16
+    $x16 = LDXImm16 511
+    $y = LDImm 1
+    PH killed $y
+    STAbsXIdx $a, 2048, killed $x16
+    $y = PL
+    $c = LDCImm -1
+    PH killed $p
+    $p = PL
+    RTS
+...

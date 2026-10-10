@@ -1,0 +1,25 @@
+2026-10-09T12:53:26Z start; before=build/llvm-mos/bin/llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19 after=build/xy16px/ds/llc 1fa2d01a54e9d1ec7578a1ca745ca548b827ea3e82a67bd47b042c2399a44cd6 clang-23 e532fbee9b78871393d3f990b72dc66cec8e7d04b3443621f40a7fd8cf3822b9
+finished: rc=0 2026-10-09T13:13:04Z
+inputs: examples/snes/*.c, examples/snes/corpus/*.c, examples/65816/*.c (424 files) x default/a16/xy16 x Os/Oz/O2/O3; frontend clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -fno-lto -S -emit-llvm; llc -O2 (Os/Oz/O2) or -O3 (O3) -verify-machineinstrs -filetype=obj; failing runs retried without the verifier to compare emitted code (tools/census.py)
+configurations: 5088; frontend failures: 0
+identical failures on both sides (far-pointer and other pre-existing compile errors, exit 1): 174
+verifier failures with this signature: before 1, after 0
+objects that differ: 1
+  examples/snes/truchet.c xy16 -O3: before exit -6:undef-phys (object emitted without the verifier), .text 21771 B; after exit 0, .text 21712 B; delta -59 B
+  default -Os: 384/384 compiled objects identical
+  default -Oz: 384/384 compiled objects identical
+  default -O2: 385/385 compiled objects identical
+  default -O3: 385/385 compiled objects identical
+  a16     -Os: 423/423 compiled objects identical
+  a16     -Oz: 421/421 compiled objects identical
+  a16     -O2: 421/421 compiled objects identical
+  a16     -O3: 424/424 compiled objects identical
+  xy16    -Os: 423/423 compiled objects identical
+  xy16    -Oz: 421/421 compiled objects identical
+  xy16    -O2: 420/420 compiled objects identical
+  xy16    -O3: 422/422 compiled objects identical
+runtime check of the one changed configuration (truchet.c, +mos-a16 +mos-xy16, -O3; object from llc, linked by the installed driver; host oracle tools/truchet-sim.c = EXPECT=0xB3E6)
+  before.sfc sha256 b6032665fbaf057299c667c1b1056aadbabd14ce89cef3d60030d2e0faff1470
+  after.sfc sha256 22c947dd1feb536eed53f7e2e10024f974176c81314ab87d0a148ed8e2f45078
+  bsnes-jg (build/jgxcheck, 800 frames): before SMOKE: PASS got=0xB3E6; after SMOKE: PASS got=0xB3E6
+  MAME (dev/_emu.sh run_assert on the host in tools/wrap.sh, SMOKE_SETTLE=800): before SMOKE: PASS got=0xB3E6; after SMOKE: PASS got=0xB3E6

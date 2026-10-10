@@ -1,0 +1,9 @@
+2026-10-09T12:59:15Z COMMAND: build/near-proof-upstream/candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs /home/will/llvm-mos-65816-xy16px/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir -o - | FileCheck /home/will/llvm-mos-65816-xy16px/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir
+llc sha256: c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  build/llvm-mos/bin/FileCheck /home/will/llvm-mos-65816-xy16px/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir
+*** Bad machine code: Using an undefined physical register ***
+- function:    live_undefined_nz
+- instruction: PH $p
+LLVM ERROR: Found 1 machine code errors.
+LLC_EXIT: 134 FILECHECK_EXIT: 2

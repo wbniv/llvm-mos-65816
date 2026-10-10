@@ -1,0 +1,149 @@
+diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
+index 76749c510e43..59c452b0c72c 100644
+--- a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
++++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
+@@ -383,25 +383,45 @@ void MOSInsertREPSEP::preserveX(MachineBasicBlock &MBB, MachineInstr &Narrow,
+   BuildMI(MBB, Narrow, Narrow.getDebugLoc(), TII->get(MOS::PHX_Implied))
+       .addReg(MOS::X16, RegState::Implicit);
+ 
+-  auto LiveBefore = [&](MachineInstr &MI, LivePhysRegs &Live) {
++  // A value must survive MI only if a later instruction reads it (backward
++  // liveness) and an earlier one defined it (forward availability, which is
++  // what the machine verifier tracks). Liveness alone overstates the flags: a
++  // later read of the whole status register keeps C, N, Z and V live back
++  // through a call that left them undefined, and pushing P there would read a
++  // register with no defined part.
++  struct Needed {
++    bool P;   // any of C, N, Z, V
++    bool NZ;  // N or Z
++    bool A16; // A or B
++  };
++  auto NeededBefore = [&](MachineInstr &MI) {
++    LivePhysRegs Live(*TRI), Defined(*TRI);
+     Live.addLiveOuts(MBB);
+     for (auto I = MBB.rbegin(); &*I != &MI; ++I)
+       Live.stepBackward(*I);
+     Live.stepBackward(MI);
++    Defined.addLiveIns(MBB);
++    SmallVector<std::pair<MCPhysReg, const MachineOperand *>, 4> Clobbers;
++    for (auto I = MBB.begin(); &*I != &MI; ++I) {
++      Clobbers.clear();
++      Defined.stepForward(*I, Clobbers);
++    }
++    auto Has = [&](MCRegister Reg) {
++      return Live.contains(Reg) && Defined.contains(Reg);
++    };
++    return Needed{Has(MOS::C) || Has(MOS::N) || Has(MOS::Z) || Has(MOS::V),
++                  Has(MOS::N) || Has(MOS::Z), Has(MOS::A) || Has(MOS::B)};
+   };
+   // Each shuffle uses A16 as a courier and preserves A/P in three bytes above
+   // the spill. PLP restores the exact incoming flags and accumulator width.
+-  auto SaveAP = [&](MachineInstr &MI, bool M16, const LivePhysRegs &Live) {
+-    bool PLive = Live.contains(MOS::C) || Live.contains(MOS::N) ||
+-                 Live.contains(MOS::Z) || Live.contains(MOS::V);
++  auto SaveAP = [&](MachineInstr &MI, bool M16, const Needed &Need) {
+     BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::PH))
+-        .addReg(MOS::P, getUndefRegState(!PLive));
++        .addReg(MOS::P, getUndefRegState(!Need.P));
+     if (!M16)
+       BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::REP_Immediate))
+           .addImm(MFlagBit);
+     BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::PHA16))
+-        .addReg(MOS::A16, getUndefRegState(!Live.contains(MOS::A) &&
+-                                           !Live.contains(MOS::B)));
++        .addReg(MOS::A16, getUndefRegState(!Need.A16));
+   };
+   auto Load = [&](MachineInstr &MI, unsigned Offset, Register Reg) {
+     BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::LDA_StackRelative))
+@@ -426,9 +446,7 @@ void MOSInsertREPSEP::preserveX(MachineBasicBlock &MBB, MachineInstr &Narrow,
+   if (Before) {
+     // Move the original bytes above X so any unmatched pulls consume their
+     // own values. Copy toward smaller offsets before writing X at the bottom.
+-    LivePhysRegs SaveLive(*TRI);
+-    LiveBefore(Narrow, SaveLive);
+-    SaveAP(Narrow, SaveM16, SaveLive);
++    SaveAP(Narrow, SaveM16, NeededBefore(Narrow));
+     unsigned I = 0;
+     for (; I + 1 < Before; I += 2) {
+       Load(Narrow, 6 + I, MOS::A16);
+@@ -446,9 +464,8 @@ void MOSInsertREPSEP::preserveX(MachineBasicBlock &MBB, MachineInstr &Narrow,
+     RestoreAP(Narrow);
+   }
+ 
+-  LivePhysRegs Live(*TRI);
+-  LiveBefore(Reader, Live);
+-  if (!After && !Live.contains(MOS::N) && !Live.contains(MOS::Z)) {
++  Needed Need = NeededBefore(Reader);
++  if (!After && !Need.NZ) {
+     BuildMI(MBB, Reader, Reader.getDebugLoc(), TII->get(MOS::PLX_Implied))
+         .addReg(MOS::X16, RegState::ImplicitDefine);
+     return;
+@@ -458,7 +475,7 @@ void MOSInsertREPSEP::preserveX(MachineBasicBlock &MBB, MachineInstr &Narrow,
+   // then shift the prefix two bytes toward larger offsets, copying backward
+   // to handle overlap. Discarding the first word removes the spill; A/P and
+   // every original stack byte then occupy their required positions.
+-  SaveAP(Reader, RestoreM16, Live);
++  SaveAP(Reader, RestoreM16, Need);
+   Load(Reader, 4 + After, MOS::A16);
+   BuildMI(MBB, Reader, Reader.getDebugLoc(), TII->get(MOS::TAX16), MOS::X16)
+       .addReg(MOS::A16);
+diff --git a/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir b/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir
+index f193abc81071..1c6b2f9947aa 100644
+--- a/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir
++++ b/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir
+@@ -158,3 +158,55 @@ body:             |
+     STAbsXIdx $a, 2048, killed $x16
+     RTS implicit $z
+ ...
++---
++name:            live_undefined_nz
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    liveins: $a
++
++    ; The later push of all of P keeps N and Z live, but nothing defines
++    ; them, so a plain PLX restores X.
++    ; CHECK-LABEL: name: live_undefined_nz
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: $y = LDImm 1
++    ; CHECK-NEXT: REP_Immediate 16
++    ; CHECK-NEXT: PLX_Implied implicit-def $x16
++    ; CHECK-NEXT: STAbsXIdx $a, 2048, killed $x16
++    ; CHECK: PH killed $p
++    $x16 = LDXImm16 511
++    $y = LDImm 1
++    STAbsXIdx $a, 2048, killed $x16
++    $c = LDCImm -1
++    PH killed $p
++    $p = PL
++    RTS
++...
++---
++name:            live_undefined_p
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    liveins: $a
++
++    ; A byte pushed in the region forces the A/P shuffle. No flag is defined
++    ; there, so the P save reads an undefined register.
++    ; CHECK-LABEL: name: live_undefined_p
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: PH killed $y
++    ; CHECK-NEXT: REP_Immediate 16
++    ; CHECK-NEXT: PH undef $p
++    ; CHECK-NEXT: REP_Immediate 32
++    ; CHECK-NEXT: PHA16 $a16
++    ; CHECK: $p = PL
++    ; CHECK-NEXT: STAbsXIdx $a, 2048, killed $x16
++    $x16 = LDXImm16 511
++    $y = LDImm 1
++    PH killed $y
++    STAbsXIdx $a, 2048, killed $x16
++    $y = PL
++    $c = LDCImm -1
++    PH killed $p
++    $p = PL
++    RTS
++...

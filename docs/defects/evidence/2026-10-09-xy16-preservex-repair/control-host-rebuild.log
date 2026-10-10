@@ -1,0 +1,5 @@
+2026-10-09T12:59:52Z Host-rebuild fidelity control: with recovery disabled the input never reaches the spurious-liveness shape, so the rebuilt llc must emit the identical object.
+COMMAND: build/near-proof-upstream/candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -mos-recover-near-nowrap=false -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll
+llc sha256: c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64 EXIT: 0 object sha256: 1afc4458db2cfccfbbf15a077d021bbc97a1d0e0b8376db79397692b690a6b38
+COMMAND: build/xy16px/np/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -mos-recover-near-nowrap=false -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll
+llc sha256: ec3535c9bfaa1e9f3ac32c3b8ab17bf691f7e7e52ae0a49e8bbd98073eabae04 EXIT: 0 object sha256: 1afc4458db2cfccfbbf15a077d021bbc97a1d0e0b8376db79397692b690a6b38

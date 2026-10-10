@@ -1,0 +1,3 @@
+2026-10-09T12:58:33Z COMMAND: build/xy16px/np/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -start-after=loop-reduce -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.recovered.ll -o /dev/null
+llc sha256: ec3535c9bfaa1e9f3ac32c3b8ab17bf691f7e7e52ae0a49e8bbd98073eabae04
+EXIT: 0

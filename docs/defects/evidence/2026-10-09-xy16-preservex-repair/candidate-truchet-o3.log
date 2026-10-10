@@ -1,0 +1,3 @@
+2026-10-09T12:58:43Z COMMAND: build/xy16px/np/llc -O3 -verify-machineinstrs -filetype=obj /tmp/claude-1000/-home-will-llvm-mos-65816/72f6d6de-6687-477a-bb4c-b186f9d1ba7f/scratchpad/truchet.ll -o /dev/null
+llc sha256: ec3535c9bfaa1e9f3ac32c3b8ab17bf691f7e7e52ae0a49e8bbd98073eabae04
+EXIT: 0

@@ -1,0 +1,16 @@
+MOS CodeGen + MC lit on the host, inside tools/wrap.sh (repo at /work): /work/build/llvm-mos/bin/llvm-lit -j4 -s vendor/llvm-mos/llvm/test/CodeGen/MOS vendor/llvm-mos/llvm/test/MC/MOS
+before: llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19, test tree as in vendor (results written 2026-10-09T12:52:31Z)
+PASS=192 UNSUPPORTED=4
+after: build/xy16px/ds/llc (1fa2d01a54e9d1ec7578a1ca745ca548b827ea3e82a67bd47b042c2399a44cd6) bound over /work/build/llvm-mos/bin/llc, and insert-rep-sep-cloned-kills.mir with the two new functions bound over the vendor copy (results written 2026-10-09T12:52:36Z)
+PASS=192 UNSUPPORTED=4
+single-test check, unfixed llc + new test:
+6f303945beb17ab3
+4
+FAIL: LLVM :: CodeGen/MOS/insert-rep-sep-cloned-kills.mir (1 of 1)
+# | *** Bad machine code: Using an undefined physical register ***
+# | - function:    live_undefined_nz
+# | - instruction: PH $p
+single-test check, fixed llc + new test:
+1fa2d01a54e9d1ec
+4
+PASS: LLVM :: CodeGen/MOS/insert-rep-sep-cloned-kills.mir (1 of 1)
