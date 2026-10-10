@@ -3025,6 +3025,34 @@
         "note": "Verified live GitHub merged flags, mysterymath merge identities, timestamps and merge commits: SDK 450 b2b09b72dfca at 02:09:41 UTC and test-suite 20 5f38e99463eb at 02:10:09 UTC on October 10. Current tables, pending summary, README and dashboard now mark both merged and review/landing complete; the completed TODO follow-up is removed. The existing SDK comment was edited only to replace both bare cross-repository 20 references with explicit test-suite links and read back. Retained draft/publication copies and recorded runtime checks remain dated evidence; no new SDK CI pickup or runtime validation is claimed. Compiler 604 and other submission holds are unaffected. Website publication workflow was reviewed; no deployment occurred.",
         "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
       }
+    },
+    {
+      "document": "docs/plans/2026-10-10-repeatable-compiler-repin.md",
+      "sources": [
+        "dev/repin-llvm-mos.py",
+        "dev/test-repin-llvm-mos.py",
+        "Taskfile.yml",
+        "dev/toolchain.sh",
+        "dev/regen-patch.sh",
+        "dev/llvm-mos-pin",
+        "docs/test-results/repin/2026-10-10/validation.json",
+        "docs/test-results/repin/2026-10-10/real-replay.log.gz"
+      ],
+      "receipt": {
+        "sources": {
+          "dev/repin-llvm-mos.py": "436ccd97463226cba19c544f306c8b9b88039fe763c649f35b837663c68468c5",
+          "dev/test-repin-llvm-mos.py": "d4e1dd50c88d3048e2cf3879eb53d0d9f000fa6316480882e51131b652c2c1e6",
+          "Taskfile.yml": "28c39cb8fadb1f68dd566e1ee566c0cd33b7278abf3e8208d4b850c982e722b9",
+          "dev/toolchain.sh": "09d5750e135026594f2ef4e0e7db5220bb131dc56e3322821848833f4343d65e",
+          "dev/regen-patch.sh": "784cac0cde97003c1196750ed5b507ef1538b1f0c9ec3a42248d8085688c1141",
+          "dev/llvm-mos-pin": "ddd7826b95f2013327779fef05506433b9f17c11f33f84efd4799686b9701ee5",
+          "docs/test-results/repin/2026-10-10/validation.json": "0e82f6221a7d18eed244ab0cc8682c059109bdafccd3fafcf87633d99092268c",
+          "docs/test-results/repin/2026-10-10/real-replay.log.gz": "92d14a86761423be6dfb1abf6b6d04f4cd66a03faee1d0d8845e1cd2a1c9d586"
+        },
+        "reviewed_at": "2026-10-10T04:17:01.075894+00:00",
+        "note": "Reviewed implementation, 12 passing local Git fixtures and the 51-application real prepare-only tree-equality evidence. Added explicit PASS for those completed checks while keeping the real compiler build and MOS lit gates pending. Next-step commands distinguish current-main updates from the frozen retained candidate and require post-publication document review. The tracked pin and patch stack remain unchanged.",
+        "attribution": "OpenAI Codex 0.162.1; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+      }
     }
   ]
 }

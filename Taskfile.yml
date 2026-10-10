@@ -19,6 +19,16 @@ tasks:
 
   # --- Host-side dev/test prerequisites ---
 
+  upstream:repin:
+    desc: "Fetch upstream main, replay active compiler patches, build/test in isolation, then update the pin"
+    cmds:
+      - python3 dev/repin-llvm-mos.py {{.CLI_ARGS}}
+
+  upstream:repin:test:
+    desc: "Exercise compiler re-pin replay, retirement, conflict recovery and validation gates with local Git fixtures"
+    cmds:
+      - python3 dev/test-repin-llvm-mos.py
+
   dev-setup:
     desc: "Install host-side dev/test prerequisites (cvise for C-reduction of fuzz repros, …). Idempotent; uses sudo apt."
     silent: true
