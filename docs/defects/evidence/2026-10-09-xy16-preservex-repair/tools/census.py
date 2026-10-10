@@ -11,9 +11,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 out_tsv, before, after = sys.argv[1:4]
 jobs = int(sys.argv[4]) if len(sys.argv) > 4 else 4
-CLANG = 'build/llvm-mos-install/bin/clang'
+CLANG = os.environ.get('CENSUS_CLANG', 'build/llvm-mos-install/bin/clang')
 CFG = 'build/install/bin/mos-snes.cfg'
-OBJDUMP = 'build/llvm-mos-install/bin/llvm-objdump'
+OBJDUMP = os.environ.get('CENSUS_OBJDUMP', 'build/llvm-mos-install/bin/llvm-objdump')
 MODES = {'default': [], 'a16': ['+mos-a16'], 'xy16': ['+mos-a16', '+mos-xy16']}
 LEVELS = {'Os': '-O2', 'Oz': '-O2', 'O2': '-O2', 'O3': '-O3'}
 SRCS = sorted(glob.glob('examples/snes/*.c') + glob.glob('examples/snes/corpus/*.c')

@@ -1,0 +1,9 @@
+2026-10-10T03:37:51Z COMMAND: build/xy16px/newpin-unfixed/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs /home/will/llvm-mos-65816-xy16pm/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir -o - | FileCheck /home/will/llvm-mos-65816-xy16pm/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir
+llc sha256: 2acf2f546d2a350b8f3fbb9458c987acfb64f2bfeb4637cb64048dabe7c8c85e
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  build/llvm-mos/bin/FileCheck /home/will/llvm-mos-65816-xy16pm/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir
+*** Bad machine code: Using an undefined physical register ***
+- function:    live_undefined_nz
+- instruction: PH $p
+LLVM ERROR: Found 1 machine code errors.
+LLC_EXIT: 134 FILECHECK_EXIT: 2

@@ -219,7 +219,7 @@
       "dependsOn": [
         "platform:321"
       ],
-      "nextStep": "Repair preserveX so it saves $p as undefined when no status flag is defined, in 0002 and the #321 prerequisite; red/green on the retained boids.c XY16 IR.",
+      "nextStep": "Fixed in 0002 and folded into #321-4 (split-series round seven, b393bb94db76); it ships with the #321 series.",
       "demoUrls": [
         "https://biohack.net/snes/boids/"
       ],

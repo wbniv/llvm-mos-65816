@@ -19,7 +19,40 @@ defined before it (forward availability, the verifier's own criterion and the
 one the scavenger's `hasNoAvailableValue` already uses). It decides the `undef`
 flags on `PH $p` and `PHA16 $a16` and the `PLX` shortcut.
 
-## Toolchains
+## October 10: container build at the new pin (closing evidence)
+
+Main moved to pin `f24948c7d1a4`, where `MOSInsertREPSEP.cpp` and the test file
+are unchanged. The selected checkout (`vendor/llvm-mos-f24948c7d1a4` →
+`.scratch/upstream-pin-2026-10-09/source`) is sparse; `runtimes/` was added to
+its patterns, nothing else ([before](sparse-before.txt), [after](sparse-after.txt);
+restore with `git sparse-checkout set --no-cone --stdin < sparse-before.txt`).
+`dev/toolchain.sh` then built the pin in the dev container into the separate
+prefix `build/llvm-mos-f24948c7d1a4-install`; the shared `build/llvm-mos-install`
+stayed `6f303945…` ([identities and lit](newpin-toolchain-and-lit.txt)).
+
+| Check | Unfixed `2acf2f54…` | Fixed `f68dae29…` |
+|---|---|---|
+| Record input `boids.xy16.ll`, baseline configuration | [exit 134](newpin-boids-original.log), `PH $p` in `main` | [exit 0](newpin-boids-original-green.log) |
+| Recovered IR | [134](newpin-recovered-ir-red.log) | [0](newpin-recovered-ir-green.log) |
+| truchet `-O3` XY16 | [134](newpin-truchet-o3-red.log) | [0](newpin-truchet-o3-green.log) |
+| MIR regression | [`llc` 134](newpin-mir-regression-red.log) | [`llc` 0, FileCheck 0](newpin-mir-regression-green.log) |
+
+At this pin the defect reproduces from the original IR without the recovery
+replay, and from C: [`newpin-census-summary.txt`](newpin-census-summary.txt)
+(5,088 configurations, rows in [`newpin-census.tsv.gz`](newpin-census.tsv.gz))
+finds it in `boids.c` XY16 `-Os` and `truchet.c` XY16 `-O3`, the only two objects
+that change (−19 B and −59 B). Every other object is byte-identical, which also
+settles the October 9 host-rebuild question. Both ROMs return their host
+oracle on bsnes-jg and MAME before and after. MOS lit: 202 passed, 4
+unsupported; `corpus-a16` 83/83; `xy16xreload` 8/8 ([gates](newpin-gates.txt)).
+
+There is nothing to gate by optimization level: the `undef` flags change no
+emitted byte, and `PLX` only removes instructions, so the changed objects are
+smaller and faster at the level where they change (`-Os` and `-O3`).
+
+## October 9: host rebuilds on the previous pin
+
+### Toolchains
 
 | Role | Path | sha256 | Source |
 |---|---|---|---|
@@ -29,7 +62,7 @@ flags on `PH $p` and `PHA16 $a16` and the `PLX` shortcut.
 | Downstream fixed (green) | `build/xy16px/ds/llc` | `1fa2d01a54e9d1ec…` | the same build directory with only `MOSInsertREPSEP.cpp` replaced |
 | Series #321-4 (red) | `build/split-320-321/llc/r3-321-04` | `7cb9426a2de329bf…` | tree `bda6806cfddb`, identical to #321-4 `e7943fff59cc` |
 
-Full hashes are in each log. The two fixed `llc` binaries are host rebuilds:
+Full hashes are in each log. The two fixed `llc` binaries were host rebuilds, removed on October 10 once the container build reproduced every result:
 the container daemon was unavailable (see below), so
 [`tools/hostbuild.py`](tools/hostbuild.py) recompiled the one changed
 translation unit with host g++ 15.2.0 (clang-only warning flags and the PCH
@@ -41,7 +74,7 @@ near-proof `405175bd5bd482e8…`, downstream `0d91e4f621c1a5e2…`.
 near-proof `llc` emits the baseline's object byte for byte where the repair
 cannot apply (recovery off).
 
-## Red / green
+### Red / green
 
 | Check | Red | Green |
 |---|---|---|
@@ -55,7 +88,7 @@ The truchet input is `zcat` of
 (decompressed sha256 `c0282601da97d578…`); the logs name the decompressed
 scratch copy.
 
-## Series fold
+### Series fold
 
 [`321-04-fold.diff`](321-04-fold.diff) is the change to fold into #321-4. Both
 files it touches have the same blob (`76749c510e43`, `f193abc81071`) from #321-4
@@ -64,7 +97,7 @@ and the 0065 packet `8520db898e70`, so every later commit rebases without
 conflict and changes by exactly this diff. [`321-04-message.txt`](321-04-message.txt)
 is the amended commit message.
 
-## Code effect and runtime
+### Code effect and runtime
 
 [`census-summary.txt`](census-summary.txt) (rows in
 [`census.tsv.gz`](census.tsv.gz)): 424 C files × default/A16/XY16 ×
@@ -83,15 +116,8 @@ the build tree; the new test alone fails on the unfixed `llc`.
 
 There is nothing to gate by optimization level: the `undef` flags change no
 emitted byte, and the `PLX` shortcut only removes instructions, so it is
-smaller and faster wherever it fires (here `-O3`; no `-Os`/`-Oz` object
-changes).
+smaller and faster wherever it fires (here `-O3`).
 
-## Not run here
+### Limits on October 9
 
-The rootful Docker socket is `root:root 0600`, and the active rootless daemon has
-no `llvm-mos-65816-dev` image; building one needs about 2 GB on a disk with
-3 GB free. So the container toolchain rebuild and install (which also refreshes
-`clang-23` and `lld`, where LTO codegen runs), the in-container MOS lit run, the
-full `corpus-a16` differential and the series' per-commit gates did not run.
-With every other object byte-identical, the full differential can only differ
-on truchet XY16 `-O3`, which passes above.
+The container daemon was unusable on October 9, so these results stood on host rebuilds; the October 10 section above repeats them with container builds and adds the gates that were missing.

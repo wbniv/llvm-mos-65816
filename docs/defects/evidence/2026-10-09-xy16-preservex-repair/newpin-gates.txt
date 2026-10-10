@@ -1,0 +1,24 @@
+Gates run from worktree /home/will/llvm-mos-65816-xy16pm (its own build/), MOS_TOOLCHAIN=/work/build/llvm-mos-install = hardlink copy of build/llvm-mos-f24948c7d1a4-install (llc f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4, clang-24 da3fe645bd57bc628ae457ef3f23f3e2d2bda5c045eb865f109b6ccd865d7d37, lld f436eea8572cf4fa9d90da3836d92656a3fc796c192b20979f41c2f1e093c86a). Shared build/install and build/llvm-mos-install untouched.
+
+SDK: MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build (into the worktree's build/install)
+==> built 296 program(s)
+==> not programs, excluded by contract (3): snes-video-codec snes-video-dma snes-video-stream
+==> FAILED (3): ascast ascast_sim lzss-gallery
+  (ascast, ascast_sim, lzss-gallery are the known open TODO item 'Capture the three demo build failures')
+
+corpus-a16: MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh corpus-a16
+2026-10-10T03:47:13Z start corpus-a16 MOS_TOOLCHAIN=/work/build/llvm-mos-install (llc f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4)
+progress snapshot: A16 [####################] 100% 83/83 complete | 0 remaining | 4685s | finished | PASS 83 FAIL 0 XFAIL 0
+rc=0 2026-10-10T05:05:23Z
+
+xy16xreload: MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh xy16xreload (stack MIR from the pin checkout, same blob c421564b55aa as the old vendor)
+2026-10-10T05:05:34Z xy16xreload MOS_TOOLCHAIN=/work/build/llvm-mos-install llc f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4; stack MIR blob c421564b55aa33b1e52103b5cb10b1d50cd79c67
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E0200 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x200 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+rc=0 2026-10-10T05:07:08Z

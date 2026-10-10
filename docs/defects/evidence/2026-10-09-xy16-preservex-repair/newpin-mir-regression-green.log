@@ -1,0 +1,3 @@
+2026-10-10T03:40:20Z COMMAND: build/llvm-mos-f24948c7d1a4-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs /home/will/llvm-mos-65816-xy16pm/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir -o - | FileCheck /home/will/llvm-mos-65816-xy16pm/docs/defects/evidence/2026-10-09-xy16-preservex-repair/insert-rep-sep-cloned-kills.mir
+llc sha256: f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4
+LLC_EXIT: 0 FILECHECK_EXIT: 0

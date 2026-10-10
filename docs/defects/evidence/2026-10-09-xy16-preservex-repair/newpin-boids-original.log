@@ -1,0 +1,12 @@
+2026-10-10T03:37:50Z COMMAND: build/xy16px/newpin-unfixed/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null
+llc sha256: 2acf2f546d2a350b8f3fbb9458c987acfb64f2bfeb4637cb64048dabe7c8c85e
+*** Bad machine code: Using an undefined physical register ***
+- function:    main
+- basic block: %bb.25  (addr)
+- instruction: PH $p
+- operand 0:   $p
+LLVM ERROR: Found 1 machine code errors.
+/tmp/claude-1000/-home-will-llvm-mos-65816/72f6d6de-6687-477a-bb4c-b186f9d1ba7f/scratchpad/runlog.sh: line 12: 196069 Aborted                    (core dumped) "$@" 2>&1
+     196070 Done                       | grep -E 'Bad machine code|^- function|^- basic block|^- instruction|^- operand|LLVM ERROR'
+     196071 Done                       | sed 's/(0x[0-9a-f]*)/(addr)/'
+EXIT: 134

@@ -1,0 +1,22 @@
+New-pin toolchain builds (container image 795d2d49c38c, dev/container.sh, heavy-build lock held inside the container, BUILD_JOBS=3; prefix LLVM_MOS_INSTALL=/work/build/llvm-mos-f24948c7d1a4-install; source vendor/llvm-mos-f24948c7d1a4 -> .scratch/upstream-pin-2026-10-09/source at pin f24948c7d1a4b9f162d4d0192ccceecab1e441ff; build dir build/llvm-mos-f24948c7d1a4)
+unfixed:
+2026-10-10T03:11:55Z start; free: 12Gi avail; disk 33G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+==> done in 25m 22s: clang version 24.0.0git (/work/vendor/llvm-mos-f24948c7d1a4/clang f24948c7d1a4b9f162d4d0192ccceecab1e441ff)
+rc=0 2026-10-10T03:37:21Z; free: 11Gi avail; disk 32G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+  frozen unfixed llc build/xy16px/newpin-unfixed/llc sha256 2acf2f546d2a350b8f3fbb9458c987acfb64f2bfeb4637cb64048dabe7c8c85e
+fixed (after copying the two files into the checkout; regen-patch.sh then reproduced the committed 0002 exactly):
+2026-10-10T03:39:14Z start; free: 11Gi avail; disk 32G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+==> done in 0m 38s: clang version 24.0.0git (/work/vendor/llvm-mos-f24948c7d1a4/clang f24948c7d1a4b9f162d4d0192ccceecab1e441ff)
+rc=0 2026-10-10T03:39:59Z; free: 11Gi avail; disk 32G free; shared llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+  compiled: MOSInsertREPSEP.cpp.o
+  installed llc sha256 f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4 mtime 2026-10-10T03:39:53Z
+  installed clang-24 sha256 da3fe645bd57bc628ae457ef3f23f3e2d2bda5c045eb865f109b6ccd865d7d37 mtime 2026-10-10T03:39:46Z
+  installed lld sha256 f436eea8572cf4fa9d90da3836d92656a3fc796c192b20979f41c2f1e093c86a mtime 2026-10-10T03:39:45Z
+  frozen fixed llc build/xy16px/newpin-fixed/llc sha256 f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4
+shared install unchanged: build/llvm-mos-install/bin/llc 6f303945beb17ab3c8a568ca135b926633533b592b01dd6677c22d49fcceca19
+
+MOS lit (dev/lit.sh in the container, build-tree llc = fixed):
+==> llvm-lit -s /work/vendor/llvm-mos-f24948c7d1a4/llvm/test/CodeGen/MOS /work/vendor/llvm-mos-f24948c7d1a4/llvm/test/MC/MOS
+Total Discovered Tests: 206
+  Unsupported:   4 (1.94%)
+  Passed     : 202 (98.06%)

@@ -1,0 +1,47 @@
+2026-10-10T05:07:18Z start; before=build/xy16px/newpin-unfixed/llc 2acf2f546d2a350b8f3fbb9458c987acfb64f2bfeb4637cb64048dabe7c8c85e after=build/llvm-mos-f24948c7d1a4-install/bin/llc f68dae297924c7edce0deb41e529f596460001a71ba713621a43bb392593c5d4 frontend=build/llvm-mos-f24948c7d1a4-install/bin/clang -> clang-24 da3fe645bd57bc628ae457ef3f23f3e2d2bda5c045eb865f109b6ccd865d7d37; cfg build/install/bin/mos-snes.cfg; jobs 2
+finished: rc=0 2026-10-10T06:17:16Z
+inputs: the same 424 C files x default/A16/XY16 x Os/Oz/O2/O3 as census-summary.txt (tools/census.py; CENSUS_CLANG/CENSUS_OBJDUMP = the new-pin install), run from the main checkout
+configurations: 5088; frontend failures: 0
+identical failures on both sides (far-pointer and other pre-existing compile errors, exit 1): 174
+verifier failures with this signature: before 2, after 0
+objects that differ: 2
+  examples/snes/boids.c xy16 -Os: before exit -6:undef-phys (object emitted without the verifier), .text 13403 B; after exit 0, .text 13384 B; delta -19 B
+  examples/snes/truchet.c xy16 -O3: before exit -6:undef-phys (object emitted without the verifier), .text 21584 B; after exit 0, .text 21525 B; delta -59 B
+  default -Os: 384/384 compiled objects identical
+  default -Oz: 384/384 compiled objects identical
+  default -O2: 385/385 compiled objects identical
+  default -O3: 385/385 compiled objects identical
+  a16     -Os: 423/423 compiled objects identical
+  a16     -Oz: 421/421 compiled objects identical
+  a16     -O2: 421/421 compiled objects identical
+  a16     -O3: 424/424 compiled objects identical
+  xy16    -Os: 422/422 compiled objects identical
+  xy16    -Oz: 421/421 compiled objects identical
+  xy16    -O2: 420/420 compiled objects identical
+  xy16    -O3: 422/422 compiled objects identical
+
+runtime check of both changed configurations (object from each llc, linked by the new-pin driver against an SDK built by it; host oracles tools/boids-sim.c and tools/truchet-sim.c):
+  == bsnes-jg boids before sfc f0760695703cb391 off 0x6c6
+  SMOKE: PASS off=0x6C6 len=2 got=0xA8AB (ran 1400 frames, bsnes-jg)
+  jgxcheck rc=0
+  == bsnes-jg boids after sfc d6f2a5c9c9d0f72d off 0x6c6
+  SMOKE: PASS off=0x6C6 len=2 got=0xA8AB (ran 1400 frames, bsnes-jg)
+  jgxcheck rc=0
+  == boids before f0760695703cb391
+  SMOKE: PASS addr=0x7E06C6 len=2 got=0xA8AB (ran 1400 ticks)
+  run_assert rc=0
+  == boids after d6f2a5c9c9d0f72d
+  SMOKE: PASS addr=0x7E06C6 len=2 got=0xA8AB (ran 1400 ticks)
+  run_assert rc=0
+  == bsnes-jg truchet before sfc e20f13c6126056eb off 0x15ee
+  SMOKE: PASS off=0x15EE len=2 got=0xB3E6 (ran 800 frames, bsnes-jg)
+  jgxcheck rc=0
+  == bsnes-jg truchet after sfc eafe0846bfead6a8 off 0x15ee
+  SMOKE: PASS off=0x15EE len=2 got=0xB3E6 (ran 800 frames, bsnes-jg)
+  jgxcheck rc=0
+  == truchet before e20f13c6126056eb
+  SMOKE: PASS addr=0x7E15EE len=2 got=0xB3E6 (ran 800 ticks)
+  run_assert rc=0
+  == truchet after eafe0846bfead6a8
+  SMOKE: PASS addr=0x7E15EE len=2 got=0xB3E6 (ran 800 ticks)
+  run_assert rc=0
