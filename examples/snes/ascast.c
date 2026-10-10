@@ -1,3 +1,5 @@
+// Build contract for dev/build.sh's example battery (grammar: dev/build.sh).
+// mos-a16-only: the near-to-far address-space cast needs +mos-a16 (G_MERGE_VALUES legalization); see docs/defects/mos-default-mode-far-cast-legalization.json.
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/text_layer.h"
