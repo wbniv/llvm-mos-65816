@@ -24,3 +24,7 @@ Whole-directory private archives of `near-proofs` and `carry-profitability` were
 Reconciliation and checks: Codex CLI 0.162.1, model `gpt-6.1-sol`, medium reasoning effort; verified environment/session `01a11e9e-a386-7462-b3f4-86364e106ee0`. Existing contributors' credits and immutable evidence are preserved.
 
 Final disk observation: **37.54 GiB available**, compared with approximately 6.8 GiB at the start of the cleanup. The four worktrees are removed; their verified private archives total approximately 12.3 GiB. The 2.35 GiB of old compiler object files, unused Docker build cache and browser HTTP/JavaScript caches were also removed. Reusable container images and the Emscripten SDK remain.
+
+## Where the archives are
+
+The four whole-directory archives (about 12.3 GiB) and a backup of this review's merge inventory are kept in the ignored, private directory `archives/llvm-cleanup-archives-2026-10-10/` of this checkout (`~/llvm-mos-65816`). They were moved there on 2026-10-18 from `~/finding-your-way/game/parmenides-slice/build/` so they are not lost or left unusable. The directory's `README.md` says what each archive is and gives the checksum and restore commands, and `SHA256SUMS` verifies them. The per-archive receipts remain in `~/finding-your-way/docs/diagnostics/browser-player-2026-10-10/llvm-cleanup/`.

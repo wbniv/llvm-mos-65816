@@ -37,3 +37,6 @@ __pycache__/
 
 # Local source reconstructions and temporary validation workspaces.
 /.scratch/
+
+# Private archives of retired worktrees (see archives/*/README.md); never publish.
+/archives/
