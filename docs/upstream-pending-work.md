@@ -1,5 +1,7 @@
 # Pending upstream work and dependencies
 
+**GitHub status checked October 29, 2026:** [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604) merged October 18 after approval and passing Ubuntu, Windows, and macOS CI. [SDK #415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415) was closed unmerged by its author October 27 without a closure explanation; preserve its reviewed proposal as reconciliation evidence, and agree the route for a new contribution with the maintainers. [Compiler #594](https://github.com/llvm-mos/llvm-mos/pull/594) remains an open draft without new review. The earlier dated publication and PR snapshots below retain the status observed at their dates.
+
 **Keep the public tracker current:** after updating this tracker, `upstream-contribution-status.md`, `TODO.md`, or other documentation feeding the compiler-work view, commit and push the compiler docs, then run `task open-source:publish` in `/home/will/wald3n.com` and verify https://wald3n.com/open-source. This publication has standing user authorization and belongs to the same update. Follow the [publication workflow](open-source-dashboard-publication.md); do not leave it as a suggested follow-up.
 
 **Compiler re-pin, October 10:** `task upstream:repin` published `0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63` after an isolated Release distribution build and MOS suites (204 passed, four unsupported, zero failures). All 51 active applications remain; none became wholly empty. Hashed historical artifacts 0013/0057/0058/0059 are preserved; bootstrap uses their rebased `-vendor` copies. Independent patch application reproduced the candidate tree. [Full validation](test-results/repin/2026-10-10/full-validation.json) and [publication receipt](upstream-status/repin-20261010T033430Z-ardhs7qy.json). Earlier pin, runtime measurements and submission packets remain dated evidence for their recorded builds; this does not advance SDK pins, validate runtime/performance, or change upstream review prerequisites.
@@ -380,8 +382,8 @@ Older notes need a current-content review before publication.
 3. Prepare the #320/#321 presentation before publishing `0028`; use the selected,
    reviewed and validated refactor. The alternative remains comparison history,
    not an outstanding implementation-choice gate.
-4. Follow review/CI of compiler #604. SDK #450 and companion test-suite #20 are merged; their review/landing follow-up is complete.
-5. In parallel, make **SNES platform reconciliation with SDK #415** the platform
+4. Compiler #604, SDK #450 and companion test-suite #20 are merged; their review/landing follow-up is complete.
+5. In parallel, make **SNES platform reconciliation after SDK #415 closed unmerged** the platform
    priority. Prepare a coherent contribution including the runtime requirements of
    whichever CPU mode it enables.
 6. Prepare the #320/#321 compiler feature series and investigate the remaining
@@ -398,14 +400,14 @@ and [Newton's Fractal](https://biohack.net/snes/newton/) as integration coverage
 the standalone regression tests establish the fix itself.
 
 **Upload/review next; do not wait for it to merge before posting independent fixes.**
-There is already an upstream [SNES target PR #415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415).
-It is open, **not currently marked draft**, at `e6a5c17cab52`. Our reconciliation and
-native-runtime additions are not posted. Work with that proposal instead of opening
-a competing duplicate target.
+The upstream [SNES target PR #415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415)
+closed unmerged October 27 at `e6a5c17cab52`; its author supplied no closure explanation.
+Our reconciliation and native-runtime additions are not posted. Preserve its reviewed
+proposal and attribution, and agree the submission route with maintainers before filing.
 
 | SNES deliverable | What exists | What remains | Dependency |
 |---|---|---|---|
-| Basic SDK SNES target | Existing #415; our downstream platform and emulator harness; isolated baseline and [file inventory](415-snes-reconciliation-inventory.md) prepared | Resolve reviewed startup, vector provenance, interrupt and config requirements; implement and validate the reconciled patch | Technically possible with existing codegen; maintainer requires proper 65816 support before merge (see below) |
+| Basic SDK SNES target | #415 closed unmerged; our downstream platform and emulator harness; isolated baseline and [file inventory](415-snes-reconciliation-inventory.md) prepared | Resolve reviewed startup, vector provenance, interrupt and config requirements; implement and validate a reconciled patch and agree its submission route | Technically possible with existing codegen; maintainer requires proper 65816 support before merge (see below) |
 | Native-mode startup and stack contract | Working downstream XCE/startup and runtime | Specify M/X, DBR/DP and hardware-stack assumptions; validate the reconciled platform | Must ship with the runtime support required by native mode |
 | Native-mode setjmp/longjmp | Working page-1-specific downstream override | Integrate and test with the native platform; agree buffer/stack contract | Same platform change or a dependent PR; no reason to merge an incomplete native runtime first |
 | Native 16-bit codegen integration | Downstream `+mos-a16`/`+mos-xy16` implementation | SDK opt-in configuration/examples after compiler support is accepted | Compiler #321 series; baseline SNES target need not wait |
@@ -435,7 +437,7 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | #586 | Published repair merged September 29 | **Merged upstream** | Supplied by new upstream pin; local carry removed | No |
 | #588 | Published repair merged October 5 | **Merged upstream** | Supplied by new upstream pin; local COP carry removed | No |
 | #589 | Published repair merged October 5 | **Merged upstream** | Supplied by new upstream pin; local carry removed | No |
-| MVN/MVP bank order (`0020`) | Complete fix validated, including symbolic relocations | **Posted: [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604)** | Maintainer review / CI follow-up | No |
+| MVN/MVP bank order (`0020`) | Complete fix validated, including symbolic relocations | **Merged October 18: [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604)** | Review and Ubuntu/Windows/macOS CI complete | No |
 | Common SDK `longjmp(env, 0)` | **Fix tested**, 20/20 simulator cases; restored suite has 52 focused checks | **Merged October 10: [SDK #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450) and [test-suite #20](https://github.com/llvm-mos/llvm-test-suite/pull/20)** | Review/landing complete; [merge receipt](upstream-status/2026-10-10-sjlj-merges.json) | **No; plain 6502 bug** |
 | Reentrant attribute contract | Source behavior confirmed; no agreed semantic fix | **Unposted question/report** | Decide whether attribute only cancels `-fnonreentrant` or must force reentrant allocation; then fix/docs + tests | No |
 | Undef register-lane verifier failure | Existing refactor selected; generic X86 MIR and companion tests independently reviewed and validated on current LLVM | **Held until #320/#321 are ready to open** | Use the selected packet once the user-presentation hold clears; two focused RUNs and 102 filtered X86 passes / one existing XFAIL | No technical SDK dependency; user presentation hold retained |
@@ -621,8 +623,8 @@ retains it as a zero-code `KILL`; the lit regression and downstream witnesses pa
 [Focused report](upstream-rc-undef-ra-pure-virtual-issue.md) ·
 [PR body](upstream-virtregrewriter-undef-lane-identity-copy-pr.md).
 
-**Native setjmp:** current SDK revision `3f6968bbc156ff9a63102a8e158db868819bd61c`
-still has the common 6502 implementation and no SNES directory. #415 remains open.
+**Dated native setjmp assessment:** SDK revision `3f6968bbc156ff9a63102a8e158db868819bd61c`
+has the common 6502 implementation and no SNES directory. #415 later closed unmerged October 27.
 The existing downstream runtime evidence is preserved; no new native emulator run
 is claimed here. [Focused report](upstream-sdk-setjmp-issue.md).
 

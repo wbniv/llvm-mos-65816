@@ -159,10 +159,12 @@ SPC700 APU IPL ROM. It is Nintendo content, so it is **gitignored** — drop you
 
 ## Upstream contribution
 
-`platforms/snes/` is PR material for
-[llvm-mos-sdk#415](https://github.com/llvm-mos/llvm-mos-sdk/issues/415). The PR is
-cut by copying it into a fork of llvm-mos-sdk as `mos-platform/snes/` — this repo
-stays the development home, decoupled from the full SDK tree.
+`platforms/snes/` is the local SDK platform and source material for an upstream
+SNES contribution. [llvm-mos-sdk#415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415)
+closed unmerged on October 27, 2026; its reviewed proposal remains a reconciliation
+input. Prepare a credited, reviewed branch in an SDK fork as `mos-platform/snes/`
+after agreeing the submission route with its author and maintainers. This repo
+remains the development home, separate from the full SDK tree.
 
 ## License
 

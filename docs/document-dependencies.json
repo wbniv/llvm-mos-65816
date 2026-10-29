@@ -78,7 +78,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "8599f910e8ca16db98db3ac114b4b62c16596c148aada49ebbcbec7d94459724",
+          "docs/upstream-dashboard-curation.json": "a3a5de24c0ada46b815eb85c6e4ec702da79a06a7cbd72cbaf6b45597cc1f330",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -125,7 +125,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "81b0c5adf51c221277a81539632f6f183cbdabe43d78a2f7ba471a3835a4e3bf"
+          "docs/upstream-dashboard.json": "a8f69dc6b8c8a6a366010c5e88fbc790a277709f0dece17e65e6a95726555ec9"
         }
       }
     },
@@ -146,13 +146,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "6d613d8ee552aa3cb0b83850d71688c83109362743485dfa7821574b6b08980e",
+          "docs/upstream-pending-work.md": "d61f17b427defff9da68e44ee080f54c1e8541f87f05ae86ebfbf5d36a24473e",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "81b0c5adf51c221277a81539632f6f183cbdabe43d78a2f7ba471a3835a4e3bf",
+          "docs/upstream-dashboard.json": "a8f69dc6b8c8a6a366010c5e88fbc790a277709f0dece17e65e6a95726555ec9",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "a02fd553bf280ceaaad57714d16b3c57e47b350fe3a938f3084292e7b60c2538"
+          "docs/upstream-dashboard-graph.json": "9a02534b05c72c59f50e255c2c12fe19c43c14d1e054217a31867081c6f3561e"
         }
       }
     },
@@ -460,9 +460,9 @@
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
           "docs/upstream-twoaddr-physreg-reschedule-pr.md": "a6597fe5631ec613d45e40b249e82a0eba5a1c4e2b31fb2e039a82c635c904b7"
         },
-        "reviewed_at": "2026-10-10T18:12:41.799387+00:00",
-        "note": "Removed the completed SPC700 copy-hint item, added its dated status line, and triaged the three captured plan deferrals: the 0033 one is covered by the existing 0033 posting item; the call-lowering and 1c-filter ones stay in the Inbox for ranking.",
-        "attribution": "Claude Code 2.1.296 t4-opus-high agent, model claude-opus-5-5, high reasoning effort; session https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx"
+        "reviewed_at": "2026-10-29T05:24:20.364508+00:00",
+        "note": "Reviewed October 29 PR status and fork destination: #604 merged with green CI, #415 closed unmerged; its unchanged author fork remains a potential SNES-only contribution target, and #594 is unchanged. Current summaries and queue updated; dated snapshots preserved.",
+        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
       }
     },
     {
@@ -590,9 +590,9 @@
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621",
           "docs/open-source-dashboard-publication.md": "42dcb93d18dd6abd407a9c8c9834afa2312f72568166cdd851c159a2d499a102"
         },
-        "reviewed_at": "2026-10-10T17:58:10.761324+00:00",
-        "note": "The SPC700 allocator-assertion mention now says a standalone repair is prepared on main 0f031168a7cc and not posted, with the packet link; the HuC6280 and #320/#321 statements are unchanged.",
-        "attribution": "Claude Code 2.1.296 t4-opus-high agent, model claude-opus-5-5, high reasoning effort; session https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx"
+        "reviewed_at": "2026-10-29T05:24:17.660485+00:00",
+        "note": "Reviewed October 29 PR status and fork destination: #604 merged with green CI, #415 closed unmerged; its unchanged author fork remains a potential SNES-only contribution target, and #594 is unchanged. Current summaries and queue updated; dated snapshots preserved.",
+        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
       }
     },
     {
@@ -713,7 +713,7 @@
           "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "efbf5e5c0f045a429fd744c0d7fe675abe0809015ecb1b4948766e39ced7c262",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28",
-          "docs/upstream-pending-work.md": "6d613d8ee552aa3cb0b83850d71688c83109362743485dfa7821574b6b08980e",
+          "docs/upstream-pending-work.md": "d61f17b427defff9da68e44ee080f54c1e8541f87f05ae86ebfbf5d36a24473e",
           "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7",
           "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
           "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9",
@@ -722,9 +722,9 @@
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621",
           "docs/open-source-dashboard-publication.md": "42dcb93d18dd6abd407a9c8c9834afa2312f72568166cdd851c159a2d499a102"
         },
-        "reviewed_at": "2026-10-10T17:59:46.578296+00:00",
-        "note": "Added a To-be-posted row for the SPC700 strong-copy-hint patch (prepared, unposted, no dependency, needs independent review); turned the line-3 dashboard URL into a link. Other rows and PR states unchanged.",
-        "attribution": "Claude Code 2.1.296 t4-opus-high agent, model claude-opus-5-5, high reasoning effort; session https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx"
+        "reviewed_at": "2026-10-29T05:24:17.648680+00:00",
+        "note": "Reviewed October 29 PR status and fork destination: #604 merged with green CI, #415 closed unmerged; its unchanged author fork remains a potential SNES-only contribution target, and #594 is unchanged. Current summaries and queue updated; dated snapshots preserved.",
+        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
       }
     },
     {
@@ -1967,9 +1967,9 @@
           "docs/upstream-twoaddr-physreg-reschedule-pr.md": "a6597fe5631ec613d45e40b249e82a0eba5a1c4e2b31fb2e039a82c635c904b7",
           "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886"
         },
-        "reviewed_at": "2026-10-10T13:26:45.615871+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-10-29T05:24:18.749387+00:00",
+        "note": "Reviewed October 29 PR status and fork destination: #604 merged with green CI, #415 closed unmerged; its unchanged author fork remains a potential SNES-only contribution target, and #594 is unchanged. Current summaries and queue updated; dated snapshots preserved.",
+        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
       }
     },
     {
@@ -2894,12 +2894,12 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "ad9ba58856aa003a30d6d0cd206db644bab8f30a545b4ad91c11a80b55195ada",
+          "TODO.md": "f1b48c53ccb6120640854f6f8f623ecb5b5f910f4a8ba93bee649d7943fead67",
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621"
         },
-        "reviewed_at": "2026-10-10T22:31:52.940607+00:00",
-        "note": "Checked the TODO.md-derived claims after ranking the SNES-page PR-links item T2 and triaging three Inbox items (SPC700 RC17 follow-up T3, the #320 1c-filter swap to Watch, the soft-stack closure decision T5): the doc describes the publish workflow, not item content, so no prose changes; the edit alters the public pending queue, so publication follows the push.",
-        "attribution": "Claude Code 2.1.296, claude-fable-5-1, reasoning effort unknown"
+        "reviewed_at": "2026-10-29T05:18:53.681424+00:00",
+        "note": "Reviewed #604 merge and green CI, #415 unmerged closure and reconciliation route, #594 unchanged draft, and newer related compiler merges. Curation and trackers updated; publication workflow still requires compiler push before site publish.",
+        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
       }
     },
     {

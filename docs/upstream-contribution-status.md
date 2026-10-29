@@ -1,5 +1,7 @@
 # Upstream contribution status — PR progress and submission queue
 
+**GitHub status checked October 29, 2026:** [compiler #604](https://github.com/llvm-mos/llvm-mos/pull/604) merged October 18 as `f67c14d18a5c` after mysterymath approved head `bece1fc91204`; Ubuntu, Windows, and macOS CI passed. The 15 authored compiler PRs are 13 merged, #609 withdrawn, and #617 closed unmerged; none remains open. The author closed [SDK #415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415) unmerged October 27 without a closure explanation. [Compiler #594](https://github.com/llvm-mos/llvm-mos/pull/594) remains an open draft at `7b80f7e18768` with no new review or reply. Other relevant compiler merges are [#611](https://github.com/llvm-mos/llvm-mos/pull/611), [#614](https://github.com/llvm-mos/llvm-mos/pull/614), and [#615](https://github.com/llvm-mos/llvm-mos/pull/615) on October 18, [#619](https://github.com/llvm-mos/llvm-mos/pull/619) on October 24, and [#601](https://github.com/llvm-mos/llvm-mos/pull/601) on October 28. Earlier snapshots below describe their recorded dates.
+
 **Keep the public tracker current:** after updating this document, `upstream-pending-work.md`, `TODO.md`, or other documentation feeding the compiler-work view, commit and push the compiler docs, then run `task open-source:publish` in `/home/will/wald3n.com` and verify [https://wald3n.com/open-source](https://wald3n.com/open-source). This publication has standing user authorization and belongs to the same update. Follow the [publication workflow](open-source-dashboard-publication.md); do not leave it as a suggested follow-up.
 
 **Compiler re-pin, October 10:** `task upstream:repin` published `0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63` after an isolated Release distribution build and MOS suites (204 passed, four unsupported, zero failures). All 51 active applications remain; none became wholly empty. Hashed historical artifacts 0013/0057/0058/0059 are preserved; bootstrap uses their rebased `-vendor` copies. Independent patch application reproduced the candidate tree. [Full validation](test-results/repin/2026-10-10/full-validation.json) and [publication receipt](upstream-status/repin-20261010T033430Z-ardhs7qy.json). Earlier pin, runtime measurements and submission packets remain dated evidence for their recorded builds; this does not advance SDK pins, validate runtime/performance, or change upstream review prerequisites.
@@ -283,9 +285,9 @@ in `mos-validation.md`.
 
 ## Current PR progress
 
-| Open PR | Current head | Review / next step | Latest GitHub CI (Ubuntu / Windows / macOS) |
+| Compiler PR | Head / merge | Review / next step | Latest GitHub CI (Ubuntu / Windows / macOS) |
 |---|---|---|---|
-| [#604 — Correct MVN/MVP bank order and symbolic fixups](https://github.com/llvm-mos/llvm-mos/pull/604) | `bece1fc91204` | Windows AMDGPU test matcher repaired October 10; await new CI and initial maintainer review. | Pending |
+| [#604 — Correct MVN/MVP bank order and symbolic fixups](https://github.com/llvm-mos/llvm-mos/pull/604) | Merged as `f67c14d18a5c` | **Merged October 18, 23:50:35 UTC.** mysterymath approved head `bece1fc91204` immediately before merge. | Passed / passed / passed |
 
 | SDK / test-suite PR | Head / merge | Review / next step | GitHub CI |
 |---|---|---|---|
@@ -1013,9 +1015,7 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   Verified end-to-end on **MAME + bsnes-jg** (the whole far suite, 12 ROMs incl. `far_tail`) + corpus 7/7 + csmith 0-mismatch.
   Still ABI-blessing-gated; the `far`/`long_call` attribute spelling-sharing design is a candidate talking
   point for the #320 note when it's posted.
-- **llvm-mos-sdk#415 reconciliation.** Engage @Phillip-May's existing open SNES-target PR (not marked draft as of 2026-09-20) (build on
-  his `snesxc` reg lib + multi-bank linker, contribute our native-mode crt0 + dual-emulator CI on top). This
-  is *engaging someone else's PR*, not opening our own. Strategy in
+- **llvm-mos-sdk#415 reconciliation.** The original SNES-target PR closed unmerged October 27. Preserve its reviewed `snesxc` register library and multi-bank linker proposal with credit, and reconcile native-mode crt0 and dual-emulator CI against it. Agree the submission route with the author and maintainers. Strategy in
   [`docs/415-snes-target-reconciliation.md`](415-snes-target-reconciliation.md).
 - **Native 65816 16-bit codegen (`+mos-a16` / `+mos-xy16`) + the index-width register model.** The whole #321
   native-16-bit slice is fork-only — upstream's `W65816` is **8-bit / emulation-mode** (`FeatureAccum16` /

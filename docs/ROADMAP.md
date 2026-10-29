@@ -1,5 +1,7 @@
 # llvm-mos 65816 C backend — contribution roadmap
 
+**Upstream status checked October 29, 2026:** SDK [#415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415) closed unmerged October 27 by its author, without a closure explanation. The dated project-start snapshot below describes its earlier open state. The [reconciliation plan](415-snes-target-reconciliation.md) now uses its code and review as credited source material for a coordinated new submission.
+
 ## Context
 
 This is a **roadmap for upstream contribution to [llvm-mos](https://github.com/llvm-mos/llvm-mos)**,

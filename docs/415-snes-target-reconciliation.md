@@ -1,11 +1,15 @@
 # SNES platform reconciliation with SDK #415
 
+**Status checked October 29, 2026:** [#415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415) was closed unmerged by its author October 27 without an accompanying explanation. Its code and review remain the starting evidence for a credited, reconciled SNES contribution. Agree the submission route with the author and maintainers before filing a new PR. The September 20 starting-point and work-package notes below describe the then-open proposal.
+
+The author's [SDK fork](https://github.com/Flipphone22/llvm-mos-sdk-snes) still has `main` at #415 head `e6a5c17cab52` and no PRs as checked October 29. A fresh checkout is at `.scratch/flipphone22-llvm-mos-sdk-snes`. Evaluate self-contained SNES hardware headers, ROM layout guards, and SDK build integration as contributions to that fork; compare its `snesxc` API and preserve authorship. Our `platforms/snes/crt0.c`, `setjmp.S`, and far thunks depend on native-mode or far compiler contracts and are not drop-in 8-bit platform patches. The llvm-mos maintainer's prerequisite governs a merge into llvm-mos-sdk, not review within this fork.
+
 **Updated 2026-09-20. Status: planning and source/review audit completed; reconciled
 branch, build and submission remain to do.** No comment or platform change has
 been posted by this work.
 
-Prepare an additive contribution to [SDK #415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415),
-working with Phillip-May's platform proposal and crediting reused work. Prepare the
+Prepare a reconciled contribution using [SDK #415](https://github.com/llvm-mos/llvm-mos-sdk/pull/415)
+as a reviewed source, working with the original author's platform proposal and crediting reused work. Prepare the
 SDK and compiler contributions in parallel. Do not promise a baseline-only SDK merge:
 the maintainer explicitly requires proper 65816 support first. Agree what that means
 in concrete ABI/compiler terms before treating any platform branch as merge-ready.
@@ -80,7 +84,7 @@ of #415, document deliberate differences, and credit authorship.
   startup, stack restoration and interrupt assumptions consistent in that bundle.
 - [ ] Prepare a reviewable diff and short collaboration note for Phillip-May and
   the reviewer: what is reusable, what changes, what remains blocked. Ask whether
-  to update #415 or supply a dependent branch/PR; do not open a competing duplicate.
+  to incorporate the closed #415 proposal into a new branch/PR; agree the route before filing.
 
 ### 2. Agree acceptance dependencies while preparing code
 
