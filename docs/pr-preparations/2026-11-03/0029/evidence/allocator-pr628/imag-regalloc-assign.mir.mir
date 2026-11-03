@@ -1,0 +1,358 @@
+--- |
+  ; ModuleID = '/review/pr628/llvm/test/CodeGen/MOS/imag-regalloc-assign.mir'
+  source_filename = "/review/pr628/llvm/test/CodeGen/MOS/imag-regalloc-assign.mir"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  define void @reuse() #0 {
+    ret void
+  }
+  
+  define void @killed_inputs() #0 {
+    ret void
+  }
+  
+  define void @live_input() #0 {
+    ret void
+  }
+  
+  define void @preassigned() #0 {
+    ret void
+  }
+  
+  define void @flags() #0 {
+    ret void
+  }
+  
+  attributes #0 = { "nonreentrant" "target-features"="+static-stack" }
+...
+---
+name:            reuse
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc2' }
+  - { id: 1, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc3' }
+  - { id: 2, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc2' }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:gpr = LDAbs 1000
+    %1:gpr = LDAbs 1001
+    STAbs %0, 2000
+    %2:gpr = LDAbs 1002
+    STAbs %1, 2001
+    STAbs %2, 2002
+    RTS
+...
+---
+name:            killed_inputs
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc2' }
+  - { id: 1, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc3' }
+  - { id: 2, class: imag16, preferred-register: '', flags: [  ], assigned-phys: '$rs1' }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ], assigned-phys: '$rc2' }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:gpr = LDAbs 1000
+    %1:gpr = LDAbs 1001
+    %2:imag16 = REG_SEQUENCE %0, %subreg.sublo, %1, %subreg.subhi
+    %3:ac = LDIndir %2
+    STAbs %3, 2000
+    RTS
+...
+---
+name:            live_input
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc2' }
+  - { id: 1, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc3' }
+  - { id: 2, class: imag16, preferred-register: '', flags: [  ], assigned-phys: '$rs2' }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ], assigned-phys: '$rc3' }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:gpr = LDAbs 1000
+    %1:gpr = LDAbs 1001
+    %2:imag16 = REG_SEQUENCE %0, %subreg.sublo, %1, %subreg.subhi
+    %3:ac = LDIndir %2
+    STAbs %3, 2000
+    STAbs %0, 2001
+    RTS
+...
+---
+name:            preassigned
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc3' }
+  - { id: 1, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc2' }
+  - { id: 2, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc4' }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:gpr = LDAbs 1000
+    %1:gpr = LDAbs 1001
+    %2:gpr = LDAbs 1002
+    STAbs %0, 2000
+    STAbs %1, 2001
+    STAbs %2, 2002
+    RTS
+...
+---
+name:            flags
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: cc, preferred-register: '', flags: [  ], assigned-phys: '$rc2lsb' }
+  - { id: 1, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc3' }
+  - { id: 2, class: gpr, preferred-register: '', flags: [  ], assigned-phys: '$rc2' }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:cc = LDImm1 1
+    %1:gpr = LDAbs 1000
+    %2:gpr = REG_SEQUENCE %0, %subreg.sublsb
+    STAbs %2, 2000
+    STAbs %1, 2001
+    RTS
+...

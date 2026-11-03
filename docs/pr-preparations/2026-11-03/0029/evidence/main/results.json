@@ -1,0 +1,1290 @@
+{
+  "phase": "main",
+  "mode": "all",
+  "upstream_base": "a5c31b24a97cc16c582d124167e29e3da8946581",
+  "assertions": false,
+  "build_type": "Release",
+  "lto": false,
+  "binary_sha256": {
+    "llc": "c033649ef835b0889733180f5183d50d350560c6cb2b71703553fdbe7a534d2d",
+    "clang": "f97a8aceab2f2bf26b7f43fc1c51c26c740446d524442caf4c8832d38c2d93f4",
+    "FileCheck": "7e3b2a355f567701db569b0260b99ee037e77c823b9888f6fb44a5d94f912c68"
+  },
+  "versions": {
+    "llc": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n",
+    "clang": "clang version 24.0.0git (https://github.com/llvm-mos/llvm-mos.git a5c31b24a97cc16c582d124167e29e3da8946581)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin\n"
+  },
+  "inputs_sha256": {
+    "mixed-width-call.i": "1b97da200799cab97d1f7e6280a531a1012f5158e17d16115513af455c1feeac",
+    "pressure-probe.ll": "f438fdf04977e7ebe2fbc5452de1bd5a7bf7b2519badc1f1a4f56f44f91da08d",
+    "mixed-width-call.ll": "ed50b7d0913619b506e08e5a4ccfda957188e34e15268b4b15da6d15d775994b",
+    "run-pressure-probes.py": "232841734fe5c38937be608c287378d8300c57d9415703e6b0773cf47d04f90b",
+    "mixed-width-call.c": "495f7cc46a28f50a8d31474695b8daf57cb9a6ea20b86281f0795a7524ad581e",
+    "check-boundary-probes.py": "7950e40749041b0ff71fd616a620ca5ca42d64108f2d847c888c37d415fc3cc1",
+    "boundary-probes.mir": "42465ea3ed595f824cef24513da4e65ac5069ae98df44e39207efddb7b731eb2",
+    "consumer-boundary.mir": "553468c0b500ab4d5b5ccf951915cb8adbe086ac44de326771264127073f4f05",
+    "twoaddr-reschedule-physreg.mir": "e01944d5de179653cf474f5a590c611f0d0b4d0969be4e8fc319c0cb239e1798"
+  },
+  "runs": [
+    {
+      "name": "retained-ir-O0",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/review/inputs/mixed-width-call.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "retained-ir-O1",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/review/inputs/mixed-width-call.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "retained-ir-O2",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/review/inputs/mixed-width-call.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "retained-ir-O3",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/review/inputs/mixed-width-call.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "no-analysis",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=two-address-instruction",
+        "-verify-machineinstrs",
+        "/review/inputs/twoaddr-reschedule-physreg.mir",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true,
+      "filecheck_exit_code": 0,
+      "expected_filecheck_exit": 0
+    },
+    {
+      "name": "liveintervals",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=liveintervals,two-address-instruction",
+        "-verify-machineinstrs",
+        "/review/inputs/twoaddr-reschedule-physreg.mir",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true,
+      "filecheck_exit_code": 1,
+      "expected_filecheck_exit": 1
+    },
+    {
+      "name": "spare-class-order",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/FileCheck",
+        "/review/inputs/twoaddr-reschedule-physreg.mir",
+        "--check-prefix=LI",
+        "--input-file=/review/evidence/main/liveintervals.stdout"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "allocate",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-start-after=two-address-instruction",
+        "-verify-machineinstrs",
+        "-x",
+        "mir",
+        "/review/evidence/main/liveintervals.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "twoaddr-before",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-stop-before=two-address-instruction",
+        "/review/inputs/mixed-width-call.ll",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "twoaddr-after",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-stop-after=two-address-instruction",
+        "/review/inputs/mixed-width-call.ll",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "preprocess",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-E",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O0-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O0-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O0-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-filetype=obj",
+        "/review/evidence/main/mos6502-O0-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O0-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O0-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mos6502-O0-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O1-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O1-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O1-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-filetype=obj",
+        "/review/evidence/main/mos6502-O1-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O1-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O1-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mos6502-O1-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O2-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O2-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O2-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/review/evidence/main/mos6502-O2-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O2-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O2-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mos6502-O2-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O3-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-O3-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O3-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-filetype=obj",
+        "/review/evidence/main/mos6502-O3-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O3-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-O3-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O3",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mos6502-O3-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-Os-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Os",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-Os-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Os",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-Os-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/review/evidence/main/mos6502-Os-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-Os-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Os",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-Os-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mos6502-Os-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-Oz-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Oz",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mos6502-Oz-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Oz",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-Oz-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "/review/evidence/main/mos6502-Oz-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-Oz-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mos6502",
+        "-Oz",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mos6502-Oz-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mos6502-Oz-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O0-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O0-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O0-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-filetype=obj",
+        "/review/evidence/main/mosw65816-O0-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O0-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O0-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mosw65816-O0-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O1-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O1-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O1-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-filetype=obj",
+        "/review/evidence/main/mosw65816-O1-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O1-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O1-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mosw65816-O1-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O2-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O2-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O2-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/review/evidence/main/mosw65816-O2-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O2-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O2-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mosw65816-O2-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O3-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O3-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O3-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-filetype=obj",
+        "/review/evidence/main/mosw65816-O3-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O3-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-O3-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O3",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mosw65816-O3-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Os-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Os-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Os-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/review/evidence/main/mosw65816-Os-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Os-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Os-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mosw65816-Os-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Oz-emit",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Oz",
+        "-S",
+        "-emit-llvm",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Oz-driver-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Oz",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Oz-backend-normal",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "/review/evidence/main/mosw65816-Oz-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Oz-driver-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Oz",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "/review/inputs/mixed-width-call.c",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    },
+    {
+      "name": "mosw65816-Oz-backend-verify",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-filetype=obj",
+        "-verify-machineinstrs",
+        "/review/evidence/main/mosw65816-Oz-emit.stdout",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "expected_exit": 1,
+      "expected_signature": "ran out of registers",
+      "pass": true
+    }
+  ]
+}

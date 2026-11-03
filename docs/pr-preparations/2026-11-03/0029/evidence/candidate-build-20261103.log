@@ -1,0 +1,7 @@
+ninja: Entering directory `/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw'
+[1/6] Building CXX object lib/CodeGen/CMakeFiles/LLVMCodeGen.dir/TwoAddressInstructionPass.cpp.o
+[2/6] Linking CXX static library lib/libLLVMCodeGen.a
+[3/6] Linking CXX executable bin/opt
+[4/6] Linking CXX executable bin/clang-24
+[5/6] Creating executable symlink bin/clang
+[6/6] Linking CXX executable bin/llc

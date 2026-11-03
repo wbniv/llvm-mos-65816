@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-10-10",
-  "sourceHash": "9ea7fdf03e760e7b6e0e08af944f9c1d9bf465042109bdaa373704854fd5eb93",
+  "sourceHash": "0443083493df8fa86b466b3069192658eaabcb0a9e9af61e2f992c77702d19d4",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -763,7 +763,7 @@
       "id": "sub:0029",
       "kind": "submission",
       "title": "0029 mixed-width call register exhaustion",
-      "summary": "The existing two-address guard is revalidated on upstream 0f031168a7cc with matching-input IR/MIR red/green and 140 MOS passes (one unsupported).",
+      "summary": "The existing two-address guard is revalidated on upstream a5c31b24a97c with matching-input IR/MIR red/green and 152 MOS passes (one unsupported).",
       "localStatus": "ready",
       "publicationStatus": "unposted",
       "nextStep": "Review the refreshed PR preview, then post when approved; current backend, C matrix and MOS checks pass.",
@@ -775,7 +775,7 @@
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-10-10/0029/README.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-twoaddr-physreg-reschedule-pr.md"
       ],
-      "evidenceNote": "",
+      "evidenceNote": "Detailed evidence awaits publication.",
       "dependsOn": [],
       "upstreamUrl": null
     },

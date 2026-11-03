@@ -1,0 +1,233 @@
+[
+  {
+    "input": "pressure-probe.ll",
+    "origin": "docs/investigations/2026-10-25-pr611-review/pressure-probe.ll",
+    "sha256": "f438fdf04977e7ebe2fbc5452de1bd5a7bf7b2519badc1f1a4f56f44f91da08d",
+    "prior_attribution": {
+      "tool": "OpenAI Codex",
+      "version": "0.164.0",
+      "originator": "codex-tui",
+      "session_source": "vscode",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh",
+      "session": "01a17144-83dd-75d2-b76e-a4f5f5026ad3",
+      "verification": "session_meta and current turn_context in the session rollout"
+    },
+    "original_review_scope": {
+      "new_lit_files": 4,
+      "new_lit_compiler_commands": 15,
+      "focused_result": "4 passed",
+      "mos_suites": {
+        "passed": 142,
+        "unsupported": 1,
+        "failed": 0,
+        "unsupported_test": "CodeGen/MOS/getchar-regression.ll"
+      },
+      "pressure_probe": "8 compiler/verifier runs; symbolic MIR transfer checker verifies all 32 ordered output stores, including repeated uses, for each run. No physical target or emulator execution.",
+      "scope_limits": [
+        "No final experimental allocation: assignment and hardware allocation remain stubs.",
+        "No runtime/performance validation.",
+        "No native a16/xy16 or far-pointer build.",
+        "Current-main liveness changes inspected but not built."
+      ]
+    }
+  },
+  {
+    "input": "run-pressure-probes.py",
+    "origin": "docs/investigations/2026-10-25-pr611-review/run-pressure-probes.py",
+    "sha256": "232841734fe5c38937be608c287378d8300c57d9415703e6b0773cf47d04f90b",
+    "prior_attribution": {
+      "tool": "OpenAI Codex",
+      "version": "0.164.0",
+      "originator": "codex-tui",
+      "session_source": "vscode",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh",
+      "session": "01a17144-83dd-75d2-b76e-a4f5f5026ad3",
+      "verification": "session_meta and current turn_context in the session rollout"
+    },
+    "original_review_scope": {
+      "new_lit_files": 4,
+      "new_lit_compiler_commands": 15,
+      "focused_result": "4 passed",
+      "mos_suites": {
+        "passed": 142,
+        "unsupported": 1,
+        "failed": 0,
+        "unsupported_test": "CodeGen/MOS/getchar-regression.ll"
+      },
+      "pressure_probe": "8 compiler/verifier runs; symbolic MIR transfer checker verifies all 32 ordered output stores, including repeated uses, for each run. No physical target or emulator execution.",
+      "scope_limits": [
+        "No final experimental allocation: assignment and hardware allocation remain stubs.",
+        "No runtime/performance validation.",
+        "No native a16/xy16 or far-pointer build.",
+        "Current-main liveness changes inspected but not built."
+      ]
+    }
+  },
+  {
+    "input": "boundary-probes.mir",
+    "origin": "docs/investigations/2026-10-25-pr615-review/boundary-probes.mir",
+    "sha256": "42465ea3ed595f824cef24513da4e65ac5069ae98df44e39207efddb7b731eb2",
+    "prior_attribution": {
+      "tool": "OpenAI Codex",
+      "version": "0.164.0",
+      "originator": "codex-tui",
+      "session_source": "vscode",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh",
+      "session": "01a17144-83dd-75d2-b76e-a4f5f5026ad3",
+      "verification": "session_meta and current turn_context in the session rollout"
+    },
+    "original_review_scope": {
+      "mos_suites": {
+        "command": "python3 /work/build/0029-cross-target-build/bin/llvm-lit -v /work/build/0029-cross-target-build/test/CodeGen/MOS /work/build/0029-cross-target-build/test/MC/MOS",
+        "passed": 143,
+        "unsupported": 1,
+        "failed": 0,
+        "unsupported_test": "CodeGen/MOS/getchar-regression.ll",
+        "log": "mos-lit.log"
+      },
+      "boundary_probes": {
+        "command": "/work/build/0029-cross-target-build/bin/llc -mtriple=mos -run-pass=mos-conventional-ssa -verify-machineinstrs /review/boundary-probes.mir -o /review/boundary-output.mir",
+        "check": "python3 /review/check-boundary-probes.py /review/boundary-output.mir",
+        "result": {
+          "result": "PASS",
+          "functions": [
+            "debug_live",
+            "distinct_sources",
+            "mixed_tied_untied",
+            "phi_edges"
+          ]
+        },
+        "origin": "constructed review probes"
+      },
+      "consumer_boundary": {
+        "commands": [
+          "llc -mtriple=mos -verify-machineinstrs -run-pass=mos-conventional-ssa consumer-boundary.mir -o consumer-normalized.mir",
+          "llc -mtriple=mos -verify-machineinstrs -run-pass=mos-conventional-ssa,mos-imag-reg-spill consumer-boundary.mir -o /dev/null"
+        ],
+        "result": {
+          "normalizer_exit": 0,
+          "normalizer_and_spiller_exit": 1,
+          "expected_rejection": true
+        },
+        "classification": "expected unsupported-path diagnostic; no new defect claimed"
+      },
+      "limits": [
+        "Original PR revision tested; current upstream only inspected.",
+        "No runtime, emulator, final allocation, native A16/XY16, far-pointer, or performance validation."
+      ]
+    }
+  },
+  {
+    "input": "check-boundary-probes.py",
+    "origin": "docs/investigations/2026-10-25-pr615-review/check-boundary-probes.py",
+    "sha256": "7950e40749041b0ff71fd616a620ca5ca42d64108f2d847c888c37d415fc3cc1",
+    "prior_attribution": {
+      "tool": "OpenAI Codex",
+      "version": "0.164.0",
+      "originator": "codex-tui",
+      "session_source": "vscode",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh",
+      "session": "01a17144-83dd-75d2-b76e-a4f5f5026ad3",
+      "verification": "session_meta and current turn_context in the session rollout"
+    },
+    "original_review_scope": {
+      "mos_suites": {
+        "command": "python3 /work/build/0029-cross-target-build/bin/llvm-lit -v /work/build/0029-cross-target-build/test/CodeGen/MOS /work/build/0029-cross-target-build/test/MC/MOS",
+        "passed": 143,
+        "unsupported": 1,
+        "failed": 0,
+        "unsupported_test": "CodeGen/MOS/getchar-regression.ll",
+        "log": "mos-lit.log"
+      },
+      "boundary_probes": {
+        "command": "/work/build/0029-cross-target-build/bin/llc -mtriple=mos -run-pass=mos-conventional-ssa -verify-machineinstrs /review/boundary-probes.mir -o /review/boundary-output.mir",
+        "check": "python3 /review/check-boundary-probes.py /review/boundary-output.mir",
+        "result": {
+          "result": "PASS",
+          "functions": [
+            "debug_live",
+            "distinct_sources",
+            "mixed_tied_untied",
+            "phi_edges"
+          ]
+        },
+        "origin": "constructed review probes"
+      },
+      "consumer_boundary": {
+        "commands": [
+          "llc -mtriple=mos -verify-machineinstrs -run-pass=mos-conventional-ssa consumer-boundary.mir -o consumer-normalized.mir",
+          "llc -mtriple=mos -verify-machineinstrs -run-pass=mos-conventional-ssa,mos-imag-reg-spill consumer-boundary.mir -o /dev/null"
+        ],
+        "result": {
+          "normalizer_exit": 0,
+          "normalizer_and_spiller_exit": 1,
+          "expected_rejection": true
+        },
+        "classification": "expected unsupported-path diagnostic; no new defect claimed"
+      },
+      "limits": [
+        "Original PR revision tested; current upstream only inspected.",
+        "No runtime, emulator, final allocation, native A16/XY16, far-pointer, or performance validation."
+      ]
+    }
+  },
+  {
+    "input": "consumer-boundary.mir",
+    "origin": "docs/investigations/2026-10-25-pr615-review/consumer-boundary.mir",
+    "sha256": "553468c0b500ab4d5b5ccf951915cb8adbe086ac44de326771264127073f4f05",
+    "prior_attribution": {
+      "tool": "OpenAI Codex",
+      "version": "0.164.0",
+      "originator": "codex-tui",
+      "session_source": "vscode",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh",
+      "session": "01a17144-83dd-75d2-b76e-a4f5f5026ad3",
+      "verification": "session_meta and current turn_context in the session rollout"
+    },
+    "original_review_scope": {
+      "mos_suites": {
+        "command": "python3 /work/build/0029-cross-target-build/bin/llvm-lit -v /work/build/0029-cross-target-build/test/CodeGen/MOS /work/build/0029-cross-target-build/test/MC/MOS",
+        "passed": 143,
+        "unsupported": 1,
+        "failed": 0,
+        "unsupported_test": "CodeGen/MOS/getchar-regression.ll",
+        "log": "mos-lit.log"
+      },
+      "boundary_probes": {
+        "command": "/work/build/0029-cross-target-build/bin/llc -mtriple=mos -run-pass=mos-conventional-ssa -verify-machineinstrs /review/boundary-probes.mir -o /review/boundary-output.mir",
+        "check": "python3 /review/check-boundary-probes.py /review/boundary-output.mir",
+        "result": {
+          "result": "PASS",
+          "functions": [
+            "debug_live",
+            "distinct_sources",
+            "mixed_tied_untied",
+            "phi_edges"
+          ]
+        },
+        "origin": "constructed review probes"
+      },
+      "consumer_boundary": {
+        "commands": [
+          "llc -mtriple=mos -verify-machineinstrs -run-pass=mos-conventional-ssa consumer-boundary.mir -o consumer-normalized.mir",
+          "llc -mtriple=mos -verify-machineinstrs -run-pass=mos-conventional-ssa,mos-imag-reg-spill consumer-boundary.mir -o /dev/null"
+        ],
+        "result": {
+          "normalizer_exit": 0,
+          "normalizer_and_spiller_exit": 1,
+          "expected_rejection": true
+        },
+        "classification": "expected unsupported-path diagnostic; no new defect claimed"
+      },
+      "limits": [
+        "Original PR revision tested; current upstream only inspected.",
+        "No runtime, emulator, final allocation, native A16/XY16, far-pointer, or performance validation."
+      ]
+    }
+  }
+]

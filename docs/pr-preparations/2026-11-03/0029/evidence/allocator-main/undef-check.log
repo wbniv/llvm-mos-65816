@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/review/inputs/check-boundary-probes.py", line 28, in <module>
+    tied = re.search(r"killed %(\d+)\(tied-def 0\)", inc)[1]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+TypeError: 'NoneType' object is not subscriptable

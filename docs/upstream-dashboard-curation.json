@@ -310,13 +310,14 @@
       "id": "sub:0029",
       "kind": "submission",
       "title": "0029 mixed-width call register exhaustion",
-      "summary": "The existing two-address guard is revalidated on upstream 0f031168a7cc with matching-input IR/MIR red/green and 140 MOS passes (one unsupported).",
+      "summary": "The existing two-address guard is revalidated on upstream a5c31b24a97c with matching-input IR/MIR red/green and 152 MOS passes (one unsupported).",
       "localStatus": "ready",
       "publicationStatus": "unposted",
       "evidencePaths": [
         "docs/defects/twoaddr-physreg-reschedule-exhaustion.json",
         "docs/pr-preparations/2026-10-10/0029/README.md",
-        "docs/upstream-twoaddr-physreg-reschedule-pr.md"
+        "docs/upstream-twoaddr-physreg-reschedule-pr.md",
+        "docs/pr-preparations/2026-11-03/0029/README.md"
       ],
       "nextStep": "Review the refreshed PR preview, then post when approved; current backend, C matrix and MOS checks pass.",
       "demoUrls": [

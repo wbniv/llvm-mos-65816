@@ -1,0 +1,755 @@
+diff --git a/llvm/lib/Target/MOS/MOSImagRegSpill.cpp b/llvm/lib/Target/MOS/MOSImagRegSpill.cpp
+index a714f8c558cc..5a067d4ab761 100644
+--- a/llvm/lib/Target/MOS/MOSImagRegSpill.cpp
++++ b/llvm/lib/Target/MOS/MOSImagRegSpill.cpp
+@@ -26,6 +26,7 @@
+ #include "MOSRegisterInfo.h"
+ #include "MOSSubtarget.h"
+ #include "llvm/ADT/DenseMap.h"
++#include "llvm/ADT/DenseSet.h"
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/CodeGen/GlobalISel/MachineIRBuilder.h"
+ #include "llvm/CodeGen/LiveIntervals.h"
+@@ -139,6 +140,9 @@ class MOSImagRegSpill : public MachineFunctionPass {
+   DenseMap<MachineInstr *, SpillTransfers> PlannedTransfers;
+   // Each original SSA value has its own slot, shared by all of its reloads.
+   DenseMap<Register, int> SpillSlots;
++  // Values whose spill slots hold their contents at the current position. Each
++  // original value has its own slot, so once stored, a value stays saved.
++  DenseSet<Register> SavedValues;
+   bool Changed = false;
+ };
+ 
+@@ -153,6 +157,7 @@ bool MOSImagRegSpill::runOnMachineFunction(MachineFunction &MF) {
+   Builder.emplace(LIS);
+   PlannedTransfers.clear();
+   SpillSlots.clear();
++  SavedValues.clear();
+   Changed = false;
+ 
+   checkSupportedMIR(MF);
+@@ -248,7 +253,7 @@ void MOSImagRegSpill::spillBeforeMIs(
+   // any assignment of the new definitions. Further evictions only remove
+   // interference, preserving the successful instruction simplification above.
+   Builder->trimToLive();
+-  Graph->retainAll();
++  Builder->retainAll();
+   ensureScratch(Instructions);
+ }
+ 
+@@ -268,7 +273,7 @@ void MOSImagRegSpill::reloadForInputs(
+     for (const MachineOperand &Use : MI.all_uses()) {
+       Register Reg = Use.getReg();
+       if (!Reg.isVirtual() || Use.isDebug() || Use.isUndef() ||
+-          Builder->spillState().ResidentValues.contains(Reg))
++          Builder->liveRegs().contains(Reg))
+         continue;
+       reloadForInput(Reg, Instructions);
+     }
+@@ -281,7 +286,7 @@ void MOSImagRegSpill::reloadForInput(
+   // The reload is not yet known to be executable: it also needs scratch while
+   // producing this result. Any required stores will precede the reload, using
+   // the scratch guaranteed on entry.
+-  Builder->reload(Reg);
++  Builder->addLiveReg(Reg);
+   SmallVector<Register> RemainingRegs;
+   while (!Graph->canSimplify(&RemainingRegs))
+     spillLiveThrough(Instructions, RemainingRegs);
+@@ -289,7 +294,7 @@ void MOSImagRegSpill::reloadForInput(
+   // Retain the destination so scratch must fit alongside any assignment of it.
+   // This provides scratch for executing this reload and any following transfers.
+   // Retention also prevents later reload checks from rearranging this result.
+-  Graph->retainAll();
++  Builder->retainAll();
+   ensureScratch(Instructions);
+   PlannedTransfers[&*Instructions.begin()].Reloads.push_back(Reg);
+ }
+@@ -311,16 +316,14 @@ void MOSImagRegSpill::ensureScratch(
+   SmallVector<Register> RemainingRegs;
+   while (!Graph->canSimplify(&RemainingRegs))
+     spillLiveThrough(Instructions, RemainingRegs);
+-  for (auto ID : Scratch) {
++  for (auto ID : Scratch)
+     Builder->killTemporaryVertex(ID);
+-    Graph->removeVertex(ID);
+-  }
+ }
+ 
+ SmallVector<Register> MOSImagRegSpill::spillCandidates(
+     iterator_range<MachineBasicBlock::iterator> Instructions) const {
+   SmallVector<Register> Regs;
+-  for (Register Reg : Builder->spillState().ResidentValues) {
++  for (Register Reg : Builder->liveRegs()) {
+     // Transfers precede the entire range, so only values unused and undefined
+     // throughout it can be evicted here.
+     if (llvm::any_of(Instructions, [&](const MachineInstr &MI) {
+@@ -347,16 +350,16 @@ void MOSImagRegSpill::spillLiveThrough(
+                        false);
+   Register Reg = *Victim;
+   evict(Reg, *Instructions.begin());
+-  Graph->remove(Reg);
+ }
+ 
+ void MOSImagRegSpill::evict(Register Reg, MachineInstr &Before) {
+-  if (!Builder->spillState().SavedResidentValues.contains(Reg))
++  if (SavedValues.insert(Reg).second)
+     PlannedTransfers[&Before].Stores.push_back(Reg);
+ 
+-  // If the builder has already stepped past Before, the value remains
+-  // evicted afterwards too.
+-  Builder->evict(Reg);
++  // The store precedes every instruction the graph covers, so none of them
++  // needs Reg in imaginary storage. If the builder has already stepped past
++  // Before, the value remains evicted afterwards too.
++  Builder->removeLiveReg(Reg);
+ }
+ 
+ void MOSImagRegSpill::insertSpillsAndReloads(MachineBasicBlock &MBB) {
+diff --git a/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp b/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp
+index 7dafda86bd35..8d28c7c705eb 100644
+--- a/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp
++++ b/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp
+@@ -7,19 +7,16 @@
+ //===----------------------------------------------------------------------===//
+ ///
+ /// \file
+-/// Interference graph construction and squeeze-based simplification.
++/// Implementation for interference graph management.
+ ///
+-/// Vertices use reusable indices and sparse adjacency bitsets. The builder
+-/// connects each new resident to the current residents. Within an instruction,
+-/// killed uses are released before definitions are introduced, and dead results
+-/// are released afterwards. Edges persist until their vertices are removed.
+-///
+-/// Simplification sums the maximum number of candidate locations each neighbor
+-/// could block, accounting for register aliasing. A worklist removes vertices
+-/// whose candidate count exceeds that bound and updates their neighbors.
+-/// Earlier definitions remain as blockers throughout. Anonymous temporary
+-/// vertices undergo the same simplification as virtual registers. Blocking
+-/// bounds are cached by register-class pair across graph edits.
++/// Simplification uses the notion of "squeeze". A vertex's candidates are the
++/// allocation order of its register class, and its squeeze is the sum, over its
++/// neighbors remaining in the graph, of the most of its candidates that one
++/// candidate of the neighbor can overlap. Each removal lowers its neighbors'
++/// squeeze, and a non-retained vertex can only be removed once its squeeze is
++/// less than its number of candidates, since its neighbors then cannot block
++/// all of them. Retained vertices are removed at the very end, since they are
++/// assumed to be allocated by other means.
+ ///
+ //===----------------------------------------------------------------------===//
+ 
+@@ -29,8 +26,8 @@
+ #include "llvm/ADT/STLExtras.h"
+ #include "llvm/CodeGen/LiveIntervals.h"
+ #include "llvm/CodeGen/MachineInstr.h"
+-#include "llvm/CodeGen/MachineRegisterInfo.h"
+ #include "llvm/CodeGen/RegisterClassInfo.h"
++#include <functional>
+ 
+ using namespace llvm;
+ 
+@@ -50,8 +47,8 @@ bool MOSInterferenceGraph::canSimplify(
+   for (VertexID ID : OccupiedVertices.set_bits()) {
+     if (RetainedVertices.test(ID))
+       continue;
+-    for (VertexID Other : Vertices[ID].Interferences)
+-      Squeezes[ID] += maxBlockedLocations(ID, Other);
++    for (VertexID Other : Vertices[ID].Edges)
++      Squeezes[ID] += Vertices[ID].maxBlockedLocations(Vertices[Other]);
+     if (Squeezes[ID] < RCI.getOrder(Vertices[ID].RC).size())
+       Worklist.push_back(ID);
+   }
+@@ -61,12 +58,12 @@ bool MOSInterferenceGraph::canSimplify(
+   while (!Worklist.empty()) {
+     VertexID ID = Worklist.pop_back_val();
+     Remaining.reset(ID);
+-    for (VertexID Other : Vertices[ID].Interferences) {
++    for (VertexID Other : Vertices[ID].Edges) {
+       if (!Remaining.test(Other) || RetainedVertices.test(Other))
+         continue;
+       unsigned &Squeeze = Squeezes[Other];
+       unsigned OldSqueeze = Squeeze;
+-      Squeeze -= maxBlockedLocations(Other, ID);
++      Squeeze -= Vertices[Other].maxBlockedLocations(Vertices[ID]);
+       unsigned Candidates = RCI.getOrder(Vertices[Other].RC).size();
+       if (OldSqueeze >= Candidates && Squeeze < Candidates)
+         Worklist.push_back(Other);
+@@ -85,66 +82,64 @@ bool MOSInterferenceGraph::canSimplify(
+   return Simplified;
+ }
+ 
+-void MOSInterferenceGraph::retainAll() {
+-  RetainedVertices = OccupiedVertices;
+-}
+-
+-void MOSInterferenceGraph::remove(Register Reg) {
+-  assert(Reg.isVirtual() && "expected a virtual register");
+-  auto It = VirtRegVertices.find(Reg);
+-  if (It != VirtRegVertices.end())
+-    removeVertex(It->second);
+-}
+-
+-void MOSInterferenceGraph::removeVertex(VertexID ID) {
+-  assert(OccupiedVertices.test(ID) && "vertex already removed");
+-  Vertex &V = Vertices[ID];
+-  for (VertexID Other : V.Interferences)
+-    Vertices[Other].Interferences.reset(ID);
+-  if (V.Reg)
+-    VirtRegVertices.erase(V.Reg);
+-  V = {};
+-  OccupiedVertices.reset(ID);
+-  RetainedVertices.reset(ID);
+-  FreeVertices.push_back(ID);
++MOSInterferenceGraph::VertexID MOSInterferenceGraph::Vertex::id() const {
++  // Use std::less to avoid UB.
++  assert(!std::less<>()(this, Graph->Vertices.begin()) &&
++         std::less<>()(this, Graph->Vertices.end()) &&
++         "vertex is not in its graph");
++  return this - Graph->Vertices.begin();
+ }
+ 
+-unsigned MOSInterferenceGraph::maxBlockedLocations(VertexID ID,
+-                                                   VertexID Other) const {
+-  auto Key = std::make_pair(Vertices[ID].RC, Vertices[Other].RC);
+-  auto It = MaxBlockedLocations.find(Key);
+-  if (It != MaxBlockedLocations.end())
++unsigned
++MOSInterferenceGraph::Vertex::maxBlockedLocations(const Vertex &Other) const {
++  auto Key = std::make_pair(RC, Other.RC);
++  auto It = Graph->MaxBlockedLocations.find(Key);
++  if (It != Graph->MaxBlockedLocations.end())
+     return It->second;
+ 
+   unsigned Max = 0;
+-  for (MCPhysReg OtherPhys : RCI.getOrder(Key.second)) {
++  for (MCPhysReg OtherPhys : Graph->RCI.getOrder(Key.second)) {
+     unsigned Blocked =
+-        llvm::count_if(RCI.getOrder(Key.first), [&](MCPhysReg Phys) {
+-          return TRI.regsOverlap(Phys, OtherPhys);
++        llvm::count_if(Graph->RCI.getOrder(Key.first), [&](MCPhysReg Phys) {
++          return Graph->TRI.regsOverlap(Phys, OtherPhys);
+         });
+     Max = std::max(Max, Blocked);
+   }
+-  MaxBlockedLocations.try_emplace(Key, Max);
++  Graph->MaxBlockedLocations.try_emplace(Key, Max);
+   return Max;
+ }
+ 
+-MOSInterferenceGraph::VertexID
++void MOSInterferenceGraph::Vertex::addEdge(Vertex &Other) {
++  assert(this != &Other && "a vertex cannot have an edge to itself");
++  assert(Graph == Other.Graph && "vertices must be in the same graph");
++  VertexID ID = id();
++  VertexID OtherID = Other.id();
++  assert(Graph->OccupiedVertices.test(ID) &&
++         Graph->OccupiedVertices.test(OtherID));
++  Edges.set(OtherID);
++  Other.Edges.set(ID);
++}
++
++void MOSInterferenceGraph::retainAll() { RetainedVertices = OccupiedVertices; }
++
++MOSInterferenceGraph::Vertex &
+ MOSInterferenceGraph::getOrCreateVertex(Register Reg) {
+   assert(Reg.isVirtual() && "expected a virtual register");
+   auto [It, Inserted] = VirtRegVertices.try_emplace(Reg);
+   if (Inserted) {
+-    It->second = createVertex(*TRI.getImagRegClass(Reg, MRI));
+-    Vertices[It->second].Reg = Reg;
++    Vertex &V = createVertex(*TRI.getImagRegClass(Reg, MRI));
++    V.Reg = Reg;
++    It->second = V.id();
+   }
+-  return It->second;
++  return Vertices[It->second];
+ }
+ 
+-MOSInterferenceGraph::VertexID
++MOSInterferenceGraph::Vertex &
+ MOSInterferenceGraph::createVertex(const TargetRegisterClass &RC) {
+   VertexID ID;
+   if (FreeVertices.empty()) {
+     ID = Vertices.size();
+-    Vertices.emplace_back();
++    Vertices.emplace_back(*this);
+     OccupiedVertices.resize(Vertices.size());
+     RetainedVertices.resize(Vertices.size());
+   } else {
+@@ -152,55 +147,73 @@ MOSInterferenceGraph::createVertex(const TargetRegisterClass &RC) {
+   }
+   Vertices[ID].RC = &RC;
+   OccupiedVertices.set(ID);
+-  return ID;
+-}
+-
+-void MOSInterferenceGraph::addInterference(VertexID ID, VertexID Other) {
+-  assert(OccupiedVertices.test(ID) && OccupiedVertices.test(Other));
+-  if (ID == Other)
+-    return;
+-  Vertices[ID].Interferences.set(Other);
+-  Vertices[Other].Interferences.set(ID);
+-}
+-
+-void MOSInterferenceGraph::addInterferences(
+-    VertexID ID, const SparseBitVector<> &LiveVertices) {
+-  for (VertexID Other : LiveVertices)
+-    addInterference(ID, Other);
++  return Vertices[ID];
+ }
+ 
+-void MOSInterferenceGraphBuilder::evict(Register Reg) {
+-  assert(Reg.isVirtual() && State.ResidentValues.contains(Reg) &&
+-         "expected a resident virtual register");
+-  releaseReg(Reg);
++void MOSInterferenceGraph::removeVertex(Vertex &V) {
++  VertexID ID = V.id();
++  assert(OccupiedVertices.test(ID) && "vertex already removed");
++  for (VertexID Other : V.Edges)
++    Vertices[Other].Edges.reset(ID);
++  if (V.Reg)
++    VirtRegVertices.erase(V.Reg);
++  V = Vertex(*this);
++  OccupiedVertices.reset(ID);
++  RetainedVertices.reset(ID);
++  FreeVertices.push_back(ID);
+ }
+ 
+-void MOSInterferenceGraphBuilder::reload(Register Reg) {
+-  assert(Reg.isVirtual() && !State.ResidentValues.contains(Reg) &&
+-         "expected a nonresident virtual register");
+-  makeLive(Reg);
+-  State.SavedResidentValues.insert(Reg);
++void MOSInterferenceGraphBuilder::stepForward(const MachineInstr &MI) {
++  SlotIndex Idx = LIS.getInstructionIndex(MI);
++  for (const MachineOperand &Use : MI.all_uses())
++    assert((!Use.getReg().isVirtual() || LiveRegs.contains(Use.getReg())) &&
++           "virtual inputs must already be live");
++  for (const MachineOperand &Use : MI.all_uses())
++    if (Use.getReg().isVirtual() &&
++        LIS.getInterval(Use.getReg()).Query(Idx).isKill())
++      LiveRegs.erase(Use.getReg());
++  for (const MachineOperand &Def : MI.all_defs())
++    if (Def.getReg().isVirtual())
++      defineReg(Def.getReg());
++  for (const MachineOperand &Def : MI.all_defs())
++    if (Def.getReg().isVirtual() &&
++        LIS.getInterval(Def.getReg()).Query(Idx).isDeadDef())
++      LiveRegs.erase(Def.getReg());
+ }
+ 
+ void MOSInterferenceGraphBuilder::beginCapture(MOSInterferenceGraph &Graph) {
+   assert(!this->Graph && "a capture is already active");
+   this->Graph = &Graph;
+-  SparseBitVector<> LiveVertices;
+-  for (Register Reg : State.ResidentValues)
+-    LiveVertices.set(Graph.getOrCreateVertex(Reg));
+-  for (VertexID ID : LiveVertices) {
+-    Graph.addInterferences(ID, LiveVertices);
++  SmallVector<VertexID> Earlier;
++  for (Register Reg : LiveRegs) {
++    Vertex &V = Graph.getOrCreateVertex(Reg);
++    for (VertexID Other : Earlier)
++      V.addEdge(Graph.Vertices[Other]);
++    VertexID ID = V.id();
++    Earlier.push_back(ID);
+     Graph.RetainedVertices.set(ID);
+   }
+ }
+ 
++void MOSInterferenceGraphBuilder::addLiveReg(Register Reg) {
++  assert(Graph && "adjusting liveness requires an active capture");
++  defineReg(Reg);
++}
++
++void MOSInterferenceGraphBuilder::removeLiveReg(Register Reg) {
++  assert(Graph && "adjusting liveness requires an active capture");
++  assert(Reg.isVirtual() && LiveRegs.contains(Reg) &&
++         "expected a live virtual register");
++  LiveRegs.erase(Reg);
++  Graph->removeVertex(Graph->Vertices[Graph->VirtRegVertices.at(Reg)]);
++}
++
+ MOSInterferenceGraph::VertexID
+ MOSInterferenceGraphBuilder::addTemporaryVertex(const TargetRegisterClass &RC) {
+   assert(Graph && "temporary storage requires an active capture");
+-  VertexID Temporary = Graph->createVertex(RC);
+-  addInterferences(Temporary);
+-  LiveTemporaries.push_back(Temporary);
+-  return Temporary;
++  Vertex &Temporary = Graph->createVertex(RC);
++  defineVertex(Temporary);
++  return Temporary.id();
+ }
+ 
+ void MOSInterferenceGraphBuilder::killTemporaryVertex(VertexID ID) {
+@@ -208,36 +221,23 @@ void MOSInterferenceGraphBuilder::killTemporaryVertex(VertexID ID) {
+   auto It = llvm::find(LiveTemporaries, ID);
+   assert(It != LiveTemporaries.end() && "temporary is not live");
+   LiveTemporaries.erase(It);
+-}
+-
+-void MOSInterferenceGraphBuilder::stepForward(const MachineInstr &MI) {
+-  SlotIndex Idx = LIS.getInstructionIndex(MI);
+-  for (const MachineOperand &Use : MI.all_uses())
+-    assert((!Use.getReg().isVirtual() ||
+-            State.ResidentValues.contains(Use.getReg())) &&
+-           "virtual inputs must already be resident");
+-  for (const MachineOperand &Use : MI.all_uses())
+-    if (Use.getReg().isVirtual() &&
+-        LIS.getInterval(Use.getReg()).Query(Idx).isKill())
+-      releaseReg(Use.getReg());
+-  for (const MachineOperand &Def : MI.all_defs())
+-    if (Def.getReg().isVirtual())
+-      makeLive(Def.getReg());
+-  for (const MachineOperand &Def : MI.all_defs())
+-    if (Def.getReg().isVirtual() &&
+-        LIS.getInterval(Def.getReg()).Query(Idx).isDeadDef())
+-      releaseReg(Def.getReg());
++  Graph->removeVertex(Graph->Vertices[ID]);
+ }
+ 
+ void MOSInterferenceGraphBuilder::trimToLive() {
+   assert(Graph && "trimming requires an active capture");
+   SmallBitVector DeadVertices = Graph->OccupiedVertices;
+-  for (Register Reg : State.ResidentValues)
++  for (Register Reg : LiveRegs)
+     DeadVertices.reset(Graph->VirtRegVertices.at(Reg));
+   for (VertexID ID : LiveTemporaries)
+     DeadVertices.reset(ID);
+   for (VertexID ID : DeadVertices.set_bits())
+-    Graph->removeVertex(ID);
++    Graph->removeVertex(Graph->Vertices[ID]);
++}
++
++void MOSInterferenceGraphBuilder::retainAll() {
++  assert(Graph && "retention requires an active capture");
++  Graph->retainAll();
+ }
+ 
+ void MOSInterferenceGraphBuilder::endCapture() {
+@@ -246,24 +246,23 @@ void MOSInterferenceGraphBuilder::endCapture() {
+   Graph = nullptr;
+ }
+ 
+-void MOSInterferenceGraphBuilder::addInterferences(VertexID ID) {
+-  SparseBitVector<> LiveVertices;
+-  for (Register Reg : State.ResidentValues)
+-    LiveVertices.set(Graph->getOrCreateVertex(Reg));
+-  for (VertexID Temporary : LiveTemporaries)
+-    LiveVertices.set(Temporary);
+-  Graph->addInterferences(ID, LiveVertices);
+-}
+-
+-void MOSInterferenceGraphBuilder::makeLive(Register Reg) {
+-  assert(Reg.isVirtual() && !State.ResidentValues.contains(Reg) &&
+-         "expected a new resident virtual register");
++void MOSInterferenceGraphBuilder::defineReg(Register Reg) {
++  assert(Reg.isVirtual() && !LiveRegs.contains(Reg) &&
++         "expected a virtual register that is not yet live");
+   if (Graph)
+-    addInterferences(Graph->getOrCreateVertex(Reg));
+-  State.ResidentValues.insert(Reg);
++    defineVertex(Graph->getOrCreateVertex(Reg));
++  else
++    LiveRegs.insert(Reg);
+ }
+ 
+-void MOSInterferenceGraphBuilder::releaseReg(Register Reg) {
+-  State.ResidentValues.erase(Reg);
+-  State.SavedResidentValues.erase(Reg);
++void MOSInterferenceGraphBuilder::defineVertex(Vertex &V) {
++  // Live registers already have vertices; creating one could invalidate V.
++  for (Register Reg : LiveRegs)
++    V.addEdge(Graph->Vertices[Graph->VirtRegVertices.at(Reg)]);
++  for (VertexID Temporary : LiveTemporaries)
++    V.addEdge(Graph->Vertices[Temporary]);
++  if (V.Reg)
++    LiveRegs.insert(V.Reg);
++  else
++    LiveTemporaries.push_back(V.id());
+ }
+diff --git a/llvm/lib/Target/MOS/MOSInterferenceGraph.h b/llvm/lib/Target/MOS/MOSInterferenceGraph.h
+index 5fd0b3db3027..16cc7d9d2173 100644
+--- a/llvm/lib/Target/MOS/MOSInterferenceGraph.h
++++ b/llvm/lib/Target/MOS/MOSInterferenceGraph.h
+@@ -7,16 +7,15 @@
+ //===----------------------------------------------------------------------===//
+ ///
+ /// \file
+-/// Interference graphs and instruction walks for imaginary register spilling.
++/// Interference graph management for imaginary register spilling.
+ ///
+-/// MOSInterferenceGraph records storage conflicts and checks whether imaginary
+-/// registers can be assigned without spilling. A successful check guarantees
+-/// an assignment; failure is conservative. It does not select assignments.
++/// MOSInterferenceGraph records the conflict relationship graph between
++/// imaginary storage for virtual registers. This provides the
++/// means to check whether registers can be assigned without spilling.
+ ///
+-/// MOSInterferenceGraphBuilder tracks register residency while walking MIR and
+-/// can capture interference in a graph. Callers can model spills and reloads
+-/// without editing MIR, model temporary storage, and discard expired portions
+-/// of the graph as the walk advances.
++/// MOSInterferenceGraphBuilder tracks register residency while walking MIR. It
++/// uses this to capture interferences between registers in a
++/// MOSInterferenceGraph.
+ ///
+ /// Currently these interfaces support ordinary virtual uses and definitions
+ /// within a block. PHI congruence, operand ties, and physical imaginary
+@@ -44,68 +43,106 @@ class MachineRegisterInfo;
+ class RegisterClassInfo;
+ class MOSRegisterInfo;
+ 
+-/// Captured interference among SSA virtual registers. Each vertex requires one
+-/// location from its imaginary register class, independently of hardware
+-/// operand constraints. A vertex can name a virtual register or describe
+-/// anonymous temporary storage. Simplification checks whether these
+-/// interferences guarantee an assignment; the graph does not choose assignments
+-/// or emit transfers.
++/// Interference graph for the imaginary storage needed by registers within some
++/// contiguous region of MIR instructions.
++///
++/// Each register that could require an imaginary storage location is a vertex
++/// in the graph, and there is an edge in the graph between two vertices if the
++/// structure of the MIR instructions that the graph covers implies that the two
++/// registers cannot be assigned to an overlapping location simultaneously.
++///
++/// The graph also provides for anonymous temporary vertices. These do not
++/// correspond to any actual register, but they instead provide means to
++/// guarantee that if a register were to be inserted into the MIR later, it
++/// could receive an assignment.
++///
++/// Some vertices may already have been assigned to some unknown location by the
++/// time the graph is being analyzed. In such cases, the vertex may be marked as
++/// retained, which means that the graph should not consider the vertex within
++/// its purview to assign.
++///
++/// The main operation done on the graph is simplification. This means to
++/// logically remove one vertex and its edges at a time from the graph. To
++/// safely remove a vertex, we first guarantee that given any assignment of the
++/// remainder of the graph, we can trivially assign the vertex to a location
++/// that does not overlap with any of its neighbors. This ensures that if
++/// vertices are assigned in the reverse order of removal, vertices can always
++/// successfully be assigned.
+ class MOSInterferenceGraph {
+ public:
+-  // Stable until removal. IDs are reused; no references may survive removal.
++  // Stable until removal. IDs of removed vertices are reused by new ones.
+   using VertexID = unsigned;
+ 
+   MOSInterferenceGraph(MachineFunction &MF, const RegisterClassInfo &RCI);
+ 
+-  /// Test whether conservative simplification can eliminate all new vertices
+-  /// while retaining earlier definitions. Their assignments are unknown, so
+-  /// their full squeeze remains throughout simplification. Success guarantees
+-  /// that any legal assignment of the retained vertices can be extended.
+-  /// On failure, RemainingRegs receives the virtual registers left, including
+-  /// retained registers that the caller can choose to spill. Anonymous vertices
+-  /// are omitted. On success, RemainingRegs is cleared.
+-  bool canSimplify(SmallVectorImpl<Register> *RemainingRegs = nullptr) const;
++  // Vertices point to their graph, so it cannot be copied or moved.
++  MOSInterferenceGraph(const MOSInterferenceGraph &) = delete;
++  MOSInterferenceGraph &operator=(const MOSInterferenceGraph &) = delete;
+ 
+-  /// Retain all current vertices: subsequent simplification must accommodate
+-  /// their assignments without changing them.
+-  void retainAll();
+-
+-  /// Remove Reg and its incident edges. The caller must establish that Reg
+-  /// needs no storage anywhere still represented by the graph.
+-  void remove(Register Reg);
+-  /// Remove a vertex and its incident edges, including an anonymous temporary.
+-  /// The builder must first kill a live temporary.
+-  void removeVertex(VertexID ID);
++  /// Test whether simplification succeeds.
++  ///
++  /// Failure means that no vertex remaining in the graph can be safely removed.
++  /// The algorithm is conservative: success guarantees assignability, but
++  /// failure does not prove the graph un-assignable.
++  ///
++  /// RemainingRegs is set to the virtual registers left in the graph when
++  /// simplification ends.
++  bool canSimplify(SmallVectorImpl<Register> *RemainingRegs = nullptr) const;
+ 
+ private:
+-  friend class MOSInterferenceGraphBuilder;
+-
+   struct Vertex {
+-    // Zero denotes anonymous temporary storage. RC specifies the imaginary
+-    // storage class for both named and anonymous vertices.
++    explicit Vertex(const MOSInterferenceGraph &Graph) : Graph(&Graph) {}
++
++    // Zero denotes anonymous temporary storage.
+     Register Reg;
++
++    // RC specifies the imaginary storage class for both named and anonymous
++    // vertices.
+     const TargetRegisterClass *RC = nullptr;
+-    SparseBitVector<> Interferences;
++
++    SparseBitVector<> Edges;
++
++    VertexID id() const;
++
++    // Maximum number of this vertex's candidates any single assignment of
++    // Other blocks.
++    unsigned maxBlockedLocations(const Vertex &Other) const;
++
++    // Adds an edge between this vertex and Other. Other must not be this
++    // vertex.
++    void addEdge(Vertex &Other);
++
++  private:
++    const MOSInterferenceGraph *Graph;
+   };
+ 
+-  // Maximum number of ID's candidates any single assignment of Other blocks.
+-  unsigned maxBlockedLocations(VertexID ID, VertexID Other) const;
+-  VertexID getOrCreateVertex(Register Reg);
+-  VertexID createVertex(const TargetRegisterClass &RC);
+-  void addInterference(VertexID ID, VertexID Other);
+-  // LiveVertices may include ID; no self-edge is added.
+-  void addInterferences(VertexID ID, const SparseBitVector<> &LiveVertices);
++  friend class MOSInterferenceGraphBuilder;
++
++  /// Retain all current vertices: subsequent simplification must accommodate
++  /// their assignments without changing them.
++  void retainAll();
++
++  // Creating a vertex may invalidate references to the others.
++  Vertex &getOrCreateVertex(Register Reg);
++  Vertex &createVertex(const TargetRegisterClass &RC);
++
++  /// Remove a vertex and its incident edges. If the vertex is live, the builder
++  /// must first end its lifetime.
++  void removeVertex(Vertex &V);
+ 
+   const MOSRegisterInfo &TRI;
+   MachineRegisterInfo &MRI;
+   const RegisterClassInfo &RCI;
+   SmallVector<Vertex> Vertices;
+   SmallBitVector OccupiedVertices;
++
+   // Definitions preceding the current instruction region. Their assignments
+   // must be preserved; simplification may only remove the new vertices.
+   SmallBitVector RetainedVertices;
++
+   SmallVector<VertexID> FreeVertices;
+   DenseMap<Register, VertexID> VirtRegVertices;
++
+   // Bounds depend on classes and aliasing, not graph topology. Ordered pairs:
+   // an Imag16 blocks two Imag8 locations, while an Imag8 blocks only one pair.
+   mutable DenseMap<
+@@ -114,60 +151,77 @@ class MOSInterferenceGraph {
+       MaxBlockedLocations;
+ };
+ 
+-/// Track register residency while walking instructions, optionally recording
++/// Track register liveness while walking instructions, optionally recording
+ /// interference in a graph. Live intervals describe the original SSA names;
+-/// evict/reload model transfers that the spiller will emit after the walk.
++/// callers adjust liveness directly to model transfers not yet in the MIR.
+ class MOSInterferenceGraphBuilder {
+ public:
+-  struct SpillState {
+-    SmallDenseSet<Register, 8> ResidentValues;
+-    // Resident values whose spill slots already hold their contents.
+-    // Nonresident values are always saved; reloading them restores membership
+-    // in this set.
+-    SmallDenseSet<Register, 8> SavedResidentValues;
+-  };
+-
+   explicit MOSInterferenceGraphBuilder(LiveIntervals &LIS) : LIS(LIS) {}
+ 
+-  const SpillState &spillState() const { return State; }
+-  void evict(Register Reg);
+-  void reload(Register Reg);
++  const SmallDenseSet<Register, 8> &liveRegs() const { return LiveRegs; }
+ 
+-  /// Begin adding to Graph, recording interference among current residents and
+-  /// retaining them as earlier definitions whose assignments must be preserved.
+-  void beginCapture(MOSInterferenceGraph &Graph);
+-  /// Define an anonymous temporary of RC at the current position. It interferes
+-  /// with current residents and live temporaries, and remains live until
+-  /// killTemporaryVertex. Later definitions interfere with it while live.
+-  /// Requires an active capture; does not change spillState or retention.
+-  MOSInterferenceGraph::VertexID
+-  addTemporaryVertex(const TargetRegisterClass &RC);
+-  /// End a temporary's lifetime without removing its vertex or recorded edges.
+-  /// The caller can then discard it with Graph.removeVertex or keep its
+-  /// interference for subsequent graph queries.
+-  void killTemporaryVertex(MOSInterferenceGraph::VertexID ID);
+   /// Advance from immediately before MI to immediately after it.
+   ///
+   /// When capturing, records any additional interference required by MI. All
+-  /// virtual inputs must already be resident. Ties, subregister operands, early
++  /// virtual inputs must already be live. Ties, subregister operands, early
+   /// clobbers, and physical imaginary constraints are not yet supported.
++  ///
+   void stepForward(const MachineInstr &MI);
+-  /// Discard captured vertices that are neither resident nor live temporaries.
++
++  /// Begin adding to Graph, recording interference among the current live
++  /// registers and retaining them as earlier definitions whose assignments must
++  /// be preserved.
++  void beginCapture(MOSInterferenceGraph &Graph);
++
++  // These operations require an active capture.
++
++  /// Make Reg live at the current position, recording its interference with
++  /// the current live registers and live temporaries.
++  void addLiveReg(Register Reg);
++
++  /// Remove a live Reg, along with its vertex and recorded interference.
++  void removeLiveReg(Register Reg);
++
++  /// Define an anonymous temporary of RC at the current position. It interferes
++  /// with the current live registers and live temporaries, and remains live
++  /// until killTemporaryVertex. Later definitions interfere with it while live.
++  /// Does not change liveRegs or retention.
++  MOSInterferenceGraph::VertexID
++  addTemporaryVertex(const TargetRegisterClass &RC);
++
++  /// End a temporary's lifetime and remove its vertex from the graph.
++  void killTemporaryVertex(MOSInterferenceGraph::VertexID ID);
++
++  /// Discard captured vertices that are neither live registers nor live
++  /// temporaries.
+   void trimToLive();
+-  /// Stop recording interference, preserving residency and the captured graph.
++
++  /// Retain all vertices in the active capture: subsequent simplification must
++  /// accommodate their assignments without changing them.
++  void retainAll();
++
++  /// Stop recording interference, preserving liveness and the captured graph.
+   /// All temporaries must have been killed.
+   void endCapture();
+ 
+ private:
++  using Vertex = MOSInterferenceGraph::Vertex;
+   using VertexID = MOSInterferenceGraph::VertexID;
+-  void addInterferences(VertexID ID);
+-  void makeLive(Register Reg);
+-  void releaseReg(Register Reg);
++
++  // Start Reg's lifetime at the current position. When capturing, records its
++  // interference with the current live registers and live temporaries.
++  void defineReg(Register Reg);
++
++  // Start V's lifetime at the current position, recording its interference
++  // with the current live registers and live temporaries.
++  void defineVertex(Vertex &V);
+ 
+   LiveIntervals &LIS;
+-  SpillState State;
+-  // Graph-local IDs. Killed temporaries may remain in the captured graph.
++  SmallDenseSet<Register, 8> LiveRegs;
++
++  // Graph-local IDs.
+   SmallVector<VertexID, 2> LiveTemporaries;
++
+   MOSInterferenceGraph *Graph = nullptr;
+ };
+ 

@@ -1,0 +1,18 @@
+{
+  "source_base": "0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63",
+  "command": [
+    "/home/will/llvm-mos-65816/build/0029-20261010/baseline/bin/llc",
+    "-mtriple=mos",
+    "-mcpu=mos6502",
+    "-O2",
+    "-verify-machineinstrs",
+    "-filetype=obj",
+    "/tmp/llvm-mos-review-20261103/inputs/mixed-width-call.ll",
+    "-o",
+    "/dev/null"
+  ],
+  "binary_sha256": "a610bbdec61cc7ef573bf150155172f8e18ad5a74270cb5413a7900e8ff56f7b",
+  "input_sha256": "ed50b7d0913619b506e08e5a4ccfda957188e34e15268b4b15da6d15d775994b",
+  "exit_code": 1,
+  "historical_signature_reproduced": true
+}

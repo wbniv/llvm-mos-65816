@@ -1,0 +1,86 @@
+{
+  "raw_comparison": "allocator-comparison.json",
+  "normalization": "Remove dead annotation only immediately preceding early-clobber",
+  "comparisons": [
+    {
+      "file": "mos6502-soft-12-spill.mir",
+      "raw_identical": false,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mos6502-soft-8-spill.mir",
+      "raw_identical": false,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mos6502-static-12-spill.mir",
+      "raw_identical": true,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mos6502-static-8-spill.mir",
+      "raw_identical": true,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mos65c02-soft-12-spill.mir",
+      "raw_identical": false,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mos65c02-soft-8-spill.mir",
+      "raw_identical": false,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mos65c02-static-12-spill.mir",
+      "raw_identical": true,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mos65c02-static-8-spill.mir",
+      "raw_identical": true,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mosspc700-soft-12-spill.mir",
+      "raw_identical": false,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mosspc700-soft-8-spill.mir",
+      "raw_identical": false,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mosspc700-static-12-spill.mir",
+      "raw_identical": true,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mosspc700-static-8-spill.mir",
+      "raw_identical": true,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mosw65816-soft-12-spill.mir",
+      "raw_identical": false,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mosw65816-soft-8-spill.mir",
+      "raw_identical": false,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mosw65816-static-12-spill.mir",
+      "raw_identical": true,
+      "identical_without_dead_early_clobber": true
+    },
+    {
+      "file": "mosw65816-static-8-spill.mir",
+      "raw_identical": true,
+      "identical_without_dead_early_clobber": true
+    }
+  ]
+}

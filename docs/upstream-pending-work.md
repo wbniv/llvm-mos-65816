@@ -163,7 +163,7 @@ remain in the linked records.
    29 ARM, and 33 AArch64 tests, plus both bundled MOS tests. No failures or skips
    in that focused run. The [coverage inventory](pr-preparations/2026-09-22/0029-cross-target-validation.md#backend-coverage-at-the-pinned-revision)
    lists the 22 remaining untested backends.
-   These counts are dated September evidence; the [October refresh](pr-preparations/2026-10-10/0029/README.md) records the current branch and backend checks, with 24 full-driver and 24 candidate-backend C checks passing.
+   These counts are dated September evidence; the [November refresh](pr-preparations/2026-11-03/0029/README.md) records current-base red/green checks and 152 candidate MOS passes, with one unsupported. The [October refresh](pr-preparations/2026-10-10/0029/README.md) remains dated evidence.
 2. [Newton `-O0` post-RA verifier failure](upstream-newton-6502-postra-issue.md):
    [fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), with patch 0030.
    Copy expansion reuses Y without clearing an earlier kill. The fix passes
@@ -263,7 +263,7 @@ attribute report needs agreement on semantics before selecting a change.
 
 Patch 0029 submission status:
 
-The first five checks retain September preparation and review evidence. The October refresh below supplies the current-base branch and backend checks; its C matrix passes (24 full-driver and 24 candidate-backend checks).
+The first five checks retain September preparation and review evidence. The [November refresh](pr-preparations/2026-11-03/0029/README.md) supplies current-base red/green checks, the C matrix and a local branch; the October checks below remain dated evidence.
 
 - [x] Reproduce the failure with stock `mos6502` C and validate the standalone fix.
 - [x] Complete the simulated review, including both liveness-analysis paths.
@@ -272,7 +272,7 @@ The first five checks retain September preparation and review evidence. The Octo
 - [x] Independent review: guard refined for reserved class members, comment reworded,
   complete X86/ARM/AArch64/MOS suites pass on the revised patch; [record](pr-preparations/2026-09-22/0029-claude-review.md).
 - [x] October 10 applicability and local branch: exact upstream `0f031168a7cc`, standalone commit `367513ea6a79`; implementation unchanged, MIR coverage refreshed for LiveIntervals.
-- [x] Current-base matching-input IR/MIR red/green and complete MOS suites: 140 passed, one unsupported, zero failures.
+- [x] November 3 matching-input IR/MIR red/green and complete MOS suites: 152 passed, one unsupported, zero failures; October had 140 passes.
 - [x] Current C matrix passes (24 full-driver and 24 candidate-backend checks).
 - [ ] Show the refreshed PR preview and obtain posting approval.
 - [ ] Publish the standalone fix PR.
@@ -345,7 +345,7 @@ failure with the stock upstream frontend and backend.
 | SNES SDK contribution around #415 | Baseline checkout and [file inventory](415-snes-reconciliation-inventory.md) prepared; resolve provenance/review requirements, implement and validate the reconciled native platform and runtime |
 | 65816 simulator discussion | Separate [discussion draft](pr-preparations/2026-09-20/65816-simulator-discussion-body.md) prepared; unposted |
 | Reentrant attribute semantics | Report drafted; agree the intended contract before selecting a fix or documentation change |
-| Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; September full cross-target/final/independent reviews remain dated; October 10 current-base branch, IR/MIR red/green and 140 MOS passes / one unsupported are complete; 48 candidate C checks pass; preview approval and publication remain |
+| Register exhaustion across calls | [Fix PR prepared](upstream-twoaddr-physreg-reschedule-pr.md), patch 0029; September full cross-target/final/independent reviews remain dated; November 3 current-base branch, IR/MIR red/green and 152 MOS passes / one unsupported are complete; 48 candidate C checks pass; preview approval and publication remain |
 | Newton `-O0` post-RA expansion | [Fix PR prepared](upstream-copy-phys-reg-liveness-pr.md), patch 0030; six focused cases and MOS CodeGen/MC pass; review audited and attribution complete; check upstream applicability, prepare branch, and publish |
 | Physical-copy destination reuse | [Fix PR reviewed](pr-preparations/2026-09-22/0031-review-audit.md), patch 0031 on top of 0030; five regression cases, six extra probes, and MOS suites pass; prepare its submission after 0030 |
 | Spill-hoisting scratch vregs (`0033`) | [Audited](pr-preparations/2026-09-23/0033-review-audit.md); rollback statistic corrected and revalidated; [response](pr-preparations/2026-09-23/0033-validation.md); ready to post |
@@ -373,7 +373,7 @@ Older notes need a current-content review before publication.
 
 ## Recommended order
 
-1. Review the [current-base 0029 packet](pr-preparations/2026-10-10/0029/README.md) and show its PR preview before posting. The local branch is refreshed on `0f031168a7cc`; matching-input IR/MIR red/green and the complete MOS suites pass (140 passed, one unsupported). The C matrix passes (24 full-driver and 24 candidate-backend checks). September independent review and cross-target results remain dated; publication is pending. It has no #320/#321 dependency.
+1. Review the [current-base 0029 packet](pr-preparations/2026-11-03/0029/README.md) and show its PR preview before posting. The local branch is refreshed on `a5c31b24a97c`; matching-input IR/MIR red/green and the complete MOS suites pass (152 passed, one unsupported). The C matrix passes (24 full-driver and 24 candidate-backend checks). September independent review and cross-target results remain dated; publication is pending. It has no #320/#321 dependency.
 2. Check upstream applicability, prepare the branch, and publish
    [patch 0030](pr-preparations/2026-09-22/0030-pr-preview.html), whose code and
    evidence have been reviewed. Patch 0031's

@@ -1,0 +1,809 @@
+diff --git a/llvm/lib/Target/MOS/MOSImagRegAssign.cpp b/llvm/lib/Target/MOS/MOSImagRegAssign.cpp
+index c282de626b4c..ab9c9749e030 100644
+--- a/llvm/lib/Target/MOS/MOSImagRegAssign.cpp
++++ b/llvm/lib/Target/MOS/MOSImagRegAssign.cpp
+@@ -7,24 +7,32 @@
+ //===----------------------------------------------------------------------===//
+ ///
+ /// \file
+-/// Assign imaginary registers after local and PHI spilling.
++/// Assign imaginary registers after local spilling.
+ ///
+ /// MOSImagRegSpill leaves an SSA program whose imaginary register demands can
+-/// be satisfied. This pass chooses assignments respecting
+-/// interference, ties, PHI congruence, and physical constraints, and records
+-/// them in VirtRegMap. It does not insert further spills. PHIs and parallel
+-/// copies remain for MOSRegAlloc to lower along with hardware allocation.
++/// be satisfied. This pass chooses assignments respecting interference and
++/// records them in VirtRegMap. It does not insert further spills.
+ ///
+-/// This pass is not implemented yet.
++/// This pass handles the MIR that MOSImagRegSpill accepts, along with the
++/// transfer code that pass inserts: early-clobber scratch definitions,
++/// REG_SEQUENCE, and subregister uses. Instructions are assigned in order using
++/// local interference graphs.
+ ///
+ //===----------------------------------------------------------------------===//
+ 
+ #include "MOSImagRegAssign.h"
+ #include "MOS.h"
++#include "MOSInterferenceGraph.h"
++#include "llvm/CodeGen/LiveIntervals.h"
++#include "llvm/CodeGen/LiveRegUnits.h"
+ #include "llvm/CodeGen/MachineFunction.h"
+ #include "llvm/CodeGen/MachineFunctionPass.h"
++#include "llvm/CodeGen/RegisterClassInfo.h"
++#include "llvm/CodeGen/VirtRegMap.h"
+ #include "llvm/InitializePasses.h"
++#include "llvm/MC/MCRegister.h"
+ #include "llvm/Support/ErrorHandling.h"
++#include <optional>
+ 
+ #define DEBUG_TYPE "mos-imag-reg-assign"
+ 
+@@ -40,20 +48,110 @@ class MOSImagRegAssign : public MachineFunctionPass {
+     initializeMOSImagRegAssignPass(*PassRegistry::getPassRegistry());
+   }
+ 
+-  bool runOnMachineFunction(MachineFunction &) override {
+-    report_fatal_error("MOSImagRegAssign is not implemented", false);
+-  }
++  bool runOnMachineFunction(MachineFunction &MF) override;
+ 
+   MachineFunctionProperties getRequiredProperties() const override {
+     return MachineFunctionProperties().setIsSSA();
+   }
++
++  void getAnalysisUsage(AnalysisUsage &AU) const override {
++    AU.addRequired<LiveIntervalsWrapperPass>();
++    AU.addRequired<MachineRegisterClassInfoWrapperPass>();
++    AU.addRequired<VirtRegMapWrapperLegacy>();
++    AU.addPreserved<LiveIntervalsWrapperPass>();
++    AU.addPreserved<SlotIndexesWrapperPass>();
++    AU.addPreserved<VirtRegMapWrapperLegacy>();
++    AU.setPreservesCFG();
++    MachineFunctionPass::getAnalysisUsage(AU);
++  }
++
++private:
++  // Assign the registers defined by a basic block.
++  void assignMBB(MachineBasicBlock &MBB);
++
++  // Assign the registers defined by a nonempty, contiguous range. The builder
++  // must be capturing Graph at the range's beginning.
++  void assignMIs(iterator_range<MachineBasicBlock::iterator> Instructions);
++
++  // Assign the registers mentioned in the current interference graph.
++  void assignGraph();
++
++  VirtRegMap *VRM = nullptr;
++  LiveIntervals *LIS = nullptr;
++  const RegisterClassInfo *RCI = nullptr;
++  std::optional<MOSInterferenceGraphBuilder> Builder;
++  std::optional<MOSInterferenceGraph> Graph;
+ };
+ 
+ } // namespace
+ 
++bool MOSImagRegAssign::runOnMachineFunction(MachineFunction &MF) {
++  VRM = &getAnalysis<VirtRegMapWrapperLegacy>().getVRM();
++  LIS = &getAnalysis<LiveIntervalsWrapperPass>().getLIS();
++  RCI = &getAnalysis<MachineRegisterClassInfoWrapperPass>().getRCI();
++  Builder.emplace(*LIS);
++
++  assignMBB(MF.front());
++
++  Builder.reset();
++  return false;
++}
++
++void MOSImagRegAssign::assignMBB(MachineBasicBlock &MBB) {
++  Graph.emplace(*MBB.getParent(), *RCI, VRM);
++  Builder->beginCapture(*Graph);
++  for (auto I = MBB.begin(), E = MBB.end(); I != E;) {
++    if (I->isDebugOrPseudoInstr()) {
++      ++I;
++      continue;
++    }
++    auto End = std::next(I);
++    if (I->isTerminator()) {
++      // Terminators remain contiguous and receive assignments together.
++      End = E;
++    }
++    assignMIs(make_range(I, End));
++    I = End;
++  }
++  Builder->endCapture();
++  Graph.reset();
++}
++
++void MOSImagRegAssign::assignMIs(
++    iterator_range<MachineBasicBlock::iterator> Instructions) {
++  for (MachineInstr &MI : Instructions)
++    if (!MI.isDebugOrPseudoInstr())
++      Builder->stepForward(MI);
++  assignGraph();
++  Builder->trimToLive();
++}
++
++void MOSImagRegAssign::assignGraph() {
++  SmallVector<MOSInterferenceGraph::VertexID> AssignmentOrder;
++  if (!Graph->simplify(nullptr, &AssignmentOrder))
++    report_fatal_error("MOS guaranteed imaginary assignment failed", false);
++  for (MOSInterferenceGraph::VertexID ID : AssignmentOrder) {
++    const MOSInterferenceGraph::Vertex &V = Graph->vertex(ID);
++    ArrayRef<MCPhysReg> Candidates = V.candidates();
++    // Choose a location that does not overlap with neighbors assigned so far.
++    LiveRegUnits BlockedUnits = V.neighborAssignedUnits();
++    auto Phys = llvm::find_if(Candidates, [&](MCPhysReg Phys) {
++      return BlockedUnits.available(Phys);
++    });
++    if (Phys == Candidates.end())
++      report_fatal_error("MOS guaranteed imaginary assignment failed", false);
++    VRM->assignVirt2Phys(V.Reg, *Phys);
++  }
++}
++
+ char MOSImagRegAssign::ID = 0;
+-INITIALIZE_PASS(MOSImagRegAssign, DEBUG_TYPE,
+-                "MOS Imaginary Register Assignment", false, false)
++INITIALIZE_PASS_BEGIN(MOSImagRegAssign, DEBUG_TYPE,
++                      "MOS Imaginary Register Assignment", false, false)
++INITIALIZE_PASS_DEPENDENCY(LiveIntervalsWrapperPass)
++INITIALIZE_PASS_DEPENDENCY(MachineRegisterClassInfoWrapperPass)
++INITIALIZE_PASS_DEPENDENCY(VirtRegMapWrapperLegacy)
++INITIALIZE_PASS_END(MOSImagRegAssign, DEBUG_TYPE,
++                    "MOS Imaginary Register Assignment", false, false)
+ 
+ MachineFunctionPass *llvm::createMOSImagRegAssignPass() {
+   return new MOSImagRegAssign;
+diff --git a/llvm/lib/Target/MOS/MOSImagRegSpill.cpp b/llvm/lib/Target/MOS/MOSImagRegSpill.cpp
+index 5a067d4ab761..7a70703b5353 100644
+--- a/llvm/lib/Target/MOS/MOSImagRegSpill.cpp
++++ b/llvm/lib/Target/MOS/MOSImagRegSpill.cpp
+@@ -244,7 +244,7 @@ void MOSImagRegSpill::spillBeforeMIs(
+       Builder->stepForward(MI);
+   }
+   SmallVector<Register> RemainingRegs;
+-  while (!Graph->canSimplify(&RemainingRegs))
++  while (!Graph->simplify(&RemainingRegs))
+     spillLiveThrough(Instructions, RemainingRegs);
+ 
+   // The next range must have scratch available to start its transfers. Making
+@@ -288,7 +288,7 @@ void MOSImagRegSpill::reloadForInput(
+   // the scratch guaranteed on entry.
+   Builder->addLiveReg(Reg);
+   SmallVector<Register> RemainingRegs;
+-  while (!Graph->canSimplify(&RemainingRegs))
++  while (!Graph->simplify(&RemainingRegs))
+     spillLiveThrough(Instructions, RemainingRegs);
+ 
+   // Retain the destination so scratch must fit alongside any assignment of it.
+@@ -314,7 +314,7 @@ void MOSImagRegSpill::ensureScratch(
+   // in stack emission (this can probably be tightened).
+   Scratch.push_back(Builder->addTemporaryVertex(MOS::Imag16RegClass));
+   SmallVector<Register> RemainingRegs;
+-  while (!Graph->canSimplify(&RemainingRegs))
++  while (!Graph->simplify(&RemainingRegs))
+     spillLiveThrough(Instructions, RemainingRegs);
+   for (auto ID : Scratch)
+     Builder->killTemporaryVertex(ID);
+diff --git a/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp b/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp
+index 8d28c7c705eb..33378d20685c 100644
+--- a/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp
++++ b/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp
+@@ -12,11 +12,13 @@
+ /// Simplification uses the notion of "squeeze". A vertex's candidates are the
+ /// allocation order of its register class, and its squeeze is the sum, over its
+ /// neighbors remaining in the graph, of the most of its candidates that one
+-/// candidate of the neighbor can overlap. Each removal lowers its neighbors'
+-/// squeeze, and a non-retained vertex can only be removed once its squeeze is
+-/// less than its number of candidates, since its neighbors then cannot block
+-/// all of them. Retained vertices are removed at the very end, since they are
+-/// assumed to be allocated by other means.
++/// candidate of the neighbor can overlap. A neighbor with a VirtRegMap
++/// assignment instead makes the candidates it overlaps unavailable, and adds no
++/// squeeze. Each removal lowers its neighbors' squeeze, and a non-retained
++/// vertex can only be removed once its squeeze is less than its number of
++/// available candidates, since its neighbors then cannot block all of them.
++/// Retained vertices are removed at the very end, since they are assumed to be
++/// allocated by other means.
+ ///
+ //===----------------------------------------------------------------------===//
+ 
+@@ -25,31 +27,49 @@
+ #include "MOSSubtarget.h"
+ #include "llvm/ADT/STLExtras.h"
+ #include "llvm/CodeGen/LiveIntervals.h"
++#include "llvm/CodeGen/LiveRegUnits.h"
+ #include "llvm/CodeGen/MachineInstr.h"
+ #include "llvm/CodeGen/RegisterClassInfo.h"
++#include "llvm/CodeGen/VirtRegMap.h"
+ #include <functional>
+ 
+ using namespace llvm;
+ 
+ MOSInterferenceGraph::MOSInterferenceGraph(MachineFunction &MF,
+-                                           const RegisterClassInfo &RCI)
++                                           const RegisterClassInfo &RCI,
++                                           const VirtRegMap *VRM)
+     : TRI(*MF.getSubtarget<MOSSubtarget>().getRegisterInfo()),
+-      MRI(MF.getRegInfo()), RCI(RCI) {}
++      MRI(MF.getRegInfo()), RCI(RCI), VRM(VRM) {}
++
++bool MOSInterferenceGraph::simplify(
++    SmallVectorImpl<Register> *RemainingRegs,
++    SmallVectorImpl<VertexID> *AssignmentOrder) const {
++  if (AssignmentOrder)
++    AssignmentOrder->clear();
+ 
+-bool MOSInterferenceGraph::canSimplify(
+-    SmallVectorImpl<Register> *RemainingRegs) const {
+   // Squeeze bounds how many candidate locations the remaining neighbors can
+   // block. Removing a vertex with more candidates than this bound guarantees
+   // that it can be assigned after all of those neighbors have been assigned.
+   SmallBitVector Remaining = OccupiedVertices;
+-  SmallVector<unsigned> Squeezes(Vertices.size(), 0);
++  SmallVector<unsigned> VertexSqueeze(Vertices.size(), 0);
++  SmallVector<unsigned> VertexNumAvailable(Vertices.size(), 0);
++  auto IsRemovable = [&](VertexID ID) {
++    return VertexSqueeze[ID] < VertexNumAvailable[ID];
++  };
+   SmallVector<VertexID> Worklist;
+   for (VertexID ID : OccupiedVertices.set_bits()) {
+-    if (RetainedVertices.test(ID))
++    const Vertex &V = Vertices[ID];
++    if (V.isRetained())
+       continue;
+-    for (VertexID Other : Vertices[ID].Edges)
+-      Squeezes[ID] += Vertices[ID].maxBlockedLocations(Vertices[Other]);
+-    if (Squeezes[ID] < RCI.getOrder(Vertices[ID].RC).size())
++    for (VertexID Other : V.Edges)
++      if (!Vertices[Other].assignment())
++        VertexSqueeze[ID] += V.maxBlockedLocations(Vertices[Other]);
++    LiveRegUnits BlockedUnits = V.neighborAssignedUnits();
++    VertexNumAvailable[ID] =
++        llvm::count_if(V.candidates(), [&](MCPhysReg Phys) {
++          return BlockedUnits.available(Phys);
++        });
++    if (IsRemovable(ID))
+       Worklist.push_back(ID);
+   }
+ 
+@@ -58,30 +78,45 @@ bool MOSInterferenceGraph::canSimplify(
+   while (!Worklist.empty()) {
+     VertexID ID = Worklist.pop_back_val();
+     Remaining.reset(ID);
++    if (AssignmentOrder)
++      AssignmentOrder->push_back(ID);
+     for (VertexID Other : Vertices[ID].Edges) {
+-      if (!Remaining.test(Other) || RetainedVertices.test(Other))
++      if (!Remaining.test(Other) || Vertices[Other].isRetained())
+         continue;
+-      unsigned &Squeeze = Squeezes[Other];
+-      unsigned OldSqueeze = Squeeze;
+-      Squeeze -= Vertices[Other].maxBlockedLocations(Vertices[ID]);
+-      unsigned Candidates = RCI.getOrder(Vertices[Other].RC).size();
+-      if (OldSqueeze >= Candidates && Squeeze < Candidates)
++      bool WasNotRemovable = !IsRemovable(Other);
++      VertexSqueeze[Other] -= Vertices[Other].maxBlockedLocations(Vertices[ID]);
++      if (WasNotRemovable && IsRemovable(Other))
+         Worklist.push_back(Other);
+     }
+   }
+-  bool Simplified = Remaining == RetainedVertices;
++  bool Simplified = llvm::all_of(Remaining.set_bits(), [&](VertexID ID) {
++    return Vertices[ID].isRetained();
++  });
++  if (Simplified)
++    Remaining.reset();
+   if (RemainingRegs) {
+     RemainingRegs->clear();
+-    if (!Simplified) {
+-      for (VertexID ID : Remaining.set_bits()) {
+-        if (Register Reg = Vertices[ID].Reg)
+-          RemainingRegs->push_back(Reg);
+-      }
+-    }
++    for (VertexID ID : Remaining.set_bits())
++      if (Register Reg = Vertices[ID].Reg)
++        RemainingRegs->push_back(Reg);
+   }
++  if (AssignmentOrder)
++    std::reverse(AssignmentOrder->begin(), AssignmentOrder->end());
+   return Simplified;
+ }
+ 
++ArrayRef<MCPhysReg> MOSInterferenceGraph::Vertex::candidates() const {
++  return Graph->RCI.getOrder(RC);
++}
++
++LiveRegUnits MOSInterferenceGraph::Vertex::neighborAssignedUnits() const {
++  LiveRegUnits Units(Graph->TRI);
++  for (VertexID Other : Edges)
++    if (MCRegister Assignment = Graph->Vertices[Other].assignment())
++      Units.addReg(Assignment);
++  return Units;
++}
++
+ MOSInterferenceGraph::VertexID MOSInterferenceGraph::Vertex::id() const {
+   // Use std::less to avoid UB.
+   assert(!std::less<>()(this, Graph->Vertices.begin()) &&
+@@ -98,17 +133,26 @@ MOSInterferenceGraph::Vertex::maxBlockedLocations(const Vertex &Other) const {
+     return It->second;
+ 
+   unsigned Max = 0;
+-  for (MCPhysReg OtherPhys : Graph->RCI.getOrder(Key.second)) {
+-    unsigned Blocked =
+-        llvm::count_if(Graph->RCI.getOrder(Key.first), [&](MCPhysReg Phys) {
+-          return Graph->TRI.regsOverlap(Phys, OtherPhys);
+-        });
++  for (MCPhysReg OtherPhys : Other.candidates()) {
++    unsigned Blocked = llvm::count_if(candidates(), [&](MCPhysReg Phys) {
++      return Graph->TRI.regsOverlap(Phys, OtherPhys);
++    });
+     Max = std::max(Max, Blocked);
+   }
+   Graph->MaxBlockedLocations.try_emplace(Key, Max);
+   return Max;
+ }
+ 
++MCRegister MOSInterferenceGraph::Vertex::assignment() const {
++  if (!Graph->VRM || !Reg)
++    return MCRegister();
++  return Graph->VRM->getPhys(Reg);
++}
++
++bool MOSInterferenceGraph::Vertex::isRetained() const {
++  return Graph->RetainedVertices.test(id()) || assignment();
++}
++
+ void MOSInterferenceGraph::Vertex::addEdge(Vertex &Other) {
+   assert(this != &Other && "a vertex cannot have an edge to itself");
+   assert(Graph == Other.Graph && "vertices must be in the same graph");
+@@ -168,12 +212,17 @@ void MOSInterferenceGraphBuilder::stepForward(const MachineInstr &MI) {
+   for (const MachineOperand &Use : MI.all_uses())
+     assert((!Use.getReg().isVirtual() || LiveRegs.contains(Use.getReg())) &&
+            "virtual inputs must already be live");
++  // Early-clobber results are written before the inputs are read, so they
++  // interfere even with inputs killed here.
++  for (const MachineOperand &Def : MI.all_defs())
++    if (Def.getReg().isVirtual() && Def.isEarlyClobber())
++      defineReg(Def.getReg());
+   for (const MachineOperand &Use : MI.all_uses())
+     if (Use.getReg().isVirtual() &&
+         LIS.getInterval(Use.getReg()).Query(Idx).isKill())
+       LiveRegs.erase(Use.getReg());
+   for (const MachineOperand &Def : MI.all_defs())
+-    if (Def.getReg().isVirtual())
++    if (Def.getReg().isVirtual() && !Def.isEarlyClobber())
+       defineReg(Def.getReg());
+   for (const MachineOperand &Def : MI.all_defs())
+     if (Def.getReg().isVirtual() &&
+diff --git a/llvm/lib/Target/MOS/MOSInterferenceGraph.h b/llvm/lib/Target/MOS/MOSInterferenceGraph.h
+index 16cc7d9d2173..7ee7dea6de85 100644
+--- a/llvm/lib/Target/MOS/MOSInterferenceGraph.h
++++ b/llvm/lib/Target/MOS/MOSInterferenceGraph.h
+@@ -7,11 +7,12 @@
+ //===----------------------------------------------------------------------===//
+ ///
+ /// \file
+-/// Interference graph management for imaginary register spilling.
++/// Interference graph management for imaginary register allocation.
+ ///
+ /// MOSInterferenceGraph records the conflict relationship graph between
+ /// imaginary storage for virtual registers. This provides the
+-/// means to check whether registers can be assigned without spilling.
++/// means to check whether registers can be assigned without spilling, and an
++/// order in which to assign them.
+ ///
+ /// MOSInterferenceGraphBuilder tracks register residency while walking MIR. It
+ /// uses this to capture interferences between registers in a
+@@ -37,11 +38,13 @@
+ namespace llvm {
+ 
+ class LiveIntervals;
++class LiveRegUnits;
+ class MachineFunction;
+ class MachineInstr;
+ class MachineRegisterInfo;
+ class RegisterClassInfo;
+ class MOSRegisterInfo;
++class VirtRegMap;
+ 
+ /// Interference graph for the imaginary storage needed by registers within some
+ /// contiguous region of MIR instructions.
+@@ -61,6 +64,10 @@ class MOSRegisterInfo;
+ /// retained, which means that the graph should not consider the vertex within
+ /// its purview to assign.
+ ///
++/// A vertex is also retained if the graph is given a VirtRegMap that assigns
++/// its register. Its location is then known, and simplification needs to
++/// accommodate only that location.
++///
+ /// The main operation done on the graph is simplification. This means to
+ /// logically remove one vertex and its edges at a time from the graph. To
+ /// safely remove a vertex, we first guarantee that given any assignment of the
+@@ -73,49 +80,73 @@ class MOSInterferenceGraph {
+   // Stable until removal. IDs of removed vertices are reused by new ones.
+   using VertexID = unsigned;
+ 
+-  MOSInterferenceGraph(MachineFunction &MF, const RegisterClassInfo &RCI);
++  MOSInterferenceGraph(MachineFunction &MF, const RegisterClassInfo &RCI,
++                       const VirtRegMap *VRM = nullptr);
+ 
+   // Vertices point to their graph, so it cannot be copied or moved.
+   MOSInterferenceGraph(const MOSInterferenceGraph &) = delete;
+   MOSInterferenceGraph &operator=(const MOSInterferenceGraph &) = delete;
+ 
+-  /// Test whether simplification succeeds.
++  /// Try to simplify the graph, returning whether it succeeds.
+   ///
+   /// Failure means that no vertex remaining in the graph can be safely removed.
+   /// The algorithm is conservative: success guarantees assignability, but
+   /// failure does not prove the graph un-assignable.
+   ///
+   /// RemainingRegs is set to the virtual registers left in the graph when
+-  /// simplification ends.
+-  bool canSimplify(SmallVectorImpl<Register> *RemainingRegs = nullptr) const;
++  /// simplification ends. AssignmentOrder is set to the removed non-retained
++  /// vertices in the reverse of their removal order. Given any assignment of
++  /// the other vertices, they can be assigned in this order.
++  bool simplify(SmallVectorImpl<Register> *RemainingRegs = nullptr,
++                SmallVectorImpl<VertexID> *AssignmentOrder = nullptr) const;
+ 
+-private:
+   struct Vertex {
+     explicit Vertex(const MOSInterferenceGraph &Graph) : Graph(&Graph) {}
+ 
+-    // Zero denotes anonymous temporary storage.
++    /// Zero denotes anonymous temporary storage.
+     Register Reg;
+ 
+-    // RC specifies the imaginary storage class for both named and anonymous
+-    // vertices.
++    /// RC specifies the imaginary storage class for both named and anonymous
++    /// vertices.
+     const TargetRegisterClass *RC = nullptr;
+ 
+     SparseBitVector<> Edges;
+ 
++    /// The locations the vertex may be assigned, in allocation order.
++    ArrayRef<MCPhysReg> candidates() const;
++
++    /// The register units that the graph's VirtRegMap currently assigns to
++    /// this vertex's neighbors.
++    LiveRegUnits neighborAssignedUnits() const;
++
++  private:
++    friend class MOSInterferenceGraph;
++    friend class MOSInterferenceGraphBuilder;
++
+     VertexID id() const;
+ 
+     // Maximum number of this vertex's candidates any single assignment of
+     // Other blocks.
+     unsigned maxBlockedLocations(const Vertex &Other) const;
+ 
++    // The location the graph's VirtRegMap assigns this vertex's register, if
++    // any.
++    MCRegister assignment() const;
++
++    // Whether this vertex is retained: marked so, or assigned by the graph's
++    // VirtRegMap.
++    bool isRetained() const;
++
+     // Adds an edge between this vertex and Other. Other must not be this
+     // vertex.
+     void addEdge(Vertex &Other);
+ 
+-  private:
+     const MOSInterferenceGraph *Graph;
+   };
+ 
++  const Vertex &vertex(VertexID ID) const { return Vertices[ID]; }
++
++private:
+   friend class MOSInterferenceGraphBuilder;
+ 
+   /// Retain all current vertices: subsequent simplification must accommodate
+@@ -133,11 +164,13 @@ class MOSInterferenceGraph {
+   const MOSRegisterInfo &TRI;
+   MachineRegisterInfo &MRI;
+   const RegisterClassInfo &RCI;
++  const VirtRegMap *VRM;
+   SmallVector<Vertex> Vertices;
+   SmallBitVector OccupiedVertices;
+ 
+   // Definitions preceding the current instruction region. Their assignments
+   // must be preserved; simplification may only remove the new vertices.
++  // Vertices with VirtRegMap assignments are retained even if not marked here.
+   SmallBitVector RetainedVertices;
+ 
+   SmallVector<VertexID> FreeVertices;
+@@ -163,8 +196,8 @@ class MOSInterferenceGraphBuilder {
+   /// Advance from immediately before MI to immediately after it.
+   ///
+   /// When capturing, records any additional interference required by MI. All
+-  /// virtual inputs must already be live. Ties, subregister operands, early
+-  /// clobbers, and physical imaginary constraints are not yet supported.
++  /// virtual inputs must already be live. Ties and physical imaginary
++  /// constraints are not yet supported.
+   ///
+   void stepForward(const MachineInstr &MI);
+ 
+diff --git a/llvm/test/CodeGen/MOS/imag-regalloc-assign-errors.mir b/llvm/test/CodeGen/MOS/imag-regalloc-assign-errors.mir
+new file mode 100644
+index 000000000000..a8701aa0571d
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag-regalloc-assign-errors.mir
+@@ -0,0 +1,21 @@
++# RUN: not llc -mtriple=mos -mattr=+static-stack -stress-regalloc=2 -run-pass=mos-imag-reg-assign -verify-machineinstrs %s -o /dev/null 2>&1 | FileCheck %s
++
++# Imaginary assignment does not spill. Three bytes live at once cannot fit in
++# two byte locations; MOSImagRegSpill would have spilled one of them.
++# CHECK: LLVM ERROR: MOS guaranteed imaginary assignment failed
++--- |
++  define void @overcommitted() "nonreentrant" { ret void }
++...
++---
++name: overcommitted
++tracksRegLiveness: true
++body: |
++  bb.0:
++    %0:gpr = LDAbs 1000
++    %1:gpr = LDAbs 1001
++    %2:gpr = LDAbs 1002
++    STAbs %0, 2000
++    STAbs %1, 2001
++    STAbs %2, 2002
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/imag-regalloc-assign-tight.mir b/llvm/test/CodeGen/MOS/imag-regalloc-assign-tight.mir
+new file mode 100644
+index 000000000000..c1cfb53d204a
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag-regalloc-assign-tight.mir
+@@ -0,0 +1,74 @@
++# RUN: llc -mtriple=mos -mattr=-static-stack -stress-regalloc=2 -run-pass=mos-imag-reg-assign -verify-machineinstrs %s -o - | FileCheck %s
++
++# Imaginary assignment with two byte candidates ($rc2, $rc3) and two pair
++# candidates ($rs1 = $rc2:$rc3, $rs2). Each case succeeds only if the graph
++# models its constraint exactly. Check VRM metadata, which
++# update_mir_test_checks.py does not generate.
++--- |
++  define void @assigned_neighbors() "nonreentrant" { ret void }
++  define void @early_clobber() "nonreentrant" { ret void }
++  define void @assignment_order() "nonreentrant" { ret void }
++...
++
++# Both bytes block only $rs1. Bounding each assigned byte's effect separately
++# would count two blocked pairs and leave no room for the pair.
++# CHECK-LABEL: name: assigned_neighbors
++# CHECK:      registers:
++# CHECK-NEXT:   - { id: 0, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT:   - { id: 1, class: gpr, {{.*}}assigned-phys: '$rc3' }
++# CHECK-NEXT:   - { id: 2, class: imag16, {{.*}}assigned-phys: '$rs2' }
++# CHECK-NEXT:   - { id: 3, class: ac, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT: liveins:
++---
++name: assigned_neighbors
++tracksRegLiveness: true
++body: |
++  bb.0:
++    %0:gpr = LDAbs 1000
++    %1:gpr = LDAbs 1001
++    %2:imag16 = REG_SEQUENCE %0, %subreg.sublo, %1, %subreg.subhi
++    STAbs %0, 2000
++    STAbs %1, 2001
++    %3:ac = LDIndir %2
++    STAbs %3, 2002
++    RTS
++...
++
++# An early-clobber result is written before the inputs are read, so it cannot
++# reuse the location of an input killed by the same instruction.
++# CHECK-LABEL: name: early_clobber
++# CHECK:      registers:
++# CHECK-NEXT:   - { id: 0, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT:   - { id: 1, class: imag16, {{.*}}assigned-phys: '$rs2' }
++# CHECK-NEXT: liveins:
++---
++name: early_clobber
++tracksRegLiveness: true
++stack:
++  - { id: 0, type: spill-slot, size: 1, alignment: 1 }
++body: |
++  bb.0:
++    %0:gpr = LDAbs 1000
++    dead early-clobber %1:imag16 = STStk %0, %stack.0, 0 :: (store (s8) into %stack.0)
++    RTS
++...
++
++# The load's byte result can only be removed after its pair scratch, since a
++# pair may block both byte candidates. Assigning in reverse removal order places
++# the byte first; the reverse would leave the byte no room.
++# CHECK-LABEL: name: assignment_order
++# CHECK:      registers:
++# CHECK-NEXT:   - { id: 0, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT:   - { id: 1, class: imag16, {{.*}}assigned-phys: '$rs2' }
++# CHECK-NEXT: liveins:
++---
++name: assignment_order
++tracksRegLiveness: true
++stack:
++  - { id: 0, type: spill-slot, size: 1, alignment: 1 }
++body: |
++  bb.0:
++    %0:gpr, dead early-clobber %1:imag16 = LDStk %stack.0, 0 :: (load (s8) from %stack.0)
++    STAbs %0, 2000
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/imag-regalloc-assign.mir b/llvm/test/CodeGen/MOS/imag-regalloc-assign.mir
+new file mode 100644
+index 000000000000..540e813ab163
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag-regalloc-assign.mir
+@@ -0,0 +1,122 @@
++# RUN: llc -mtriple=mos -mattr=+static-stack -run-pass=mos-imag-reg-assign -verify-machineinstrs %s -o - | FileCheck %s
++
++# Straight-line imaginary assignment. Each location is the first candidate in
++# allocation order that no live neighbor occupies. Check VRM metadata, which
++# update_mir_test_checks.py does not generate.
++--- |
++  define void @reuse() "nonreentrant" { ret void }
++  define void @killed_inputs() "nonreentrant" { ret void }
++  define void @live_input() "nonreentrant" { ret void }
++  define void @preassigned() "nonreentrant" { ret void }
++  define void @flags() "nonreentrant" { ret void }
++...
++
++# A killed value's location is free for later definitions.
++# CHECK-LABEL: name: reuse
++# CHECK:      registers:
++# CHECK-NEXT:   - { id: 0, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT:   - { id: 1, class: gpr, {{.*}}assigned-phys: '$rc3' }
++# CHECK-NEXT:   - { id: 2, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT: liveins:
++---
++name: reuse
++tracksRegLiveness: true
++body: |
++  bb.0:
++    %0:gpr = LDAbs 1000
++    %1:gpr = LDAbs 1001
++    STAbs %0, 2000
++    %2:gpr = LDAbs 1002
++    STAbs %1, 2001
++    STAbs %2, 2002
++    RTS
++...
++
++# Inputs killed by an instruction release their locations to its results: the
++# pair reuses both bytes, and the load reuses the pair's low byte.
++# CHECK-LABEL: name: killed_inputs
++# CHECK:      registers:
++# CHECK-NEXT:   - { id: 0, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT:   - { id: 1, class: gpr, {{.*}}assigned-phys: '$rc3' }
++# CHECK-NEXT:   - { id: 2, class: imag16, {{.*}}assigned-phys: '$rs1' }
++# CHECK-NEXT:   - { id: 3, class: ac, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT: liveins:
++---
++name: killed_inputs
++tracksRegLiveness: true
++body: |
++  bb.0:
++    %0:gpr = LDAbs 1000
++    %1:gpr = LDAbs 1001
++    %2:imag16 = REG_SEQUENCE %0, %subreg.sublo, %1, %subreg.subhi
++    %3:ac = LDIndir %2
++    STAbs %3, 2000
++    RTS
++...
++
++# An input that remains live blocks every pair that overlaps it.
++# CHECK-LABEL: name: live_input
++# CHECK:      registers:
++# CHECK-NEXT:   - { id: 0, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT:   - { id: 1, class: gpr, {{.*}}assigned-phys: '$rc3' }
++# CHECK-NEXT:   - { id: 2, class: imag16, {{.*}}assigned-phys: '$rs2' }
++# CHECK-NEXT:   - { id: 3, class: ac, {{.*}}assigned-phys: '$rc3' }
++# CHECK-NEXT: liveins:
++---
++name: live_input
++tracksRegLiveness: true
++body: |
++  bb.0:
++    %0:gpr = LDAbs 1000
++    %1:gpr = LDAbs 1001
++    %2:imag16 = REG_SEQUENCE %0, %subreg.sublo, %1, %subreg.subhi
++    %3:ac = LDIndir %2
++    STAbs %3, 2000
++    STAbs %0, 2001
++    RTS
++...
++
++# A register already assigned in VRM keeps its location, and its neighbors
++# avoid it.
++# CHECK-LABEL: name: preassigned
++# CHECK:      registers:
++# CHECK-NEXT:   - { id: 0, class: gpr, {{.*}}assigned-phys: '$rc3' }
++# CHECK-NEXT:   - { id: 1, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT:   - { id: 2, class: gpr, {{.*}}assigned-phys: '$rc4' }
++# CHECK-NEXT: liveins:
++---
++name: preassigned
++tracksRegLiveness: true
++registers:
++  - { id: 0, class: gpr, assigned-phys: '$rc3' }
++body: |
++  bb.0:
++    %0:gpr = LDAbs 1000
++    %1:gpr = LDAbs 1001
++    %2:gpr = LDAbs 1002
++    STAbs %0, 2000
++    STAbs %1, 2001
++    STAbs %2, 2002
++    RTS
++...
++
++# Flags use the least significant bit of a byte location. A byte cannot
++# overlap a live flag.
++# CHECK-LABEL: name: flags
++# CHECK:      registers:
++# CHECK-NEXT:   - { id: 0, class: cc, {{.*}}assigned-phys: '$rc2lsb' }
++# CHECK-NEXT:   - { id: 1, class: gpr, {{.*}}assigned-phys: '$rc3' }
++# CHECK-NEXT:   - { id: 2, class: gpr, {{.*}}assigned-phys: '$rc2' }
++# CHECK-NEXT: liveins:
++---
++name: flags
++tracksRegLiveness: true
++body: |
++  bb.0:
++    %0:cc = LDImm1 1
++    %1:gpr = LDAbs 1000
++    %2:gpr = REG_SEQUENCE %0, %subreg.sublsb
++    STAbs %2, 2000
++    STAbs %1, 2001
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/imag-regalloc-spill-reloads.mir b/llvm/test/CodeGen/MOS/imag-regalloc-spill-reloads.mir
+index 952d69f6529c..beed9e11f10e 100644
+--- a/llvm/test/CodeGen/MOS/imag-regalloc-spill-reloads.mir
++++ b/llvm/test/CodeGen/MOS/imag-regalloc-spill-reloads.mir
+@@ -1,5 +1,7 @@
+ # NOTE: Assertions have been autogenerated by utils/update_mir_test_checks.py UTC_ARGS: --version 6
+ # RUN: llc -mtriple=mos -mattr=+static-stack -stress-regalloc=8 -run-pass=mos-imag-reg-spill -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mattr=+static-stack -stress-regalloc=8 -run-pass=mos-imag-reg-spill,mos-imag-reg-assign -verify-machineinstrs %s -o /dev/null
++# Imaginary assignment must succeed on every spilled result.
+ 
+ # Four return inputs must fit alongside transfer scratch. The intervening
+ # loads force multiple inputs to spill and subsequently reload together. Each
+diff --git a/llvm/test/CodeGen/MOS/imag-regalloc-spill-terminators.mir b/llvm/test/CodeGen/MOS/imag-regalloc-spill-terminators.mir
+index 73ea509c33d9..165dfd262344 100644
+--- a/llvm/test/CodeGen/MOS/imag-regalloc-spill-terminators.mir
++++ b/llvm/test/CodeGen/MOS/imag-regalloc-spill-terminators.mir
+@@ -1,6 +1,9 @@
+ # NOTE: Assertions have been autogenerated by utils/update_mir_test_checks.py UTC_ARGS: --version 6
+ # RUN: llc -mtriple=mos -mattr=+static-stack -stress-regalloc=6 -run-pass=mos-imag-reg-spill -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=STATIC
+ # RUN: llc -mtriple=mos -mattr=-static-stack -stress-regalloc=3 -run-pass=mos-imag-reg-spill -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=SOFT
++# RUN: llc -mtriple=mos -mattr=+static-stack -stress-regalloc=6 -run-pass=mos-imag-reg-spill,mos-imag-reg-assign -verify-machineinstrs %s -o /dev/null
++# RUN: llc -mtriple=mos -mattr=-static-stack -stress-regalloc=3 -run-pass=mos-imag-reg-spill,mos-imag-reg-assign -verify-machineinstrs %s -o /dev/null
++# Imaginary assignment must succeed on every spilled result.
+ 
+ # Extra loads force a return input to spill. Their temporaries die before
+ # the terminators, leaving room to reload both inputs before either return.
+diff --git a/llvm/test/CodeGen/MOS/imag-regalloc-spill.mir b/llvm/test/CodeGen/MOS/imag-regalloc-spill.mir
+index 0ae5e820c3b7..714211381627 100644
+--- a/llvm/test/CodeGen/MOS/imag-regalloc-spill.mir
++++ b/llvm/test/CodeGen/MOS/imag-regalloc-spill.mir
+@@ -1,6 +1,9 @@
+ # NOTE: Assertions have been autogenerated by utils/update_mir_test_checks.py UTC_ARGS: --version 6
+ # RUN: llc -mtriple=mos -mattr=+static-stack -stress-regalloc=5 -run-pass=mos-imag-reg-spill -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=STATIC
+ # RUN: llc -mtriple=mos -mattr=-static-stack -stress-regalloc=4 -run-pass=mos-imag-reg-spill -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=SOFT
++# RUN: llc -mtriple=mos -mattr=+static-stack -stress-regalloc=5 -run-pass=mos-imag-reg-spill,mos-imag-reg-assign -verify-machineinstrs %s -o /dev/null
++# RUN: llc -mtriple=mos -mattr=-static-stack -stress-regalloc=4 -run-pass=mos-imag-reg-spill,mos-imag-reg-assign -verify-machineinstrs %s -o /dev/null
++# Imaginary assignment must succeed on every spilled result.
+ 
+ # Straight-line spilling: all virtual operands are whole and untied.
+ # Restrict the allocation orders to exercise pressure with small examples.

@@ -1,0 +1,35 @@
+{
+  "inspected_revision": "a5c31b24a97cc16c582d124167e29e3da8946581",
+  "date": "2026-11-03",
+  "scope": "Existing 0029 revalidation and review of PR627/628; not a new defect report.",
+  "files": [
+    {
+      "source_path": "llvm/lib/CodeGen/TwoAddressInstructionPass.cpp",
+      "artifact": "TwoAddressInstructionPass.cpp.txt",
+      "sha256": "9516185d8d14bb9701f49101dfa687f6fd54621fd3377b69d783eff1ca38388d"
+    },
+    {
+      "source_path": "llvm/lib/Target/MOS/MOSTargetMachine.cpp",
+      "artifact": "MOSTargetMachine.cpp.txt",
+      "sha256": "ea88cbdc953120f00696337cc170bfc299d8db01fbff399f1e308b2867627817"
+    },
+    {
+      "source_path": "llvm/lib/Target/MOS/MOSImagRegSpill.cpp",
+      "artifact": "MOSImagRegSpill.cpp.txt",
+      "sha256": "be6b6cc5db1c3fa521d35e57685834901c19a1383e81c722a7b635d866cb4d11"
+    },
+    {
+      "source_path": "llvm/lib/Target/MOS/MOSRegAlloc.cpp",
+      "artifact": "MOSRegAlloc.cpp.txt",
+      "sha256": "717cd54e838589d39c42c3905601220432f377c24319d70fedc47b768ac8d83b"
+    }
+  ],
+  "findings": [
+    "The destination rescheduleKillAboveMI still requires LiveIntervals and permits hoisting a kill-copy into a physical register above a folded load; it still lacks the 0029 register-class availability guard.",
+    "The pass is named two-address-instruction at this revision. Old reproduction commands must be adapted without altering the MIR function bodies.",
+    "The experimental pipeline runs conventional SSA, imaginary spilling, imaginary assignment, and the still-unimplemented hardware MOSRegAlloc in order. The default remains conventional allocation.",
+    "MOSImagRegSpill rejects functions other than one successor-free block, physical imaginary live-ins, calls/regmasks, and virtual undef/tied/subregister/early-clobber inputs. Its generated transfers introduce the scratch and subregister cases handled by PR628.",
+    "No downstream implementation of MOSInterferenceGraph or MOSImagRegAssign was found in the active patch bundle. The 0002 search hit is only an initialization context line, not another implementation.",
+    "The preserved October 10 baseline binary reproduces the retained IR register-exhaustion signature; its original hash matches the historical record."
+  ]
+}

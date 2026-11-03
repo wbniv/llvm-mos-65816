@@ -1,5 +1,7 @@
 # Refresh the standalone 0029 compiler PR
 
+**November 3 follow-up:** The [new validation packet](../pr-preparations/2026-11-03/0029/README.md) records a separate exact-main refresh on `a5c31b24a97c`, current red/green evidence and 152 candidate MOS passes with one unsupported. The October plan and results below remain dated; preview review and publication are still pending.
+
 Requested October 10, 2026: reconcile the existing register-exhaustion fix with the exact current llvm-mos revision, prepare a standalone branch, validate the reproducer and regressions, and show a PR preview before posting. No PR publication is authorized by this preparation request.
 
 Attribution: OpenAI Codex CLI 0.162.0; model `gpt-6.1-sol`; medium reasoning effort; verified session `01a1208b-91e0-7e33-b5bf-8787d2a9c919`. Earlier diagnosis and independent-review credits remain in their original records.
@@ -8,7 +10,7 @@ Attribution: OpenAI Codex CLI 0.162.0; model `gpt-6.1-sol`; medium reasoning eff
 
 The original entry point is [the mixed-width-call report](../upstream-mixed-width-call-regalloc-issue.md). The [existing draft](../upstream-twoaddr-physreg-reschedule-pr.md), [September validation](../pr-preparations/2026-09-22/0029-validation.md), [independent review](../pr-preparations/2026-09-22/0029-claude-review.md), patch 0029, Git history and current source are the starting evidence. This is a refresh of an existing causal defect, not a new discovery. Historical compiler/binary identities and full cross-target results remain scoped to their recorded revisions.
 
-GitHub `main` resolves to `0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63`, the new downstream pin. The destination helper retains the physical-copy hoist and lacks the class-availability guard. Its entry gate now requires LiveIntervals; upstream `8068182dd6fb1a8efae0291db1d2462d29025cd1` removed the LiveVariables path. Inspecting only the helper would miss that reachability change. Update the regression to exercise LiveIntervals and separately check the no-analysis contract.
+On October 10 GitHub `main` resolved to `0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63`, the then-new downstream pin. The destination helper retains the physical-copy hoist and lacks the class-availability guard. Its entry gate now requires LiveIntervals; upstream `8068182dd6fb1a8efae0291db1d2462d29025cd1` removed the LiveVariables path. Inspecting only the helper would miss that reachability change. Update the regression to exercise LiveIntervals and separately check the no-analysis contract.
 
 ## Work and verification
 

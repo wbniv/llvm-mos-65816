@@ -1,0 +1,62 @@
+[
+  {
+    "path": "llvm/lib/Target/MOS/MOSImagRegAssign.cpp",
+    "expected_git_blob": "ab9c9749e0307433ffa9dc4debeead308698e75d",
+    "actual_git_blob": "ab9c9749e0307433ffa9dc4debeead308698e75d",
+    "match": true
+  },
+  {
+    "path": "llvm/lib/Target/MOS/MOSImagRegSpill.cpp",
+    "expected_git_blob": "7a70703b535315769e6430351cecda6388e9f054",
+    "actual_git_blob": "7a70703b535315769e6430351cecda6388e9f054",
+    "match": true
+  },
+  {
+    "path": "llvm/lib/Target/MOS/MOSInterferenceGraph.cpp",
+    "expected_git_blob": "33378d20685c66d657de6f386159fee458bf7e07",
+    "actual_git_blob": "33378d20685c66d657de6f386159fee458bf7e07",
+    "match": true
+  },
+  {
+    "path": "llvm/lib/Target/MOS/MOSInterferenceGraph.h",
+    "expected_git_blob": "7ee7dea6de859574e3ba5b8e4ce9acf746481ddf",
+    "actual_git_blob": "7ee7dea6de859574e3ba5b8e4ce9acf746481ddf",
+    "match": true
+  },
+  {
+    "path": "llvm/test/CodeGen/MOS/imag-regalloc-assign-errors.mir",
+    "expected_git_blob": "a8701aa0571df3efe23b2d9e093c0e6c753e9e15",
+    "actual_git_blob": "a8701aa0571df3efe23b2d9e093c0e6c753e9e15",
+    "match": true
+  },
+  {
+    "path": "llvm/test/CodeGen/MOS/imag-regalloc-assign-tight.mir",
+    "expected_git_blob": "c1cfb53d204a4a549377693022517813d14cc53e",
+    "actual_git_blob": "c1cfb53d204a4a549377693022517813d14cc53e",
+    "match": true
+  },
+  {
+    "path": "llvm/test/CodeGen/MOS/imag-regalloc-assign.mir",
+    "expected_git_blob": "540e813ab1634cb857aff6fe8b0f5988ecc2f031",
+    "actual_git_blob": "540e813ab1634cb857aff6fe8b0f5988ecc2f031",
+    "match": true
+  },
+  {
+    "path": "llvm/test/CodeGen/MOS/imag-regalloc-spill-reloads.mir",
+    "expected_git_blob": "beed9e11f10e8262a28b5df9acd3bd46fc5a2f2a",
+    "actual_git_blob": "beed9e11f10e8262a28b5df9acd3bd46fc5a2f2a",
+    "match": true
+  },
+  {
+    "path": "llvm/test/CodeGen/MOS/imag-regalloc-spill-terminators.mir",
+    "expected_git_blob": "165dfd262344a100fffbdb0cb5ecb5e92b5674bd",
+    "actual_git_blob": "165dfd262344a100fffbdb0cb5ecb5e92b5674bd",
+    "match": true
+  },
+  {
+    "path": "llvm/test/CodeGen/MOS/imag-regalloc-spill.mir",
+    "expected_git_blob": "714211381627861890b587432bcd76f957cea0be",
+    "actual_git_blob": "714211381627861890b587432bcd76f957cea0be",
+    "match": true
+  }
+]

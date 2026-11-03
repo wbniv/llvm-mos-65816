@@ -1,0 +1,327 @@
+--- |
+  ; ModuleID = '/review/inputs/pressure-probe.ll'
+  source_filename = "/review/inputs/pressure-probe.ll"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @input = external global [16 x i8]
+  @output = external global [32 x i8]
+  
+  define void @pressure_probe() #0 {
+  entry:
+    %v0 = load volatile i8, ptr @input, align 1
+    %v1 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 1), align 1
+    %v2 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 2), align 1
+    %v3 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 3), align 1
+    %v4 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 4), align 1
+    %v5 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 5), align 1
+    %v6 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 6), align 1
+    %v7 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 7), align 1
+    %v8 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 8), align 1
+    %v9 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 9), align 1
+    %v10 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 10), align 1
+    %v11 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 11), align 1
+    %v12 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 12), align 1
+    %v13 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 13), align 1
+    %v14 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 14), align 1
+    %v15 = load volatile i8, ptr getelementptr inbounds nuw (i8, ptr @input, i16 15), align 1
+    store volatile i8 %v5, ptr @output, align 1
+    store volatile i8 %v0, ptr getelementptr inbounds nuw (i8, ptr @output, i16 1), align 1
+    store volatile i8 %v15, ptr getelementptr inbounds nuw (i8, ptr @output, i16 2), align 1
+    store volatile i8 %v3, ptr getelementptr inbounds nuw (i8, ptr @output, i16 3), align 1
+    store volatile i8 %v9, ptr getelementptr inbounds nuw (i8, ptr @output, i16 4), align 1
+    store volatile i8 %v1, ptr getelementptr inbounds nuw (i8, ptr @output, i16 5), align 1
+    store volatile i8 %v14, ptr getelementptr inbounds nuw (i8, ptr @output, i16 6), align 1
+    store volatile i8 %v6, ptr getelementptr inbounds nuw (i8, ptr @output, i16 7), align 1
+    store volatile i8 %v12, ptr getelementptr inbounds nuw (i8, ptr @output, i16 8), align 1
+    store volatile i8 %v2, ptr getelementptr inbounds nuw (i8, ptr @output, i16 9), align 1
+    store volatile i8 %v10, ptr getelementptr inbounds nuw (i8, ptr @output, i16 10), align 1
+    store volatile i8 %v4, ptr getelementptr inbounds nuw (i8, ptr @output, i16 11), align 1
+    store volatile i8 %v13, ptr getelementptr inbounds nuw (i8, ptr @output, i16 12), align 1
+    store volatile i8 %v8, ptr getelementptr inbounds nuw (i8, ptr @output, i16 13), align 1
+    store volatile i8 %v7, ptr getelementptr inbounds nuw (i8, ptr @output, i16 14), align 1
+    store volatile i8 %v11, ptr getelementptr inbounds nuw (i8, ptr @output, i16 15), align 1
+    store volatile i8 %v11, ptr getelementptr inbounds nuw (i8, ptr @output, i16 16), align 1
+    store volatile i8 %v7, ptr getelementptr inbounds nuw (i8, ptr @output, i16 17), align 1
+    store volatile i8 %v8, ptr getelementptr inbounds nuw (i8, ptr @output, i16 18), align 1
+    store volatile i8 %v13, ptr getelementptr inbounds nuw (i8, ptr @output, i16 19), align 1
+    store volatile i8 %v4, ptr getelementptr inbounds nuw (i8, ptr @output, i16 20), align 1
+    store volatile i8 %v10, ptr getelementptr inbounds nuw (i8, ptr @output, i16 21), align 1
+    store volatile i8 %v2, ptr getelementptr inbounds nuw (i8, ptr @output, i16 22), align 1
+    store volatile i8 %v12, ptr getelementptr inbounds nuw (i8, ptr @output, i16 23), align 1
+    store volatile i8 %v6, ptr getelementptr inbounds nuw (i8, ptr @output, i16 24), align 1
+    store volatile i8 %v14, ptr getelementptr inbounds nuw (i8, ptr @output, i16 25), align 1
+    store volatile i8 %v1, ptr getelementptr inbounds nuw (i8, ptr @output, i16 26), align 1
+    store volatile i8 %v9, ptr getelementptr inbounds nuw (i8, ptr @output, i16 27), align 1
+    store volatile i8 %v3, ptr getelementptr inbounds nuw (i8, ptr @output, i16 28), align 1
+    store volatile i8 %v15, ptr getelementptr inbounds nuw (i8, ptr @output, i16 29), align 1
+    store volatile i8 %v0, ptr getelementptr inbounds nuw (i8, ptr @output, i16 30), align 1
+    store volatile i8 %v5, ptr getelementptr inbounds nuw (i8, ptr @output, i16 31), align 1
+    ret void
+  }
+  
+  attributes #0 = { "nonreentrant" "target-cpu"="mos65c02" "target-features"="-static-stack" }
+...
+---
+name:            pressure_probe
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 21, class: _, preferred-register: '', flags: [  ] }
+  - { id: 22, class: _, preferred-register: '', flags: [  ] }
+  - { id: 23, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 24, class: _, preferred-register: '', flags: [  ] }
+  - { id: 25, class: _, preferred-register: '', flags: [  ] }
+  - { id: 26, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 27, class: _, preferred-register: '', flags: [  ] }
+  - { id: 28, class: _, preferred-register: '', flags: [  ] }
+  - { id: 29, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 30, class: _, preferred-register: '', flags: [  ] }
+  - { id: 31, class: _, preferred-register: '', flags: [  ] }
+  - { id: 32, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 33, class: _, preferred-register: '', flags: [  ] }
+  - { id: 34, class: _, preferred-register: '', flags: [  ] }
+  - { id: 35, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 36, class: _, preferred-register: '', flags: [  ] }
+  - { id: 37, class: _, preferred-register: '', flags: [  ] }
+  - { id: 38, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 39, class: _, preferred-register: '', flags: [  ] }
+  - { id: 40, class: _, preferred-register: '', flags: [  ] }
+  - { id: 41, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 42, class: _, preferred-register: '', flags: [  ] }
+  - { id: 43, class: _, preferred-register: '', flags: [  ] }
+  - { id: 44, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 45, class: _, preferred-register: '', flags: [  ] }
+  - { id: 46, class: _, preferred-register: '', flags: [  ] }
+  - { id: 47, class: _, preferred-register: '', flags: [  ] }
+  - { id: 48, class: _, preferred-register: '', flags: [  ] }
+  - { id: 49, class: _, preferred-register: '', flags: [  ] }
+  - { id: 50, class: _, preferred-register: '', flags: [  ] }
+  - { id: 51, class: _, preferred-register: '', flags: [  ] }
+  - { id: 52, class: _, preferred-register: '', flags: [  ] }
+  - { id: 53, class: _, preferred-register: '', flags: [  ] }
+  - { id: 54, class: _, preferred-register: '', flags: [  ] }
+  - { id: 55, class: _, preferred-register: '', flags: [  ] }
+  - { id: 56, class: _, preferred-register: '', flags: [  ] }
+  - { id: 57, class: _, preferred-register: '', flags: [  ] }
+  - { id: 58, class: _, preferred-register: '', flags: [  ] }
+  - { id: 59, class: _, preferred-register: '', flags: [  ] }
+  - { id: 60, class: _, preferred-register: '', flags: [  ] }
+  - { id: 61, class: _, preferred-register: '', flags: [  ] }
+  - { id: 62, class: _, preferred-register: '', flags: [  ] }
+  - { id: 63, class: _, preferred-register: '', flags: [  ] }
+  - { id: 64, class: _, preferred-register: '', flags: [  ] }
+  - { id: 65, class: _, preferred-register: '', flags: [  ] }
+  - { id: 66, class: _, preferred-register: '', flags: [  ] }
+  - { id: 67, class: _, preferred-register: '', flags: [  ] }
+  - { id: 68, class: _, preferred-register: '', flags: [  ] }
+  - { id: 69, class: _, preferred-register: '', flags: [  ] }
+  - { id: 70, class: _, preferred-register: '', flags: [  ] }
+  - { id: 71, class: _, preferred-register: '', flags: [  ] }
+  - { id: 72, class: _, preferred-register: '', flags: [  ] }
+  - { id: 73, class: _, preferred-register: '', flags: [  ] }
+  - { id: 74, class: _, preferred-register: '', flags: [  ] }
+  - { id: 75, class: _, preferred-register: '', flags: [  ] }
+  - { id: 76, class: _, preferred-register: '', flags: [  ] }
+  - { id: 77, class: _, preferred-register: '', flags: [  ] }
+  - { id: 78, class: _, preferred-register: '', flags: [  ] }
+  - { id: 79, class: _, preferred-register: '', flags: [  ] }
+  - { id: 80, class: _, preferred-register: '', flags: [  ] }
+  - { id: 81, class: _, preferred-register: '', flags: [  ] }
+  - { id: 82, class: _, preferred-register: '', flags: [  ] }
+  - { id: 83, class: _, preferred-register: '', flags: [  ] }
+  - { id: 84, class: _, preferred-register: '', flags: [  ] }
+  - { id: 85, class: _, preferred-register: '', flags: [  ] }
+  - { id: 86, class: _, preferred-register: '', flags: [  ] }
+  - { id: 87, class: _, preferred-register: '', flags: [  ] }
+  - { id: 88, class: _, preferred-register: '', flags: [  ] }
+  - { id: 89, class: _, preferred-register: '', flags: [  ] }
+  - { id: 90, class: _, preferred-register: '', flags: [  ] }
+  - { id: 91, class: _, preferred-register: '', flags: [  ] }
+  - { id: 92, class: _, preferred-register: '', flags: [  ] }
+  - { id: 93, class: _, preferred-register: '', flags: [  ] }
+  - { id: 94, class: _, preferred-register: '', flags: [  ] }
+  - { id: 95, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 96, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 97, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 98, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 99, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 100, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 101, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 102, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 103, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 104, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 105, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 106, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 107, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 108, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 109, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 110, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 111, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 112, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 113, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 114, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 115, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 116, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 117, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 118, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 119, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 120, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 121, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 122, class: imag16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0.entry:
+    %0:gpr = LDAbs @input :: (volatile dereferenceable load (s8) from @input)
+    %2:gpr = LDAbs @input + 1 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 1)`)
+    %5:gpr = LDAbs @input + 2 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 2)`)
+    %8:gpr = LDAbs @input + 3 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 3)`)
+    %11:gpr = LDAbs @input + 4 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 4)`)
+    %14:gpr = LDAbs @input + 5 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 5)`)
+    %17:gpr = LDAbs @input + 6 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 6)`)
+    %20:gpr = LDAbs @input + 7 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 7)`)
+    %23:gpr = LDAbs @input + 8 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 8)`)
+    %26:gpr = LDAbs @input + 9 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 9)`)
+    %29:gpr = LDAbs @input + 10 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 10)`)
+    early-clobber %95:imag16 = STStk %0, %stack.0, 0 :: (store (s8) into %stack.0)
+    %32:gpr = LDAbs @input + 11 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 11)`)
+    early-clobber %96:imag16 = STStk %2, %stack.1, 0 :: (store (s8) into %stack.1)
+    %35:gpr = LDAbs @input + 12 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 12)`)
+    early-clobber %97:imag16 = STStk %5, %stack.2, 0 :: (store (s8) into %stack.2)
+    %38:gpr = LDAbs @input + 13 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 13)`)
+    early-clobber %98:imag16 = STStk %38, %stack.3, 0 :: (store (s8) into %stack.3)
+    %41:gpr = LDAbs @input + 14 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 14)`)
+    early-clobber %99:imag16 = STStk %41, %stack.4, 0 :: (store (s8) into %stack.4)
+    %44:gpr = LDAbs @input + 15 :: (volatile dereferenceable load (s8) from `ptr getelementptr inbounds nuw (i8, ptr @input, i16 15)`)
+    STAbs %14, @output :: (volatile store (s8) into @output)
+    early-clobber %100:imag16 = STStk %44, %stack.5, 0 :: (store (s8) into %stack.5)
+    %101:gpr, early-clobber %102:imag16 = LDStk %stack.0, 0 :: (load (s8) from %stack.0)
+    STAbs %101, @output + 1 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 1)`)
+    %103:gpr, early-clobber %104:imag16 = LDStk %stack.5, 0 :: (load (s8) from %stack.5)
+    STAbs %103, @output + 2 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 2)`)
+    STAbs %8, @output + 3 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 3)`)
+    STAbs %26, @output + 4 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 4)`)
+    %105:gpr, early-clobber %106:imag16 = LDStk %stack.1, 0 :: (load (s8) from %stack.1)
+    STAbs %105, @output + 5 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 5)`)
+    %107:gpr, early-clobber %108:imag16 = LDStk %stack.4, 0 :: (load (s8) from %stack.4)
+    STAbs %107, @output + 6 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 6)`)
+    STAbs %17, @output + 7 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 7)`)
+    STAbs %35, @output + 8 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 8)`)
+    %109:gpr, early-clobber %110:imag16 = LDStk %stack.2, 0 :: (load (s8) from %stack.2)
+    STAbs %109, @output + 9 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 9)`)
+    STAbs %29, @output + 10 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 10)`)
+    STAbs %11, @output + 11 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 11)`)
+    %111:gpr, early-clobber %112:imag16 = LDStk %stack.3, 0 :: (load (s8) from %stack.3)
+    STAbs %111, @output + 12 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 12)`)
+    STAbs %23, @output + 13 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 13)`)
+    STAbs %20, @output + 14 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 14)`)
+    STAbs %32, @output + 15 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 15)`)
+    STAbs %32, @output + 16 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 16)`)
+    STAbs %20, @output + 17 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 17)`)
+    STAbs %23, @output + 18 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 18)`)
+    STAbs %111, @output + 19 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 19)`)
+    STAbs %11, @output + 20 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 20)`)
+    STAbs %29, @output + 21 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 21)`)
+    %113:gpr, early-clobber %114:imag16 = LDStk %stack.2, 0 :: (load (s8) from %stack.2)
+    STAbs %113, @output + 22 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 22)`)
+    STAbs %35, @output + 23 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 23)`)
+    STAbs %17, @output + 24 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 24)`)
+    %115:gpr, early-clobber %116:imag16 = LDStk %stack.4, 0 :: (load (s8) from %stack.4)
+    STAbs %115, @output + 25 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 25)`)
+    %117:gpr, early-clobber %118:imag16 = LDStk %stack.1, 0 :: (load (s8) from %stack.1)
+    STAbs %117, @output + 26 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 26)`)
+    STAbs %26, @output + 27 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 27)`)
+    STAbs %8, @output + 28 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 28)`)
+    %119:gpr, early-clobber %120:imag16 = LDStk %stack.5, 0 :: (load (s8) from %stack.5)
+    STAbs %119, @output + 29 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 29)`)
+    %121:gpr, early-clobber %122:imag16 = LDStk %stack.0, 0 :: (load (s8) from %stack.0)
+    STAbs %121, @output + 30 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 30)`)
+    STAbs %14, @output + 31 :: (volatile store (s8) into `ptr getelementptr inbounds nuw (i8, ptr @output, i16 31)`)
+    RTS
+...

@@ -1,0 +1,2 @@
+error: <unknown>:0:0: ran out of registers during register allocation in function 'accumulator_argument'
+error: <unknown>:0:0: ran out of registers during register allocation in function 'intervening_index'

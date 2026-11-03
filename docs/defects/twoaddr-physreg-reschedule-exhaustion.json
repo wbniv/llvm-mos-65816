@@ -9,7 +9,8 @@
   "attribution": [
     "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919: October 10 historical migration and exact-current standalone refresh.",
     "OpenAI Codex CLI 0.155.1; model gpt-6-astra; xhigh reasoning effort: September diagnosis, implementation and validation, credit retained from the existing PR draft.",
-    "Claude Code CLI 2.1.278; model claude-fable-5-1; high reasoning effort: September independent review and reserved-register refinement, credit retained from the existing PR draft."
+    "Claude Code CLI 2.1.278; model claude-fable-5-1; high reasoning effort: September independent review and reserved-register refinement, credit retained from the existing PR draft.",
+    "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown: November 3 validation continuation and documentation."
   ],
   "prior_work": {
     "disposition": "historical_migration",
@@ -122,6 +123,10 @@
     {
       "path": "docs/pr-preparations/2026-10-10/0029/evidence/upstream-final-recheck.json",
       "sha256": "7ec370c6d7f96b24d3d6eb88e7623a703223a72438bf0bfa1916caabdbe1377b"
+    },
+    {
+      "path": "docs/pr-preparations/2026-11-03/0029/manifest.json",
+      "sha256": "27b6066a7140d467eaf716670566471ada7b4a695beda96ca45c75856517906a"
     }
   ],
   "baseline": {

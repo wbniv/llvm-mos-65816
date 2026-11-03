@@ -1,0 +1,13 @@
+ninja: Entering directory `/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw'
+[1/8] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSImagRegAssign.cpp.o
+[2/8] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSImagRegSpill.cpp.o
+[3/8] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSInterferenceGraph.cpp.o
+/work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/lib/Target/MOS/MOSInterferenceGraph.cpp:212:30: warning: unused variable 'Use' [-Wunused-variable]
+  212 |   for (const MachineOperand &Use : MI.all_uses())
+      |                              ^~~
+1 warning generated.
+[4/8] Linking CXX static library lib/libLLVMMOSCodeGen.a
+[5/8] Linking CXX executable bin/clang-24
+[6/8] Creating executable symlink bin/clang
+[7/8] Linking CXX executable bin/llc
+[8/8] Linking CXX executable bin/opt

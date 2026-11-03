@@ -1,5 +1,7 @@
 # MOS: "ran out of registers" on mixed-width accesses through one pointer across a call
 
+**Current follow-up, November 3:** The [current standalone packet](../pr-preparations/2026-11-03/0029/README.md) repeats matching-input red/green on upstream `a5c31b24a97c`; the candidate MOS suites pass 152 tests with one unsupported. The C matrix passes and the PR remains unposted. The October follow-up and September evidence below are dated records.
+
 **Current follow-up, October 10:** [canonical defect record](../defects/twoaddr-physreg-reschedule-exhaustion.json) and [standalone refresh](../pr-preparations/2026-10-10/0029/README.md) retain matching-input red/green on upstream `0f031168a7cc`. The unchanged 0029 guard repairs the IR and LiveIntervals schedule; the refreshed MOS suites pass 140 tests with one unsupported. The C matrix is pending the candidate frontend build. No PR has been posted. The September evidence below retains its original compiler and review scope.
 
 **Fix completed September 22:**

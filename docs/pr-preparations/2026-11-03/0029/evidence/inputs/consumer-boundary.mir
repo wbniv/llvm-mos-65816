@@ -1,0 +1,12 @@
+# A virtual undef store operand is valid normalized MIR. It still requires
+# instruction-local assignment support in the next experimental pass.
+---
+name: undef_store
+tracksRegLiveness: true
+registers:
+  - { id: 0, class: gpr }
+body: |
+  bb.0:
+    STAbs undef %0, 2000
+    RTS
+...

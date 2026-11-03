@@ -103,7 +103,9 @@ Four patches (`0003`, `0008`, `0010`, `0011`) are **upstream bug-fix candidates*
 feature's longer flag live ranges to trigger. `0012` remains in the historical fork stack but was
 retired from upstream submission on 2026-08-05 because it has no current producer.
 
-**Current 0029 follow-up, October 10:** the [standalone packet](pr-preparations/2026-10-10/0029/README.md) refreshes the unchanged guard on upstream `0f031168a7cc`. Matching-input IR/MIR red/green and 140 MOS tests pass (one unsupported); the C matrix passes (24 full-driver and 24 candidate-backend checks). The branch is local and the PR unposted. September review and cross-target counts below remain dated evidence.
+**Current 0029 follow-up, November 3:** the [standalone packet](pr-preparations/2026-11-03/0029/README.md) repeats matching-input IR/MIR red/green on upstream `a5c31b24a97c`; the candidate MOS suites pass 152 tests with one unsupported, and the C matrix passes. The branch is local and the PR unposted. October and September results remain dated evidence.
+
+**Dated 0029 follow-up, October 10:** the [standalone packet](pr-preparations/2026-10-10/0029/README.md) refreshes the unchanged guard on upstream `0f031168a7cc`. Matching-input IR/MIR red/green and 140 MOS tests pass (one unsupported); the C matrix passes (24 full-driver and 24 candidate-backend checks). The branch is local and the PR unposted. September review and cross-target counts below remain dated evidence.
 
 **Later independent fix, September 22:** [patch 0029](../patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch)
 adds a shared CodeGen guard against hoisting a physical definition across virtual

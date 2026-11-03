@@ -1,0 +1,289 @@
+{
+  "comparisons": [
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mos6502-soft-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mos6502-soft-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mos6502-static-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mos6502-static-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mos65c02-soft-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mos65c02-soft-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mos65c02-static-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mos65c02-static-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mosspc700-soft-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mosspc700-soft-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mosspc700-static-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mosspc700-static-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mosw65816-soft-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mosw65816-soft-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mosw65816-static-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "mosw65816-static-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "main",
+      "to": "pr627",
+      "file": "undef-normalize.mir",
+      "identical_undef_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mos6502-soft-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mos6502-soft-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mos6502-static-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mos6502-static-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mos65c02-soft-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mos65c02-soft-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mos65c02-static-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mos65c02-static-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mosspc700-soft-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mosspc700-soft-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mosspc700-static-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mosspc700-static-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mosw65816-soft-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mosw65816-soft-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mosw65816-static-12-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "mosw65816-static-8-spill.mir",
+      "identical_spill_mir": true
+    },
+    {
+      "from": "pr627",
+      "to": "pr628",
+      "file": "undef-normalize.mir",
+      "identical_undef_mir": true
+    },
+    {
+      "from": "mos6502-soft-12-spill.mir",
+      "to": "mos6502-soft-12-assign.mir",
+      "identical_instruction_body": false
+    },
+    {
+      "from": "mos6502-soft-8-spill.mir",
+      "to": "mos6502-soft-8-assign.mir",
+      "identical_instruction_body": false
+    },
+    {
+      "from": "mos6502-static-12-spill.mir",
+      "to": "mos6502-static-12-assign.mir",
+      "identical_instruction_body": true
+    },
+    {
+      "from": "mos6502-static-8-spill.mir",
+      "to": "mos6502-static-8-assign.mir",
+      "identical_instruction_body": true
+    },
+    {
+      "from": "mos65c02-soft-12-spill.mir",
+      "to": "mos65c02-soft-12-assign.mir",
+      "identical_instruction_body": false
+    },
+    {
+      "from": "mos65c02-soft-8-spill.mir",
+      "to": "mos65c02-soft-8-assign.mir",
+      "identical_instruction_body": false
+    },
+    {
+      "from": "mos65c02-static-12-spill.mir",
+      "to": "mos65c02-static-12-assign.mir",
+      "identical_instruction_body": true
+    },
+    {
+      "from": "mos65c02-static-8-spill.mir",
+      "to": "mos65c02-static-8-assign.mir",
+      "identical_instruction_body": true
+    },
+    {
+      "from": "mosspc700-soft-12-spill.mir",
+      "to": "mosspc700-soft-12-assign.mir",
+      "identical_instruction_body": false
+    },
+    {
+      "from": "mosspc700-soft-8-spill.mir",
+      "to": "mosspc700-soft-8-assign.mir",
+      "identical_instruction_body": false
+    },
+    {
+      "from": "mosspc700-static-12-spill.mir",
+      "to": "mosspc700-static-12-assign.mir",
+      "identical_instruction_body": true
+    },
+    {
+      "from": "mosspc700-static-8-spill.mir",
+      "to": "mosspc700-static-8-assign.mir",
+      "identical_instruction_body": true
+    },
+    {
+      "from": "mosw65816-soft-12-spill.mir",
+      "to": "mosw65816-soft-12-assign.mir",
+      "identical_instruction_body": false
+    },
+    {
+      "from": "mosw65816-soft-8-spill.mir",
+      "to": "mosw65816-soft-8-assign.mir",
+      "identical_instruction_body": false
+    },
+    {
+      "from": "mosw65816-static-12-spill.mir",
+      "to": "mosw65816-static-12-assign.mir",
+      "identical_instruction_body": true
+    },
+    {
+      "from": "mosw65816-static-8-spill.mir",
+      "to": "mosw65816-static-8-assign.mir",
+      "identical_instruction_body": true
+    }
+  ],
+  "all_identical": false
+}

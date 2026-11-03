@@ -1,0 +1,219 @@
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dis in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-link in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml2obj in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find verify-uselistorder in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+llvm-lit: /work/.scratch/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin
+-- Testing: 154 tests, 2 workers --
+PASS: LLVM :: CodeGen/MOS/imag-regalloc-spill-errors.mir (1 of 154)
+PASS: LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll (2 of 154)
+PASS: LLVM :: MC/MOS/branch-range-boundary.s (3 of 154)
+PASS: LLVM :: CodeGen/MOS/legalizer.mir (4 of 154)
+PASS: LLVM :: CodeGen/MOS/instruction-selector.mir (5 of 154)
+PASS: LLVM :: CodeGen/MOS/vector-scalarize.ll (6 of 154)
+PASS: LLVM :: CodeGen/MOS/jump-table-limit.ll (7 of 154)
+PASS: LLVM :: MC/MOS/eflags-ir.ll (8 of 154)
+PASS: LLVM :: MC/MOS/modifiers-65816.s (9 of 154)
+PASS: LLVM :: CodeGen/MOS/call-lowering-stack.mir (10 of 154)
+PASS: LLVM :: CodeGen/MOS/call-lowering.mir (11 of 154)
+PASS: LLVM :: CodeGen/MOS/mos-conventional-ssa-undef.mir (12 of 154)
+PASS: LLVM :: MC/MOS/align-nop.s (13 of 154)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-inline-asm.mir (14 of 154)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65ce02.ll (15 of 154)
+PASS: LLVM :: CodeGen/MOS/cmpzero-terminator-invalid.mir (16 of 154)
+PASS: LLVM :: CodeGen/MOS/asm-printer-huc6280.mir (17 of 154)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-spc700.mir (18 of 154)
+PASS: LLVM :: CodeGen/MOS/regalloc.mir (19 of 154)
+PASS: LLVM :: CodeGen/MOS/indexiv.ll (20 of 154)
+PASS: LLVM :: MC/MOS/branch-range-matrix-65816.s (21 of 154)
+PASS: LLVM :: MC/MOS/zeropage.s (22 of 154)
+PASS: LLVM :: MC/MOS/bit-branch-target-r65c02.s (23 of 154)
+PASS: LLVM :: CodeGen/MOS/internalize.mir (24 of 154)
+PASS: LLVM :: CodeGen/MOS/late-opt-cmpzero.mir (25 of 154)
+PASS: LLVM :: MC/MOS/zp-regression.s (26 of 154)
+PASS: LLVM :: CodeGen/MOS/late-opt-65816.mir (27 of 154)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65816.mir (28 of 154)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-65dtv02.mir (29 of 154)
+PASS: LLVM :: CodeGen/MOS/leaf-20231021.ll (30 of 154)
+PASS: LLVM :: MC/MOS/zeropage-huc6280.s (31 of 154)
+PASS: LLVM :: CodeGen/MOS/late-opt-spc700.mir (32 of 154)
+PASS: LLVM :: MC/MOS/long-branches-65816.s (33 of 154)
+PASS: LLVM :: MC/MOS/all-65ce02-opcodes.s (34 of 154)
+PASS: LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll (35 of 154)
+PASS: LLVM :: CodeGen/MOS/shift-rotate.ll (36 of 154)
+PASS: LLVM :: CodeGen/MOS/call-lowering-spc700.mir (37 of 154)
+PASS: LLVM :: MC/MOS/branch-range-matrix-65ce02.s (38 of 154)
+PASS: LLVM :: MC/MOS/eflags.s (39 of 154)
+PASS: LLVM :: CodeGen/MOS/lower-select.mir (40 of 154)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-65c02.mir (41 of 154)
+PASS: LLVM :: MC/MOS/modifiers-spc700.s (42 of 154)
+PASS: LLVM :: CodeGen/MOS/imag-regalloc-spill-reloads.mir (43 of 154)
+PASS: LLVM :: CodeGen/MOS/commute.mir (44 of 154)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-huc6280.mir (45 of 154)
+PASS: LLVM :: MC/MOS/do-init-array.s (46 of 154)
+PASS: LLVM :: MC/MOS/all-65dtv02-opcodes.s (47 of 154)
+PASS: LLVM :: MC/MOS/all-65c02-opcodes.s (48 of 154)
+PASS: LLVM :: MC/MOS/pc-rel-reloc.s (49 of 154)
+PASS: LLVM :: MC/MOS/asm-errors.s (50 of 154)
+PASS: LLVM :: CodeGen/MOS/scmp-ucmp.ll (51 of 154)
+PASS: LLVM :: CodeGen/MOS/asm-printer-ir.mir (52 of 154)
+PASS: LLVM :: CodeGen/MOS/char-stats-norecurse.ll (53 of 154)
+PASS: LLVM :: CodeGen/MOS/nonreentrant.ll (54 of 154)
+PASS: LLVM :: CodeGen/MOS/whole-program-zp.ll (55 of 154)
+PASS: LLVM :: MC/MOS/addr-asciz.s (56 of 154)
+PASS: LLVM :: CodeGen/MOS/cfi-cie.ll (57 of 154)
+PASS: LLVM :: CodeGen/MOS/cfi-soft-stack.ll (58 of 154)
+PASS: LLVM :: CodeGen/MOS/fcmp.ll (59 of 154)
+PASS: LLVM :: CodeGen/MOS/cmp-select.ll (60 of 154)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65c02.mir (61 of 154)
+PASS: LLVM :: CodeGen/MOS/zeropage.ll (62 of 154)
+PASS: LLVM :: CodeGen/MOS/imag-regalloc-spill.mir (63 of 154)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-huc6280.mir (64 of 154)
+PASS: LLVM :: MC/MOS/65816-block-move-bank-order.s (65 of 154)
+PASS: LLVM :: CodeGen/MOS/shift-rotate-chain.mir (66 of 154)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-65ce02.mir (67 of 154)
+PASS: LLVM :: MC/MOS/all-spc700-aliases.s (68 of 154)
+PASS: LLVM :: CodeGen/MOS/legalizer-65c02.mir (69 of 154)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation.mir (70 of 154)
+PASS: LLVM :: CodeGen/MOS/dbg-value-static-local.ll (71 of 154)
+PASS: LLVM :: CodeGen/MOS/finalize-isel.mir (72 of 154)
+PASS: LLVM :: MC/MOS/all-w65c02-opcodes.s (73 of 154)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-spc700.mir (74 of 154)
+PASS: LLVM :: MC/MOS/all-45gs02-opcodes.s (75 of 154)
+PASS: LLVM :: CodeGen/MOS/copy-opt-chain.mir (76 of 154)
+PASS: LLVM :: CodeGen/MOS/trivial.ll (77 of 154)
+PASS: LLVM :: MC/MOS/brk-signature.s (78 of 154)
+PASS: LLVM :: CodeGen/MOS/late-opt-65c02.mir (79 of 154)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-spc700.mir (80 of 154)
+PASS: LLVM :: CodeGen/MOS/prologepilog-ir.mir (81 of 154)
+PASS: LLVM :: CodeGen/MOS/print-int.ll (82 of 154)
+PASS: LLVM :: CodeGen/MOS/char-stats.ll (83 of 154)
+PASS: LLVM :: MC/MOS/trivial.s (84 of 154)
+PASS: LLVM :: CodeGen/MOS/no-csr.ll (85 of 154)
+PASS: LLVM :: MC/MOS/long-branches-65ce02.s (86 of 154)
+PASS: LLVM :: CodeGen/MOS/hello-world.ll (87 of 154)
+PASS: LLVM :: CodeGen/MOS/prologepilog.mir (88 of 154)
+PASS: LLVM :: CodeGen/MOS/postrapseudos.mir (89 of 154)
+PASS: LLVM :: MC/MOS/motorola-integers-default.s (90 of 154)
+PASS: LLVM :: MC/MOS/modifiers.s (91 of 154)
+PASS: LLVM :: CodeGen/MOS/store-zero.ll (92 of 154)
+PASS: LLVM :: CodeGen/MOS/static-stack.ll (93 of 154)
+PASS: LLVM :: CodeGen/MOS/inlineasm-constraint.mir (94 of 154)
+PASS: LLVM :: CodeGen/MOS/integer-compare.ll (95 of 154)
+PASS: LLVM :: MC/MOS/ophis-hello-world.s (96 of 154)
+PASS: LLVM :: MC/MOS/all-r65c02-opcodes.s (97 of 154)
+PASS: LLVM :: MC/MOS/do-zero-bss.s (98 of 154)
+PASS: LLVM :: MC/MOS/all-huc6280-opcodes.s (99 of 154)
+PASS: LLVM :: CodeGen/MOS/add-sub.ll (100 of 154)
+PASS: LLVM :: MC/MOS/all-65816-aliases.s (101 of 154)
+PASS: LLVM :: CodeGen/MOS/insert-copies.mir (102 of 154)
+PASS: LLVM :: CodeGen/MOS/legalizer-huc6280.mir (103 of 154)
+PASS: LLVM :: MC/MOS/cop-signature.s (104 of 154)
+PASS: LLVM :: MC/MOS/all-6502x-opcodes.s (105 of 154)
+PASS: LLVM :: MC/MOS/do-init-stack.s (106 of 154)
+PASS: LLVM :: MC/MOS/inst-lda.s (107 of 154)
+PASS: LLVM :: CodeGen/MOS/mos-conventional-ssa.mir (108 of 154)
+PASS: LLVM :: CodeGen/MOS/immediate-remat.ll (109 of 154)
+PASS: LLVM :: CodeGen/MOS/imag-regalloc-spill-terminators.mir (110 of 154)
+PASS: LLVM :: CodeGen/MOS/copy-opt-loop.mir (111 of 154)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-preexisting.ll (112 of 154)
+PASS: LLVM :: CodeGen/MOS/copy-opt.mir (113 of 154)
+PASS: LLVM :: CodeGen/MOS/inc-dec.ll (114 of 154)
+PASS: LLVM :: CodeGen/MOS/asm-printer.mir (115 of 154)
+PASS: LLVM :: CodeGen/MOS/ret-global-addr.ll (116 of 154)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-bra.mir (117 of 154)
+PASS: LLVM :: CodeGen/MOS/coalesce-remat.ll (118 of 154)
+PASS: LLVM :: MC/MOS/uppercase-registers.s (119 of 154)
+PASS: LLVM :: CodeGen/MOS/inc-dec-6502x.ll (120 of 154)
+PASS: LLVM :: MC/MOS/do-copy-data.s (121 of 154)
+PASS: LLVM :: CodeGen/MOS/zp-alloc.ll (122 of 154)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir.mir (123 of 154)
+PASS: LLVM :: CodeGen/MOS/combiner.mir (124 of 154)
+PASS: LLVM :: CodeGen/MOS/legalizer-ir.mir (125 of 154)
+UNSUPPORTED: LLVM :: CodeGen/MOS/getchar-regression.ll (126 of 154)
+PASS: LLVM :: MC/MOS/all-4510-opcodes.s (127 of 154)
+PASS: LLVM :: CodeGen/MOS/late-opt.mir (128 of 154)
+PASS: LLVM :: CodeGen/MOS/null-target-streamer.ll (129 of 154)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65c02.ll (130 of 154)
+PASS: LLVM :: CodeGen/MOS/frame-pointer-cfi.ll (131 of 154)
+PASS: LLVM :: MC/MOS/branch-range-matrix-bcc8.s (132 of 154)
+PASS: LLVM :: CodeGen/MOS/asm-printer-spc700.mir (133 of 154)
+PASS: LLVM :: CodeGen/MOS/mos-conventional-ssa-ties.mir (134 of 154)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-deterministic.ll (135 of 154)
+PASS: LLVM :: CodeGen/MOS/zp-indexed-store.ll (136 of 154)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-spc700.mir (137 of 154)
+PASS: LLVM :: CodeGen/MOS/light-spill.ll (138 of 154)
+PASS: LLVM :: MC/MOS/all-65el02-opcodes.s (139 of 154)
+PASS: LLVM :: MC/MOS/do-fini-array.s (140 of 154)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg.mir (141 of 154)
+PASS: LLVM :: MC/MOS/addressing-modes-65816.s (142 of 154)
+PASS: LLVM :: CodeGen/MOS/inline-asm-zp-csr.ll (143 of 154)
+PASS: LLVM :: MC/MOS/branch-range-errors.s (144 of 154)
+PASS: LLVM :: CodeGen/MOS/scavenger-65c02.mir (145 of 154)
+PASS: LLVM :: CodeGen/MOS/scavenger.mir (146 of 154)
+PASS: LLVM :: CodeGen/MOS/callee-saved-regs.ll (147 of 154)
+PASS: LLVM :: CodeGen/MOS/dp-pointer-arg.ll (148 of 154)
+PASS: LLVM :: MC/MOS/all-6502-opcodes.s (149 of 154)
+PASS: LLVM :: MC/MOS/all-spc700-opcodes.s (150 of 154)
+PASS: LLVM :: MC/MOS/all-65816-opcodes.s (151 of 154)
+PASS: LLVM :: CodeGen/MOS/imag-regalloc-assign-errors.mir (152 of 154)
+PASS: LLVM :: CodeGen/MOS/imag-regalloc-assign-tight.mir (153 of 154)
+PASS: LLVM :: CodeGen/MOS/imag-regalloc-assign.mir (154 of 154)
+
+Testing Time: 3.29s
+
+Total Discovered Tests: 154
+  Unsupported:   1 (0.65%)
+  Passed     : 153 (99.35%)

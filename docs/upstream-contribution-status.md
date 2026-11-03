@@ -833,7 +833,7 @@ Native SDK setjmp has a fix already: [current assessment](upstream-sdk-setjmp-is
   found no actionable defect. An [independent review](pr-preparations/2026-09-22/0029-claude-review.md)
   then refined the guard (reserved class members are not counted as available)
   and ran the complete X86, ARM, AArch64 and MOS suites on the revised patch with
-  assertions: no codegen failures. Those results remain scoped to September's revision. The [October 10 refresh](pr-preparations/2026-10-10/0029/README.md) uses exact upstream `0f031168a7cc`: the local standalone branch and matching-input IR/MIR red/green are complete, and 140 MOS tests pass with one unsupported. All 24 full-driver and 24 candidate-backend C checks pass; preview approval and posting remain. The [canonical record](defects/twoaddr-physreg-reschedule-exhaustion.json) migrates this existing defect. Unposted.
+  assertions: no codegen failures. Those results remain scoped to September's revision. The [October 10 refresh](pr-preparations/2026-10-10/0029/README.md) uses exact upstream `0f031168a7cc`: the local standalone branch and matching-input IR/MIR red/green are complete, and 140 MOS tests pass with one unsupported. All 24 full-driver and 24 candidate-backend C checks pass; preview approval and posting remain. The [November refresh](pr-preparations/2026-11-03/0029/README.md) repeats red/green and records 152 candidate MOS passes, one unsupported. The [canonical record](defects/twoaddr-physreg-reschedule-exhaustion.json) migrates this existing defect. Unposted.
 
 - **Newton post-RA expansion — fix prepared September 22.**
   [Patch 0030](../patches/llvm-mos/0030-mos-copy-phys-reg-liveness.patch) clears

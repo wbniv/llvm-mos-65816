@@ -11,7 +11,8 @@
       "docs/defects/evidence/**",
       "docs/transcripts/**",
       ".history/**",
-      "docs/pr-preparations/2026-10-10/0029/evidence/**"
+      "docs/pr-preparations/2026-10-10/0029/evidence/**",
+      "docs/pr-preparations/2026-11-03/0029/evidence/**"
     ]
   },
   "generated": [
@@ -78,7 +79,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "a3a5de24c0ada46b815eb85c6e4ec702da79a06a7cbd72cbaf6b45597cc1f330",
+          "docs/upstream-dashboard-curation.json": "8365f2d4324b5ffb5c0c84b8ceef3bbe2a9aca300b249dbc303939df52febaf3",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -121,11 +122,11 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "0fe97bab63ba3f6aab5ae5e59072bb32e7100439478bd1f249eef5441c813497",
           "docs/defects/shift64-narrow-count.json": "f838d2f297cd5723db603e66c195b8cf870af624c52b74203b2f0510afd834c6",
           "docs/defects/snes-soft-stack-static-data-collision.json": "f271d6cb0cfeb0da676a4e59e4a647a0d0f1b82e6a59b8a64acfee824858afe8",
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886",
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58",
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "a8f69dc6b8c8a6a366010c5e88fbc790a277709f0dece17e65e6a95726555ec9"
+          "docs/upstream-dashboard.json": "99f267e8aa78300fea339b7c7a83aafa163dca3053bd255f241d754c72113585"
         }
       }
     },
@@ -146,13 +147,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "d61f17b427defff9da68e44ee080f54c1e8541f87f05ae86ebfbf5d36a24473e",
+          "docs/upstream-pending-work.md": "04d723613aceeaaf5968fd0358a795ac926f3a2c18b4f4aa0f9b0d47a2e0b3e9",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "a8f69dc6b8c8a6a366010c5e88fbc790a277709f0dece17e65e6a95726555ec9",
+          "docs/upstream-dashboard.json": "99f267e8aa78300fea339b7c7a83aafa163dca3053bd255f241d754c72113585",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "9a02534b05c72c59f50e255c2c12fe19c43c14d1e054217a31867081c6f3561e"
+          "docs/upstream-dashboard-graph.json": "c37a1a58019e9e3d5aff0a7f5c695bf5e95fa3b8efa4584ef07b37993b0a6da7"
         }
       }
     },
@@ -270,11 +271,11 @@
       "id": "twoaddr-physreg-current-pr-preview",
       "sources": [
         "docs/upstream-twoaddr-physreg-reschedule-pr.md",
-        "docs/pr-preparations/2026-10-10/0029/0029-llvm-mos.patch",
-        "docs/pr-preparations/2026-10-10/0029/README.md",
+        "docs/pr-preparations/2026-11-03/0029/0029-llvm-mos.patch",
+        "docs/pr-preparations/2026-11-03/0029/README.md",
         "dev/pr-preview.py",
         "docs/pr-preparations/2026-09-22/0029-pr-preview.html",
-        "docs/pr-preparations/2026-10-10/0029-pr-aside.html",
+        "docs/pr-preparations/2026-10-10/0029-pr-aside-20261103.html",
         "docs/pr-preparations/2026-10-10/0029-pr-review.html",
         "docs/pr-preparations/2026-10-10/0029-pr-validation.html"
       ],
@@ -289,13 +290,13 @@
         "--md",
         "docs/upstream-twoaddr-physreg-reschedule-pr.md",
         "--patch",
-        "docs/pr-preparations/2026-10-10/0029/0029-llvm-mos.patch",
+        "docs/pr-preparations/2026-11-03/0029/0029-llvm-mos.patch",
         "--number",
         "0029",
         "--notice",
         "Current-base standalone refresh; backend, C matrix and MOS checks pass. September cross-target evidence remains dated. Ready for preview review; not submitted.",
         "--aside",
-        "docs/pr-preparations/2026-10-10/0029-pr-aside.html",
+        "docs/pr-preparations/2026-10-10/0029-pr-aside-20261103.html",
         "--out",
         "docs/pr-preparations/2026-10-10/0029-pr-preview.html",
         "--review",
@@ -305,17 +306,17 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "a6597fe5631ec613d45e40b249e82a0eba5a1c4e2b31fb2e039a82c635c904b7",
-          "docs/pr-preparations/2026-10-10/0029/0029-llvm-mos.patch": "b23e89e727e40eea3cc62fcce7a516b7bafe763d8d16bb3fc5a7e1b024a00f82",
-          "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
+          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "c7df224d388b0f41c1e51d92d18821ee34fdc84b11b9e1573c396942156f4014",
+          "docs/pr-preparations/2026-11-03/0029/0029-llvm-mos.patch": "420b043765dd21e673915dc726bb025355d47a49eb5582c02fdda2b0b0ca39c0",
+          "docs/pr-preparations/2026-11-03/0029/README.md": "69d46b36c29c4a62331f939ab5bc3ab7f83b3ffad311aea404d35cfb8d2fbdd9",
           "dev/pr-preview.py": "af31cf2ebb32f361db3527985e2122c4aeb670d47230ea572489a52a64e77577",
           "docs/pr-preparations/2026-09-22/0029-pr-preview.html": "729944225d3ddade3ac87463e9889fc135d0f0a20e8c3970b513cb93b083858f",
-          "docs/pr-preparations/2026-10-10/0029-pr-aside.html": "1ceb9afc78174eab5966d39ed8bca67c63267cab2335a6c98e699da502ec17fc",
+          "docs/pr-preparations/2026-10-10/0029-pr-aside-20261103.html": "03d21bdf9d2c2518512f4f9cbd4073530bb33f639121d5cb1235427a25c40ebe",
           "docs/pr-preparations/2026-10-10/0029-pr-review.html": "b21ff71253418b87393ccc0a3a73a07e8b6d60fb8b49ef505765bd5b72ed656b",
           "docs/pr-preparations/2026-10-10/0029-pr-validation.html": "2a03dd885fb2ae6f283c4a04e06fd57f834c7c39807379a744e5c180e047a613"
         },
         "outputs": {
-          "docs/pr-preparations/2026-10-10/0029-pr-preview.html": "44c1759b5661cebbd8103c27f3d754af56822b7317e640ac2ef4848f33f47aaf"
+          "docs/pr-preparations/2026-10-10/0029-pr-preview.html": "92a71369c237460e5285efd29f625f5cf92457dc0bbbafb5dc8ebbebe676ef9b"
         }
       }
     }
@@ -421,7 +422,7 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/defects/snes-soft-stack-static-data-collision.json": "675a45b8fc43e4b13400e543d8a2c70f8cc9d2c3e7eece96bd1f28f51aae49fa",
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886",
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
@@ -458,11 +459,11 @@
           "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
           "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9",
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "a6597fe5631ec613d45e40b249e82a0eba5a1c4e2b31fb2e039a82c635c904b7"
+          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "c7df224d388b0f41c1e51d92d18821ee34fdc84b11b9e1573c396942156f4014"
         },
-        "reviewed_at": "2026-10-29T05:24:20.364508+00:00",
-        "note": "Reviewed October 29 PR status and fork destination: #604 merged with green CI, #415 closed unmerged; its unchanged author fork remains a potential SNES-only contribution target, and #594 is unchanged. Current summaries and queue updated; dated snapshots preserved.",
-        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
+        "reviewed_at": "2026-11-03T05:57:54.481290+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -556,7 +557,7 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/defects/snes-soft-stack-static-data-collision.json": "675a45b8fc43e4b13400e543d8a2c70f8cc9d2c3e7eece96bd1f28f51aae49fa",
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886",
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "91c2ccb804247cd027e9c13b82a83219fba19b8ae16c08db436bd94ad7d8d03a",
@@ -586,13 +587,13 @@
           "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
           "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9",
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "a6597fe5631ec613d45e40b249e82a0eba5a1c4e2b31fb2e039a82c635c904b7",
+          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "c7df224d388b0f41c1e51d92d18821ee34fdc84b11b9e1573c396942156f4014",
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621",
           "docs/open-source-dashboard-publication.md": "42dcb93d18dd6abd407a9c8c9834afa2312f72568166cdd851c159a2d499a102"
         },
-        "reviewed_at": "2026-10-29T05:24:17.660485+00:00",
-        "note": "Reviewed October 29 PR status and fork destination: #604 merged with green CI, #415 closed unmerged; its unchanged author fork remains a potential SNES-only contribution target, and #594 is unchanged. Current summaries and queue updated; dated snapshots preserved.",
-        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
+        "reviewed_at": "2026-11-03T05:57:55.414419+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -687,7 +688,7 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/defects/snes-soft-stack-static-data-collision.json": "675a45b8fc43e4b13400e543d8a2c70f8cc9d2c3e7eece96bd1f28f51aae49fa",
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886",
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "91c2ccb804247cd027e9c13b82a83219fba19b8ae16c08db436bd94ad7d8d03a",
@@ -713,18 +714,18 @@
           "docs/pr-preparations/2026-10-10/sdk450-publication/publication.json": "b44d66a019386a7188d40ffd81e5c11561a6e34def9c2d01473d1e0fafa124a9",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/README.md": "efbf5e5c0f045a429fd744c0d7fe675abe0809015ecb1b4948766e39ced7c262",
           "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28",
-          "docs/upstream-pending-work.md": "d61f17b427defff9da68e44ee080f54c1e8541f87f05ae86ebfbf5d36a24473e",
+          "docs/upstream-pending-work.md": "04d723613aceeaaf5968fd0358a795ac926f3a2c18b4f4aa0f9b0d47a2e0b3e9",
           "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7",
           "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
           "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9",
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "a6597fe5631ec613d45e40b249e82a0eba5a1c4e2b31fb2e039a82c635c904b7",
+          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "c7df224d388b0f41c1e51d92d18821ee34fdc84b11b9e1573c396942156f4014",
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621",
           "docs/open-source-dashboard-publication.md": "42dcb93d18dd6abd407a9c8c9834afa2312f72568166cdd851c159a2d499a102"
         },
-        "reviewed_at": "2026-10-29T05:24:17.648680+00:00",
-        "note": "Reviewed October 29 PR status and fork destination: #604 merged with green CI, #415 closed unmerged; its unchanged author fork remains a potential SNES-only contribution target, and #594 is unchanged. Current summaries and queue updated; dated snapshots preserved.",
-        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
+        "reviewed_at": "2026-11-03T05:57:55.639653+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -1802,11 +1803,11 @@
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/pr-preparations/2026-10-10/0029-pr-preview.html": "44c1759b5661cebbd8103c27f3d754af56822b7317e640ac2ef4848f33f47aaf"
+          "docs/pr-preparations/2026-10-10/0029-pr-preview.html": "92a71369c237460e5285efd29f625f5cf92457dc0bbbafb5dc8ebbebe676ef9b"
         },
-        "reviewed_at": "2026-10-10T13:31:21.385106+00:00",
-        "note": "Reviewed the regenerated final October 10 0029 preview, its identical standalone patch and complete C/backend/MOS results. Existing demo registry links correctly put the current preview first while preserving the September view. The review guide current qualification matches 24 full-driver and 24 candidate-backend passes, 140 MOS passes and one unsupported; dated independent and cross-target evidence remains unchanged. Only generated preview bytes changed after the earlier substantive review.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-11-03T05:53:06.476238+00:00",
+        "note": "Reviewed the 0029 contribution and byvaledge demo entries against the regenerated preview: the current preview path and original September preview remain valid, the demonstration is cited as provenance, and the guide identifies the November results while retaining October and September as dated evidence.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -1964,12 +1965,12 @@
           "docs/pr-preparations/2026-10-10/sjlj-restoration/publication.json": "c70c9ab06f9f35fcf21ab6de45702d07b0d9f6c1c568859ba74b19bdda425a28",
           "docs/upstream-status/2026-10-10-sjlj-merges.json": "221cd1d3ffd60501d4722dd64b53031a0fa1119a6f0777a5edbfa1252e5e47e7",
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "a6597fe5631ec613d45e40b249e82a0eba5a1c4e2b31fb2e039a82c635c904b7",
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886"
+          "docs/upstream-twoaddr-physreg-reschedule-pr.md": "c7df224d388b0f41c1e51d92d18821ee34fdc84b11b9e1573c396942156f4014",
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58"
         },
-        "reviewed_at": "2026-10-29T05:24:18.749387+00:00",
-        "note": "Reviewed October 29 PR status and fork destination: #604 merged with green CI, #415 closed unmerged; its unchanged author fork remains a potential SNES-only contribution target, and #594 is unchanged. Current summaries and queue updated; dated snapshots preserved.",
-        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
+        "reviewed_at": "2026-11-03T05:57:56.830374+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -2238,11 +2239,11 @@
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "ad90248ddcdfeaaa050874ac485467d611969dfe76637c080c157224f9bc47c4",
           "docs/upstream-status/2026-10-09.json": "1586a0490fbe1ff42604b24666f11c0c5e0e78a03571fd31a24c26b6533aa981",
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/pr-preparations/2026-10-10/0029-pr-preview.html": "44c1759b5661cebbd8103c27f3d754af56822b7317e640ac2ef4848f33f47aaf"
+          "docs/pr-preparations/2026-10-10/0029-pr-preview.html": "92a71369c237460e5285efd29f625f5cf92457dc0bbbafb5dc8ebbebe676ef9b"
         },
-        "reviewed_at": "2026-10-10T13:31:22.224098+00:00",
-        "note": "Reviewed the regenerated final October 10 0029 preview, its identical standalone patch and complete C/backend/MOS results. Existing demo registry links correctly put the current preview first while preserving the September view. The review guide current qualification matches 24 full-driver and 24 candidate-backend passes, 140 MOS passes and one unsupported; dated independent and cross-target evidence remains unchanged. Only generated preview bytes changed after the earlier substantive review.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-11-03T05:53:07.131397+00:00",
+        "note": "Reviewed the 0029 contribution and byvaledge demo entries against the regenerated preview: the current preview path and original September preview remain valid, the demonstration is cited as provenance, and the guide identifies the November results while retaining October and September as dated evidence.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -2894,12 +2895,12 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "f1b48c53ccb6120640854f6f8f623ecb5b5f910f4a8ba93bee649d7943fead67",
+          "TODO.md": "2232953db634fe48982cf020948902fea7dcdcac6f24c0e1dbd376ad94b7ca80",
           "AGENTS.md": "20706bc2938b284eb6b4098326e59ef61de3292ba824a39b99f75cc444cf3621"
         },
-        "reviewed_at": "2026-10-29T05:18:53.681424+00:00",
-        "note": "Reviewed #604 merge and green CI, #415 unmerged closure and reconciliation route, #594 unchanged draft, and newer related compiler merges. Curation and trackers updated; publication workflow still requires compiler push before site publish.",
-        "attribution": "OpenAI Codex app-server 0.165.0, exact model unknown (GPT-6 family), reasoning effort unknown; session 01a18610-f63c-7dc0-9480-0d58d1a8f067"
+        "reviewed_at": "2026-11-03T05:47:19.936514+00:00",
+        "note": "Reviewed the public publication workflow against the changed 0029 TODO entry: compiler commit and push precede site publication. Reviewed the October re-pin record against the new standalone 0029 run: the downstream pin is unchanged and its dated validation remains scoped to that pin.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -3086,11 +3087,11 @@
           "docs/test-results/repin/2026-10-10/full-validation.json": "576260104d1fe6c3a003bfe09a5623053f7daa15542aab15789e5fa92e1cb020",
           "docs/upstream-status/repin-20261010T033430Z-ardhs7qy.json": "79708391680b601d54ae4b390a153e46f2cea4452f22b02052d2c5e66a1eeed9",
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/pr-preparations/2026-10-10/0029-pr-preview.html": "44c1759b5661cebbd8103c27f3d754af56822b7317e640ac2ef4848f33f47aaf"
+          "docs/pr-preparations/2026-10-10/0029-pr-preview.html": "92a71369c237460e5285efd29f625f5cf92457dc0bbbafb5dc8ebbebe676ef9b"
         },
-        "reviewed_at": "2026-10-10T13:31:23.057095+00:00",
-        "note": "Reviewed the regenerated final October 10 0029 preview, its identical standalone patch and complete C/backend/MOS results. Existing demo registry links correctly put the current preview first while preserving the September view. The review guide current qualification matches 24 full-driver and 24 candidate-backend passes, 140 MOS passes and one unsupported; dated independent and cross-target evidence remains unchanged. Only generated preview bytes changed after the earlier substantive review.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-11-03T05:53:07.807940+00:00",
+        "note": "Reviewed the 0029 contribution and byvaledge demo entries against the regenerated preview: the current preview path and original September preview remain valid, the demonstration is cited as provenance, and the guide identifies the November results while retaining October and September as dated evidence.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -3240,11 +3241,11 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "0fe97bab63ba3f6aab5ae5e59072bb32e7100439478bd1f249eef5441c813497",
           "docs/defects/shift64-narrow-count.json": "f838d2f297cd5723db603e66c195b8cf870af624c52b74203b2f0510afd834c6",
           "docs/defects/snes-soft-stack-static-data-collision.json": "f271d6cb0cfeb0da676a4e59e4a647a0d0f1b82e6a59b8a64acfee824858afe8",
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886"
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58"
         },
-        "reviewed_at": "2026-10-10T18:02:51.392722+00:00",
-        "note": "The re-pin plan describes pin validation; the SPC700 record stays confirmed and the change does not affect the pin or its patch stack.",
-        "attribution": "Claude Code 2.1.296 t4-opus-high agent, model claude-opus-5-5, high reasoning effort; session https://claude.ai/code/session_012Tm5osWxSMUvv28Uw7nudx"
+        "reviewed_at": "2026-11-03T05:57:58.510656+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -3268,15 +3269,15 @@
           "docs/pr-preparations/2026-10-10/0029/evidence/baseline-backend.json": "5d5d019e3f800100be7263be6dbebb59fa59f8e43302b94ec92090679bb46e06",
           "docs/pr-preparations/2026-10-10/0029/evidence/baseline-coverage-backend.json": "6380ae34281fa17b8c26eefa2e1f6ea8b726cefca77913e0b44b41bef73ce3ad",
           "docs/pr-preparations/2026-10-10/0029/evidence/candidate-mos-lit.log": "7a3926c0bcb4deae9bda30cb5a886e31bf14c1a70d4be121fe6418dbf8e47fd6",
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886",
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58",
           "docs/pr-preparations/2026-10-10/0029/evidence/current-c-matrix.json": "2f89f4918f28e862515a4506e9ed1e6bf04058e2652765ca674f17b2dc63e2ef",
           "docs/pr-preparations/2026-10-10/0029/evidence/build-metadata.json": "0e15bf0c29cc8197d0523ecfea6ac019eb219ffcca6cb28e4449dfdcf6705952",
           "docs/pr-preparations/2026-10-10/0029/evidence/candidate-CMakeCache.txt": "9de298ccda1575b15cf24eb361c4defb3aa242a9958ed5be0ab794622cb847ee",
           "docs/pr-preparations/2026-10-10/0029/evidence/upstream-final-recheck.json": "7ec370c6d7f96b24d3d6eb88e7623a703223a72438bf0bfa1916caabdbe1377b"
         },
-        "reviewed_at": "2026-10-10T13:26:53.026011+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-11-03T05:58:00.273857+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -3288,25 +3289,29 @@
         "sources": {
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01"
         },
-        "reviewed_at": "2026-10-10T13:26:53.026087+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-11-03T05:45:08.196007+00:00",
+        "note": "Reviewed the 0029 status and evidence links against the November 3 exact-main packet, 71-check red/green results, MOS suites, C matrix, allocator review, and unposted status. Earlier cross-target and October evidence remain dated; demo links remain intact. The allocator comparison retains the raw annotation differences and normalized result.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
       "document": "docs/upstream-twoaddr-physreg-reschedule-pr.md",
       "sources": [
         "docs/pr-preparations/2026-10-10/0029/README.md",
-        "docs/pr-preparations/2026-10-10/0029/0029-llvm-mos.patch"
+        "docs/pr-preparations/2026-10-10/0029/0029-llvm-mos.patch",
+        "docs/pr-preparations/2026-11-03/0029/README.md",
+        "docs/pr-preparations/2026-11-03/0029/0029-llvm-mos.patch"
       ],
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/pr-preparations/2026-10-10/0029/0029-llvm-mos.patch": "b23e89e727e40eea3cc62fcce7a516b7bafe763d8d16bb3fc5a7e1b024a00f82"
+          "docs/pr-preparations/2026-10-10/0029/0029-llvm-mos.patch": "b23e89e727e40eea3cc62fcce7a516b7bafe763d8d16bb3fc5a7e1b024a00f82",
+          "docs/pr-preparations/2026-11-03/0029/README.md": "69d46b36c29c4a62331f939ab5bc3ab7f83b3ffad311aea404d35cfb8d2fbdd9",
+          "docs/pr-preparations/2026-11-03/0029/0029-llvm-mos.patch": "420b043765dd21e673915dc726bb025355d47a49eb5582c02fdda2b0b0ca39c0"
         },
-        "reviewed_at": "2026-10-10T13:26:53.026139+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-11-03T05:45:11.296820+00:00",
+        "note": "Reviewed the 0029 status and evidence links against the November 3 exact-main packet, 71-check red/green results, MOS suites, C matrix, allocator review, and unposted status. Earlier cross-target and October evidence remain dated; demo links remain intact. The allocator comparison retains the raw annotation differences and normalized result.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -3318,11 +3323,11 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01",
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886"
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58"
         },
-        "reviewed_at": "2026-10-10T13:26:53.026200+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-11-03T05:58:00.273923+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     },
     {
@@ -3333,12 +3338,28 @@
       ],
       "receipt": {
         "sources": {
-          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "99bd9e017ace533474fa653bb9476abf5d67c8ef8de5fe5ea34e1e2cc7514886",
+          "docs/defects/twoaddr-physreg-reschedule-exhaustion.json": "a9b3a6471b62bd299aac999651b650ba858e3a2b5e1b44cbb4fe0de89a1aae58",
           "docs/pr-preparations/2026-10-10/0029/README.md": "5a1a4e6279918c8a052394cbfff94242d8eb5b05d27636da2a480ab712e20e01"
         },
-        "reviewed_at": "2026-10-10T13:26:53.026259+00:00",
-        "note": "Reviewed current 0029 branch, unchanged guard, exact 0f031168a7cc entry/caller contract, matching-input IR/MIR red/green and 140 MOS passes / one unsupported. Reviewed all 85 current C matrix commands and diagnostics: 24 full candidate driver and 24 candidate backend passes, four O0 baseline passes, 20 optimized baseline register-exhaustion failures using identical emitted IR. Exact upstream base rechecked after build. Current checklists, prose and flowchart now mark branch/backend/C checks complete and retain preview approval and unposted PR. The baseline shares the unchanged candidate frontend; it is not a pristine Clang driver rebuild. The guard description states conservative class availability rather than claiming every rejected move necessarily fails allocation. Shared-hook verification reminder is consolidated in T5; full recorded validation is now PASS. September full cross-target/assertion/runtime results and original discovery dates remain dated. Canonical migration reuses sub:0029; registry preview links preserve the dated view and identify the current view. Documentary source bytes and original audit are preserved with explicit filename-location metadata. Reviewed generic project, completed re-pin and September packet follow-ups against this scope; unrelated fixes and #320/#321 holds are unchanged. Standing website-publication instruction is now at the top of both trackers, in AGENTS and in the publication workflow: push compiler docs, run the publisher, verify the live page.",
-        "attribution": "OpenAI Codex CLI 0.162.0; model gpt-6.1-sol; medium reasoning effort; verified session 01a1208b-91e0-7e33-b5bf-8787d2a9c919"
+        "reviewed_at": "2026-11-03T05:58:00.273963+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
+      }
+    },
+    {
+      "document": "docs/investigations/2026-11-03-pr627-pr628-review.md",
+      "sources": [
+        "docs/pr-preparations/2026-11-03/0029/manifest.json",
+        "docs/pr-preparations/2026-11-03/0029/README.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-11-03/0029/manifest.json": "27b6066a7140d467eaf716670566471ada7b4a695beda96ca45c75856517906a",
+          "docs/pr-preparations/2026-11-03/0029/README.md": "69d46b36c29c4a62331f939ab5bc3ab7f83b3ffad311aea404d35cfb8d2fbdd9"
+        },
+        "reviewed_at": "2026-11-03T05:58:00.562731+00:00",
+        "note": "Reviewed the added provenance and source identities against the existing November 3 results: the canonical defect status, downstream pin, unposted submission and recorded 0029 and allocator outcomes are unchanged. The historical packet and earlier credits remain intact.",
+        "attribution": "OpenAI Codex CLI 0.166.0; GPT-6 exact model ID unknown; reasoning effort unknown"
       }
     }
   ]

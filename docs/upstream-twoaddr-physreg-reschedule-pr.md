@@ -29,13 +29,13 @@ Conservatively require an unreserved class member outside the newly live physica
 
 Add a MIR test covering the accumulator argument, an intervening constrained index, and a legal copy into `$x` with a GPR temporary that has other allocation choices, using LiveIntervals and a separate no-analysis ordering control. Allocate the LiveIntervals output to check the resulting schedule. Add an IR test for the mixed-width call through full code generation at `-O1`, `-O2`, and `-O3`.
 
-Validated against llvm-mos `0f031168a7cc8e81b7b40c0ec0b1f7b3c90b8a63`, checked as upstream `main` on October 10, with only this standalone compiler patch applied:
+Validated against llvm-mos `a5c31b24a97cc16c582d124167e29e3da8946581`, checked as upstream `main` on November 3, with only this standalone compiler patch applied:
 
 - The unchanged C-derived IR fails on the retained unpatched backend at `-O1`, `-O2` and `-O3` with register exhaustion, and passes with the guard. `-O0` passes on both.
 - The MIR LiveIntervals ordering checks fail before the guard, and allocation of that output fails in the accumulator and intervening-index cases. Both checks pass with the guard; the legal move with spare class members remains permitted.
-- Complete MOS CodeGen/MC suites: 140 passed, one unsupported, no failures; Release build with assertions and LTO disabled.
+- Complete MOS CodeGen/MC suites: 152 passed, one unsupported, no failures; Release build with assertions and LTO disabled. Baseline: 150 passed, one unsupported.
 
-Current C compilation matrix: `mos6502` and `mosw65816`, O0/O1/O2/O3/Os/Oz, with and without the machine verifier. All 24 candidate full-driver compilations and 24 candidate-backend runs pass. The unchanged candidate frontend emits each IR input once for both backends: the preserved unpatched backend passes the four O0 runs and fails all 20 optimized runs with register exhaustion. This split-pipeline baseline is not a separately rebuilt pristine current-base Clang driver.
+Current C compilation matrix: `mos6502` and `mosw65816`, O0/O1/O2/O3/Os/Oz, with and without the machine verifier. All 24 candidate full-driver compilations and 24 candidate-backend runs pass. The rebuilt baseline and candidate frontends emit byte-identical IR for all 12 CPU/optimization combinations; those inputs are also checked against both backends: the preserved unpatched backend passes the four O0 runs and fails all 20 optimized runs with register exhaustion. This split-pipeline baseline is not a separately rebuilt pristine current-base Clang driver.
 
 The original September 22 standalone validation on `742d554bf080` also passed the six-level C matrix and the complete assertion-enabled X86/ARM/AArch64 suites (11,436 passed, 23 expected failures). Those are dated results; other backends, runtime behavior and compile-time benchmarks have not been revalidated on the current base.
 
@@ -46,3 +46,5 @@ Assisted-by: OpenAI Codex CLI 0.155.1, model `gpt-6-astra`, xhigh reasoning effo
 Assisted-by: Claude Code CLI 2.1.278, model `claude-fable-5-1`, high reasoning effort, for the original independent review, reserved-register refinement and full-suite validation.
 
 Assisted-by: OpenAI Codex CLI 0.162.0, model `gpt-6.1-sol`, medium reasoning effort, for the October 10 exact-upstream reconciliation, standalone branch refresh, regression coverage, retained red/green evidence and PR preparation.
+
+Assisted-by: OpenAI Codex CLI 0.166.0, GPT-6 exact model ID unknown, reasoning effort unknown, for the November 3 validation continuation and evidence packet.

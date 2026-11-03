@@ -1,0 +1,23 @@
+{
+  "phase": "main",
+  "checks": 21,
+  "unexpected": [
+    {
+      "name": "undef-normalize",
+      "command": [
+        "/work/build/repin/20261010T033430Z-ardhs7qy/build-source-3rl8r2dw/bin/llc",
+        "-mtriple=mos",
+        "-run-pass=mos-conventional-ssa",
+        "-verify-machineinstrs",
+        "/review/inputs/boundary-probes.mir",
+        "-o",
+        "-"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "expected_signature": null,
+      "pass": false,
+      "semantic_exit": 1
+    }
+  ]
+}
